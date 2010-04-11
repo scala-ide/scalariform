@@ -1,0 +1,35 @@
+import sbt._
+
+class Project(info: ProjectInfo) extends ParentProject(info) {
+
+  lazy val main = project("core", "core", new CoreProject(_))
+  lazy val gui = project("gui", "gui", new GuiProject(_), main)
+  lazy val corpusScan = project("corpusscan", "corpusscan", new CorpusScanProject(_), main)
+
+  class CoreProject(info: ProjectInfo) extends DefaultProject(info) {
+
+    override def artifactID = "scalariform"
+
+    val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
+    val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
+    val scalatest = "org.scalatest" % "scalatest" % "1.0.1-for-scala-2.8.0.Beta1-with-test-interfaces-0.3-SNAPSHOT"
+    //val scalatest = "org.scalatest" % "scalatest" % "1.0-for-2.8-with-test-interfaces-0.1-SNAPSHOT"
+  }
+
+  class CorpusScanProject(info: ProjectInfo) extends DefaultProject(info) {
+
+    val commonsIo = "commons-io" % "commons-io" % "1.4" 
+
+    override def mainClass = Some("scalariform.corpusscan.Runner")
+    
+  }
+
+  class GuiProject(info: ProjectInfo) extends DefaultProject(info) {
+
+    val miglayout = "com.miglayout" % "miglayout" % "3.7.1" 
+
+    override def mainClass = Some("scalariform.gui.Main")
+
+  }
+}
+

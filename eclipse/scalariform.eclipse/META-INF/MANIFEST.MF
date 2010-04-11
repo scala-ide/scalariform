@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scalariform for Eclipse
+Bundle-SymbolicName: scalariform.eclipse;singleton:=true
+Bundle-Version: 0.0.1
+Require-Bundle: 
+ scalariform;bundle-version="0.0.1",
+ ch.epfl.lamp.sdt.core;bundle-version="2.8.0",
+ scala.library,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.text,
+ org.eclipse.ui,
+ org.eclipse.ui.editors
+Import-Package: 
+ scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor;apply-aspects:=false
+Bundle-ClassPath: .
+Export-Package: scala.tools.eclipse.formatter
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: scala.tools.eclipse.formatter.ScalaFormatterPlugin

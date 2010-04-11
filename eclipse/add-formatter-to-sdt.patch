@@ -1,0 +1,201 @@
+Index: plugin.xml
+===================================================================
+--- plugin.xml	(revision 21352)
++++ plugin.xml	(working copy)
+@@ -27,7 +27,15 @@
+             id="ch.epfl.lamp.sdt.core.preferences.CompilerPreferences"
+             name="Scala Compiler Preferences">
+       </page>
++      <page
++            category="ch.epfl.lamp.sdt.core.preferences"
++            class="scala.tools.eclipse.formatter.FormatterPreferencePage"
++            id="scala.tools.eclipse.formatter.FormatterPreferencePage"
++            name="Scala Formatter Preferences">
++      </page>
+    </extension>
++  
++   
+   <extension point="org.eclipse.core.runtime.contentTypes">
+     <content-type id="scala.tools.eclipse.scalaSource" name="Scala Source File" 
+       base-type="org.eclipse.core.runtime.text"
+@@ -482,6 +490,9 @@
+      <initializer
+            class="scala.tools.eclipse.properties.ScalaCompilerPreferenceInitializer">
+      </initializer>
++     <initializer
++           class="scala.tools.eclipse.formatter.ScalaFormatterPreferenceInitializer">
++     </initializer>
+   </extension>
+ 
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
+Index: src/scala/tools/eclipse/ScalaSourceViewerConfiguration.scala
+===================================================================
+--- src/scala/tools/eclipse/ScalaSourceViewerConfiguration.scala	(revision 21228)
++++ src/scala/tools/eclipse/ScalaSourceViewerConfiguration.scala	(working copy)
+@@ -15,6 +15,7 @@
+ import org.eclipse.jdt.ui.text.{ JavaSourceViewerConfiguration, IJavaPartitions }
+ import org.eclipse.jface.preference.IPreferenceStore
+ import org.eclipse.jface.text.{ IAutoEditStrategy, IDocument, ITextHover }
++import org.eclipse.jface.text.formatter.ContentFormatter
+ import org.eclipse.jface.text.contentassist.ContentAssistant
+ import org.eclipse.jface.text.hyperlink.IHyperlinkDetector
+ import org.eclipse.jface.text.presentation.PresentationReconciler
+@@ -24,6 +25,7 @@
+ 
+ import scala.tools.eclipse.ui.{ JdtPreferenceProvider, ScalaAutoIndentStrategy, ScalaIndenter }
+ import scala.tools.eclipse.util.ReflectionUtils
++import scala.tools.eclipse.formatter.ScalaFormattingStrategy
+ 
+ class ScalaSourceViewerConfiguration(store : IPreferenceStore, editor : ITextEditor) 
+   extends JavaSourceViewerConfiguration(JavaPlugin.getDefault.getJavaTextTools.getColorManager, store, editor, IJavaPartitions.JAVA_PARTITIONING) {
+@@ -121,6 +123,14 @@
+       return Array(new ScalaAutoIndentStrategy(partitioning, getProject, sourceViewer, new JdtPreferenceProvider(getProject)))
+     }
+   }
++  
++  override def getContentFormatter(sourceViewer: ISourceViewer) = {
++	val contentFormatter = new ContentFormatter
++    contentFormatter.enablePartitionAwareFormatting( false );
++    contentFormatter.setFormattingStrategy(new ScalaFormattingStrategy(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE)
++	contentFormatter
++  }
++  
+ }
+ 
+ object ScalaSourceViewerConfigurationUtils extends ReflectionUtils {
+Index: src/scala/tools/eclipse/formatter/FormatterPreferencePage.scala
+===================================================================
+--- src/scala/tools/eclipse/formatter/FormatterPreferencePage.scala	(revision 0)
++++ src/scala/tools/eclipse/formatter/FormatterPreferencePage.scala	(revision 0)
+@@ -0,0 +1,50 @@
++package scala.tools.eclipse.formatter
++import org.eclipse.ui._
++import org.eclipse.jface.preference._
++import scalariform.formatter._
++import scalariform.formatter.preferences._
++import scala.tools.eclipse.ScalaPlugin
++
++class FormatterPreferencePage extends FieldEditorPreferencePage with IWorkbenchPreferencePage {
++  import FormatterPreferencePage._
++  setPreferenceStore(ScalaPlugin.plugin.getPreferenceStore)
++
++  def init(workbench: IWorkbench) {}
++
++  override def createFieldEditors() {
++
++    for (preference ← AllPreferences.preferences) {
++      val preferenceType = preference.preferenceType
++      preferenceType match {
++        case BooleanPreference ⇒
++          val field = new BooleanFieldEditor(prefix + preference.key, preference.description, org.eclipse.swt.SWT.NONE, getFieldEditorParent())
++          addField(field)
++        case IntegerPreference(min, max) ⇒
++          val field = new IntegerFieldEditor(prefix + preference.key, preference.description, getFieldEditorParent())
++          field.setValidRange(min, max)
++          addField(field)
++      }
++    }
++  }
++}
++
++object FormatterPreferencePage {
++
++  val prefix = "scala.tools.eclipse.formatter."
++
++  def getPreferences() = {
++    val preferenceStore = ScalaPlugin.plugin.getPreferenceStore
++    var preferences: IFormattingPreferences = FormattingPreferences()
++
++    for (preference ← AllPreferences.preferences) {
++      preference.preferenceType match {
++        case prefType@BooleanPreference ⇒
++          preferences = preferences.setPreference(prefType.cast(preference), preferenceStore.getBoolean(prefix + preference.key))
++        case prefType@IntegerPreference(_, _) ⇒
++          preferences = preferences.setPreference(prefType.cast(preference), preferenceStore.getInt(prefix + preference.key))
++      }
++    }
++    preferences
++  }
++
++}
+Index: src/scala/tools/eclipse/formatter/ScalaFormatterPreferenceInitializer.scala
+===================================================================
+--- src/scala/tools/eclipse/formatter/ScalaFormatterPreferenceInitializer.scala	(revision 0)
++++ src/scala/tools/eclipse/formatter/ScalaFormatterPreferenceInitializer.scala	(revision 0)
+@@ -0,0 +1,25 @@
++package scala.tools.eclipse.formatter
++
++import org.eclipse.core.runtime.preferences.{ AbstractPreferenceInitializer, DefaultScope }
++
++import scala.tools.eclipse.ScalaPlugin
++import scalariform.formatter._
++import scalariform.formatter.preferences._
++
++class ScalaFormatterPreferenceInitializer extends AbstractPreferenceInitializer {
++
++  def initializeDefaultPreferences(): Unit =
++    ScalaPlugin.plugin.check {
++      val preferenceStore = ScalaPlugin.plugin.getPluginPreferences
++      for {
++        preference ← AllPreferences.preferences
++        val key = FormatterPreferencePage.prefix + preference.key
++      } preference.preferenceType match {
++        case prefType@BooleanPreference ⇒
++          preferenceStore.setDefault(key, prefType.cast(preference).defaultValue)
++        case prefType@IntegerPreference(_, _) ⇒
++          preferenceStore.setDefault(key, prefType.cast(preference).defaultValue)
++      }
++
++    }
++}
+Index: src/scala/tools/eclipse/formatter/ScalaFormattingStrategy.scala
+===================================================================
+--- src/scala/tools/eclipse/formatter/ScalaFormattingStrategy.scala	(revision 0)
++++ src/scala/tools/eclipse/formatter/ScalaFormattingStrategy.scala	(revision 0)
+@@ -0,0 +1,45 @@
++package scala.tools.eclipse.formatter
++
++import org.eclipse.jface.text.formatter.IFormattingStrategy
++import org.eclipse.jface.text.source.ISourceViewer
++import scalariform.parser.ScalaParserException
++import scalariform.formatter.ScalaFormatter
++import scalariform.formatter.preferences.FormattingPreferences
++import scalariform.utils.TextEdit
++import org.eclipse.text.undo.DocumentUndoManagerRegistry
++import org.eclipse.text.edits.{ TextEdit ⇒ JFaceTextEdit, _ }
++import org.eclipse.jface.text.{ IDocument, TextUtilities }
++
++class ScalaFormattingStrategy(val sourceViewer: ISourceViewer) extends IFormattingStrategy {
++
++  // We mostly totally ignore the contract of the method. TODO: Don't do that.
++  def format(content: String, isLineStart: Boolean, indentation: String, positions: Array[Int]): String = {
++    format(sourceViewer.getDocument)
++    null
++  }
++
++  private def format(document: IDocument) {
++    val source = document.get
++    val lineDelimiter = Option(TextUtilities.getDefaultLineDelimiter(document))
++    try {
++      val edits = ScalaFormatter.formatAsEdits(source, FormatterPreferencePage.getPreferences, lineDelimiter)
++
++      val undoManager = DocumentUndoManagerRegistry.getDocumentUndoManager(document)
++      undoManager.beginCompoundChange()
++      val eclipseEdit = new MultiTextEdit
++      for (TextEdit(start, length, replacement) ← edits)
++        eclipseEdit.addChild(new ReplaceEdit(start, length, replacement))
++      new TextEditProcessor(document, eclipseEdit, JFaceTextEdit.NONE).performEdits
++      undoManager.endCompoundChange()
++
++    } catch {
++      case _: ScalaParserException ⇒
++      case e ⇒ throw e
++    }
++  }
++
++  def formatterStarts(initialIndentation: String) {}
++
++  def formatterStops() {}
++
++}
+\ No newline at end of file
