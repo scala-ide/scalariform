@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Scalariform &mdash; Scalariform v0.0.1 documentation</title>
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="Scalariform v0.0.1 documentation" href="" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="">Scalariform v0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            
+  <div class="section" id="scalariform">
+<h1>Scalariform<a class="headerlink" href="#scalariform" title="Permalink to this headline">¶</a></h1>
+<p>Scalariform is a code formatter for Scala 2.8. It is a stand-alone
+library and an Eclipse plug-in. Currently, Scalariform supports only a
+limited set of options, although it is intended to be compatible with
+the recommendations of the <a class="reference external" href="http://davetron5000.github.com/scala-style/">Scala Style Guide</a> (see below). Please
+let me know what other features people would like.</p>
+<p>Scalariform is licenced under <a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">The MIT Licence</a>.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>In Eclipse Ganymede (3.5), install the latest nightly Scala Eclipse
+plugin using the Eclipse update site mechanism:</p>
+<blockquote>
+<a class="reference external" href="http://www.scala-lang.org/scala-eclipse-plugin-nightly">http://www.scala-lang.org/scala-eclipse-plugin-nightly</a></blockquote>
+<p>(See <a class="reference external" href="http://www.scala-lang.org/node/94">http://www.scala-lang.org/node/94</a> for more detailed instructions.)</p>
+<p>Then install Scalariform from this update site:</p>
+<blockquote>
+<a class="reference external" href="http://scalariform.googlecode.com/svn/trunk/update-site/">http://scalariform.googlecode.com/svn/trunk/update-site/</a></blockquote>
+<p>To format:</p>
+<ul class="simple">
+<li>Right click in the editor -&gt; Format Scala Source Code, or</li>
+<li>Press Ctrl-Shift-D</li>
+</ul>
+<p>To configure preferences, go to Window -&gt; Preferences -&gt; Scala -&gt; Scala Formatter Preferences</p>
+</div>
+<div class="section" id="preferences">
+<h2>Preferences<a class="headerlink" href="#preferences" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="alignparameters">
+<h3>alignParameters<a class="headerlink" href="#alignparameters" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">false</span></tt></p>
+<p>Align class/function parameters in the same column. For example, if <tt class="docutils literal"><span class="pre">false</span></tt>, then:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Person</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+  <span class="n">age</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+  <span class="n">birthdate</span><span class="k">:</span> <span class="kt">Date</span><span class="o">,</span>
+  <span class="n">astrologicalSign</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+  <span class="n">shoeSize</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+  <span class="n">favoriteColor</span><span class="k">:</span> <span class="kt">java.awt.Color</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">true</span></tt>, then:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Person</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+             <span class="n">age</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+             <span class="n">birthdate</span><span class="k">:</span> <span class="kt">Date</span><span class="o">,</span>
+             <span class="n">astrologicalSign</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+             <span class="n">shoeSize</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+             <span class="n">favoriteColor</span><span class="k">:</span> <span class="kt">java.awt.Color</span><span class="o">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="compactstringconcatenation">
+<h3>compactStringConcatenation<a class="headerlink" href="#compactstringconcatenation" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">false</span></tt></p>
+<p>Omit spaces when formatting a &#8216;+&#8217; operator on String literals&#8221;. For example, If <tt class="docutils literal"><span class="pre">false</span></tt>, then:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;!&quot;</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">true</span></tt>, then:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="s">&quot;Hello &quot;</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s">&quot;!&quot;</span>
+</pre></div>
+</div>
+<p>The Scala Style Guide <a class="reference external" href="http://davetron5000.github.com/scala-style/method_invocation/operators.html">recommends</a> that operators, &#8220;should <cite>always</cite> be
+invoked using infix notation with spaces separated the target&#8221;.</p>
+</div>
+<div class="section" id="doubleindentclassdeclaration">
+<h3>doubleIndentClassDeclaration<a class="headerlink" href="#doubleindentclassdeclaration" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">false</span></tt></p>
+<p>With this set to <tt class="docutils literal"><span class="pre">true</span></tt>, class (and trait / object) declarations
+will be formatted as recommended by the <a class="reference external" href="http://davetron5000.github.com/scala-style/">Scala Style Guide</a>. That is,
+if the declaration section spans multiple lines, it will be formatted
+so that either the parameter section or the inheritance section is
+doubly indented. This provides a visual distinction from the members
+of the class. For example:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Person</span><span class="o">(</span>
+  <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+  <span class="n">age</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+  <span class="n">birthdate</span><span class="k">:</span> <span class="kt">Date</span><span class="o">,</span>
+  <span class="n">astrologicalSign</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+  <span class="n">shoeSize</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+  <span class="n">favoriteColor</span><span class="k">:</span> <span class="kt">java.awt.Color</span><span class="o">)</span>
+    <span class="k">extends</span> <span class="nc">Entity</span>
+    <span class="k">with</span> <span class="nc">Logging</span>
+    <span class="k">with</span> <span class="nc">Identifiable</span>
+    <span class="k">with</span> <span class="nc">Serializable</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">firstMethod</span> <span class="k">=</span> <span class="o">...</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Person</span><span class="o">(</span>
+    <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+    <span class="n">age</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+    <span class="n">birthdate</span><span class="k">:</span> <span class="kt">Date</span><span class="o">,</span>
+    <span class="n">astrologicalSign</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
+    <span class="n">shoeSize</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span>
+    <span class="n">favoriteColor</span><span class="k">:</span> <span class="kt">java.awt.Color</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">firstMethod</span> <span class="k">=</span> <span class="o">...</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indentspaces">
+<h3>indentSpaces<a class="headerlink" href="#indentspaces" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">2</span></tt></p>
+<p>The number of spaces to use for each level of indentation.</p>
+</div>
+<div class="section" id="preservespacebeforearguments">
+<h3>preserveSpaceBeforeArguments<a class="headerlink" href="#preservespacebeforearguments" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">false</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">true</span></tt>, the formatter will keep an existing space before a parenthesis argument. For example:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span> <span class="n">should</span> <span class="n">equal</span> <span class="o">(</span><span class="mi">2</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>Otherwise, if <tt class="docutils literal"><span class="pre">false</span></tt>, spaces before arguments will always be removed.</p>
+</div>
+<div class="section" id="rewritearrowsymbols">
+<h3>rewriteArrowSymbols<a class="headerlink" href="#rewritearrowsymbols" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">false</span></tt></p>
+<p>Replace arrow tokens with their unicode equivalents: <tt class="docutils literal"><span class="pre">=&gt;</span></tt> with <tt class="docutils literal"><span class="pre">⇒</span></tt>, and <tt class="docutils literal"><span class="pre">&lt;-</span></tt> with <tt class="docutils literal"><span class="pre">←</span></tt>. For example:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">for</span> <span class="o">(</span><span class="n">n</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="o">)</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="mi">0</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;even&quot;</span><span class="o">)</span>
+  <span class="k">case</span> <span class="mi">1</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;odd&quot;</span><span class="o">)</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>is formatted as:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">for</span> <span class="o">(</span><span class="n">n</span> <span class="k">←</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="o">)</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="mi">0</span> <span class="k">⇒</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;even&quot;</span><span class="o">)</span>
+  <span class="k">case</span> <span class="mi">1</span> <span class="k">⇒</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;odd&quot;</span><span class="o">)</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="spacebeforecolon">
+<h3>spaceBeforeColon<a class="headerlink" href="#spacebeforecolon" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">false</span></tt></p>
+<p>Whether to ensure a space before colon. For example, If <tt class="docutils literal"><span class="pre">false</span></tt>, then:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">def</span> <span class="n">add</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">true</span></tt>, then:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">def</span> <span class="n">add</span><span class="o">(</span><span class="n">a</span> <span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">b</span> <span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Scala Style Guide<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Scalariform is &#8220;compatible&#8221; with the <a class="reference external" href="http://davetron5000.github.com/scala-style/">Scala Style Guide</a> v1.1.0 in the
+sense that, given the right preference settings, source code that is
+initially compiliant with the Style Guide will not become uncompliant
+after formatting. In a number of cases, running the formatter will
+make uncompliant source more compliant.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="61%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Preference</th>
+<th class="head">Value</th>
+<th class="head">Default?</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>alignParameters</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>compactStringConcatenation</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>doubleIndentClassDeclaration</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>No</td>
+</tr>
+<tr><td>indentSpaces</td>
+<td><tt class="docutils literal"><span class="pre">2</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>preserveSpaceBeforeArguments</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>rewriteArrowSymbols</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>spaceBeforeColon</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="source-directives">
+<h2>Source directives<a class="headerlink" href="#source-directives" title="Permalink to this headline">¶</a></h2>
+<p>As well as global preferences, formatting can be tweaked at the source level through comments.</p>
+<div class="section" id="format-on-off">
+<h3>format: [ON|OFF]<a class="headerlink" href="#format-on-off" title="Permalink to this headline">¶</a></h3>
+<p>Disables the formatter for selective portions of a source file:</p>
+<div class="highlight-scala"><pre>// format: OFF    &lt;-- this directive disables formatting from this point
+class AsciiDSL {
+  n ¦- "1" -+ { n: Node =&gt;
+          n ¦- "i"
+          n ¦- "ii"
+          n ¦- "iii"
+          n ¦- "iv"
+          n ¦- "v"
+  }
+  n ¦- "2"
+  n ¦- "3" -+ { n: Node =&gt;
+          n ¦- "i"
+          n ¦- "ii" -+ { n: Node =&gt;
+                   n ¦- "a"
+                   n ¦- "b"
+                   n ¦- "c"
+          }
+          n ¦- "iii"
+          n ¦- "iv"
+          n ¦- "v"
+  }
+  // format: ON   &lt;-- formatter resumes from this point
+  ...
+}
+// (see: http://dev.day.com/microsling/content/blogs/main/scalajcr2.html)</pre>
+</div>
+</div>
+<div class="section" id="format-preferencename">
+<h3>format: [+|-]&lt;preferenceName&gt;<a class="headerlink" href="#format-preferencename" title="Permalink to this headline">¶</a></h3>
+<p>Sets a preference for the entire of the source file, overriding the global formatting settings:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="c">// format: +preserveSpaceBeforeArguments</span>
+<span class="k">class</span> <span class="nc">StackSpec</span> <span class="k">extends</span> <span class="nc">FlatSpec</span> <span class="k">with</span> <span class="nc">ShouldMatchers</span> <span class="o">{</span>
+  <span class="c">// ...</span>
+  <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span> <span class="n">should</span> <span class="n">equal</span> <span class="o">(</span><span class="mi">2</span><span class="o">)</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="">Scalariform v0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Matt Russell.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
