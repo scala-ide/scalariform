@@ -15,8 +15,8 @@ Scalariform is licenced under `The MIT Licence`_.
 Installation
 ------------
 
-In Eclipse Ganymede (3.5), install the latest nightly Scala Eclipse
-plugin using the Eclipse update site mechanism:
+In Eclipse 3.5, install the latest nightly Scala Eclipse plugin using
+the update site mechanism:
 
   http://www.scala-lang.org/scala-eclipse-plugin-nightly
 
