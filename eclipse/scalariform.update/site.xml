@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+   <description name="Scalariform Update Site" url="http://scalariform.googlecode.com/svn/trunk/update-site/">
+      Scalariform Update Site
+   </description>
    <feature url="features/scalariform.feature_0.0.2.jar" id="scalariform.feature" version="0.0.2">
       <category name="Scala"/>
    </feature>
