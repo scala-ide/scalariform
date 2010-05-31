@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scalariform for Eclipse
 Bundle-SymbolicName: scalariform.eclipse;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 0.0.2
 Require-Bundle: 
- scalariform;bundle-version="0.0.1",
+ scalariform,
  ch.epfl.lamp.sdt.core;bundle-version="2.8.0",
  scala.library,
  org.eclipse.core.resources,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/scalariform.feature_0.0.1.jar" id="scalariform.feature" version="0.0.1">
+   <feature url="features/scalariform.feature_0.0.2.jar" id="scalariform.feature" version="0.0.2">
       <category name="Scala"/>
    </feature>
    <category-def name="Scala" label="Scala"/>
