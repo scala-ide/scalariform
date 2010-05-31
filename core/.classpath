@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry including="**/*.scala" kind="src" path="src/main/scala"/>
 	<classpathentry including="**/*.scala" kind="src" path="src/test/scala"/>
-	<classpathentry kind="con" path="sbt.eclipse.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="ch.epfl.lamp.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib_managed/scala_2.8.0-SNAPSHOT/compile/scalatest-1.2-for-scala-2.8.0.RC2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
