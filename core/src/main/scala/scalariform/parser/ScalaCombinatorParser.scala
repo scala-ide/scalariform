@@ -329,16 +329,18 @@ class ScalaCombinatorParser extends Parsers {
     opt(actualGuard)
   }
 
+  val definiteGuard: Parser[Guard] = guard(IF) ~> guard ^^ { _.get }
+
   lazy val enumerators: Parser[Enumerators] = {
-    val enumerator: Parser[Enumerator] = (guard(IF) ~> guard ^^ { _.get }) | generator(eqOK = true) | expr
+    val enumerator: Parser[Enumerator] = definiteGuard | generator(eqOK = true) | expr
     generator(eqOK = false) ~ pairRep(statSep, enumerator) ^^ {
       case initialGenerator ~ rest ⇒ Enumerators(initialGenerator, rest)
     }
   }
 
   def generator(eqOK: Boolean): Parser[Generator] = {
-    opt(VAL) ~ pattern1(seqOK = false) ~ (when(eqOK, EQUALS) | LARROW) ~ expr ~ guard ^^ {
-      case valOption ~ pattern ~ equalsOrArrowToken ~ expr ~ guard ⇒ Generator(valOption, pattern, equalsOrArrowToken, expr, guard)
+    opt(VAL) ~ pattern1(seqOK = false) ~ (when(eqOK, EQUALS) | LARROW) ~ expr ~ rep(definiteGuard) ^^ {
+      case valOption ~ pattern ~ equalsOrArrowToken ~ expr ~ guards ⇒ Generator(valOption, pattern, equalsOrArrowToken, expr, guards)
     }
   }
 

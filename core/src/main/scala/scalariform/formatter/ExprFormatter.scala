@@ -299,11 +299,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(generator: Generator)(implicit formatterState: FormatterState): FormatResult = {
-    val Generator(valOption: Option[Token], pattern: Expr, equalsOrArrowToken: Token, expr: Expr, guardOption: Option[Guard]) = generator
-    format(expr) ++ format(pattern) ++ (guardOption match {
-      case None ⇒ NoFormatResult
-      case Some(guard) ⇒ format(guard)
-    })
+    val Generator(valOption: Option[Token], pattern: Expr, equalsOrArrowToken: Token, expr: Expr, guards: List[Guard]) = generator
+    var formatResult: FormatResult = NoFormatResult
+    formatResult ++= format(expr)
+    formatResult ++= format(pattern)
+    for (guard <- guards) 
+      formatResult ++= format(guard)
+    formatResult
   }
 
   private def format(guard: Guard)(implicit formatterState: FormatterState): FormatResult = {

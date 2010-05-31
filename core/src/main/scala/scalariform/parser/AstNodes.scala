@@ -155,9 +155,9 @@ case class Generator(
   pattern: Expr,
   equalsOrArrowToken: Token,
   expr: Expr,
-  guardOption: Option[Guard]) extends AstNode with Enumerator {
+  guards: List[Guard]) extends AstNode with Enumerator {
 
-  lazy val tokens = flatten(valOption, pattern, equalsOrArrowToken, expr, guardOption)
+  lazy val tokens = flatten(valOption, pattern, equalsOrArrowToken, expr, guards)
 
 }
 
