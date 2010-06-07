@@ -18,7 +18,7 @@ Installation
 In Eclipse 3.5, install the latest nightly Scala Eclipse plugin using
 the update site mechanism:
 
-  http://www.scala-lang.org/scala-eclipse-plugin-nightly
+  http://download.scala-ide.org/nightly-update-master-trunk
 
 (See http://www.scala-lang.org/node/94 for more detailed instructions.)
 
