@@ -1,7 +1,10 @@
-0.0.1 (11/April/10) 
-* initial release
+0.0.3 (in dev)
+* command line tool (scalariform.commandline.Main)
 
 0.0.2 (31/May/20) 
 * parser update for multiple guards in a generator to match new scalac behaviour
 * small compiler fixes to match trunk
+
+0.0.1 (11/April/10) 
+* initial release
 

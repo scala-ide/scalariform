@@ -21,12 +21,13 @@ case class Spaces(n: Int) extends IndentStyle {
   def indent(indentLevel: Int) = repeat(repeat(" ", n), indentLevel)
 }
 
-class FormattingPreferences(preferencesMap: Map[PreferenceDescriptor[_], Any]) extends IFormattingPreferences {
+class FormattingPreferences(val preferencesMap: Map[PreferenceDescriptor[_], Any]) extends IFormattingPreferences {
 
   def apply[T](preference: PreferenceDescriptor[T]): T = preferencesMap.get(preference) map { _.asInstanceOf[T] } getOrElse preference.defaultValue
 
-  def setPreference[T](preference: PreferenceDescriptor[T], value: T): IFormattingPreferences = new FormattingPreferences(preferencesMap + (preference -> value))
+  def setPreference[T](preference: PreferenceDescriptor[T], value: T) = new FormattingPreferences(preferencesMap + (preference -> value))
 
+  override def toString = getClass.getSimpleName + "(" + preferencesMap + ")"
 }
 
 case object FormattingPreferences extends FormattingPreferences(Map()) {

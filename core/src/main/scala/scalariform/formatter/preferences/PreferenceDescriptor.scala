@@ -2,11 +2,36 @@ package scalariform.formatter.preferences
 
 sealed trait PreferenceType[T] {
   def cast(preference: PreferenceDescriptor[_]): PreferenceDescriptor[T] = preference.asInstanceOf[PreferenceDescriptor[T]]
+
+  def parseValue(s: String): Either[String, T]
 }
 
-case object BooleanPreference extends PreferenceType[Boolean]
+case object BooleanPreference extends PreferenceType[Boolean] {
+  def parseValue(s: String) = 
+    s.toLowerCase match {
+      case "true" => Right(true)
+      case "false" => Right(false)
+      case _ => Left("Could not parse as boolean value: " + s)
+    }
+}
 
-case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int]
+case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int] {
+
+  require(min <= max)
+
+  def parseValue(s: String) = 
+    try {
+      val n = Integer.parseInt(s)
+      if (n < min)
+	Left(n + " is below minimum of " + min)
+      else if (n > max)
+	Left(n + " is above maximum of " + max)
+      else
+	Right(n)
+    } catch { 
+      case e: NumberFormatException =>  Left("Could not parse as integer: " + s)
+    }
+}
 
 trait PreferenceDescriptor[T] {
 

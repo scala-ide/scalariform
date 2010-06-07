@@ -13,6 +13,9 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
     val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
     val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
     val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.RC2-SNAPSHOT"
+
+    override def mainClass = Some("scalariform.commandline.Main")
+
   }
 
   class CorpusScanProject(info: ProjectInfo) extends DefaultProject(info) {
