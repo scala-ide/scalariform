@@ -1,26 +1,27 @@
 Scalariform
 ===========
 
-Scalariform is a code formatter for Scala 2.8. It is a stand-alone
-library and an Eclipse plug-in. Currently, Scalariform supports only a
-limited set of options, although it is intended to be compatible with
-the recommendations of the `Scala Style Guide`_ (see below). Please
-let me know what other features people would like.
+Scalariform is a code formatter for Scala 2.8. It is both a
+stand-alone command line tool / library and an Eclipse
+plug-in. Currently, Scalariform supports only a limited set of
+options, although it is intended to be compatible with the
+recommendations of the `Scala Style Guide`_ (see below). Please let me
+know what other features people would like.
 
 Scalariform is licenced under `The MIT Licence`_.
 
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
-Installation
-------------
+Installation in Eclipse
+-----------------------
 
-In Eclipse 3.5, install the latest nightly Scala Eclipse plugin using
-the update site mechanism:
+In Eclipse 3.5, install the latest nightly build of Scala IDE for
+Eclipse using the update site mechanism:
 
-  http://www.scala-lang.org/scala-eclipse-plugin-nightly
+  http://download.scala-ide.org/nightly-update-master-trunk
 
-(See http://www.scala-lang.org/node/94 for more detailed instructions.)
+(See http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation for more detailed instructions.)
 
 Then install Scalariform from this update site:
 
@@ -32,6 +33,38 @@ To format:
 - Press Ctrl-Shift-D
 
 To configure preferences, go to Window -> Preferences -> Scala -> Scala Formatter Preferences
+
+Command line tool
+-----------------
+
+Scalariform can be used as a stand-alone command line utility. Sample script::
+
+  #!/bin/bash
+  scala -cp /path/to/scalariform-X.Y.Z.jar scalariform.commandline.Main "$@"
+
+Usage::
+
+  scalariform [options] [files...]
+  
+  Options:
+    --help, -h       Show help
+    --inPlace, -i    Replace the input file(s) in place with a formatted version.
+    --test, -t       Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
+    --verbose -v     Verbose output
+  
+  Preferences:
+    [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
+    [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
+    [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
+    -indentSpaces=[1-10]                Set Number of spaces to use for indentation
+    [+|-]preserveSpaceBeforeArguments   Enable/disable Preserve a space before a parenthesis argument
+    [+|-]rewriteArrowSymbols            Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
+    [+|-]spaceBeforeColon               Enable/disable Add a space before colons
+  
+  Examples:
+   scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
+   find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
+   echo 'class A ( n  :Int )' | scalariform
 
 Preferences
 -----------
