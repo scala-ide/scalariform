@@ -83,7 +83,14 @@ object Main {
 
     if (test) {
       var allFormattedCorrectly = true
-      def checkSource(source: Source) = ScalaFormatter.formatAsEdits(source.mkString, preferences).isEmpty
+      def checkSource(source: Source) = {
+        val original = source.mkString
+        val formatted = ScalaFormatter.format(original, preferences)
+        formatted == original
+        // TODO: Sometimes get edits which cancel each other out
+        // val edits = ScalaFormatter.formatAsEdits(source.mkString, preferences)
+        // edits.isEmpty
+      }
       if (files.isEmpty) {
         val formattedCorrectly = checkSource(Source.fromInputStream(System.in))
         allFormattedCorrectly &= formattedCorrectly
@@ -96,12 +103,12 @@ object Main {
       System.exit(if (allFormattedCorrectly) 0 else 1)
     } else {
       if (files.isEmpty) {
-        val original = Source.fromInputStream(System.in) mkString ""
+        val original = Source.fromInputStream(System.in).mkString
         val formatted = ScalaFormatter.format(original, preferences)
         print(formatted)
       } else
         for (file ← files) {
-          val original = Source.fromFile(file) mkString ""
+          val original = Source.fromFile(file).mkString
           val formatted = ScalaFormatter.format(original, preferences)
           if (inPlace)
             if (formatted == original)

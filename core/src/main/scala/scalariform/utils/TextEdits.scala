@@ -3,6 +3,10 @@ package scalariform.utils
 case class TextEdit(position: Int, length: Int, replacement: String) {
   require(position >= 0)
   require(length >= 0)
+  override lazy val toString = {
+    val replacementDisplay = replacement.replace("\n", """\n""").replace("\r", """\r""")
+    getClass.getSimpleName + "(position = " + position + ", length = " + length + ", replacement = '" + replacementDisplay + "')"
+  }
 }
 
 object TextEditProcessor {
