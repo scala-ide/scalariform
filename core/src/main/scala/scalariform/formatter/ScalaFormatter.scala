@@ -303,6 +303,10 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val xmlPreviousExceptions = Set(LBRACE, LPAREN)
     if (type2 == XML_START_OPEN && !(xmlPreviousExceptions.contains(type1) || type1.isXml))
       return CompactEnsuringGap
+    if (type1 == USCORE && IDS.contains(type2) && type2 != STAR)
+      return CompactEnsuringGap
+    if (type2 == USCORE && IDS.contains(type1))
+      return CompactEnsuringGap
     if ((type1 == RPAREN || type1 == RBRACKET) && type2 == LBRACE)
       return CompactEnsuringGap
     if (type1 == MINUS && (type2 == INTEGER_LITERAL || type2 == FLOATING_POINT_LITERAL))

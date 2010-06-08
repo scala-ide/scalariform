@@ -35,6 +35,10 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   "|v| : Int" ==> "|v| : Int"
   "×× : (A, A)" ==> "×× : (A, A)"
   
+  "{ case (_~_) => }" ==> "{ case (_ ~ _) => }"
+  "{ case (a~_) => }" ==> "{ case (a ~ _) => }"
+  "{ case (_~b) => }" ==> "{ case (_ ~ b) => }"
+
   "(1, 2, 3, 4)" ==> "(1, 2, 3, 4)"
   "(x: Int, y: List[String], z: Map[_ <: K, V])" ==> "(x: Int, y: List[String], z: Map[_ <: K, V])"
 
