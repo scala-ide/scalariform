@@ -20,15 +20,15 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   class CorpusScanProject(info: ProjectInfo) extends DefaultProject(info) {
 
-    val commonsIo = "commons-io" % "commons-io" % "1.4" 
+    val commonsIo = "commons-io" % "commons-io" % "1.4"
 
     override def mainClass = Some("scalariform.corpusscan.Runner")
-    
+
   }
 
   class GuiProject(info: ProjectInfo) extends DefaultProject(info) {
 
-    val miglayout = "com.miglayout" % "miglayout" % "3.7.1" 
+    val miglayout = "com.miglayout" % "miglayout" % "3.7.1"
 
     override def mainClass = Some("scalariform.gui.Main")
 

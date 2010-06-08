@@ -197,28 +197,27 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     object PreferencesPanel extends JPanel(new MigLayout) {
       setBorder(new TitledBorder("Preferences"))
       for (preference ← AllPreferences.preferences) {
-	val preferenceType = preference.preferenceType
-	preferenceType match {
+        val preferenceType = preference.preferenceType
+        preferenceType match {
           case BooleanPreference ⇒
-          val checkBox = new JCheckBox(preference.description)
-          checkBox.setSelected(preference.defaultValue.asInstanceOf[Boolean])
-          add(checkBox, new CC().wrap)
-          addChangeListener(checkBox)
-          preferenceToWidgetMap += (preference -> checkBox)
+            val checkBox = new JCheckBox(preference.description)
+            checkBox.setSelected(preference.defaultValue.asInstanceOf[Boolean])
+            add(checkBox, new CC().wrap)
+            addChangeListener(checkBox)
+            preferenceToWidgetMap += (preference -> checkBox)
           case IntegerPreference(min, max) ⇒
-          val label = new JLabel(preference.description)
-          add(label, new CC)
-          val spinner = new JSpinner
-          spinner.setValue(preference.defaultValue.asInstanceOf[Int])
-          spinner.addChangeListener(new ChangeListener() { def stateChanged(e: ChangeEvent) { runFormatter() } })
-          add(spinner, new CC().wrap)
-          preferenceToWidgetMap += (preference -> spinner)
-	}
+            val label = new JLabel(preference.description)
+            add(label, new CC)
+            val spinner = new JSpinner
+            spinner.setValue(preference.defaultValue.asInstanceOf[Int])
+            spinner.addChangeListener(new ChangeListener() { def stateChanged(e: ChangeEvent) { runFormatter() } })
+            add(spinner, new CC().wrap)
+            preferenceToWidgetMap += (preference -> spinner)
+        }
       }
     }
     add(PreferencesPanel, new CC().wrap())
 
- 
     val makeTestButton = new JButton("Make test")
     makeTestButton.addActionListener(new ActionListener() {
       def actionPerformed(e: ActionEvent) {
@@ -374,8 +373,6 @@ object Samples {
     |
     |}""".stripMargin
 } // format: ON
-
-
 
 class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends AbstractTableModel {
   def getColumnCount = 5

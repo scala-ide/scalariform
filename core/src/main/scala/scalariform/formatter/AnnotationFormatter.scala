@@ -4,8 +4,7 @@ import scalariform.parser._
 import scalariform.utils._
 import scalariform.lexer._
 import scalariform.formatter.preferences._
-trait AnnotationFormatter {
-  self: HasFormattingPreferences with TypeFormatter with ExprFormatter ⇒
+trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter with ExprFormatter ⇒
 
   def format(annotation: Annotation)(implicit formatterState: FormatterState): FormatResult = {
     val Annotation(atToken: Token, annotationType: Type, argumentExprss: List[ArgumentExprs], newlineOption: Option[Token]) = annotation

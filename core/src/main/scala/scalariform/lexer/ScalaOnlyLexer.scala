@@ -365,10 +365,14 @@ trait ScalaOnlyLexer extends Lexer {
     }
 
     def restOfUncertainToken() = {
-      def isEfd = ch match { case 'e' | 'E' | 'f' | 'F' | 'd' | 'D' ⇒ true;
-      case _ ⇒ false }
-      def isL = ch match { case 'l' | 'L' ⇒ true;
-      case _ ⇒ false }
+      def isEfd = ch match {
+        case 'e' | 'E' | 'f' | 'F' | 'd' | 'D' ⇒ true;
+        case _ ⇒ false
+      }
+      def isL = ch match {
+        case 'l' | 'L' ⇒ true;
+        case _ ⇒ false
+      }
 
       if (isEfd)
         getFraction()
@@ -456,8 +460,6 @@ trait ScalaOnlyLexer extends Lexer {
     }
   }
 
-
-
 }
 
 object ScalaOnlyLexer {
@@ -476,7 +478,7 @@ object ScalaOnlyLexer {
       }
     }
   }
-	
+
   def isSpecial(i: Int) = {
     if (i == CharConstants.EOF_CHAR)
       false
@@ -486,6 +488,6 @@ object ScalaOnlyLexer {
       chtp == Character.MATH_SYMBOL.toInt || chtp == Character.OTHER_SYMBOL.toInt
     }
   }
-  
+
 }
 

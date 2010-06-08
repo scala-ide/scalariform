@@ -5,9 +5,9 @@ import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils._
 
-case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstruction], 
-			inferredNewlineFormatting: Map[Token, IntertokenFormatInstruction],
-		        xmlRewrites: Map[Token, String]) {
+case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstruction],
+                        inferredNewlineFormatting: Map[Token, IntertokenFormatInstruction],
+                        xmlRewrites: Map[Token, String]) {
 
   def replaceXml(token: Token, replacement: String) = {
     require(token.getType.isXml)

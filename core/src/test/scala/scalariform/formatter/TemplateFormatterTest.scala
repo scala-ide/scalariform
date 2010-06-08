@@ -4,8 +4,8 @@ import scalariform.parser._
 import scalariform.formatter._
 import scalariform.formatter.preferences._
 
-class TemplateFormatterTest extends AbstractFormatterTest {
 // format: OFF
+class TemplateFormatterTest extends AbstractFormatterTest {
 
   "case class A" ==> "case class A"
 
@@ -448,7 +448,6 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |    val name = "Bob"
     |  }"""
 
-  
   // format: ON
 
   override val debug = false

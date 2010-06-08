@@ -2,6 +2,7 @@ package scalariform.formatter
 
 import scalariform.parser._
 
+// format: OFF
 class TypeFormatterTest extends AbstractFormatterTest {
 
   "Int" ==> "Int"

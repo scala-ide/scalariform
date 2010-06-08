@@ -10,7 +10,7 @@ class ScalaLexer(reader: UnicodeEscapeReader) extends Lexer(reader) with ScalaOn
   modeStack.push(new ScalaMode())
 
   def nextToken(): Token = {
-    if (eof) 
+    if (eof)
       super[Lexer].token(EOF)
     else if (isXmlMode)
       fetchXmlToken()
@@ -20,7 +20,6 @@ class ScalaLexer(reader: UnicodeEscapeReader) extends Lexer(reader) with ScalaOn
     builtToken = None
     token
   }
-  
 
   protected def switchToScalaModeAndFetchToken() {
     modeStack.push(new ScalaMode())

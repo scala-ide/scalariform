@@ -3,6 +3,7 @@ package scalariform.formatter
 import scalariform.parser._
 import scalariform.formatter._
 
+// format: OFF
 class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "while( true )  run()" ==> "while (true) run()"

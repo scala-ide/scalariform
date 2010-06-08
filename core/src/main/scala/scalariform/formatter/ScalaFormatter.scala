@@ -404,10 +404,10 @@ object ScalaFormatter {
 
   @throws(classOf[ScalaParserException])
   def format(source: String, formattingPreferences: IFormattingPreferences): String = {
-	 val edits = formatAsEdits(source, formattingPreferences)
-	 TextEditProcessor.runEdits(source, edits)
+    val edits = formatAsEdits(source, formattingPreferences)
+    TextEditProcessor.runEdits(source, edits)
   }
-  
+
   @throws(classOf[ScalaParserException])
   def formatAsEdits(source: String, formattingPreferences: IFormattingPreferences, lineDelimiter: Option[String] = None): List[TextEdit] = {
     val specificFormatter = new SpecificFormatter {
@@ -422,5 +422,5 @@ object ScalaFormatter {
     val (edits, _) = specificFormatter.fullFormat(source)(formattingPreferences)
     edits
   }
-  
+
 }

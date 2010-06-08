@@ -303,7 +303,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(expr)
     formatResult ++= format(pattern)
-    for (guard <- guards) 
+    for (guard ← guards)
       formatResult ++= format(guard)
     formatResult
   }
@@ -631,7 +631,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         formatResult = formatResult.before(token, formatterState.indent(paramIndent).currentIndentLevelInstruction)
         paramFormatterState = if (formattingPreferences(AlignParameters)) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
       } else if (containsNewline(firstParam) && formattingPreferences(AlignParameters))
-	paramFormatterState = formatterState.alignWithToken(relativeToken)     
+        paramFormatterState = formatterState.alignWithToken(relativeToken)
       formatResult ++= format(firstParam)(paramFormatterState)
     }
 

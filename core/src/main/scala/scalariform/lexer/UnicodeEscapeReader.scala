@@ -60,7 +60,7 @@ class UnicodeEscapeReader(delegate: Reader) extends Reader {
   }
 
   def read(cbuf: Array[Char], off: Int, len: Int): Int = throw new UnsupportedOperationException()
-  
+
   def close() { delegate.close() }
 
 }

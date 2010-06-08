@@ -6,7 +6,7 @@ import scalariform.lexer.Token
 import scalariform.parser._
 import scalariform.utils._
 import scalariform.formatter.preferences._
-trait TemplateFormatter {self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with ExprFormatter with ScalaFormatter ⇒
+trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with ExprFormatter with ScalaFormatter ⇒
 
   def format(tmplDef: TmplDef)(implicit formatterState: FormatterState): FormatResult = {
     val TmplDef(markerTokens, name, typeParamClauseOpt, annotations, accessModifierOpt, paramClausesOpt, templateInheritanceSectionOpt, templateBodyOption) = tmplDef
@@ -28,13 +28,13 @@ trait TemplateFormatter {self: HasFormattingPreferences with AnnotationFormatter
     for (paramClauses ← paramClausesOpt) {
       if (annotations.size > 0)
         formatResult = formatResult.before(paramClauses.firstToken, CompactEnsuringGap)
-      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration) && !templateInheritanceSectionOpt.exists{section => containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline } &&
-        templateBodyOption.exists(containsNewline(_)) 
+      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration) && !templateInheritanceSectionOpt.exists { section ⇒ containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline } &&
+        templateBodyOption.exists(containsNewline(_))
       formatResult ++= formatParamClauses(paramClauses, doubleIndentParams)
     }
     for (TemplateInheritanceSection(extendsOrSubtype, earlyDefsOpt, templateParentsOpt) ← templateInheritanceSectionOpt) {
-      val doubleIndentTemplateInheritance = formattingPreferences(DoubleIndentClassDeclaration) && 
-	(templateBodyOption.exists(containsNewline(_)) || paramClausesOpt.exists(containsNewline(_)))
+      val doubleIndentTemplateInheritance = formattingPreferences(DoubleIndentClassDeclaration) &&
+        (templateBodyOption.exists(containsNewline(_)) || paramClausesOpt.exists(containsNewline(_)))
       val inheritanceIndent = if (doubleIndentTemplateInheritance) 2 else 1
       var currentFormatterState = formatterState
       if (hiddenPredecessors(extendsOrSubtype).containsNewline) {

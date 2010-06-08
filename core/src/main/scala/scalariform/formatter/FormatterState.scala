@@ -15,5 +15,5 @@ case class FormatterState(indentLevel: Int = 0, indentRelativeToTokenOption: Opt
   def nextIndentLevelInstruction = EnsureNewlineAndIndent(nextIndentLevel, relativeTo = indentRelativeToTokenOption)
 
   def currentIndentLevelInstruction = EnsureNewlineAndIndent(indentLevel, relativeTo = indentRelativeToTokenOption)
-  
+
 }

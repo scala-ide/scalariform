@@ -3,6 +3,7 @@ package scalariform.formatter
 import scalariform.parser._
 import scalariform.formatter._
 import scalariform.formatter.preferences._
+
 // format: OFF
 class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 

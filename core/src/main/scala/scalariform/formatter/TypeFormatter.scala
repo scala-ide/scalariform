@@ -6,8 +6,7 @@ import scalariform.parser._
 import scalariform.utils._
 import scalariform.lexer.Tokens
 import scalariform.formatter.preferences._
-trait TypeFormatter {
-  self: HasFormattingPreferences with AnnotationFormatter with ExprFormatter with ScalaFormatter ⇒
+trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter with ExprFormatter with ScalaFormatter ⇒
 
   def format(type_ : Type)(implicit formatterState: FormatterState): FormatResult = format(type_.contents)
 
@@ -23,8 +22,8 @@ trait TypeFormatter {
       else if (element.isInstanceOf[Annotation]) {
         val instruction =
           previousElement match {
-            case GeneralTokens(tokens) if tokens.last.getType == Tokens.LBRACKET ⇒          Compact
-            case _ ⇒       CompactEnsuringGap
+            case GeneralTokens(tokens) if tokens.last.getType == Tokens.LBRACKET ⇒ Compact
+            case _ ⇒ CompactEnsuringGap
           }
         formatResult = formatResult.before(element.firstToken, instruction)
       } else if (previousElement.isInstanceOf[VarianceTypeElement])

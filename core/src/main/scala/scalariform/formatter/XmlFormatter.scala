@@ -50,13 +50,13 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
       formatResult = formatResult.replaceXml(whitespace, "")
     formatResult
   }
-  
+
   def format(xmlAttribute: XmlAttribute)(implicit formatterState: FormatterState): FormatResult = {
     val XmlAttribute(name, whitespaceOption, equals, whitespaceOption2, valueOrEmbeddedScala: Either[Token, Expr]) = xmlAttribute
     var formatResult: FormatResult = NoFormatResult
     for (whitespace ← whitespaceOption if formattingPreferences(FormatXml))
       formatResult = formatResult.replaceXml(whitespace, "")
-    for (embeddedScala <- valueOrEmbeddedScala.right)
+    for (embeddedScala ← valueOrEmbeddedScala.right)
       formatResult ++= format(embeddedScala)
     for (whitespace ← whitespaceOption2 if formattingPreferences(FormatXml))
       formatResult = formatResult.replaceXml(whitespace, "")
@@ -68,12 +68,12 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     var formatResult: FormatResult = NoFormatResult
     val multiline = containsNewline(xmlNonEmpty)
     formatResult ++= format(startTag)
-    
-    for (xmlContent ← contents) {     
+
+    for (xmlContent ← contents) {
       formatResult ++= format(xmlContent)
     }
     if (multiline && formattingPreferences(FormatXml))
-       formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
+      formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
     formatResult
   }
 

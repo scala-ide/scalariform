@@ -3,6 +3,7 @@ package scalariform.formatter
 import scalariform.parser._
 import scalariform.formatter._
 
+// format: OFF
 class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   override val debug = false

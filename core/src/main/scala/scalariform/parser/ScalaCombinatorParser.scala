@@ -14,8 +14,8 @@ class ScalaCombinatorParser extends Parsers {
   def when[T](condition: Boolean, parser: Parser[T]): Parser[T] =
     if (condition) parser else failure("condition did not hold")
 
-  def pairRep[U, T](parser1: Parser[U], parser2: Parser[T]): Parser[List[(U, T)]] = rep(parser1 ~ parser2 ^^ { case result1 ~ result2 => (result1, result2) })
-  def pairOpt[U, T](parser1: Parser[U], parser2: Parser[T]): Parser[Option[(U, T)]] = opt(parser1 ~ parser2 ^^ { case result1 ~ result2 => (result1, result2) })
+  def pairRep[U, T](parser1: Parser[U], parser2: Parser[T]): Parser[List[(U, T)]] = rep(parser1 ~ parser2 ^^ { case result1 ~ result2 ⇒ (result1, result2) })
+  def pairOpt[U, T](parser1: Parser[U], parser2: Parser[T]): Parser[Option[(U, T)]] = opt(parser1 ~ parser2 ^^ { case result1 ~ result2 ⇒ (result1, result2) })
 
   class ParserExtra[+T](parser1: Parser[T]) {
 
@@ -230,7 +230,7 @@ class ScalaCombinatorParser extends Parsers {
     // TODO: Cleanup: 
     lazy val ascription = (COLON ~ (USCORE ~ STAR |/ guard(AT) ~> annotations(skipNewLines = false, requireOneArgList = false) |/ (if (location == Local) typ_ ^^ { type_ ⇒ TypeExprElement(List(type_)) } else infixType(isPattern = false) ^^ { TypeExprElement(_) }))) ^^ exprElementFlatten
     lazy val matchExpr = MATCH ~ (LBRACE ~ caseClauses ~ RBRACE ^^ { case lbrace ~ caseClauses ~ rbrace ⇒ BlockExpr(lbrace, Left(caseClauses), rbrace) }) ^^ exprElementFlatten
-    lazy val other = postfixExpr ~ opt(EQUALS ~ expr/* TODO: only if postfixExpr is Ident, Select or Apply */ |/ ascription |/ matchExpr) ^^ exprElementFlatten
+    lazy val other = postfixExpr ~ opt(EQUALS ~ expr/* TODO: only if postfixExpr is Ident, Select or Apply */|/ ascription |/ matchExpr) ^^ exprElementFlatten
     lazy val res = (ifExpr |/ tryExpr |/ whileExpr |/ doExpr |/ forExpr |/ returnExpr |/ throwExpr |/ IMPLICIT ~ implicitClosure(location) |/ other) ^^ exprElementFlatten
     lazy val postArrow = if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten
     //lazy val arrowSuffix = ARROW ~ postArrow ^^ exprElementFlatten
@@ -466,7 +466,7 @@ class ScalaCombinatorParser extends Parsers {
   }
 
   lazy val patDefOrDcl = {
-    val equalsClauseOption = pairOpt(/* not optional if typedOpt is None */EQUALS, (USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) }/* extra conditions...*/ | expr))
+    val equalsClauseOption = pairOpt(/* not optional if typedOpt is None */EQUALS, (USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) }/* extra conditions...*/| expr))
     (VAL | VAR) ~ pattern2(seqOK = false) ~ pairRep(COMMA, pattern2(seqOK = false)) ~ typedOpt ~ equalsClauseOption ^^ {
       case valOrVarToken ~ pattern ~ otherPatterns ~ typedOpt ~ equalsClauseOption ⇒ {
         PatDefOrDcl(valOrVarToken, pattern, otherPatterns, typedOpt, equalsClauseOption)

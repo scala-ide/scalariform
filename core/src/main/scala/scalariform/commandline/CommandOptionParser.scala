@@ -19,13 +19,12 @@ class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
 
   lazy val plusOrMinus = "+" ^^^ true | "-" ^^^ false
 
-  lazy val preferenceOption = "-" ~ ident ~ "=" ~ "\\w+".r ^^ { case (_ ~ key ~ _ ~ value) => PreferenceOption(key, value) }
+  lazy val preferenceOption = "-" ~ ident ~ "=" ~ "\\w+".r ^^ { case (_ ~ key ~ _ ~ value) ⇒ PreferenceOption(key, value) }
 
   lazy val badOption = guard(plusOrMinus) ~> ".*".r ^^ { BadOption(_) }
 
   def getArgument(s: String) = parse(option, s) getOrElse FileName(s)
 }
-
 
 sealed trait CommandLineArgument
 

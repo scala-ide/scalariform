@@ -40,7 +40,7 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
   case class AstNodeNode(name: String, astNode: AstNode) extends TreeNode(name) {
     val fields = astNode.getFields
     lazy val children = fields flatMap {
-      case (_, None) |(_, Nil) ⇒ None
+      case (_, None) | (_, Nil) ⇒ None
       case (fieldName, value) ⇒ Some(makeTreeNode(value.asInstanceOf[AnyRef], fieldName))
     }
     override def toString = {

@@ -91,7 +91,6 @@ object Main {
     if (inPlace && files.isEmpty)
       errors ::= "Need to provide at least one file to modify in place"
 
-
     if (!inPlace && !test && files.size > 1)
       errors ::= "Cannot have more than one input file unless using --test or --inPlace"
 
