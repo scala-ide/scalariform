@@ -14,32 +14,7 @@ object Main {
     val arguments = args.toList map parser.getArgument
 
     if (arguments contains Help) {
-      println("Usage: scalariform [options] [files...]")
-      println()
-      println("Options:")
-      println("  --help, -h       Show help")
-      println("  --inPlace, -i    Replace the input file(s) in place with a formatted version.")
-      println("  --test, -t       Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
-      println("  --verbose -v     Verbose output")
-      println()
-      println("Preferences:")
-      for (key ← AllPreferences.preferencesByKey.keySet.toList.sorted) {
-        def handlePreference[T](preference: PreferenceDescriptor[T]) {
-          preference.preferenceType match {
-            case BooleanPreference ⇒
-              val filler = " " * (30 - key.length)
-              println("  [+|-]" + key + filler + "Enable/disable " + preference.description)
-            case IntegerPreference(min, max) ⇒
-              val filler = " " * (28 - key.length)
-              println("  " + key + "=[" + min + "-" + max + "]" + filler + "Set " + preference.description)
-          }
-        }
-        handlePreference(AllPreferences.preferencesByKey(key))
-      }
-      println()
-      println("Examples:")
-      println(" scalariform +spaceBeforeColon -indentSpaces=2 --inPlace foo.scala")
-      println(" find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test")
+      printUsage()
       System.exit(0)
     }
 
@@ -139,6 +114,38 @@ object Main {
             print(formatted)
         }
     }
+  }
+
+  private def printUsage() {
+    println("Usage: scalariform [options] [files...]")
+    println()
+    println("Options:")
+    println("  --help, -h       Show help")
+    println("  --inPlace, -i    Replace the input file(s) in place with a formatted version.")
+    println("  --test, -t       Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
+    println("  --verbose -v     Verbose output")
+    println()
+    println("Preferences:")
+    for (key ← AllPreferences.preferencesByKey.keySet.toList.sorted) {
+      def handlePreference[T](preference: PreferenceDescriptor[T]) {
+        preference.preferenceType match {
+          case BooleanPreference ⇒
+            val optionText = "  [+|-]" + key
+            val filler = " " * (38 - optionText.length)
+            println(optionText + filler + "Enable/disable " + preference.description)
+          case IntegerPreference(min, max) ⇒
+            val optionText = "  -" + key + "=[" + min + "-" + max + "]"
+            val filler = " " * (38 - optionText.length)
+            println(optionText + filler + "Set " + preference.description)
+        }
+      }
+      handlePreference(AllPreferences.preferencesByKey(key))
+    }
+    println()
+    println("Examples:")
+    println(" scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala")
+    println(" find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test")
+    println(" echo 'class A ( n  :Int )' | scalariform")
   }
 
 }

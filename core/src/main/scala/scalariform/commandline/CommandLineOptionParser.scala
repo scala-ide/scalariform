@@ -13,7 +13,7 @@ class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
 
   lazy val verbose = ("--verbose" | "-v") ^^^ Verbose
 
-  lazy val help = ("--help" | "-h" | "-help") ^^^ Help
+  lazy val help = ("--help" | "-help" | "-h") ^^^ Help
 
   lazy val toggle = plusOrMinus ~ ident ^^ { case onOrOff ~ key ⇒ PreferenceOption(key, onOrOff.toString) }
 
