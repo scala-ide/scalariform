@@ -2,7 +2,7 @@ import sbt._
 
 class Project(info: ProjectInfo) extends ParentProject(info) {
 
-  lazy val main = project("scalariform.core", "saclariform.core", new CoreProject(_))
+  lazy val main = project("scalariform.core", "scalariform.core", new CoreProject(_))
   lazy val gui = project("gui", "gui", new GuiProject(_), main)
   lazy val corpusScan = project("corpusscan", "corpusscan", new CorpusScanProject(_), main)
 

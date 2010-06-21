@@ -18,4 +18,8 @@
         <version>0.0.4-SNAPSHOT</version>
      </dependency>
   </dependencies>
+  <build>
+    <sourceDirectory>${basedir}/src</sourceDirectory>
+  </build>
+
 </project>
