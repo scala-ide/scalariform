@@ -55,7 +55,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          unpack="false"/>
 
    <plugin
-         id="scalariform"
+         id="scalariform.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
