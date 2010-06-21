@@ -6,13 +6,14 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   lazy val gui = project("gui", "gui", new GuiProject(_), main)
   lazy val corpusScan = project("corpusscan", "corpusscan", new CorpusScanProject(_), main)
 
+  val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
+  val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
+
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) {
 
     override def artifactID = "scalariform"
 
-    val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
-    val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
-    val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.RC2-SNAPSHOT"
+    val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.RC6-SNAPSHOT"
 
     override def mainClass = Some("scalariform.commandline.Main")
 
