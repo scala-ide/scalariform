@@ -8,7 +8,7 @@
     <version>0.0.4-SNAPSHOT</version>
   </parent>
   <groupId>com.github.mdr</groupId>
-  <artifactId>core</artifactId>
+  <artifactId>scalariform.core</artifactId>
   <version>0.0.4-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   <dependencies>

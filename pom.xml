@@ -7,7 +7,7 @@
   <version>0.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
-    <module>core</module>
+    <module>scalariform.core</module>
     <module>scalariform.eclipse</module>
     <module>scalariform.feature</module>
     <module>scalariform.update</module>
