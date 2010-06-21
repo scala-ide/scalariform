@@ -1,3 +1,6 @@
+0.0.4 (..)
+* Add Maven/Tycho build
+
 0.0.3 (9/June/10)
 * command line tool (scalariform.commandline.Main)
 * _~_ formatting fix
