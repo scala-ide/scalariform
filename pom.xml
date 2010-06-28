@@ -14,7 +14,7 @@
   </properties>
   <modules>
     <module>scalariform.core</module>
-    <module>scalariform.eclipse</module>
+<!--    <module>scalariform.eclipse</module> -->
     <module>scalariform.feature</module>
     <module>scalariform.update</module>
   </modules>
@@ -26,8 +26,6 @@
     </dependency>
   </dependencies>
   <build>
-<!--    <sourceDirectory>${basedir}/src</sourceDirectory>
-    <testSourceDirectory>${basedir}/test</testSourceDirectory> -->
     <plugins>
       <plugin>
         <groupId>org.sonatype.tycho</groupId>
