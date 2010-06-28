@@ -5,8 +5,6 @@ Bundle-SymbolicName: scalariform.eclipse;singleton:=true
 Bundle-Version: 0.0.4.qualifier
 Require-Bundle: 
  scalariform.core,
- ch.epfl.lamp.sdt.core;bundle-version="2.8.0",
- scala.library,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,
@@ -14,7 +12,9 @@ Require-Bundle:
  org.eclipse.jface.text,
  org.eclipse.text,
  org.eclipse.ui,
- org.eclipse.ui.editors
+ org.eclipse.ui.editors,
+ org.scala-ide.scala.library,
+ org.scala-ide.sdt.core;bundle-version="1.0.0"
 Import-Package: 
  org.eclipse.ui.views.contentoutline,
  scala.tools.eclipse.contribution.weaving.jdt.ui.javaeditor;apply-aspects:=false

@@ -4,7 +4,7 @@ Bundle-Name: Scalariform
 Bundle-SymbolicName: scalariform.core
 Bundle-Version: 0.0.4.qualifier
 Require-Bundle: 
- scala.library
+ org.scala-ide.scala.library
 Bundle-ClassPath: .
 Export-Package: scalariform.formatter,
  scalariform.formatter.preferences,

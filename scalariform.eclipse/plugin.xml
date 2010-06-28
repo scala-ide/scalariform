@@ -4,7 +4,7 @@
 
    <extension point="org.eclipse.ui.preferencePages">
       <page
-            category="ch.epfl.lamp.sdt.core.preferences"
+            category="org.scala-ide.sdt.core.preferences"
             class="scala.tools.eclipse.formatter.FormatterPreferencePage"
             id="scala.tools.eclipse.formatter.FormatterPreferencePage"
             name="Scala Formatter Preferences">
