@@ -6,6 +6,12 @@
   <artifactId>scalariform.parent</artifactId>
   <version>0.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <properties>
+    <scala.toolchain.version>2.8.0-RC6</scala.toolchain.version>
+    <scala.version>2.8.0.RC6</scala.version>
+    <tycho.version>0.9.0-SNAPSHOT</tycho.version>
+    <encoding>UTF-8</encoding>
+  </properties>
   <modules>
     <module>scalariform.core</module>
     <module>scalariform.eclipse</module>
@@ -16,7 +22,7 @@
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>2.8.0.RC6</version>
+      <version>${scala.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -26,13 +32,13 @@
       <plugin>
         <groupId>org.sonatype.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
-        <version>0.8.0</version>
+        <version>${tycho.version}</version>
         <extensions>true</extensions>
       </plugin>
       <plugin>
         <groupId>org.sonatype.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
-        <version>0.8.0</version>
+        <version>${tycho.version}</version>
         <configuration>
           <resolver>p2</resolver>
         </configuration>
@@ -64,6 +70,12 @@
        <layout>p2</layout>
        <!-- <url>http://download.scala-ide.org/nightly-update-master-2.8.0.RC6</url> -->
        <url>http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.RC6</url>
+    </repository>
+    <repository>
+      <id>scala-tools.org.releases</id>
+      <name>Scala Tools Maven2 Repository</name>
+      <url>http://scala-tools.org/repo-releases</url>
+      <snapshots/>
     </repository>
     <repository>
       <id>scala-tools.org.snapshots</id>

@@ -2,15 +2,15 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.mdr</groupId>
+  <artifactId>scalariform.core</artifactId>
+  <version>0.0.4-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
   <parent>
     <artifactId>scalariform.parent</artifactId>
     <groupId>com.github.mdr</groupId>
     <version>0.0.4-SNAPSHOT</version>
   </parent>
-  <groupId>com.github.mdr</groupId>
-  <artifactId>scalariform.core</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
   <dependencies>
     <dependency>
       <groupId>org.scalatest</groupId>
@@ -19,4 +19,18 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>maven-osgi-compiler-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <excludeResources>
+            <excludeResource>**/*.scala</excludeResource>
+          </excludeResources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
