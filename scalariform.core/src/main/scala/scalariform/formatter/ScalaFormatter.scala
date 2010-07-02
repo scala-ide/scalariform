@@ -48,7 +48,6 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     var suspendFormatting = false
     var edits: List[TextEdit] = Nil // Stored in reverse
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
-      val nextTokenIsPrintable = nextTokenOption exists { !isInferredNewline(_) }
       val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
 
       if (xmlRewrites contains token) {
@@ -63,6 +62,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val formattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
           val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
+          val nextTokenIsPrintable = nextTokenOption exists { !isInferredNewline(_) }
           edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap).toList
         }
       } else {
@@ -76,6 +76,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           builder.append(token.getText)
         } else {
           val nextTokenUnindents = token.getType == RBRACE
+          val nextTokenIsPrintable = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
           val positionHintOption =
             if (hiddenTokens.isEmpty) Some(token.startIndex)
@@ -137,7 +138,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         case Some(SingleLineComment(_)) ⇒ false
         case Some(MultiLineComment(_)) if nextTokenIsPrintable ⇒ true
         case Some(ScalaDocComment(_)) if nextTokenIsPrintable ⇒ true
-        case None ⇒ false
+        case _ ⇒ false
       }
       if (needGapBetweenThisAndFollowing)
         builder.append(" ")

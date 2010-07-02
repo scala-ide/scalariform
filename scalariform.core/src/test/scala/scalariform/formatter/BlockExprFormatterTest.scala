@@ -88,4 +88,13 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
     |  val b
     |}"""
 
+  """{
+    |  if (b) { /**/}
+    |  false
+    |}""" ==>
+  """{
+    |  if (b) { /**/ }
+    |  false
+    |}"""
+
 }
