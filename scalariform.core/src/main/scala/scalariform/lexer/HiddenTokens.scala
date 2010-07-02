@@ -16,6 +16,8 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
 
   def containsNewline = text contains '\n'
 
+  def containsComment = !comments.isEmpty
+
   lazy val text = tokens.map(_.token.getText).mkString
   lazy val newlines: Option[Token] = {
     if (containsNewline) {

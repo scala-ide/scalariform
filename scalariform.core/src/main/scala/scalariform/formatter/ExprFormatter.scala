@@ -56,7 +56,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             if (isInferredNewline(token))
               nextElementOpt match {
                 case Some(ArgumentExprs(_)) if token == element.tokens.last ⇒
-                //  Don't allow expression breaks immediately before an argument expressions
+                  () //  Don't allow expression breaks immediately before an argument expressions
                 case _ ⇒
                   formatResult = formatResult.formatNewline(token, formatterState.nextIndentLevelInstruction)
               }

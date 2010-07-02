@@ -448,6 +448,12 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |    val name = "Bob"
     |  }"""
 
+  """class A // foo
+    |/*bar*/
+    |{}""" ==>
+  """class A // foo
+    |/*bar*/ {}"""
+
   // format: ON
 
   override val debug = false

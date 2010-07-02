@@ -139,9 +139,9 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   "1+/+2" ==> "1 +/+ 2"
   "1*/2" ==> "1 */ 2"
 
-  "1*/*a*/2" ==> "1 */*a*/2"
-  "1 +/* /* var */ var */2" ==> "1 +/* /* var */ var */2"
-  "1 + /* /* var */ var */2" ==> "1 +/* /* var */ var */2"
+  "1*/*a*/2" ==> "1 * /*a*/ 2"
+  "1 +/* /* var */ var */2" ==> "1 + /* /* var */ var */ 2"
+  "1 + /* /* var */ var */2" ==> "1 + /* /* var */ var */ 2"
 
   """(1//2
     |+2)""" ==>
@@ -214,7 +214,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """1 / // foo
     |  2"""
   
-  "(USCORE ~ opt(wildcardType) |/ /* id |/ */typ_)" ==> "(USCORE ~ opt(wildcardType) |/ /* id |/ */typ_)" 
+  "(USCORE ~ opt(wildcardType) |/ /* id |/ */typ_)" ==> "(USCORE ~ opt(wildcardType) |/ /* id |/ */ typ_)" 
 
   "a match {case b => c; case d => e}" ==> "a match { case b => c; case d => e }"
   
@@ -283,6 +283,15 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |}""" ==>
   """foo { () =>
     |}"""    
+
+  """3 +// foo
+    |4""" ==>
+  """3 + // foo
+    |  4"""
+
+  """/* a */
+    |b""" ==>
+  """/* a */ b"""
   
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)

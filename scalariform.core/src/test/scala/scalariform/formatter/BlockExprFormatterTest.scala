@@ -27,7 +27,7 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
   """{
     |  a; b; c;
     |  d; e; f //Foo
-    |  g/*h*/; i
+    |  g /*h*/ ; i
     |  /* j */
     |  k
     |}"""

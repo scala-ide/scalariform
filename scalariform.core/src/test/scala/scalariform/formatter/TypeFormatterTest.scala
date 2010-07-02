@@ -11,9 +11,9 @@ class TypeFormatterTest extends AbstractFormatterTest {
  
   "A => B" ==> "A => B"  
 
-  "List/*b*/[/*c*/String/*d*/]" ==> "List/*b*/[/*c*/String/*d*/]"
+  "List/*b*/[/*c*/String/*d*/]" ==> "List /*b*/ [ /*c*/ String /*d*/ ]"
   
-  "Int /*foo*/ Either  String" ==> "Int/*foo*/Either String"
+  "Int /*foo*/ Either  String" ==> "Int /*foo*/ Either String"
   
   "List[_>:A<:B]" ==> "List[_ >: A <: B]"
 

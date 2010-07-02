@@ -3,8 +3,12 @@ package scalariform.formatter
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.parser._
+import scalariform.utils.Utils._
 import scalariform.utils._
+import scalariform.utils.BooleanLang._
+
 import scalariform.formatter.preferences._
+
 trait HasHiddenTokenInfo {
 
   def isInferredNewline(token: Token): Boolean
@@ -16,8 +20,6 @@ trait HasHiddenTokenInfo {
 }
 
 abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter {
-
-  import scalariform.utils.Utils._
 
   val newlineSequence: String
 
@@ -46,19 +48,22 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     var suspendFormatting = false
     var edits: List[TextEdit] = Nil // Stored in reverse
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
+      val nextTokenIsPrintable = nextTokenOption exists { !isInferredNewline(_) }
+      val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
+
       if (xmlRewrites contains token) {
         val replacement = xmlRewrites(token)
         builder.append(replacement)
         edits ::= replaceEdit(token, replacement)
       } else if (isInferredNewline(token)) {
-        val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
         alterSuspendFormatting(token.getText) foreach { suspendFormatting = _ }
         if (suspendFormatting)
           builder.append(token.getText)
         else {
           val formattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
-          edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents, tokenIndentMap).toList
+          val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
+          edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap).toList
         }
       } else {
         val formattingInstruction = predecessorFormatting.get(token) orElse
@@ -75,7 +80,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val positionHintOption =
             if (hiddenTokens.isEmpty) Some(token.startIndex)
             else None
-          edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, tokenIndentMap, positionHintOption).toList
+          edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap, positionHintOption).toList
           tokenIndentMap += (token -> builder.currentIndent)
           edits :::= builder.write(token).toList
         }
@@ -111,31 +116,35 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                                 hiddenTokens: HiddenTokens,
                                 instruction: IntertokenFormatInstruction,
                                 nextTokenUnindents: Boolean,
+                                nextTokenIsPrintable: Boolean,
+                                previousTokenIsPrintable: Boolean,
                                 tokenIndentMap: Map[Token, Int],
                                 positionHintOption: Option[Int] = None): Option[TextEdit] = {
 
     def writeIntertokenCompact() {
-      var allWhitespaceSoFar = true
-      hiddenTokens foreach {
-        case SingleLineComment(token) ⇒ {
-          if (allWhitespaceSoFar)
-            builder.append(" ")
-          if (builder.lastCharacter == Some('/'))
-            builder.append(" ")
-          builder.write(token)
-          allWhitespaceSoFar = false
+      val comments = hiddenTokens.comments
+      for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {
+        val needGapBetweenThisAndPrevious = previousCommentOption match {
+          case Some(MultiLineComment(_)) | Some(ScalaDocComment(_)) ⇒ true
+          case _ if comment == comments.first && previousTokenIsPrintable ⇒ true
+          case _ ⇒ false
         }
-        case Comment(token) ⇒ {
-          if (builder.lastCharacter == Some('/'))
-            builder.append(" ")
-          builder.write(token)
-          allWhitespaceSoFar = false
-        }
-        case _ ⇒
+        if (needGapBetweenThisAndPrevious)
+          builder.append(" ")
+        builder.write(comment.token)
       }
+      val needGapBetweenThisAndFollowing = comments.lastOption match {
+        case Some(SingleLineComment(_)) ⇒ false
+        case Some(MultiLineComment(_)) if nextTokenIsPrintable ⇒ true
+        case Some(ScalaDocComment(_)) if nextTokenIsPrintable ⇒ true
+        case None ⇒ false
+      }
+      if (needGapBetweenThisAndFollowing)
+        builder.append(" ")
     }
+
     val startPos = builder.length
-    val allWhitespace = hiddenTokens.forall(_.isInstanceOf[Whitespace])
+    val allWhitespace = hiddenTokens forall { _.isInstanceOf[Whitespace] }
     var edits: List[TextEdit] = Nil
     instruction match {
       case Compact ⇒ writeIntertokenCompact()

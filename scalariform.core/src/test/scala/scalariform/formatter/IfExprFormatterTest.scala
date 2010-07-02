@@ -177,9 +177,9 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |} /*e*/ else /*f*/ {
     |  2
     |}""" ==>
-  """if/*a*/(/*b*/true/*c*/)/*d*/{
+  """if /*a*/ ( /*b*/ true /*c*/ ) /*d*/ {
     |  1
-    |}/*e*/else/*f*/{
+    |} /*e*/ else /*f*/ {
     |  2
     |}"""
 
