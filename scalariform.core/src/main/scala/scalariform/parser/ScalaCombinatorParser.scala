@@ -65,9 +65,9 @@ class ScalaCombinatorParser extends Parsers {
 
   lazy val id: Parser[Token] = VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION
 
-  lazy val nonStarId: Parser[Token] = VARID | OTHERID | PLUS | MINUS |/* STAR | */PIPE | TILDE | EXCLAMATION
+  lazy val nonStarId: Parser[Token] = VARID | OTHERID | PLUS | MINUS | /* STAR | */ PIPE | TILDE | EXCLAMATION
 
-  lazy val nonPipeId: Parser[Token] = VARID | OTHERID | PLUS | MINUS | STAR |/* PIPE | */TILDE | EXCLAMATION
+  lazy val nonPipeId: Parser[Token] = VARID | OTHERID | PLUS | MINUS | STAR | /* PIPE | */ TILDE | EXCLAMATION
 
   lazy val statSep: Parser[Token] = NEWLINE | NEWLINES | SEMI
 
@@ -155,7 +155,7 @@ class ScalaCombinatorParser extends Parsers {
     LBRACKET ~ types(argType) ~ RBRACKET ^^ typeElementFlatten
   }
 
-  lazy val patternArgType = (USCORE ~ opt(wildcardType) |/ /* id |/ */typ_) ^^ typeElementFlatten // TODO: is id needed ?
+  lazy val patternArgType = (USCORE ~ opt(wildcardType) |/ /* id |/ */ typ_) ^^ typeElementFlatten // TODO: is id needed ?
   lazy val funcArgType = {
     lazy val varargs = typ_ ~ opt(STAR ^^ { VarargsTypeElement(_) })
     lazy val callByName = (ARROW ^^ { CallByNameTypeElement(_) }) ~ typ_
@@ -230,7 +230,7 @@ class ScalaCombinatorParser extends Parsers {
     // TODO: Cleanup: 
     lazy val ascription = (COLON ~ (USCORE ~ STAR |/ guard(AT) ~> annotations(skipNewLines = false, requireOneArgList = false) |/ (if (location == Local) typ_ ^^ { type_ ⇒ TypeExprElement(List(type_)) } else infixType(isPattern = false) ^^ { TypeExprElement(_) }))) ^^ exprElementFlatten
     lazy val matchExpr = MATCH ~ (LBRACE ~ caseClauses ~ RBRACE ^^ { case lbrace ~ caseClauses ~ rbrace ⇒ BlockExpr(lbrace, Left(caseClauses), rbrace) }) ^^ exprElementFlatten
-    lazy val other = postfixExpr ~ opt(EQUALS ~ expr/* TODO: only if postfixExpr is Ident, Select or Apply */|/ ascription |/ matchExpr) ^^ exprElementFlatten
+    lazy val other = postfixExpr ~ opt(EQUALS ~ expr /* TODO: only if postfixExpr is Ident, Select or Apply */ |/ ascription |/ matchExpr) ^^ exprElementFlatten
     lazy val res = (ifExpr |/ tryExpr |/ whileExpr |/ doExpr |/ forExpr |/ returnExpr |/ throwExpr |/ IMPLICIT ~ implicitClosure(location) |/ other) ^^ exprElementFlatten
     lazy val postArrow = if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten
     //lazy val arrowSuffix = ARROW ~ postArrow ^^ exprElementFlatten
@@ -466,7 +466,7 @@ class ScalaCombinatorParser extends Parsers {
   }
 
   lazy val patDefOrDcl = {
-    val equalsClauseOption = pairOpt(/* not optional if typedOpt is None */EQUALS, (USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) }/* extra conditions...*/| expr))
+    val equalsClauseOption = pairOpt( /* not optional if typedOpt is None */ EQUALS, (USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) } /* extra conditions...*/ | expr))
     (VAL | VAR) ~ pattern2(seqOK = false) ~ pairRep(COMMA, pattern2(seqOK = false)) ~ typedOpt ~ equalsClauseOption ^^ {
       case valOrVarToken ~ pattern ~ otherPatterns ~ typedOpt ~ equalsClauseOption ⇒ {
         PatDefOrDcl(valOrVarToken, pattern, otherPatterns, typedOpt, equalsClauseOption)
@@ -484,7 +484,7 @@ class ScalaCombinatorParser extends Parsers {
 
     val normalFunBody: Parser[FunBody] = newlineOpt ~ blockExpr ^^ { case newlineOpt ~ blockExpr ⇒ ProcFunBody(newlineOpt, blockExpr) } |
       equalsExpr ^^ { case equalsToken ~ expr ⇒ ExprFunBody(equalsToken, expr) }
-    val normalDefOrDcl = DEF ~ id ~ typeParamClauseOpt ~ paramClauses ~/* TODO: newlineOpt? */typedOpt ~ opt(normalFunBody) ^^ {
+    val normalDefOrDcl = DEF ~ id ~ typeParamClauseOpt ~ paramClauses ~ /* TODO: newlineOpt? */ typedOpt ~ opt(normalFunBody) ^^ {
       case defToken ~ nameToken ~ typeParamClauseOpt ~ paramClauses ~ returnTypeOpt ~ funBodyOpt ⇒
         FunDefOrDcl(defToken, nameToken, typeParamClauseOpt, paramClauses, returnTypeOpt, funBodyOpt)
     }
@@ -575,7 +575,7 @@ class ScalaCombinatorParser extends Parsers {
       case subtypeToken ~ Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) ⇒
         TemplateOpt(Some(TemplateInheritanceSection(subtypeToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
     }
-    val justBody =/* opt(NEWLINE <~ guard(LBRACE)) ~ */templateBodyOpt ^^ { // Omitted the NEWLINEopt because it will be picked up by templateBodyOpt
+    val justBody = /* opt(NEWLINE <~ guard(LBRACE)) ~ */ templateBodyOpt ^^ { // Omitted the NEWLINEopt because it will be picked up by templateBodyOpt
 templateBodyOpt ⇒
       TemplateOpt(None, templateBodyOpt)
     }

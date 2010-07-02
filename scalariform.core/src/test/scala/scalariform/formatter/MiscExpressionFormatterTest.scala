@@ -292,7 +292,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """/* a */
     |b""" ==>
   """/* a */ b"""
-  
+
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)
     "(a: Int) => 3" ==> "(a : Int) => 3"

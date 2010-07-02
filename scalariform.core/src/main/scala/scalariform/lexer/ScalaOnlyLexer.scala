@@ -22,7 +22,7 @@ trait ScalaOnlyLexer extends Lexer {
 
   protected def fetchScalaToken() {
     (ch: @switch) match {
-      case ' ' | '\t' | '\n' | '\r'/* TODO: | FF */⇒
+      case ' ' | '\t' | '\n' | '\r' /* TODO: | FF */ ⇒
         nextChar()
         getWhitespaceRest()
       case 'A' | 'B' | 'C' | 'D' | 'E' |
@@ -136,7 +136,7 @@ trait ScalaOnlyLexer extends Lexer {
 
   @tailrec
   private def getWhitespaceRest(): Unit = (ch: @switch) match {
-    case ' ' | '\t' | '\n' | '\r'/* TODO: | FF */⇒
+    case ' ' | '\t' | '\n' | '\r' /* TODO: | FF */ ⇒
       nextChar()
       getWhitespaceRest()
     case _ ⇒

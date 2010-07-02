@@ -127,7 +127,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {
         val needGapBetweenThisAndPrevious = previousCommentOption match {
           case Some(MultiLineComment(_)) | Some(ScalaDocComment(_)) ⇒ true
-          case _ if comment == comments.first && previousTokenIsPrintable ⇒ true
+          case _ if comment == comments.head && previousTokenIsPrintable ⇒ true
           case _ ⇒ false
         }
         if (needGapBetweenThisAndPrevious)
