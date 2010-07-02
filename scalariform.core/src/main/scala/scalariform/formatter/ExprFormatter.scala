@@ -3,7 +3,8 @@ package scalariform.formatter
 import scalariform.lexer.Token
 import scalariform.lexer.Tokens._
 import scalariform.parser._
-import scalariform.utils._
+import scalariform.utils.Utils
+import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
 
 trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter ⇒
@@ -12,63 +13,58 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = {
     var formatResult = format(exprElements.head)
+
     for ((Some(previousElement), element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
+
       val instructionOption = (previousElement, element) match {
         case (PrefixExprElement(_), _) ⇒ Some(Compact)
         case (_, PostfixExprElement(_)) ⇒ Some(CompactPreservingGap)
         case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ Some(CompactEnsuringGap)
-        case (_, ArgumentExprs(_)) ⇒
-          if (formattingPreferences(PreserveSpaceBeforeArguments))
-            Some(CompactPreservingGap)
-          else
-            None
+        case (_, ArgumentExprs(_)) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ Some(CompactPreservingGap)
         case _ ⇒ None
       }
-      for (instruction ← instructionOption if !formatResult.predecessorFormatting.contains(element.firstToken))
+
+      for (instruction ← instructionOption if not(formatResult.predecessorFormatting contains element.firstToken))
         formatResult = formatResult.before(element.firstToken, instruction)
 
-      for {
-        InfixExprElement(Token(PLUS, _, _, _)) ← Some(element)
-        if formattingPreferences(CompactStringConcatenation)
-        val Some(nextElement) = nextElementOption
-      } {
-        val stringConcatenation = (previousElement, nextElement) match {
-          case (GeneralTokens(tokens), _) if tokens.last.tokenType == STRING_LITERAL ⇒ true
-          case (_, GeneralTokens(tokens)) if tokens.head.tokenType == STRING_LITERAL ⇒ true
+      if (formattingPreferences(CompactStringConcatenation)) {
+        val infixPlus = element match {
+          case InfixExprElement(Token(PLUS, _, _, _)) ⇒ true
           case _ ⇒ false
         }
-        if (stringConcatenation) {
+        val stringConcatenation = (previousElement, nextElementOption) match {
+          case (GeneralTokens(tokens), _) if tokens.last.tokenType == STRING_LITERAL ⇒ true
+          case (_, Some(GeneralTokens(tokens))) if tokens.head.tokenType == STRING_LITERAL ⇒ true
+          case _ ⇒ false
+        }
+        if (infixPlus and stringConcatenation) {
+          val Some(nextElement) = nextElementOption // Safe because current is an infix operator
           formatResult = formatResult.before(element.firstToken, Compact)
           formatResult = formatResult.before(nextElement.firstToken, Compact)
         }
       }
+
       formatResult ++= format(element)
     }
 
     // Indent expression breaks:
     val firstToken = exprElements.head.tokens.head
-    for ((previousElementOpt, element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
+    for ((previousElementOpt, element, nextElementOpt) ← Utils.withPreviousAndNext(exprElements))
       element match {
         case GeneralTokens(_) | PrefixExprElement(_) | InfixExprElement(_) | PostfixExprElement(_) ⇒
-          for {
-            token ← element.tokens
-            if (token != firstToken)
-          } {
+          for (token ← element.tokens if token != firstToken)
             if (isInferredNewline(token))
-              nextElementOption match {
-                case Some(ArgumentExprs(_)) if token == element.tokens.last ⇒ //  Don't allow expression breaks before argument expressions 
-                case _ ⇒ formatResult = formatResult.formatNewline(token, formatterState.nextIndentLevelInstruction)
+              nextElementOpt match {
+                case Some(ArgumentExprs(_)) if token == element.tokens.last ⇒
+                //  Don't allow expression breaks immediately before an argument expressions
+                case _ ⇒
+                  formatResult = formatResult.formatNewline(token, formatterState.nextIndentLevelInstruction)
               }
-            else if (hiddenPredecessors(token).containsNewline && token != firstToken)
+            else if (hiddenPredecessors(token).containsNewline)
               formatResult = formatResult.before(token, formatterState.nextIndentLevelInstruction)
-          }
         case _ ⇒
-          for (firstElementToken ← element.tokens.headOption)
-            if (firstElementToken != firstToken) {
-              ; // TODO: format newlines as above
-            }
+        //for (firstElementToken ← element.tokens.headOption if firstElementToken != firstToken)  { /* TODO: format newlines as above*/  }
       }
-    }
 
     formatResult
   }
