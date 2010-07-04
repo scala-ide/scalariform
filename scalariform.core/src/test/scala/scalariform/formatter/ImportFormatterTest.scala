@@ -12,11 +12,11 @@ class ImportFormatterTest extends AbstractFormatterTest {
   "import foo.{bar=>baz},baz.biz" ==> "import foo.{ bar => baz }, baz.biz"
 
   """import foo.{bar => baz,
-    |wibble => wobble}""" =/=>
+    |wibble => wobble}""" ==>
   """import foo.{
     |  bar => baz,
     |  wibble => wobble
-  |}""" because "TODO"
+  |}"""
 
   override val debug = false
 

@@ -669,12 +669,26 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(blockImportExpr: BlockImportExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val BlockImportExpr(prefixExpr, ImportSelectors(lbrace, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace)) = blockImportExpr
+    val BlockImportExpr(prefixExpr, importSelectors@ImportSelectors(lbrace, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace)) = blockImportExpr
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(prefixExpr)
-    formatResult ++= format(firstImportSelector)
-    for ((comma, otherImportSelector) ← otherImportSelectors)
-      formatResult ++= format(otherImportSelector)
+
+    val singleLineBlock = !containsNewline(importSelectors)
+    val newFormatterState = formatterState.copy(inSingleLineBlock = singleLineBlock)
+
+    if (singleLineBlock) {
+      formatResult ++= format(firstImportSelector)
+      for ((comma, otherImportSelector) ← otherImportSelectors)
+        formatResult ++= format(otherImportSelector)
+    } else {
+      formatResult = formatResult.before(firstImportSelector.firstToken, formatterState.nextIndentLevelInstruction)
+      formatResult ++= format(firstImportSelector)
+      for ((comma, otherImportSelector) ← otherImportSelectors) {
+        formatResult = formatResult.before(otherImportSelector.firstToken, formatterState.nextIndentLevelInstruction)
+        formatResult ++= format(otherImportSelector)
+      }
+      formatResult = formatResult.before(rbrace, formatterState.currentIndentLevelInstruction)
+    }
     formatResult
   }
 
