@@ -16,7 +16,7 @@ class ImportFormatterTest extends AbstractFormatterTest {
   """import foo.{
     |  bar => baz,
     |  wibble => wobble
-  |}"""
+    |}"""
 
   override val debug = false
 
