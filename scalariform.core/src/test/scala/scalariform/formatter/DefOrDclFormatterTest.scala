@@ -40,7 +40,9 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   "private def x" ==> "private def x"
 
-  "private[pack] def x" ==> "private[pack] def x"
+  "private[pack]def x" ==> "private[pack] def x"
+  "private[pack]val x" ==> "private[pack] val x"
+  "private[pack]var x" ==> "private[pack] var x"
 
   """def a
     |: String""" ==>
