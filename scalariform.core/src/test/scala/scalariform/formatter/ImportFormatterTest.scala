@@ -6,8 +6,10 @@ import scalariform.formatter._
 // format: OFF
 class ImportFormatterTest extends AbstractFormatterTest {
 
+  "import foo . _" ==> "import foo._" 
   "import foo . bar" ==> "import foo.bar" 
   "import foo.{bar=>baz}" ==> "import foo.{ bar => baz }"
+  "import foo.{bar=>baz},baz.biz" ==> "import foo.{ bar => baz }, baz.biz"
 
   """import foo.{bar => baz,
     |wibble => wobble}""" =/=>

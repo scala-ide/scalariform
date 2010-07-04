@@ -198,6 +198,8 @@ class ScalaCombinatorParser extends Parsers {
     ExprElements(pair._1.elements ::: pair._2.elements)
   implicit def ordinaryPairToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable](pair: (A, B)): ExprElementFlattenable =
     ExprElements(pair._1.elements ::: pair._2.elements)
+  implicit def tripleToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable, C <% ExprElementFlattenable](triple: (A, B, C)): ExprElementFlattenable =
+    ExprElements(triple._1.elements ::: triple._2.elements ::: triple._3.elements)
   implicit def eitherToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable](either: Either[A, B]) = ExprElements(either match {
     case Left(x) ⇒ x.elements
     case Right(x) ⇒ x.elements
@@ -449,15 +451,19 @@ class ScalaCombinatorParser extends Parsers {
     case importToken ~ importExpr ~ otherImportExprs ⇒ ImportClause(importToken, importExpr, otherImportExprs)
   }
 
-  lazy val importExpr: Parser[Expr] = {
-    def loop: Parser[List[ExprElement]] = (USCORE |/ importSelectors |/ id ~ opt(DOT ~ loop)) ^^ exprElementFlatten
+  lazy val importExpr: Parser[ImportExpr] = {
     def initialSelection = (THIS ~ DOT ~ id ~ DOT |/ id ~ DOT ~ opt(THIS ~ DOT ~ id ~ DOT)) ^^ exprElementFlatten
-    initialSelection ~ loop ^^ { x ⇒ Expr(exprElementFlatten2(x)) }
+    initialSelection ~ pairRep(id, DOT) ~ ((USCORE | id) |/ importSelectors) ^^ {
+      case initialSelection ~ idDots ~ Right(importSelectors) ⇒ BlockImportExpr(Expr(exprElementFlatten2(initialSelection, idDots)), importSelectors)
+      case initialSelection ~ idDots ~ Left(uscoreOrIdToken) ⇒ Expr(exprElementFlatten2(initialSelection, idDots, uscoreOrIdToken))
+    }
   }
 
-  lazy val importSelectors = LBRACE ~ importSelector ~ rep(COMMA ~ importSelector) ~ RBRACE ^^ exprElementFlatten
+  lazy val importSelectors: Parser[ImportSelectors] = LBRACE ~ importSelector ~ pairRep(COMMA, importSelector) ~ RBRACE ^^ {
+    case lbrace ~ firstImportSelector ~ otherImportSelectors ~ rbrace ⇒ ImportSelectors(lbrace, firstImportSelector, otherImportSelectors, rbrace)
+  }
 
-  lazy val importSelector = (USCORE |/ id ~ opt(ARROW ~ (USCORE | id))) ^^ exprElementFlatten
+  lazy val importSelector: Parser[Expr] = (USCORE |/ id ~ opt(ARROW ~ (USCORE | id))) ^^ { x ⇒ Expr(exprElementFlatten2(x)) }
 
   lazy val defOrDcl: Parser[DefOrDcl] = patDefOrDcl | funDefOrDcl | typeDefOrDcl | tmplDef
 

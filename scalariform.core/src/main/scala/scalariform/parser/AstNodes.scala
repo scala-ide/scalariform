@@ -77,7 +77,7 @@ case class CallByNameTypeElement(arrow: Token) extends AstNode with TypeElement 
 
 sealed trait ExprElement extends AstNode
 
-case class Expr(contents: List[ExprElement]) extends AstNode with ExprElement with Stat with Enumerator with XmlContents {
+case class Expr(contents: List[ExprElement]) extends AstNode with ExprElement with Stat with Enumerator with XmlContents with ImportExpr {
   lazy val tokens = flatten(contents)
 }
 
@@ -277,8 +277,18 @@ case class TemplateParents(type1: Type, argumentExprss: List[ArgumentExprs], wit
   lazy val tokens = flatten(type1, argumentExprss, withTypes)
 }
 
-case class ImportClause(importToken: Token, importExpr: Expr, otherImportExprs: List[(Token, Expr)]) extends AstNode with Stat {
+case class ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) extends AstNode with Stat {
   lazy val tokens = flatten(importToken, importExpr, otherImportExprs)
+}
+
+sealed trait ImportExpr extends AstNode
+
+case class BlockImportExpr(prefixExpr: Expr, importSelectors: ImportSelectors) extends ImportExpr {
+  lazy val tokens = flatten(prefixExpr, importSelectors)
+}
+
+case class ImportSelectors(lbrace: Token, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace: Token) extends AstNode {
+  lazy val tokens = flatten(lbrace, firstImportSelector, otherImportSelectors, rbrace)
 }
 
 case class PackageBlock(packageToken: Token, name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) extends Stat {

@@ -655,11 +655,26 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   protected def format(import_ : ImportClause)(implicit formatterState: FormatterState): FormatResult = {
-    val ImportClause(importToken: Token, importExpr: Expr, otherImportExprs: List[(Token, Expr)]) = import_
+    val ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) = import_
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(importExpr)
     for ((comma, otherImportExpr) ← otherImportExprs)
       formatResult ++= format(otherImportExpr)
+    formatResult
+  }
+
+  private def format(importExpr: ImportExpr)(implicit formatterState: FormatterState): FormatResult = importExpr match {
+    case expr@Expr(_) ⇒ format(expr)
+    case blockImportExpr@BlockImportExpr(_, _) ⇒ format(blockImportExpr)
+  }
+
+  private def format(blockImportExpr: BlockImportExpr)(implicit formatterState: FormatterState): FormatResult = {
+    val BlockImportExpr(prefixExpr, ImportSelectors(lbrace, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace)) = blockImportExpr
+    var formatResult: FormatResult = NoFormatResult
+    formatResult ++= format(prefixExpr)
+    formatResult ++= format(firstImportSelector)
+    for ((comma, otherImportSelector) ← otherImportSelectors)
+      formatResult ++= format(otherImportSelector)
     formatResult
   }
 
