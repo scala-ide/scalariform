@@ -66,13 +66,32 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
   def format(xmlNonEmpty: XmlNonEmptyElement)(implicit formatterState: FormatterState): FormatResult = {
     val XmlNonEmptyElement(startTag: XmlStartTag, contents: List[XmlContents], endTag: XmlEndTag) = xmlNonEmpty
     var formatResult: FormatResult = NoFormatResult
-    val multiline = containsNewline(xmlNonEmpty)
-    formatResult ++= format(startTag)
-
-    for (xmlContent ← contents) {
-      formatResult ++= format(xmlContent)
+    val multiline = contents exists {
+      case x: XmlElement ⇒ true
+      case XmlPCDATA(Token(_, text, _, _)) if text contains '\n' ⇒ true
+      case _ ⇒ false
     }
-    if (multiline && formattingPreferences(FormatXml))
+    formatResult ++= format(startTag)
+    val nestedFormatterState = formatterState.alignWithToken(startTag.firstToken).indent
+    for (xmlContent ← contents) {
+      xmlContent match {
+        case XmlPCDATA(token@Token(_, text@Trimmed(prefix, infix, suffix), _, _)) ⇒
+          if (infix.isEmpty) {
+            formatResult = formatResult.replaceXml(token, "")
+          } else {
+            formatResult = formatResult.replaceXml(token, infix)
+            val withNewlines = (prefix contains '\n') || (suffix contains '\n')
+            if (withNewlines)
+              formatResult = formatResult.before(token, nestedFormatterState.currentIndentLevelInstruction)
+          }
+        case _ if multiline ⇒
+          formatResult = formatResult.before(xmlContent.firstToken, nestedFormatterState.currentIndentLevelInstruction)
+          formatResult ++= format(xmlContent)(nestedFormatterState)
+        case _ ⇒
+          formatResult ++= format(xmlContent)
+      }
+    }
+    if (multiline)
       formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
     formatResult
   }

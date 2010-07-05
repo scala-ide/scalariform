@@ -49,12 +49,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     var edits: List[TextEdit] = Nil // Stored in reverse
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
       val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
-
-      if (xmlRewrites contains token) {
-        val replacement = xmlRewrites(token)
-        builder.append(replacement)
-        edits ::= replaceEdit(token, replacement)
-      } else if (isInferredNewline(token)) {
+      if (isInferredNewline(token)) {
         alterSuspendFormatting(token.getText) foreach { suspendFormatting = _ }
         if (suspendFormatting)
           builder.append(token.getText)
@@ -78,16 +73,15 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val nextTokenUnindents = token.getType == RBRACE
           val nextTokenIsPrintable = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
-          val positionHintOption =
-            if (hiddenTokens.isEmpty) Some(token.startIndex)
-            else None
+          val positionHintOption = if (hiddenTokens.isEmpty) Some(token.startIndex) else None
           edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap, positionHintOption).toList
           tokenIndentMap += (token -> builder.currentIndent)
-          edits :::= builder.write(token).toList
+          val newTokenTextOpt: Option[String] = if (xmlRewrites contains token) Some(xmlRewrites(token)) else None
+          edits :::= builder.write(token, newTokenTextOpt).toList
         }
       }
     }
-    edits.reverse filter { case TextEdit(start, length, replacement) ⇒ s.substring(start, start + length) != replacement }
+    edits.reverse filter { case TextEdit(start, length, replacement) ⇒ s.substring(start, start + length) != replacement } distinct
   }
 
   private def formatComment(comment: HiddenToken, indentLevel: Int) = {
@@ -238,14 +232,14 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       builder
     }
 
-    def write(token: Token): Option[TextEdit] = {
+    def write(token: Token, replacementOption: Option[String] = None): Option[TextEdit] = {
       val rewriteArrows = formattingPreferences(RewriteArrowSymbols)
-      val replacementOption = token.getType match {
+      val actualReplacementOption = replacementOption orElse (token.getType match {
         case ARROW if rewriteArrows ⇒ Some("⇒")
         case LARROW if rewriteArrows ⇒ Some("←")
         case EOF ⇒ Some("")
         case _ ⇒ None
-      }
+      })
       builder.append(replacementOption getOrElse token.getText)
       replacementOption map { replaceEdit(token, _) }
     }

@@ -1,9 +1,11 @@
 package scalariform.formatter.preferences
 
 sealed trait PreferenceType[T] {
+
   def cast(preference: PreferenceDescriptor[_]): PreferenceDescriptor[T] = preference.asInstanceOf[PreferenceDescriptor[T]]
 
   def parseValue(s: String): Either[String, T]
+
 }
 
 case object BooleanPreference extends PreferenceType[Boolean] {
@@ -46,12 +48,14 @@ trait PreferenceDescriptor[T] {
 }
 
 abstract trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean] {
+
   val preferenceType = BooleanPreference
+
 }
 
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
-    PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration)
+    PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -108,6 +112,6 @@ case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
 case object FormatXml extends BooleanPreferenceDescriptor {
   val key = "formatXml"
   val description = "Format XML literals"
-  val defaultValue = false
+  val defaultValue = true
 }
 

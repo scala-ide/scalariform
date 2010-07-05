@@ -179,17 +179,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  println("bar")
     |})"""
 
-  """{
-    |<html>{
-    |println("Foo")
-    |}</html>
-    |}""" ==>
-  """{
-    |  <html>{
-    |    println("Foo")
-    |  }</html>
-    |}"""
-
   """b match { 
     |case y@ <phone/> => 
     |}""" ==>
@@ -197,17 +186,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  case y@ <phone/> =>
     |}""" // TODO: Whitespace around @ in this case?
 
-    
-  """{
-    |    <package>
-    |    <name>{ name.get }</name>
-    |    <version>{ version.get }</version></package>
-    |}""" ==>    
-  """{
-    |  <package>
-    |    <name>{ name.get }</name>
-    |    <version>{ version.get }</version></package>
-    |}""" // For now, we don't touch formatting inside XML     
 
   """1 / // foo
     |2""" ==>
@@ -312,6 +290,35 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """/* a */
     |b""" ==>
   """/* a */ b"""
+
+  """a("A", 
+    |  b("B",
+    |     c(1, 2),
+    |     c(3, 4)), 
+    |  b("B2", 
+    |     c(5, 6)))""" ==>
+  """a("A",
+    |  b("B",
+    |    c(1, 2),
+    |    c(3, 4)),
+    |  b("B2",
+    |    c(5, 6)))"""
+
+  """1 + (a,
+    | b, c)""" ==>
+  """1 + (a,
+    |  b, c)"""
+
+  """1 + (
+    |  a, b, c)""" =/=>
+  """1 + (
+    |  a, b, c)""" because "How to format?"
+
+  """1 + (a
+    |, b, c)""" =/=>
+  """1 + (a
+    |  , b, c)""" because "Permit newline before comma ?"
+
 
   "()" ==> "()"
 
