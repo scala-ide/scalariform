@@ -289,9 +289,31 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """3 + // foo
     |  4"""
 
+  """3 +
+    |{ 4 * 12
+    |}""" ==>
+  """3 +
+    |  {
+    |    4 * 12
+    |  }"""
+
+  """1 + 
+    |2 + 
+    |3""" ==>
+  """1 +
+    |  2 +
+    |  3"""
+
+  """foo(1,
+    |2)""" ==>
+  """foo(1,
+    |  2)"""
+
   """/* a */
     |b""" ==>
   """/* a */ b"""
+
+  "()" ==> "()"
 
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)
@@ -303,6 +325,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """{ // format: +spaceBeforeColon
     |  val a : Int = 2
     |}""" 
+
+  "_.a" ==> "_.a"
 
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(CompactStringConcatenation, true)

@@ -169,8 +169,7 @@ class ScalaCombinatorParser extends Parsers {
   def exprElementFlatten[T <% ExprElementFlattenable]: (T ⇒ List[ExprElement]) = t ⇒ { exprElementFlatten2(t) }
   def exprElementFlatten2[T <% ExprElementFlattenable](t: T): List[ExprElement] = groupGeneralTokens(t.elements)
   def groupGeneralTokens(xs: List[ExprElement]): List[ExprElement] = {
-    val eq = (x: ExprElement, y: ExprElement) ⇒
-      (x, y) match {
+    val eq = (x: ExprElement, y: ExprElement) ⇒ (x, y) match {
       case (GeneralTokens(_), GeneralTokens(_)) ⇒ true
       case _ ⇒ false
     }
@@ -293,12 +292,14 @@ class ScalaCombinatorParser extends Parsers {
   }
 
   lazy val simpleExpr = {
+    val parenExpr = LPAREN ~ opt(expr ~ rep(COMMA ~ expr)) ~ RPAREN ^^ {
+      case lparen ~ contents ~ rparen ⇒ ParenExpr(lparen, exprElementFlatten2(contents), rparen)
+    }
     val first = (literal
       |/ xmlExpr
       |/ path(thisOK = true, typeOK = false)
       |/ USCORE
-      |/ LPAREN ~ opt(expr ~ rep(COMMA ~ expr)) ~ RPAREN
-      ) ~ simpleExprRest(canApply = true) ^^ exprElementFlatten // TODO: Check simpleExprRest applicability
+      |/ parenExpr) ~ simpleExprRest(canApply = true) ^^ exprElementFlatten // TODO: Check simpleExprRest applicability
     val blockOrNewTemplate = (blockExpr |/ NEW ~ template(isTrait = false)) ^^ exprElementFlatten
     val second = blockOrNewTemplate ~ simpleExprRest(canApply = false) ^^ exprElementFlatten
     (first |/ second) ^^ exprElementFlatten
@@ -417,8 +418,8 @@ class ScalaCombinatorParser extends Parsers {
 
     val param: Parser[Param] = annotations(skipNewLines = false, requireOneArgList = false) ~ modifiers ~ opt(VAL | VAR) ~ id ~
       pairOpt(COLON, paramType) ~ pairOpt(EQUALS, expr) ^^ {
-      case annotations ~ modifiers ~ valOrVarOpt ~ id ~ paramTypeOpt ~ defaultValueOpt ⇒ Param(annotations, modifiers, valOrVarOpt, id, paramTypeOpt, defaultValueOpt)
-    }
+        case annotations ~ modifiers ~ valOrVarOpt ~ id ~ paramTypeOpt ~ defaultValueOpt ⇒ Param(annotations, modifiers, valOrVarOpt, id, paramTypeOpt, defaultValueOpt)
+      }
 
     val paramClause: Parser[ParamClause] = LPAREN ~ opt(opt(IMPLICIT) ~ param ~ pairRep(COMMA, param)) ~ RPAREN ^^ {
       case lparen ~ None ~ rparen ⇒ ParamClause(lparen, None, None, Nil, rparen)
@@ -472,7 +473,7 @@ class ScalaCombinatorParser extends Parsers {
   }
 
   lazy val patDefOrDcl = {
-    val equalsClauseOption = pairOpt( /* not optional if typedOpt is None */ EQUALS, (USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) } /* extra conditions...*/ | expr))
+    val equalsClauseOption = pairOpt( /* not optional if typedOpt is None */ EQUALS, (expr | USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) } /* extra conditions...*/ ))
     (VAL | VAR) ~ pattern2(seqOK = false) ~ pairRep(COMMA, pattern2(seqOK = false)) ~ typedOpt ~ equalsClauseOption ^^ {
       case valOrVarToken ~ pattern ~ otherPatterns ~ typedOpt ~ equalsClauseOption ⇒ {
         PatDefOrDcl(valOrVarToken, pattern, otherPatterns, typedOpt, equalsClauseOption)

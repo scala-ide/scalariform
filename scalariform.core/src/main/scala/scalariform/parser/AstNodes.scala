@@ -81,6 +81,10 @@ case class Expr(contents: List[ExprElement]) extends AstNode with ExprElement wi
   lazy val tokens = flatten(contents)
 }
 
+case class ParenExpr(lparen: Token, contents: List[ExprElement], rparen: Token) extends ExprElement {
+  lazy val tokens = flatten(lparen, contents, rparen)
+}
+
 case class PrefixExprElement(id: Token) extends AstNode with ExprElement {
   lazy val tokens = flatten(id)
 }

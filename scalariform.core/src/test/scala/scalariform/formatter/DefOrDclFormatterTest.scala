@@ -87,7 +87,8 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
     |B""" ==>
   """type B"""
 
-    
+  "class A { val b = _.c }" ==> "class A { val b = _.c }"
+
   type Result = FullDefOrDcl
   
   def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.nonLocalDefOrDcl)

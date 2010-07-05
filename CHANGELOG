@@ -2,7 +2,9 @@
 * Add Maven/Tycho build
 * Adjust spacing between comments and adjacent tokens
 * Improved formatting for import blocks
-* "private[pack]trait" formatting fix
+* FIX: "private[pack]trait" formatting
+* FIX: "val a = _.b" parsing
+* Improved "staircase expression" formatting
 
 0.0.3 (9/June/10)
 * command line tool (scalariform.commandline.Main)
