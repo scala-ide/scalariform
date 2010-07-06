@@ -5,6 +5,7 @@
 * FIX: "private[pack]trait" formatting
 * FIX: "val a = _.b" parsing
 * Improved "staircase expression" formatting
+* Simple XML processing by default
 
 0.0.3 (9/June/10)
 * command line tool (scalariform.commandline.Main)

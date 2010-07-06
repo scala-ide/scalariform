@@ -67,27 +67,43 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     val XmlNonEmptyElement(startTag: XmlStartTag, contents: List[XmlContents], endTag: XmlEndTag) = xmlNonEmpty
     var formatResult: FormatResult = NoFormatResult
     val multiline = contents exists {
-      case x: XmlElement ⇒ true
+      /* case x: XmlElement ⇒ true */
       case XmlPCDATA(Token(_, text, _, _)) if text contains '\n' ⇒ true
       case _ ⇒ false
     }
     formatResult ++= format(startTag)
     val nestedFormatterState = formatterState.alignWithToken(startTag.firstToken).indent
-    for (xmlContent ← contents) {
-      xmlContent match {
-        case XmlPCDATA(token@Token(_, text@Trimmed(prefix, infix, suffix), _, _)) ⇒
-          if (infix.isEmpty) {
+    var firstNonWhitespace = true
+    for (previousAndThis ← Utils.pairWithPrevious(contents)) {
+      previousAndThis match {
+        case (_, xmlContent@XmlPCDATA(token@Token(_, text@Trimmed(prefix, infix, suffix), _, _))) ⇒
+          if (infix.isEmpty)
             formatResult = formatResult.replaceXml(token, "")
-          } else {
+          else {
+            firstNonWhitespace = false
             formatResult = formatResult.replaceXml(token, infix)
             val withNewlines = (prefix contains '\n') || (suffix contains '\n')
-            if (withNewlines)
+            if (multiline)
               formatResult = formatResult.before(token, nestedFormatterState.currentIndentLevelInstruction)
           }
-        case _ if multiline ⇒
+        case (_, xmlContent) if multiline && firstNonWhitespace =>
+          firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, nestedFormatterState.currentIndentLevelInstruction)
-          formatResult ++= format(xmlContent)(nestedFormatterState)
-        case _ ⇒
+          formatResult ++= format(xmlContent)
+        case (Some(XmlPCDATA(Token(_, Trimmed(prefix, infix, suffix), _, _))), xmlContent) if multiline && (suffix.contains('\n') || (infix.isEmpty && prefix.contains('\n'))) =>
+          firstNonWhitespace = false
+          formatResult = formatResult.before(xmlContent.firstToken, nestedFormatterState.currentIndentLevelInstruction)
+          formatResult ++= format(xmlContent)
+        case (Some(_), xmlContent@Expr(_)) =>
+          firstNonWhitespace = false
+          formatResult = formatResult.before(xmlContent.firstToken, Compact)
+          formatResult ++= format(xmlContent)
+        case (Some(Expr(_)), xmlContent) =>
+          firstNonWhitespace = false
+          formatResult = formatResult.before(xmlContent.firstToken, Compact)
+          formatResult ++= format(xmlContent)
+        case (_, xmlContent) ⇒
+          firstNonWhitespace = false
           formatResult ++= format(xmlContent)
       }
     }

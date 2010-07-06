@@ -7,7 +7,35 @@ import scalariform.formatter.preferences._
 // format: OFF
 class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
-    "<a b = 'c'/>" ==> "<a b='c'/>"
+  "<a b = 'c'/>" ==> "<a b='c'/>"
+
+  "<a>{foo}</a>" ==> "<a>{ foo }</a>"
+
+  "<a>{foo}{bar}</a>" ==> "<a>{ foo }{ bar }</a>"
+  
+  """<a>
+    |{foo}
+    |</a>""" ==>
+  """<a>
+    |  { foo }
+    |</a>"""
+
+  """<a>
+    |foo
+    |{bar}
+    |baz
+    |</a>""" ==>
+  """<a>
+    |  foo
+    |  { bar }
+    |  baz
+    |</a>"""
+
+  """<a>42<c/>
+    |</a>""" ==>
+  """<a>
+    |  42<c/>
+    |</a>"""
 
   """b(<c d={e + 
     |"f"}/>)""" ==>
@@ -65,14 +93,45 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  </package>
     |}"""
 
-  """class A {
+  """{
     |val b = <c>
     |<d/></c>
     |}""" ==>
-  """class A {
+  """{
     |  val b = <c>
     |            <d/>
     |          </c>
+    |}"""
+
+  """{
+    |
+    |  <p>{ 1 } { 1 }</p>;
+    |
+    |  <p>{ 1 }{ 1 }</p>
+    |
+    |}""" ==>
+  """{
+    |
+    |  <p>{ 1 }{ 1 }</p>;
+    |
+    |  <p>{ 1 }{ 1 }</p>
+    |
+    |}"""
+
+
+  """{
+    |{ <a><b/></a> }
+    |  { <a>
+    |      <b/>
+    |    </a> }
+    |}""" ==>
+  """{
+    |  { <a><b/></a> }
+    |  {
+    |    <a>
+    |      <b/>
+    |    </a>
+    |  }
     |}"""
 
   override val debug = false
