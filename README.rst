@@ -47,10 +47,11 @@ Usage::
   scalariform [options] [files...]
   
   Options:
-    --help, -h       Show help
-    --inPlace, -i    Replace the input file(s) in place with a formatted version.
-    --test, -t       Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
-    --verbose -v     Verbose output
+    --help, -h                      Show help
+    --inPlace, -i                   Replace the input file(s) in place with a formatted version.
+    --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
+    --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
+    --verbose -v                    Verbose output
   
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
