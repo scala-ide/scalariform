@@ -54,6 +54,11 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <jvmArgs>
+            <jvmArg>-Xmx1024m</jvmArg>
+          </jvmArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>
