@@ -45,16 +45,30 @@ object Main {
     else
       FormattingPreferences()
 
-    var files: List[File] = Nil
-    for (FileName(fileName) ← arguments) {
-      val file = new File(fileName)
-      if (!file.exists)
-        errors ::= "No such file " + file
-      if (file.isDirectory)
-        errors ::= "Cannot format a directory (" + file + ")"
-      files ::= file
+    def getFiles(): List[File] = {
+      var files: List[File] = Nil
+      def addFile(fileName: String) {
+        val file = new File(fileName)
+        if (!file.exists)
+          errors ::= "No such file " + file
+        if (file.isDirectory)
+          errors ::= "Cannot format a directory (" + file + ")"
+        files ::= file
+      }
+      for (FileList(listName) ← arguments) {
+        val listFile = new File(listName)
+        if (!listFile.exists)
+          errors ::= "No such file: file list " + listFile
+        else if (listFile.isDirectory)
+          errors ::= "Path is a directory: file list " + listFile
+        else
+          Source.fromFile(listFile).getLines foreach addFile
+      }
+      for (FileName(fileName) ← arguments) addFile(fileName)
+      files.reverse
     }
-    files = files.reverse
+
+    val files = getFiles()
 
     val test = arguments contains Test
     val inPlace = arguments contains InPlace
@@ -127,10 +141,11 @@ object Main {
     println("Usage: scalariform [options] [files...]")
     println()
     println("Options:")
-    println("  --help, -h       Show help")
-    println("  --inPlace, -i    Replace the input file(s) in place with a formatted version.")
-    println("  --test, -t       Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
-    println("  --verbose -v     Verbose output")
+    println("  --help, -h                      Show help")
+    println("  --inPlace, -i                   Replace the input file(s) in place with a formatted version.")
+    println("  --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
+    println("  --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)")
+    println("  --verbose -v                    Verbose output")
     println()
     println("Preferences:")
     for (key ← AllPreferences.preferencesByKey.keySet.toList.sorted) {
