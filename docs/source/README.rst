@@ -47,15 +47,17 @@ Usage::
   scalariform [options] [files...]
   
   Options:
-    --help, -h       Show help
-    --inPlace, -i    Replace the input file(s) in place with a formatted version.
-    --test, -t       Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
-    --verbose -v     Verbose output
+    --help, -h                      Show help
+    --inPlace, -i                   Replace the input file(s) in place with a formatted version.
+    --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
+    --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
+    --verbose -v                    Verbose output
   
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
     [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
+    [+|-]formatXml                      Enable/disable Format XML literals
     -indentSpaces=[1-10]                Set Number of spaces to use for indentation
     [+|-]preserveSpaceBeforeArguments   Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols            Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
@@ -147,6 +149,13 @@ Or::
       favoriteColor: java.awt.Color) {
     def firstMethod = ...
   }
+
+formatXml
+~~~~~~~~~
+
+Default: ``true``
+
+Format embedded XML literals .
 
 indentSpaces 
 ~~~~~~~~~~~~
