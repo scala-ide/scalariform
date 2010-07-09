@@ -68,6 +68,13 @@ Usage::
    find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
    echo 'class A ( n  :Int )' | scalariform
 
+Integration with sbt
+--------------------
+
+`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions.
+
+.. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
+
 Preferences
 -----------
 
