@@ -7,8 +7,8 @@
   <version>0.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-    <scala.toolchain.version>2.8.0-RC6</scala.toolchain.version>
-    <scala.version>2.8.0.RC6</scala.version>
+    <scala.toolchain.version>2.8.0</scala.toolchain.version>
+    <scala.version>2.8.0</scala.version>
     <tycho.version>0.9.0</tycho.version>
     <encoding>UTF-8</encoding>
   </properties>
