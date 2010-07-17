@@ -4,12 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.mdr</groupId>
   <artifactId>scalariform.core</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   <parent>
     <artifactId>scalariform.parent</artifactId>
     <groupId>com.github.mdr</groupId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>

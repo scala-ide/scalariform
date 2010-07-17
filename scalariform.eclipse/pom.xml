@@ -5,17 +5,17 @@
   <parent>
     <artifactId>scalariform.parent</artifactId>
     <groupId>com.github.mdr</groupId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
   </parent>
   <groupId>com.github.mdr</groupId>
   <artifactId>scalariform.eclipse</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
     <dependencies>
       <dependency>
         <groupId>com.github.mdr</groupId>
         <artifactId>core</artifactId>
-        <version>0.0.4-SNAPSHOT</version>
+        <version>0.0.5-SNAPSHOT</version>
      </dependency>
   </dependencies>
   <build>
