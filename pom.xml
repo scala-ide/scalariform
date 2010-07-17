@@ -2,7 +2,7 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.mdr</groupId>
+  <groupId>org.scalariform</groupId>
   <artifactId>scalariform.parent</artifactId>
   <version>0.0.5-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -13,8 +13,7 @@
     <encoding>UTF-8</encoding>
   </properties>
   <modules>
-    <module>scalariform.core</module>
-<!--    <module>scalariform.eclipse</module> -->
+    <module>scalariform</module>
     <module>scalariform.feature</module>
     <module>scalariform.update</module>
   </modules>

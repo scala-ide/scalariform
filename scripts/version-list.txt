@@ -1,11 +1,11 @@
 project/build.properties
 pom.xml
 scalariform.eclipse/pom.xml
-scalariform.core/pom.xml
+scalariform/pom.xml
 scalariform.feature/pom.xml
 scalariform.update/pom.xml
 docs/source/conf.py
-scalariform.core/META-INF/MANIFEST.MF
+scalariform/META-INF/MANIFEST.MF
 scalariform.eclipse/META-INF/MANIFEST.MF
 scalariform.feature/feature.xml
 scalariform.update/site.xml

@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="sbt.eclipse.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/scalariform.core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scalariform"/>
 	<classpathentry kind="lib" path="lib_managed/scala_2.8.0.RC6/compile/miglayout-3.7.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
