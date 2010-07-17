@@ -13,26 +13,25 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
-Installation in Eclipse
------------------------
+Use with Eclipse
+----------------
 
-In Eclipse 3.5, install the latest nightly build of Scala IDE for
-Eclipse using the update site mechanism:
+In Eclipse 3.5.2, install the ``tycho-reorg`` build of Scala IDE,
+which integrates Scalariform as the formatter. You can use the
+following update site:
 
-  http://download.scala-ide.org/nightly-update-master-trunk
+  http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.RC6/
 
 (See http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation for more detailed instructions.)
 
-Then install Scalariform from this update site:
+Formatting works the same in the Scala editor; that is, either
 
-  http://scalariform.googlecode.com/svn/trunk/update-site/
+- Right click in the editor -> Source -> Format
+- Press Ctrl-Shift-F
 
-To format:
+To configure preferences, go to Window -> Preferences -> Scala -> Formatter
 
-- Right click in the editor -> Format Scala Source Code, or 
-- Press Ctrl-Shift-D
-
-To configure preferences, go to Window -> Preferences -> Scala -> Scala Formatter Preferences
+It can also perform formatting as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
 
 Command line tool
 -----------------
@@ -162,7 +161,7 @@ formatXml
 
 Default: ``true``
 
-Format embedded XML literals .
+Format embedded XML literals; if ``false`` they will be left untouched.
 
 indentSpaces 
 ~~~~~~~~~~~~
