@@ -13,7 +13,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
     override def artifactID = "scalariform"
 
-    val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.RC6-SNAPSHOT"
+    val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.final-SNAPSHOT"
 
     override def mainClass = Some("scalariform.commandline.Main")
 

@@ -20,7 +20,7 @@ In Eclipse 3.5.2, install the ``tycho-reorg`` build of Scala IDE,
 which integrates Scalariform as the formatter. You can use the
 following update site:
 
-  http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.RC6/
+  http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.final/
 
 (See http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation for more detailed instructions.)
 
