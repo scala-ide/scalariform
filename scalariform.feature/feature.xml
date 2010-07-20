@@ -42,19 +42,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       <import plugin="org.eclipse.text"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.scala-ide.scala.library"/>
-      <import plugin="org.scala-ide.sdt.core" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.scala-ide.sdt.aspects"/>
    </requires>
 
-<!--   <plugin
-         id="scalariform.eclipse"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
--->
    <plugin
          id="scalariform"
          download-size="0"

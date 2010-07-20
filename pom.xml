@@ -68,12 +68,6 @@
        <url>http://download.eclipse.org/releases/galileo</url>
     </repository>
     <repository>
-       <id>scala eclipse nightly</id>
-       <layout>p2</layout>
-       <!-- <url>http://download.scala-ide.org/nightly-update-master-2.8.0.final</url> -->
-       <url>http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.final</url>
-    </repository>
-    <repository>
       <id>scala-tools.org.releases</id>
       <name>Scala Tools Maven2 Repository</name>
       <url>http://scala-tools.org/repo-releases</url>
