@@ -13,9 +13,28 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
     override def artifactID = "scalariform"
 
-    val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.final-SNAPSHOT"
+    val scalatest = "org.scalatest" % "scalatest" % "1.2-for-scala-2.8.0.final-SNAPSHOT" % "test->default"
 
     override def mainClass = Some("scalariform.commandline.Main")
+
+    override def managedStyle = ManagedStyle.Maven
+  
+    val publishTo = "Scala Toos Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+
+    //val publishTo = Resolver.file("maven-local", Path.userHome / ".m2" / "repository" asFile) 
+  
+    Credentials(Path.userHome / ".ivy2" / ".credentials", log)
+
+    override def pomExtra =
+      <inceptionYear>2010</inceptionYear>
+      <url>http://github.com/mdr/scalariform</url>
+      <licenses>
+        <license>
+          <name>MIT License</name>
+          <url>http://www.opensource.org/licenses/mit-license.php</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses> 
 
   }
 
@@ -34,5 +53,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
     override def mainClass = Some("scalariform.gui.Main")
 
   }
+
+
 }
 
