@@ -79,5 +79,11 @@
       <url>http://scala-tools.org/repo-snapshots</url>
       <snapshots/>
     </repository>
+    <repository>
+       <id>scala eclipse nightly</id>
+       <layout>p2</layout>
+       <url>http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.final</url>
+    </repository>
+
   </repositories>
 </project>
