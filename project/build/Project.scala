@@ -1,4 +1,5 @@
 import sbt._
+import com.github.olim7t.sbtscalariform._
 
 class Project(info: ProjectInfo) extends ParentProject(info) {
 
@@ -9,7 +10,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
   val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
 
-  class CoreProject(info: ProjectInfo) extends DefaultProject(info) {
+  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with ScalariformPlugin {
 
     val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test->default"
 
@@ -23,6 +24,8 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   
     Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
+    override def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true))
+
     override def pomExtra =
       <inceptionYear>2010</inceptionYear>
       <url>http://github.com/mdr/scalariform</url>
@@ -33,6 +36,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
           <distribution>repo</distribution>
         </license>
       </licenses> 
+
 
   }
 
@@ -51,7 +55,6 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
     override def mainClass = Some("scalariform.gui.Main")
 
   }
-
 
 }
 
