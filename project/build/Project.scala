@@ -11,7 +11,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) {
 
-    val scalatest = "org.scalatest" % "scalatest" % "1.2" // % "test->default"
+    val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test->default"
 
     override def mainClass = Some("scalariform.commandline.Main")
 
