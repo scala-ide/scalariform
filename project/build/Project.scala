@@ -3,6 +3,12 @@ import com.github.olim7t.sbtscalariform._
 
 class Project(info: ProjectInfo) extends ParentProject(info) {
 
+  trait FormatterOptions extends ScalariformPlugin {
+
+    override def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true))
+
+  }
+
   lazy val main = project("scalariform", "scalariform", new CoreProject(_))
   lazy val gui = project("gui", "gui", new GuiProject(_), main)
   lazy val corpusScan = project("corpusscan", "corpusscan", new CorpusScanProject(_), main)
@@ -10,7 +16,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
   val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
 
-  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with ScalariformPlugin {
+  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions {
 
     val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test->default"
 
@@ -23,8 +29,6 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
     //val publishTo = Resolver.file("maven-local", Path.userHome / ".m2" / "repository" asFile) 
   
     Credentials(Path.userHome / ".ivy2" / ".credentials", log)
-
-    override def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true))
 
     override def pomExtra =
       <inceptionYear>2010</inceptionYear>
@@ -40,7 +44,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   }
 
-  class CorpusScanProject(info: ProjectInfo) extends DefaultProject(info) {
+  class CorpusScanProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions {
 
     val commonsIo = "commons-io" % "commons-io" % "1.4"
 
@@ -48,7 +52,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   }
 
-  class GuiProject(info: ProjectInfo) extends DefaultProject(info) {
+  class GuiProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions {
 
     val miglayout = "com.miglayout" % "miglayout" % "3.7.1"
 
