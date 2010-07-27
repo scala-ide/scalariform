@@ -130,7 +130,7 @@ trait ScalaOnlyLexer extends Lexer {
           nextChar()
           getOperatorRest()
         } else
-          throw new ScalaLexerException("illegal character")
+          throw new ScalaLexerException("illegal character: " + ch)
     }
   }
 
