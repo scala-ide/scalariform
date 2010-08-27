@@ -300,6 +300,29 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |else {println()}""" ==>
   """if (a) { println() }
     |else { println() }"""
+
+  """Some(if (a) 
+    |b 
+    |else 
+    |c)""" ==>
+  """Some(if (a)
+    |  b
+    |else
+    |  c)"""
+
+  """Some(if (a) {
+    |b 
+    |} else 
+    |c)""" ==>
+  """Some(if (a) {
+    |  b
+    |} else
+    |  c)"""
+
+  """Some(if (a) { b } else 
+    |c)""" ==>
+  """Some(if (a) { b } else
+    |  c)"""
     
 }
  

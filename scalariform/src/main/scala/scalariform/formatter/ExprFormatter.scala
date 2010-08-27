@@ -175,18 +175,18 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val bodyIsABlock = isBlockExpr(body)
 
     val indentBody = newlinesOpt match {
-      case Some(newlines) if bodyIsABlock ⇒ {
+      case Some(newlines) if bodyIsABlock ⇒
         formatResult = formatResult.formatNewline(newlines, CompactEnsuringGap)
         false
-      }
-      case Some(newlines) ⇒ {
+      case Some(newlines) ⇒
         formatResult = formatResult.formatNewline(newlines, formatterState.nextIndentLevelInstruction)
         true
-      }
-      case None ⇒ {
+      case None if hiddenPredecessors(body.firstToken).containsNewline && !bodyIsABlock ⇒
+        formatResult = formatResult.before(body.firstToken, formatterState.nextIndentLevelInstruction)
+        false
+      case None ⇒
         formatResult = formatResult.before(body.firstToken, CompactEnsuringGap)
         false
-      }
     }
 
     val bodyFormatterState = if (indentBody) formatterState.indent else formatterState
