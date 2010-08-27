@@ -16,13 +16,12 @@ Scalariform is licenced under `The MIT Licence`_.
 Use with Eclipse
 ----------------
 
-In Eclipse 3.5.2, install the ``tycho-reorg`` build of Scala IDE,
-which integrates Scalariform as the formatter. You can use the
-following update site:
+Scala IDE for Eclipse incorporates Scalariform:
 
-  http://download.scala-ide.org/nightly-update-tycho-reorg-2.8.0.final/
+  http://download.scala-ide.org/
 
-(See http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation for more detailed instructions.)
+(See http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation 
+for more detailed instructions.)
 
 Formatting works the same in the Scala editor; that is, either
 
@@ -32,6 +31,22 @@ Formatting works the same in the Scala editor; that is, either
 To configure preferences, go to Window -> Preferences -> Scala -> Formatter
 
 It can also perform formatting as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
+
+Use with TextMate
+-----------------
+
+Mads Jensen's Scala TextMate bundle uses Scalariform:
+
+  http://github.com/mads379/scala.tmbundle
+
+Reformat using Ctrl-Shift-H.
+
+Integration with sbt
+--------------------
+
+`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions.
+
+.. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
 
 Command line tool
 -----------------
@@ -66,13 +81,6 @@ Usage::
    scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
    find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
    echo 'class A ( n  :Int )' | scalariform
-
-Integration with sbt
---------------------
-
-`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions.
-
-.. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
 
 Preferences
 -----------
