@@ -1,5 +1,7 @@
 0.0.5 (..)
 * Set up publish to Scala Tools repo
+* Better staircase expr formatting
+* Bug fixes for if/for/while inside paren expressions
 
 0.0.4 (17/July/10)
 * Add Maven/Tycho build

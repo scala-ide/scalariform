@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.scala" kind="src" path="src/main/scala"/>
-	<classpathentry including="**/*.scala" kind="src" path="src/test/scala"/>
+	<classpathentry kind="src" path="src/main/scala"/>
+	<classpathentry kind="src" path="src/test/scala"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib_managed/scala_2.8.0.final/compile/scalatest-1.2-for-scala-2.8.0.final-SNAPSHOT.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

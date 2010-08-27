@@ -13,11 +13,5 @@ gui/src_managed/
 corpusscan/target/
 corpusscan/lib_managed/
 corpusscan/src_managed/
-scalariform.eclipse/bin
-scalariform.update/artifacts.jar
-scalariform.update/content.jar
-scalariform.update/features
-scalariform.update/plugins
-scalariform.update/logs.zip
-scalariform.eclipse/lib/scalariform_2.8.0-SNAPSHOT-0.1.jar
 docs/build
+.settings

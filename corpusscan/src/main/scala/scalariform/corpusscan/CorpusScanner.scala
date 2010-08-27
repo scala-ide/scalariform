@@ -1,9 +1,9 @@
 package scalariform.corpusscan
 
-import scalariform.parser._
 import scalariform.lexer.{ Token ⇒ _, _ }
 import scalariform.formatter._
 import scalariform.formatter.preferences._
+import scalariform.parser._
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 import java.io.File
