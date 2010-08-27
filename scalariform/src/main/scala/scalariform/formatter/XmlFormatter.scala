@@ -86,19 +86,19 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
             if (multiline)
               formatResult = formatResult.before(token, nestedFormatterState.currentIndentLevelInstruction)
           }
-        case (_, xmlContent) if multiline && firstNonWhitespace =>
+        case (_, xmlContent) if multiline && firstNonWhitespace ⇒
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, nestedFormatterState.currentIndentLevelInstruction)
           formatResult ++= format(xmlContent)(nestedFormatterState)
-        case (Some(XmlPCDATA(Token(_, Trimmed(prefix, infix, suffix), _, _))), xmlContent) if multiline && (suffix.contains('\n') || (infix.isEmpty && prefix.contains('\n'))) =>
+        case (Some(XmlPCDATA(Token(_, Trimmed(prefix, infix, suffix), _, _))), xmlContent) if multiline && (suffix.contains('\n') || (infix.isEmpty && prefix.contains('\n'))) ⇒
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, nestedFormatterState.currentIndentLevelInstruction)
           formatResult ++= format(xmlContent)(nestedFormatterState)
-        case (Some(_), xmlContent@Expr(_)) =>
+        case (Some(_), xmlContent@Expr(_)) ⇒
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, Compact)
           formatResult ++= format(xmlContent)(if (multiline) nestedFormatterState else formatterState)
-        case (Some(Expr(_)), xmlContent) =>
+        case (Some(Expr(_)), xmlContent) ⇒
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, Compact)
           formatResult ++= format(xmlContent)
