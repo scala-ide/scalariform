@@ -401,7 +401,7 @@ object ScalaFormatter {
     OBJECT, OVERRIDE, /* PACKAGE, */ PRIVATE, PROTECTED,
     /* REQUIRES, RETURN, */ SEALED, /* SUPER, THIS, */
     /* THROW, */ TRAIT, /* TRY, TYPE, */
-    VAL, VAR, WHILE, WITH, YIELD, 
+    VAL, VAR, /* WHILE, */ WITH, YIELD, 
     /* USCORE, COLON, */ EQUALS, /* ARROW, */ LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /*, HASH, AT, */
     RBRACE)
   // format: ON

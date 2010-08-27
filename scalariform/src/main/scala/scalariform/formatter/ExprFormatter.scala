@@ -177,6 +177,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val IfExpr(ifToken: Token, condExpr: CondExpr, newlinesOpt: Option[Token], body: Expr, elseClauseOption: Option[ElseClause]) = ifExpr
     var formatResult: FormatResult = NoFormatResult
 
+    // TODO: Same as first half of whileExpr
+
     formatResult ++= format(condExpr)
 
     val bodyIsABlock = isBlockExpr(body)
@@ -260,19 +262,23 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     // TODO: similar to whileExpr, first half of ifExpr
     val bodyIsABlock = isBlockExpr(body)
 
+    val ensureNoNewline = bodyIsABlock || enumeratorsSectionContainsNewline
     val indentBody = newlinesOpt match {
-      case Some(newlines) if bodyIsABlock || enumeratorsSectionContainsNewline ⇒ {
+      case Some(newlines) if ensureNoNewline ⇒
         formatResult = formatResult.formatNewline(newlines, CompactEnsuringGap)
         false
-      }
-      case Some(newlines) ⇒ {
+      case Some(newlines) ⇒
         formatResult = formatResult.formatNewline(newlines, formatterState.nextIndentLevelInstruction)
         true
-      }
-      case None ⇒ {
+      case None if (yieldOption exists { hiddenPredecessors(_).containsNewline }) && !ensureNoNewline ⇒
+        formatResult = formatResult.before(yieldOption.get, formatterState.nextIndentLevelInstruction)
+        false
+      case None if yieldOption.isEmpty && hiddenPredecessors(body.firstToken).containsNewline && !ensureNoNewline ⇒
+        formatResult = formatResult.before(body.firstToken, formatterState.nextIndentLevelInstruction)
+        false
+      case None ⇒
         formatResult = formatResult.before(body.firstToken, CompactEnsuringGap)
         false
-      }
     }
 
     val bodyFormatterState = if (indentBody) formatterState.indent else formatterState
@@ -339,18 +345,18 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val bodyIsABlock = isBlockExpr(body)
 
     val indentBody = newlinesOpt match {
-      case Some(newlines) if bodyIsABlock ⇒ {
+      case Some(newlines) if bodyIsABlock ⇒
         formatResult = formatResult.formatNewline(newlines, CompactEnsuringGap)
         false
-      }
-      case Some(newlines) ⇒ {
+      case Some(newlines) ⇒
         formatResult = formatResult.formatNewline(newlines, formatterState.nextIndentLevelInstruction)
         true
-      }
-      case None ⇒ {
+      case None if hiddenPredecessors(body.firstToken).containsNewline && !bodyIsABlock ⇒
+        formatResult = formatResult.before(body.firstToken, formatterState.nextIndentLevelInstruction)
+        false
+      case None ⇒
         formatResult = formatResult.before(body.firstToken, CompactEnsuringGap)
         false
-      }
     }
 
     val bodyFormatterState = if (indentBody) formatterState.indent else formatterState

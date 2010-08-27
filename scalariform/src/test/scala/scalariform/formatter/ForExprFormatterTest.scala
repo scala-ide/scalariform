@@ -131,10 +131,23 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
     |  y <- ys
     |} println(x + y)"""
 
-
   "for (n <- 1 to 10 if n > 4 if n < 10) yield n" ==> "for (n <- 1 to 10 if n > 4 if n < 10) yield n"
 
   "for {n <- 1 to 10 if n > (4)if n < 10} yield n" ==> "for { n <- 1 to 10 if n > (4) if n < 10 } yield n"
+
+  """Some(
+    |for (n <- 1 to 10)
+    |yield n)""" ==>
+  """Some(
+    |  for (n <- 1 to 10)
+    |    yield n)"""
+
+  """Some(
+    |for (n <- 1 to 10)
+    |proc())""" ==>
+  """Some(
+    |  for (n <- 1 to 10)
+    |    proc())"""
     
 }
 

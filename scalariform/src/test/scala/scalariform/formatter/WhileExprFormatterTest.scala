@@ -94,6 +94,11 @@ class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
     |  })
     |}"""
 
+  """a(while (b) 
+    |c())""" ==>
+  """a(while (b)
+    |  c())"""
+
 }
 
  
