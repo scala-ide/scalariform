@@ -291,6 +291,18 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |b""" ==>
   """/* a */ b"""
 
+  """a(
+    |if (b) c)""" ==>
+  """a(
+    |  if (b) c)"""
+
+  """a(
+    |if (b)
+    |c)""" ==>
+  """a(
+    |  if (b)
+    |    c)"""
+
   """a("A", 
     |  b("B",
     |     c(1, 2),
@@ -318,7 +330,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |, b, c)""" =/=>
   """1 + (a
     |  , b, c)""" because "Permit newline before comma ?"
-
 
   "()" ==> "()"
 
