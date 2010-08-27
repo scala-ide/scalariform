@@ -8,6 +8,7 @@ import scalariform.utils._
 import scalariform.utils.BooleanLang._
 
 import scalariform.formatter.preferences._
+import PartialFunction._
 
 trait HasHiddenTokenInfo {
 
@@ -234,14 +235,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
 
     def write(token: Token, replacementOption: Option[String] = None): Option[TextEdit] = {
       val rewriteArrows = formattingPreferences(RewriteArrowSymbols)
-      val actualReplacementOption = replacementOption orElse (token.getType match {
-        case ARROW if rewriteArrows ⇒ Some("⇒")
-        case LARROW if rewriteArrows ⇒ Some("←")
-        case EOF ⇒ Some("")
-        case _ ⇒ None
+      val actualReplacementOption = replacementOption orElse (condOpt(token.getType) {
+        case ARROW if rewriteArrows ⇒ "⇒"
+        case LARROW if rewriteArrows ⇒ "←"
+        case EOF ⇒ ""
       })
-      builder.append(replacementOption getOrElse token.getText)
-      replacementOption map { replaceEdit(token, _) }
+      builder.append(actualReplacementOption getOrElse token.getText)
+      actualReplacementOption map { replaceEdit(token, _) }
     }
 
     def write(hiddenToken: HiddenToken) = {
