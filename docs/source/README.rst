@@ -1,9 +1,9 @@
 Scalariform
 ===========
 
-Scalariform is a code formatter for Scala 2.8. It is both a
-stand-alone command line tool / library and an Eclipse
-plug-in. Currently, Scalariform supports only a limited set of
+Scalariform is a code formatter for Scala 2.8. It is a library and a
+stand-alone command line tool, with integrations for Eclipse, TextMate
+and sbt. Currently, Scalariform supports only a limited set of
 options, although it is intended to be compatible with the
 recommendations of the `Scala Style Guide`_ (see below). Please let me
 know what other features people would like.
@@ -16,7 +16,7 @@ Scalariform is licenced under `The MIT Licence`_.
 Use with Eclipse
 ----------------
 
-Scala IDE for Eclipse incorporates Scalariform:
+Scala IDE for Eclipse uses Scalariform for formatting:
 
   http://download.scala-ide.org/
 
@@ -35,7 +35,7 @@ It can also perform formatting as a save action (Window -> Preferences -> Java -
 Use with TextMate
 -----------------
 
-Mads Jensen's Scala TextMate bundle uses Scalariform:
+See Mads Jensen's Scala TextMate bundle::
 
   http://github.com/mads379/scala.tmbundle
 
@@ -51,7 +51,7 @@ Integration with sbt
 Command line tool
 -----------------
 
-Scalariform can be used as a stand-alone command line utility. Sample script::
+Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
   scala -cp /path/to/scalariform-X.Y.Z.jar scalariform.commandline.Main "$@"
@@ -81,6 +81,32 @@ Usage::
    scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
    find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
    echo 'class A ( n  :Int )' | scalariform
+
+
+Library
+-------
+
+Example usage::
+
+  import scalariform.formatter.preferences._
+  import scalariform.formatter.ScalaFormatter
+  
+  object Test extends Application {
+  
+   val unformattedScala = """
+    class A  {
+    println (42)}"""
+   val preferences = FormattingPreferences().setPreference(IndentSpaces, 3)
+   val formattedScala = ScalaFormatter.format(unformattedScala, preferences)
+   println(formattedScala)
+  
+  }
+
+Maven (using sbt)::
+
+  val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5-SNAPSHOT"
+
 
 Preferences
 -----------
