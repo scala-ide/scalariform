@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Scalariform &mdash; Scalariform v0.0.1 documentation</title>
+    <title>Scalariform &mdash; Scalariform v0.0.5 documentation</title>
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '0.0.1',
+        URL_ROOT:    '#',
+        VERSION:     '0.0.5',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="Scalariform v0.0.1 documentation" href="" /> 
+    <link rel="top" title="Scalariform v0.0.5 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -28,7 +28,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="">Scalariform v0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="#">Scalariform v0.0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -38,28 +38,100 @@
             
   <div class="section" id="scalariform">
 <h1>Scalariform<a class="headerlink" href="#scalariform" title="Permalink to this headline">¶</a></h1>
-<p>Scalariform is a code formatter for Scala 2.8. It is a stand-alone
-library and an Eclipse plug-in. Currently, Scalariform supports only a
-limited set of options, although it is intended to be compatible with
-the recommendations of the <a class="reference external" href="http://davetron5000.github.com/scala-style/">Scala Style Guide</a> (see below). Please
-let me know what other features people would like.</p>
+<p>Scalariform is a code formatter for Scala 2.8. It is a library and a
+stand-alone command line tool, with integrations for Eclipse, TextMate
+and sbt. Currently, Scalariform supports only a limited set of
+options, although it is intended to be compatible with the
+recommendations of the <a class="reference external" href="http://davetron5000.github.com/scala-style/">Scala Style Guide</a> (see below). Please let me
+know what other features people would like.</p>
 <p>Scalariform is licenced under <a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">The MIT Licence</a>.</p>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>In Eclipse 3.5, install the latest nightly Scala Eclipse plugin using
-the update site mechanism:</p>
+<div class="section" id="integration-with-eclipse">
+<h2>Integration with Eclipse<a class="headerlink" href="#integration-with-eclipse" title="Permalink to this headline">¶</a></h2>
+<p>Scala IDE for Eclipse uses Scalariform for formatting:</p>
 <blockquote>
-<a class="reference external" href="http://www.scala-lang.org/scala-eclipse-plugin-nightly">http://www.scala-lang.org/scala-eclipse-plugin-nightly</a></blockquote>
-<p>(See <a class="reference external" href="http://www.scala-lang.org/node/94">http://www.scala-lang.org/node/94</a> for more detailed instructions.)</p>
-<p>Then install Scalariform from this update site:</p>
-<blockquote>
-<a class="reference external" href="http://scalariform.googlecode.com/svn/trunk/update-site/">http://scalariform.googlecode.com/svn/trunk/update-site/</a></blockquote>
-<p>To format:</p>
+<a class="reference external" href="http://download.scala-ide.org/">http://download.scala-ide.org/</a></blockquote>
+<p>(See <a class="reference external" href="http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation">http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation</a>
+for more detailed instructions.)</p>
+<p>Formatting works the same in the Scala editor; that is, either</p>
 <ul class="simple">
-<li>Right click in the editor -&gt; Format Scala Source Code, or</li>
-<li>Press Ctrl-Shift-D</li>
+<li>Right click in the editor -&gt; Source -&gt; Format</li>
+<li>Press Ctrl-Shift-F</li>
 </ul>
-<p>To configure preferences, go to Window -&gt; Preferences -&gt; Scala -&gt; Scala Formatter Preferences</p>
+<p>To configure preferences, go to Window -&gt; Preferences -&gt; Scala -&gt; Formatter</p>
+<p>It can also perform formatting as a save action (Window -&gt; Preferences -&gt; Java -&gt; Editor -&gt; Save Actions).</p>
+</div>
+<div class="section" id="integration-with-ensime">
+<h2>Integration with ENSIME<a class="headerlink" href="#integration-with-ensime" title="Permalink to this headline">¶</a></h2>
+<p>&#8220;<a class="reference external" href="http://github.com/aemoncannon/ensime">ENSIME</a> uses the Scalariform library to format Scala sources. Type C-c f to format the current buffer.&#8221;</p>
+<blockquote>
+<a class="reference external" href="http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8">http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8</a></blockquote>
+</div>
+<div class="section" id="integration-with-sbt">
+<h2>Integration with sbt<a class="headerlink" href="#integration-with-sbt" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://github.com/olim7t/sbt-scalariform">sbt-scalariform</a>, written by Olivier Michallat, provides an sbt plugin contributing formatting actions.</p>
+</div>
+<div class="section" id="integration-with-textmate">
+<h2>Integration with TextMate<a class="headerlink" href="#integration-with-textmate" title="Permalink to this headline">¶</a></h2>
+<p>See Mads Jensen&#8217;s Scala TextMate bundle:</p>
+<blockquote>
+<a class="reference external" href="http://github.com/mads379/scala.tmbundle">http://github.com/mads379/scala.tmbundle</a></blockquote>
+<p>Reformat using Ctrl-Shift-H.</p>
+</div>
+<div class="section" id="command-line-tool">
+<h2>Command line tool<a class="headerlink" href="#command-line-tool" title="Permalink to this headline">¶</a></h2>
+<p>Scalariform includes a stand-alone command line utility. Sample script:</p>
+<div class="highlight-scala"><pre>#!/bin/bash
+scala -cp /path/to/scalariform-X.Y.Z.jar scalariform.commandline.Main "$@"</pre>
+</div>
+<p>Usage:</p>
+<div class="highlight-scala"><pre>scalariform [options] [files...]
+
+Options:
+  --help, -h                      Show help
+  --inPlace, -i                   Replace the input file(s) in place with a formatted version.
+  --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
+  --fileList=&lt;path&gt;, -l=&lt;path&gt;    Read the list of input file(s) from a text file (one per line)
+  --verbose -v                    Verbose output
+
+Preferences:
+  [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
+  [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
+  [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
+  [+|-]formatXml                      Enable/disable Format XML literals
+  -indentSpaces=[1-10]                Set Number of spaces to use for indentation
+  [+|-]preserveSpaceBeforeArguments   Enable/disable Preserve a space before a parenthesis argument
+  [+|-]rewriteArrowSymbols            Enable/disable Replace arrow tokens with unicode equivalents: =&gt; with ⇒, and &lt;- with ←
+  [+|-]spaceBeforeColon               Enable/disable Add a space before colons
+
+Examples:
+ scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
+ find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
+ echo 'class A ( n  :Int )' | scalariform</pre>
+</div>
+</div>
+<div class="section" id="library">
+<h2>Library<a class="headerlink" href="#library" title="Permalink to this headline">¶</a></h2>
+<p>Example usage:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">import</span> <span class="nn">scalariform.formatter.preferences._</span>
+<span class="k">import</span> <span class="nn">scalariform.formatter.ScalaFormatter</span>
+
+<span class="k">object</span> <span class="nc">Test</span> <span class="k">extends</span> <span class="nc">Application</span> <span class="o">{</span>
+
+ <span class="k">val</span> <span class="n">unformattedScala</span> <span class="k">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">  class A  {</span>
+<span class="s">  println (42)}&quot;&quot;&quot;</span>
+ <span class="k">val</span> <span class="n">preferences</span> <span class="k">=</span> <span class="nc">FormattingPreferences</span><span class="o">().</span><span class="n">setPreference</span><span class="o">(</span><span class="nc">IndentSpaces</span><span class="o">,</span> <span class="mi">3</span><span class="o">)</span>
+ <span class="k">val</span> <span class="n">formattedScala</span> <span class="k">=</span> <span class="nc">ScalaFormatter</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">unformattedScala</span><span class="o">,</span> <span class="n">preferences</span><span class="o">)</span>
+ <span class="n">println</span><span class="o">(</span><span class="n">formattedScala</span><span class="o">)</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Maven (using sbt):</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">val</span> <span class="n">scalaToolsSnapshots</span> <span class="k">=</span> <span class="s">&quot;Scala-Tools Maven2 Snapshots Repository&quot;</span> <span class="n">at</span> <span class="s">&quot;http://scala-tools.org/repo-snapshots&quot;</span>
+<span class="k">val</span> <span class="n">scalariform</span> <span class="k">=</span> <span class="s">&quot;org.scalariform&quot;</span> <span class="o">%%</span> <span class="s">&quot;scalariform&quot;</span> <span class="o">%</span> <span class="s">&quot;0.0.5-SNAPSHOT&quot;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="preferences">
 <h2>Preferences<a class="headerlink" href="#preferences" title="Permalink to this headline">¶</a></h2>
@@ -135,6 +207,11 @@ of the class. For example:</p>
 <span class="o">}</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="formatxml">
+<h3>formatXml<a class="headerlink" href="#formatxml" title="Permalink to this headline">¶</a></h3>
+<p>Default: <tt class="docutils literal"><span class="pre">true</span></tt></p>
+<p>Format embedded XML literals; if <tt class="docutils literal"><span class="pre">false</span></tt> they will be left untouched.</p>
 </div>
 <div class="section" id="indentspaces">
 <h3>indentSpaces<a class="headerlink" href="#indentspaces" title="Permalink to this headline">¶</a></h3>
@@ -238,39 +315,40 @@ make uncompliant source more compliant.</p>
 <div class="section" id="format-on-off">
 <h3>format: [ON|OFF]<a class="headerlink" href="#format-on-off" title="Permalink to this headline">¶</a></h3>
 <p>Disables the formatter for selective portions of a source file:</p>
-<div class="highlight-scala"><pre>// format: OFF    &lt;-- this directive disables formatting from this point
-class AsciiDSL {
-  n ¦- "1" -+ { n: Node =&gt;
-          n ¦- "i"
-          n ¦- "ii"
-          n ¦- "iii"
-          n ¦- "iv"
-          n ¦- "v"
-  }
-  n ¦- "2"
-  n ¦- "3" -+ { n: Node =&gt;
-          n ¦- "i"
-          n ¦- "ii" -+ { n: Node =&gt;
-                   n ¦- "a"
-                   n ¦- "b"
-                   n ¦- "c"
-          }
-          n ¦- "iii"
-          n ¦- "iv"
-          n ¦- "v"
-  }
-  // format: ON   &lt;-- formatter resumes from this point
-  ...
-}
-// (see: http://dev.day.com/microsling/content/blogs/main/scalajcr2.html)</pre>
+<div class="highlight-scala"><div class="highlight"><pre><span class="c1">// format: OFF    &lt;-- this directive disables formatting from this point</span>
+<span class="k">class</span> <span class="nc">AsciiDSL</span> <span class="o">{</span>
+  <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;1&quot;</span> <span class="o">-+</span> <span class="o">{</span> <span class="n">n</span><span class="k">:</span> <span class="kt">Node</span> <span class="o">=&gt;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;i&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;ii&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;iii&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;iv&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;v&quot;</span>
+  <span class="o">}</span>
+  <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;2&quot;</span>
+  <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;3&quot;</span> <span class="o">-+</span> <span class="o">{</span> <span class="n">n</span><span class="k">:</span> <span class="kt">Node</span> <span class="o">=&gt;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;i&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;ii&quot;</span> <span class="o">-+</span> <span class="o">{</span> <span class="n">n</span><span class="k">:</span> <span class="kt">Node</span> <span class="o">=&gt;</span>
+                   <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;a&quot;</span>
+                   <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;b&quot;</span>
+                   <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;c&quot;</span>
+          <span class="o">}</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;iii&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;iv&quot;</span>
+          <span class="n">n</span> <span class="o">¦-</span> <span class="s">&quot;v&quot;</span>
+  <span class="o">}</span>
+  <span class="c1">// format: ON   &lt;-- formatter resumes from this point</span>
+  <span class="o">...</span>
+<span class="o">}</span>
+<span class="c1">// (see: http://dev.day.com/microsling/content/blogs/main/scalajcr2.html)</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="format-preferencename">
 <h3>format: [+|-]&lt;preferenceName&gt;<a class="headerlink" href="#format-preferencename" title="Permalink to this headline">¶</a></h3>
 <p>Sets a preference for the entire of the source file, overriding the global formatting settings:</p>
-<div class="highlight-scala"><div class="highlight"><pre><span class="c">// format: +preserveSpaceBeforeArguments</span>
+<div class="highlight-scala"><div class="highlight"><pre><span class="c1">// format: +preserveSpaceBeforeArguments</span>
 <span class="k">class</span> <span class="nc">StackSpec</span> <span class="k">extends</span> <span class="nc">FlatSpec</span> <span class="k">with</span> <span class="nc">ShouldMatchers</span> <span class="o">{</span>
-  <span class="c">// ...</span>
+  <span class="c1">// ...</span>
   <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span> <span class="n">should</span> <span class="n">equal</span> <span class="o">(</span><span class="mi">2</span><span class="o">)</span>
 <span class="o">}</span>
 </pre></div>
@@ -290,12 +368,12 @@ class AsciiDSL {
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="">Scalariform v0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="#">Scalariform v0.0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2010, Matt Russell.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
     </div>
   </body>
 </html>
