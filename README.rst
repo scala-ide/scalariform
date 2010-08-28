@@ -51,7 +51,7 @@ Integration with sbt
 Integration with TextMate
 -------------------------
 
-See Mads Jensen's Scala TextMate bundle::
+See Mads Jensen's Scala TextMate bundle:
 
   http://github.com/mads379/scala.tmbundle
 
