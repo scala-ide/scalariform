@@ -13,8 +13,8 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
-Use with Eclipse
-----------------
+Integration with Eclipse
+------------------------
 
 Scala IDE for Eclipse uses Scalariform for formatting:
 
@@ -32,14 +32,14 @@ To configure preferences, go to Window -> Preferences -> Scala -> Formatter
 
 It can also perform formatting as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
 
-Use with TextMate
------------------
+Integration with ENSIME
+-----------------------
 
-See Mads Jensen's Scala TextMate bundle::
+"`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c f to format the current buffer." 
 
-  http://github.com/mads379/scala.tmbundle
+  http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8
 
-Reformat using Ctrl-Shift-H.
+.. _ENSIME: http://github.com/aemoncannon/ensime
 
 Integration with sbt
 --------------------
@@ -47,6 +47,15 @@ Integration with sbt
 `sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions.
 
 .. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
+
+Integration with TextMate
+-------------------------
+
+See Mads Jensen's Scala TextMate bundle::
+
+  http://github.com/mads379/scala.tmbundle
+
+Reformat using Ctrl-Shift-H.
 
 Command line tool
 -----------------
