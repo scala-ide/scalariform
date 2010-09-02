@@ -123,7 +123,7 @@ object Main {
           // edits.isEmpty
           if (formatted == original) FormattedCorrectly else NotFormattedCorrectly
         } catch {
-          case e: ScalaParserException => DidNotParse
+          case e: ScalaParserException ⇒ DidNotParse
         }
       }
       if (files.isEmpty) {
@@ -133,9 +133,9 @@ object Main {
         for (file ← files) {
           val formatResult = checkSource(Source.fromFile(file))
           val resultString = formatResult match {
-            case FormattedCorrectly => "OK"
-            case NotFormattedCorrectly => "FAILED"
-            case DidNotParse => "ERROR"
+            case FormattedCorrectly ⇒ "OK"
+            case NotFormattedCorrectly ⇒ "FAILED"
+            case DidNotParse ⇒ "ERROR"
           }
           val padding = " " * (6 - resultString.length)
           log("[" + resultString + "]" + padding + " " + file)
@@ -149,7 +149,7 @@ object Main {
           val formatted = ScalaFormatter.format(original, preferences)
           print(formatted)
         } catch {
-          case e: ScalaParserException =>
+          case e: ScalaParserException ⇒
             System.err.println("Could not parse text as Scala.")
             exit(1)
         }
@@ -160,12 +160,12 @@ object Main {
           val formattedOption = try {
             Some(ScalaFormatter.format(original, preferences))
           } catch {
-            case e: ScalaParserException =>
+            case e: ScalaParserException ⇒
               System.err.println("Could not parse '" + file.getPath + "' as Scala, skipping.")
               problems = true
               None
           }
-          for (formatted <- formattedOption) {
+          for (formatted ← formattedOption) {
             if (inPlace)
               if (formatted == original)
                 log(file + " is already correctly formatted.")
