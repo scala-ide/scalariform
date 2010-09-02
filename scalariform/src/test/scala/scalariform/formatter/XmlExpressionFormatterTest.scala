@@ -175,6 +175,47 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  println("foo")
     |}</a>"""
 
+  """{
+    |
+    |val x = <foo/>
+    |<bar/>
+    |<biz>
+    |42
+    |</biz>
+    |
+    |}""" ==>
+  """{
+    |
+    |  val x = <foo/>
+    |          <bar/>
+    |          <biz>
+    |            42
+    |          </biz>
+    |
+    |}"""
+
+  """{
+    |
+    |val x = 
+    |<foo/>
+    |<bar/>
+    |<biz>
+    |42
+    |</biz>
+    |
+    |}""" ==>
+  """{
+    |
+    |  val x =
+    |    <foo/>
+    |    <bar/>
+    |    <biz>
+    |      42
+    |    </biz>
+    |
+    |}"""
+
+
   override val debug = false
 
   // implicit val formattingPreferences = FormattingPreferences.setPreference(FormatXml, true)

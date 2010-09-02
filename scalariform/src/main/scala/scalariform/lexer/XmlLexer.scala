@@ -31,6 +31,13 @@ trait XmlLexer extends Lexer {
     def nestingLevel = tagNestLevel
   }
 
+  private def moreXmlToCome: Boolean = {
+    var offset = 0
+    while (ch(offset) != EOF_CHAR && isSpace(ch(offset).asInstanceOf[Char]))
+      offset += 1
+    ch(offset) == '<'
+  }
+
   protected def fetchXmlToken() {
     (ch: @switch) match {
       case '<' ⇒ {
@@ -43,22 +50,22 @@ trait XmlLexer extends Lexer {
         } else if (ch(1) == '!') {
           if (ch(2) == '-') {
             getXmlComment()
-            if (xmlMode.nestingLevel == 0)
-              modeStack.pop() // Go back to Scala; TODO -- scan for more elems
+            if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+              modeStack.pop()
           } else if (ch(2) == '[') {
             getXmlCDATA()
-            if (xmlMode.nestingLevel == 0)
-              modeStack.pop() // Go back to Scala; TODO -- scan for more elems
+            if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+              modeStack.pop()
           } else
             throw new ScalaLexerException("Bad XML")
         } else if (ch(1) == '?') {
           getXmlProcessingInstruction()
-          if (xmlMode.nestingLevel == 0)
-            modeStack.pop() // Go back to Scala; TODO -- scan for more elems
+          if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+            modeStack.pop()
         } else if (lookaheadIs("<xml:unparsed")) {
           getXmlUnparsed()
-          if (xmlMode.nestingLevel == 0)
-            modeStack.pop() // Go back to Scala; TODO -- scan for more elems
+          if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+            modeStack.pop()
         } else {
           nextChar()
           token(XML_START_OPEN)
@@ -75,8 +82,8 @@ trait XmlLexer extends Lexer {
             token(XML_EMPTY_CLOSE)
             xmlMode.isTagMode = false
             xmlMode.tagState = Normal
-            if (xmlMode.nestingLevel == 0)
-              modeStack.pop() // Go back to Scala; TODO -- scan for more elems
+            if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+              modeStack.pop()
           } else
             getXmlCharData()
         } else
@@ -91,8 +98,8 @@ trait XmlLexer extends Lexer {
             case InStartTag ⇒ xmlMode.nestTag()
             case InEndTag ⇒ {
               val nestingLevel = xmlMode.unnestTag()
-              if (nestingLevel == 0)
-                modeStack.pop() // Go back to Scala; TODO -- scan for more elems
+              if (nestingLevel == 0 && !moreXmlToCome)
+                modeStack.pop()
             }
             case Normal ⇒ throw new AssertionError("shouldn't reach here")
           }

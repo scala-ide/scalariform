@@ -23,11 +23,11 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
     override def mainClass = Some("scalariform.commandline.Main")
 
     override def managedStyle = ManagedStyle.Maven
-  
+
     val publishTo = "Scala Toos Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
 
     //val publishTo = Resolver.file("maven-local", Path.userHome / ".m2" / "repository" asFile) 
-  
+
     Credentials(Path.userHome / ".ivy2" / ".credentials", log)
 
     override def pomExtra =
@@ -39,8 +39,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
           <url>http://www.opensource.org/licenses/mit-license.php</url>
           <distribution>repo</distribution>
         </license>
-      </licenses> 
-
+      </licenses>
 
   }
 

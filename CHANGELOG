@@ -3,6 +3,7 @@
 * Better staircase expr formatting
 * Bug fixes for if/for/while inside paren expressions
 * Handle Scala parsing exceptions in command-line tool
+* Parse and format a sequence of XML nodes correctly
 
 0.0.4 (17/July/10)
 * Add Maven/Tycho build

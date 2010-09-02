@@ -130,7 +130,17 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     try {
       val inputText = inputTextPane.getText
       val startTime = System.currentTimeMillis
-      val outputText = specificFormatter.format(inputText)(OptionsPanel.getFormattingPreferences)
+      val outputText = try {
+        specificFormatter.format(inputText)(OptionsPanel.getFormattingPreferences)
+      } catch {
+        case e: ScalaParserException ⇒
+          if (showAstCheckBox.isSelected) {
+            val (lexer, tokens) = ScalaLexer.tokeniseFull(inputText)
+            val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
+            tokensTable.setModel(tableModel)
+          }
+          throw e
+      }
       val duration = System.currentTimeMillis - startTime
       val tokenCount = getTokens(inputText).size
       setTitle("Scalariform -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / duration) + " tokens/second")
@@ -147,7 +157,14 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
         val (lexer, tokens) = ScalaLexer.tokeniseFull(inputText)
         val parser = new ScalaCombinatorParser
-        val rawParseResult = specificFormatter.getParser(parser)(new ScalaLexerReader(tokens))
+        val rawParseResult = try {
+          specificFormatter.getParser(parser)(new ScalaLexerReader(tokens))
+        } catch {
+          case e: ScalaParserException ⇒
+            val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
+            tokensTable.setModel(tableModel)
+            throw e
+        }
         if (!rawParseResult.successful) { throw new RuntimeException("Parse failed: " + rawParseResult) }
         val parseResult = rawParseResult.get
         val treeModel = new ParseTreeModel(parseResult)

@@ -168,6 +168,16 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   """<?this is a pi foo bar = && {{ ?>""" producesTokens (XML_PROCESSING_INSTRUCTION)
 
+  """<foo/>
+     
+     <bar/>""" producesTokens (XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE, XML_PCDATA, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE)
+
+  """<foo/>
+     <bar/>""" producesTokens (XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE, XML_PCDATA, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE)
+
+  """<!-- -->
+     <bar/>""" producesTokens (XML_COMMENT, XML_PCDATA, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE)
+
   class TestString(s: String) {
 
     def producesTokens(toks: TokenType*) {

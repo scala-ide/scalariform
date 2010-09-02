@@ -7,11 +7,12 @@ import scalariform.formatter.preferences._
 trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with ScalaFormatter ⇒
 
   def format(xmlExpr: XmlExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val XmlExpr(first: XmlContents, otherElements: List[XmlElement]) = xmlExpr
+    val XmlExpr(first: XmlContents, otherElements: List[XmlContents]) = xmlExpr
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(first)
-    for (element ← otherElements)
-      formatResult ++= format(element)
+    val nestedFormatterState = formatterState.alignWithToken(first.firstToken)
+    val (contentsFormatResult, multiline) = format(otherElements)(formatterState, nestedFormatterState)
+    formatResult ++= contentsFormatResult
     formatResult
   }
 
@@ -66,13 +67,22 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
   def format(xmlNonEmpty: XmlNonEmptyElement)(implicit formatterState: FormatterState): FormatResult = {
     val XmlNonEmptyElement(startTag: XmlStartTag, contents: List[XmlContents], endTag: XmlEndTag) = xmlNonEmpty
     var formatResult: FormatResult = NoFormatResult
+    formatResult ++= format(startTag)
+    val nestedFormatterState = formatterState.alignWithToken(startTag.firstToken).indent
+    val (contentsFormatResult, multiline) = format(contents)(formatterState, nestedFormatterState)
+    formatResult ++= contentsFormatResult
+    if (multiline)
+      formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
+    formatResult
+  }
+
+  def format(contents: List[XmlContents])(formatterState: FormatterState, nestedFormatterState: FormatterState): (FormatResult, Boolean) = {
+    var formatResult: FormatResult = NoFormatResult
     val multiline = contents exists {
       /* case x: XmlElement ⇒ true */
       case XmlPCDATA(Token(_, text, _, _)) if text contains '\n' ⇒ true
       case _ ⇒ false
     }
-    formatResult ++= format(startTag)
-    val nestedFormatterState = formatterState.alignWithToken(startTag.firstToken).indent
     var firstNonWhitespace = true
     for (previousAndThis ← Utils.pairWithPrevious(contents)) {
       previousAndThis match {
@@ -101,15 +111,13 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
         case (Some(Expr(_)), xmlContent) ⇒
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, Compact)
-          formatResult ++= format(xmlContent)
+          formatResult ++= format(xmlContent)(formatterState)
         case (_, xmlContent) ⇒
           firstNonWhitespace = false
-          formatResult ++= format(xmlContent)
+          formatResult ++= format(xmlContent)(formatterState)
       }
     }
-    if (multiline)
-      formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
-    formatResult
+    (formatResult, multiline)
   }
 
 }

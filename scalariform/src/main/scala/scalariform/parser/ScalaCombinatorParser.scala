@@ -754,7 +754,7 @@ templateBodyOpt ⇒
   lazy val xmlExpr = xml(isPattern = false)
   lazy val xmlPattern = xml(isPattern = true)
   def xml(isPattern: Boolean): Parser[XmlExpr] = {
-    lazy val xmlContent: Parser[XmlContents] = xmlElement(isPattern) | xmlComment | xmlCDATA | xmlUnparsed | xmlProcessingInstruction
-    xmlContent ~ rep(xmlElement(isPattern)) ^^ { case first ~ otherElements ⇒ XmlExpr(first, otherElements) }
+    lazy val xmlContent: Parser[XmlContents] = xmlElement(isPattern) | xmlComment | xmlCDATA | xmlUnparsed | xmlProcessingInstruction | xmlPCDATA
+    xmlContent ~ rep(xmlElement(isPattern) | xmlPCDATA) ^^ { case first ~ otherElements ⇒ XmlExpr(first, otherElements) }
   }
 }

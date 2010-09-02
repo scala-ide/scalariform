@@ -353,7 +353,7 @@ case class XmlComment(token: Token) extends XmlContents { lazy val tokens = flat
 case class XmlUnparsed(token: Token) extends XmlContents { lazy val tokens = flatten(token) }
 case class XmlProcessingInstruction(token: Token) extends XmlContents { lazy val tokens = flatten(token) }
 
-case class XmlExpr(first: XmlContents, otherElements: List[XmlElement]) extends ExprElement {
+case class XmlExpr(first: XmlContents, otherElements: List[XmlContents]) extends ExprElement {
   lazy val tokens = flatten(first, otherElements)
 }
 
