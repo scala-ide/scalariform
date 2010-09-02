@@ -2,9 +2,9 @@ Scalariform
 ===========
 
 Scalariform is a code formatter for Scala 2.8. It is a library and a
-stand-alone command line tool, with integrations for Eclipse, TextMate
-and sbt. Currently, Scalariform supports only a limited set of
-options, although it is intended to be compatible with the
+stand-alone command line tool, with integrations for Eclipse, ENSIME,
+TextMate and sbt. Currently, Scalariform supports only a limited set
+of options, although it is intended to be compatible with the
 recommendations of the `Scala Style Guide`_ (see below). Please let me
 know what other features people would like.
 
@@ -99,15 +99,20 @@ Example usage::
 
   import scalariform.formatter.preferences._
   import scalariform.formatter.ScalaFormatter
+  import scalariform.parser.ScalaParserException
   
   object Test extends Application {
   
-   val unformattedScala = """
-    class A  {
-    println (42)}"""
-   val preferences = FormattingPreferences().setPreference(IndentSpaces, 3)
-   val formattedScala = ScalaFormatter.format(unformattedScala, preferences)
-   println(formattedScala)
+    val unformattedScala = """
+      class A  {
+      println (42)}"""
+    val preferences = FormattingPreferences().setPreference(IndentSpaces, 3)
+    try {
+      val formattedScala = ScalaFormatter.format(unformattedScala, preferences)
+      println(formattedScala)
+    } catch {
+       case e: ScalaParserException => println("Syntax error in Scala source")
+    }
   
   }
 
