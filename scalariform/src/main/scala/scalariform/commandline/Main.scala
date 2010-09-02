@@ -4,6 +4,7 @@ import scalariform.formatter.preferences._
 import java.io.File
 import scala.io.Source
 import scalariform.formatter.ScalaFormatter
+import scalariform.parser.ScalaParserException
 import scalariform.utils.Utils.writeText
 
 object Main {
@@ -15,18 +16,23 @@ object Main {
 
     if (arguments contains Help) {
       printUsage()
-      System.exit(0)
+      exit(0)
     }
 
     var errors: List[String] = Nil
+    var showUsage = false
 
-    for (BadOption(s) ← arguments)
+    for (BadOption(s) ← arguments) {
       errors ::= "Unrecognised option: " + s
+      showUsage = true
+    }
 
     val preferenceOptions = (for (p@PreferenceOption(_, _) ← arguments) yield p)
 
-    for (PreferenceOption(key, _) ← preferenceOptions if !(AllPreferences.preferencesByKey contains key))
+    for (PreferenceOption(key, _) ← preferenceOptions if !(AllPreferences.preferencesByKey contains key)) {
       errors ::= "Unrecognised preference: " + key
+      showUsage = true
+    }
 
     val preferences = if (errors.isEmpty)
       preferenceOptions.foldLeft(FormattingPreferences()) {
@@ -88,52 +94,92 @@ object Main {
 
     if (!errors.isEmpty) {
       errors.reverse foreach System.err.println
-      System.exit(1)
+      if (showUsage)
+        printUsage()
+      exit(1)
     }
 
     def log(s: String) = if (verbose) println(s)
 
-    log("Formatting with preferences: " + preferences.preferencesMap.mkString(", "))
+    val preferencesText = preferences.preferencesMap.mkString(", ")
+    if (preferencesText.isEmpty)
+      log("Formatting with default preferences.")
+    else
+      log("Formatting with preferences: " + preferencesText)
 
     if (test) {
+      trait FormatResult
+      case object FormattedCorrectly extends FormatResult
+      case object NotFormattedCorrectly extends FormatResult
+      case object DidNotParse extends FormatResult
+
       var allFormattedCorrectly = true
-      def checkSource(source: Source) = {
+      def checkSource(source: Source): FormatResult = {
         val original = source.mkString
-        val formatted = ScalaFormatter.format(original, preferences)
-        formatted == original
-        // TODO: Sometimes get edits which cancel each other out
-        // val edits = ScalaFormatter.formatAsEdits(source.mkString, preferences)
-        // edits.isEmpty
+        try {
+          val formatted = ScalaFormatter.format(original, preferences)
+          // TODO: Sometimes get edits which cancel each other out
+          // val edits = ScalaFormatter.formatAsEdits(source.mkString, preferences)
+          // edits.isEmpty
+          if (formatted == original) FormattedCorrectly else NotFormattedCorrectly
+        } catch {
+          case e: ScalaParserException => DidNotParse
+        }
       }
       if (files.isEmpty) {
-        val formattedCorrectly = checkSource(Source.fromInputStream(System.in))
-        allFormattedCorrectly &= formattedCorrectly
+        val formatResult = checkSource(Source.fromInputStream(System.in))
+        allFormattedCorrectly &= (formatResult == FormattedCorrectly)
       } else
         for (file ← files) {
-          val formattedCorrectly = checkSource(Source.fromFile(file))
-          log("Checking " + file + " -- " + (if (formattedCorrectly) "[OK]" else "[FAILED]"))
-          allFormattedCorrectly &= formattedCorrectly
+          val formatResult = checkSource(Source.fromFile(file))
+          val resultString = formatResult match {
+            case FormattedCorrectly => "OK"
+            case NotFormattedCorrectly => "FAILED"
+            case DidNotParse => "ERROR"
+          }
+          val padding = " " * (6 - resultString.length)
+          log("[" + resultString + "]" + padding + " " + file)
+          allFormattedCorrectly &= (formatResult == FormattedCorrectly)
         }
-      System.exit(if (allFormattedCorrectly) 0 else 1)
+      exit(if (allFormattedCorrectly) 0 else 1)
     } else {
       if (files.isEmpty) {
         val original = Source.fromInputStream(System.in).mkString
-        val formatted = ScalaFormatter.format(original, preferences)
-        print(formatted)
-      } else
+        try {
+          val formatted = ScalaFormatter.format(original, preferences)
+          print(formatted)
+        } catch {
+          case e: ScalaParserException =>
+            System.err.println("Could not parse text as Scala.")
+            exit(1)
+        }
+      } else {
+        var problems = false
         for (file ← files) {
           val original = Source.fromFile(file).mkString
-          val formatted = ScalaFormatter.format(original, preferences)
-          if (inPlace)
-            if (formatted == original)
-              log(file + " is already correctly formatted.")
-            else {
-              log("Formatting " + file)
-              writeText(file, formatted)
-            }
-          else
-            print(formatted)
+          val formattedOption = try {
+            Some(ScalaFormatter.format(original, preferences))
+          } catch {
+            case e: ScalaParserException =>
+              System.err.println("Could not parse '" + file.getPath + "' as Scala, skipping.")
+              problems = true
+              None
+          }
+          for (formatted <- formattedOption) {
+            if (inPlace)
+              if (formatted == original)
+                log(file + " is already correctly formatted.")
+              else {
+                log("Formatting " + file)
+                writeText(file, formatted)
+              }
+            else
+              print(formatted)
+          }
         }
+        if (problems)
+          exit(1)
+      }
     }
   }
 
