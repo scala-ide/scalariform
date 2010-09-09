@@ -232,7 +232,7 @@ class ScalaCombinatorParser extends Parsers {
     lazy val ascription = (COLON ~ (USCORE ~ STAR |/ guard(AT) ~> annotations(skipNewLines = false, requireOneArgList = false) |/ (if (location == Local) typ_ ^^ { type_ ⇒ TypeExprElement(List(type_)) } else infixType(isPattern = false) ^^ { TypeExprElement(_) }))) ^^ exprElementFlatten
     lazy val matchExpr = MATCH ~ (LBRACE ~ caseClauses ~ RBRACE ^^ { case lbrace ~ caseClauses ~ rbrace ⇒ BlockExpr(lbrace, Left(caseClauses), rbrace) }) ^^ exprElementFlatten
     lazy val other = postfixExpr ~ opt(EQUALS ~ expr /* TODO: only if postfixExpr is Ident, Select or Apply */ |/ ascription |/ matchExpr) ^^ exprElementFlatten
-    lazy val res = (ifExpr |/ tryExpr |/ whileExpr |/ doExpr |/ forExpr |/ returnExpr |/ throwExpr |/ IMPLICIT ~ implicitClosure(location) |/ other) ^^ exprElementFlatten
+    lazy val res = (ifExpr |/ tryExpr |/ whileExpr |/ doExpr |/ forExpr |/ returnExpr |/ throwExpr |/ implicitClosure(location) |/ other) ^^ exprElementFlatten
     lazy val postArrow = if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten
     //lazy val arrowSuffix = ARROW ~ postArrow ^^ exprElementFlatten
     lazy val typeParamList = LPAREN ~ opt(id ~ ascription ~ rep(COMMA ~ id ~ ascription)) ~ RPAREN ^^ exprElementFlatten
@@ -274,7 +274,12 @@ class ScalaCombinatorParser extends Parsers {
 
   lazy val throwExpr = THROW ~ expr ^^ exprElementFlatten
 
-  def implicitClosure(location: Location) = id ~ ARROW ~ (if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten) ^^ exprElementFlatten
+  def implicitClosure(location: Location) = { // Note: nsc's implicitClosure() doesn't include the initial IMPLICIT token
+    val anonFnStart = IMPLICIT ~ id ~ ARROW ^^ {
+      case implicitToken ~ id ~ arrowToken ⇒ AnonymousFunctionStart(exprElementFlatten2(implicitToken, id), arrowToken)
+    }
+    anonFnStart ~ (if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten) ^^ exprElementFlatten
+  }
 
   lazy val postfixExpr = { // TODO: Clean this up
     val remainder = newlineOpt ~ prefixExpr ^^ exprElementFlatten
@@ -377,11 +382,13 @@ class ScalaCombinatorParser extends Parsers {
       resultOpt map { case lbracket ~ thisOrId ~ rbracket ⇒ AccessQualifier(lbracket, thisOrId, rbracket) }
     }
   }
+
   lazy val accessModifierOpt: Parser[Option[AccessModifier]] = {
     opt((PRIVATE | PROTECTED) ~ accessQualifierOpt) ^^ { resultOpt ⇒
       resultOpt map { case privateOrProtected ~ accessQualifierOpt ⇒ AccessModifier(privateOrProtected, accessQualifierOpt) }
     }
   }
+
   lazy val modifiers: Parser[List[Modifier]] = {
     val tokenModifier = (ABSTRACT | FINAL | SEALED | OVERRIDE | LAZY | IMPLICIT | NEWLINE) ^^ { SimpleModifier(_) }
     val privateProtected = (PRIVATE | PROTECTED) ~ accessQualifierOpt ^^ {
@@ -389,6 +396,7 @@ class ScalaCombinatorParser extends Parsers {
     }
     rep(tokenModifier | privateProtected)
   }
+
   lazy val localModifiers: Parser[List[Modifier]] = {
     val modifier = ABSTRACT | FINAL | SEALED | IMPLICIT | LAZY
     rep(modifier ^^ { SimpleModifier(_) })
@@ -659,7 +667,7 @@ templateBodyOpt ⇒
     (importClause whenFollowedBy statSep) |
       expr0(InBlock) |
       implicitLocalDef |
-      IMPLICIT ~ implicitClosure(InBlock) ^^ { x ⇒ Expr(exprElementFlatten2(x)) } |
+      implicitClosure(InBlock) ^^ { x ⇒ Expr(exprElementFlatten2(x)) } |
       localDef
   }
   lazy val blockStatSeq = {

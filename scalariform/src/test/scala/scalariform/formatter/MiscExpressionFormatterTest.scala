@@ -354,5 +354,19 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     """"foo" + bar""" ==> """"foo"+bar"""
     """foo + bar""" ==> """foo + bar"""
   }
+
+  """a { implicit b =>
+    |println(b)
+    |}""" ==>
+  """a { implicit b =>
+    |  println(b)
+    |}"""
+
+  """a { b =>
+    |println(b)
+    |}""" ==>
+  """a { b =>
+    |  println(b)
+    |}"""
   
 }
