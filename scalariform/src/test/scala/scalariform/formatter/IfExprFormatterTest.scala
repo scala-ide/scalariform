@@ -142,7 +142,8 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
 
   """if (true){
     |}""" ==>
-  """if (true) {}"""
+  """if (true) {
+    |}"""
 
   "if (true){;}" ==> "if (true) { ; }"
 

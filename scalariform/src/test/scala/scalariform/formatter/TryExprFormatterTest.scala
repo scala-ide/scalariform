@@ -57,7 +57,8 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
     |} catch { case e => }finally 
     |{ 
     |println("foo") }""" ==>
-  """try {} catch { case e => }
+  """try {
+    |} catch { case e => }
     |finally {
     |  println("foo")
     |}"""

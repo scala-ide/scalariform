@@ -459,6 +459,13 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "private [a] case class B" ==> "private[a] case class B"
   "private [a] object B" ==> "private[a] object B"
 
+  """class A {
+    |
+    |}""" ==>
+  """class A {
+    |
+    |}"""
+
   // format: ON
 
   override val debug = false

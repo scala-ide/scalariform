@@ -426,23 +426,25 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           formatResult ++= format(caseClauses)(newFormatterState)
 
       case Right(statSeq) ⇒ {
-        if (!singleLineBlock && statSeq.firstTokenOption.isDefined) {
-          statSeq.firstStatOpt match {
-            case Some(Expr(List(AnonymousFunctionStart(params, _), subStatSeq))) ⇒ {
-              formatResult = formatResult.before(statSeq.firstToken, CompactEnsuringGap)
-              for (firstToken ← subStatSeq.firstTokenOption)
-                formatResult = formatResult.before(firstToken, newFormatterState.nextIndentLevelInstruction)
-              formatResult ++= format(params)
-              formatResult ++= format(subStatSeq)(newFormatterState.indent)
-            }
-            case _ ⇒ {
-              val instruction =
-                if (statSeq.selfReferenceOpt.isDefined)
-                  CompactEnsuringGap
-                else
-                  newFormatterState.nextIndentLevelInstruction
-              formatResult = formatResult.before(statSeq.firstToken, instruction)
-              formatResult ++= format(statSeq)(newFormatterState.indent)
+        if (!singleLineBlock) {
+          if (statSeq.firstTokenOption.isDefined) {
+            statSeq.firstStatOpt match {
+              case Some(Expr(List(AnonymousFunctionStart(params, _), subStatSeq))) ⇒ {
+                formatResult = formatResult.before(statSeq.firstToken, CompactEnsuringGap)
+                for (firstToken ← subStatSeq.firstTokenOption)
+                  formatResult = formatResult.before(firstToken, newFormatterState.nextIndentLevelInstruction)
+                formatResult ++= format(params)
+                formatResult ++= format(subStatSeq)(newFormatterState.indent)
+              }
+              case _ ⇒ {
+                val instruction =
+                  if (statSeq.selfReferenceOpt.isDefined)
+                    CompactEnsuringGap
+                  else
+                    newFormatterState.nextIndentLevelInstruction
+                formatResult = formatResult.before(statSeq.firstToken, instruction)
+                formatResult ++= format(statSeq)(newFormatterState.indent)
+              }
             }
           }
           formatResult = formatResult.before(rbrace, newFormatterState.currentIndentLevelInstruction)
