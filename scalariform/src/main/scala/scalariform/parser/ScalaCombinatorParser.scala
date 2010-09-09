@@ -327,12 +327,10 @@ class ScalaCombinatorParser extends Parsers {
     rep1(caseClause) ^^ { CaseClauses(_) }
   }
 
-  lazy val guard: Parser[Option[Guard]] = {
-    val actualGuard = IF ~ postfixExpr ^^ { case ifToken ~ postfixExpr ⇒ Guard(ifToken, Expr(postfixExpr)) }
-    opt(actualGuard)
-  }
+  lazy val actualGuard = IF ~ postfixExpr ^^ { case ifToken ~ postfixExpr ⇒ Guard(ifToken, Expr(postfixExpr)) }
+  lazy val guard: Parser[Option[Guard]] = opt(actualGuard)
 
-  val definiteGuard: Parser[Guard] = guard(IF) ~> guard ^^ { _.get }
+  val definiteGuard: Parser[Guard] = guard(IF) ~> actualGuard
 
   lazy val enumerators: Parser[Enumerators] = {
     val enumerator: Parser[Enumerator] = definiteGuard | generator(eqOK = true) | expr
