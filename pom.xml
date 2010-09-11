@@ -92,7 +92,7 @@
   </pluginRepositories>
   <profiles>
     <profile>
-      <id>scala-2.8.0.final</id>
+      <id>scala-2.8.0</id>
       <activation>
         <property>
           <name>scala.version</name>
@@ -109,11 +109,28 @@
       </repositories>
     </profile>
     <profile>
-      <id>scala-2.8.0.trunk</id>
+      <id>scala-2.8.1</id>
       <activation>
         <property>
           <name>scala.version</name>
-          <value>2.8.0-SNAPSHOT</value>
+          <value>2.8.1-SNAPSHOT</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-2.8.1.alpha</id>
+          <name>Scala Toolchain 2.8.1.alpha p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.1.alpha</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala-trunk</id>
+      <activation>
+        <property>
+          <name>scala.version</name>
+          <value>2.9.0-SNAPSHOT</value>
         </property>
       </activation>
       <repositories>
