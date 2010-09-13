@@ -319,7 +319,13 @@ class ScalaCombinatorParser extends Parsers {
       ) ^^ exprElementFlatten
   }
 
-  lazy val argumentExprs: Parser[ArgumentExprs] = (blockExpr |/ LPAREN ~ opt(expr ~ rep(COMMA ~ expr)) ~ RPAREN) ^^ { x ⇒ ArgumentExprs(exprElementFlatten2(x)) }
+  lazy val argumentExprs: Parser[ArgumentExprs] = {
+    val blockArgumentExprs = blockExpr ^^ { x ⇒ BlockArgumentExprs(exprElementFlatten2(x)) }
+    val parenArgumentExprs = LPAREN ~ opt(expr ~ rep(COMMA ~ expr)) ~ RPAREN ^^ {
+      case lparen ~ body ~ rparen => ParenArgumentExprs(lparen, exprElementFlatten2(body), rparen)
+    }
+    blockArgumentExprs | parenArgumentExprs
+  }
 
   lazy val blockExpr = LBRACE ~ (caseClauses |/ block) ~ RBRACE ^^ { case (lbrace ~ body ~ rbrace) ⇒ BlockExpr(lbrace, body, rbrace) }
   lazy val block: Parser[StatSeq] = blockStatSeq

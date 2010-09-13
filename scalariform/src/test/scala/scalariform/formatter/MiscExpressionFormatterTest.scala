@@ -373,5 +373,18 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |/* c */d)""" ==>
   """a(b,
     |  /* c */ d)"""
+
+  """submit(
+    |
+    |)""" ==>
+  """submit()"""
+
+  """(
+    |42, 
+    |46
+    |)""" ==>
+  """(42,
+    |  46)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
+
   
 }

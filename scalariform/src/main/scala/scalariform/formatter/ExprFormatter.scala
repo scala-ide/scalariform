@@ -26,7 +26,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (PrefixExprElement(_), _) ⇒ Compact
             case (_, PostfixExprElement(_)) ⇒ CompactPreservingGap
             case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
-            case (_, ArgumentExprs(_)) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
+            case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
             case (_, _) if element.firstTokenOption exists { hiddenPredecessors(_).containsNewline } ⇒
               nestedFormatterState = currentFormatterState.indent
               nestedFormatterState.currentIndentLevelInstruction
@@ -64,7 +64,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           for (token ← element.tokens if token != firstToken)
             if (isInferredNewline(token))
               nextElementOption match {
-                case Some(ArgumentExprs(_)) if token == element.tokens.last ⇒
+                case Some(_: ArgumentExprs) if token == element.tokens.last ⇒
                   () //  Don't allow expression breaks immediately before an argument expression
                 case _ ⇒
                   if (not(expressionBreakIndentHappened)) {
@@ -111,7 +111,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case _ ⇒ NoFormatResult
   }
 
-  def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = format(argumentExprs.contents)
+  def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = argumentExprs match {
+    case BlockArgumentExprs(contents) => format(contents)
+    case ParenArgumentExprs(lparen, contents, rparen) => format(GeneralTokens(List(lparen)) :: contents)
+  }
 
   private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): FormatResult = format(parenExpr.contents)
 
