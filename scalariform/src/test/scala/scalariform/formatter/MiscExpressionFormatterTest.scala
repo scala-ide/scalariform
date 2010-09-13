@@ -368,5 +368,10 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """a { b =>
     |  println(b)
     |}"""
+
+  """a(b,
+    |/* c */d)""" ==>
+  """a(b,
+    |  /* c */ d)"""
   
 }

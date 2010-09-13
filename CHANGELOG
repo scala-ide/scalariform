@@ -6,6 +6,7 @@
 * Parse and format a sequence of XML nodes correctly
 * No longer force empty blocks to be single line (class A {})
 * Bug fix for implicit closure formatting
+* Better formatting for multiline comments in stairway expressions
 
 0.0.4 (17/July/10)
 * Add Maven/Tycho build

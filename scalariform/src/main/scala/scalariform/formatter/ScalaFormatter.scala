@@ -155,10 +155,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         else
           writeIntertokenCompact()
       case EnsureNewlineAndIndent(indentLevel, relativeTo) ⇒
-        val baseIndentOption = for {
-          relativeToken ← relativeTo
-          baseIndent ← tokenIndentMap.get(relativeToken)
-        } yield baseIndent
+        val baseIndentOption = relativeTo flatMap tokenIndentMap.get
         if (hiddenTokens.isEmpty) {
           builder.ensureAtBeginningOfLine()
           builder.indent(indentLevel, baseIndentOption)
@@ -166,19 +163,17 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val commentIndentLevel = if (nextTokenUnindents) indentLevel + 1 else indentLevel
           for ((previousOpt, hiddenToken, nextOpt) ← Utils.withPreviousAndNext(hiddenTokens)) {
             hiddenToken match {
-              case ScalaDocComment(token) ⇒ {
+              case ScalaDocComment(token) ⇒
                 builder.ensureAtBeginningOfLine()
                 builder.indent(commentIndentLevel, baseIndentOption)
                 builder.append(formatComment(hiddenToken, commentIndentLevel))
-              }
-              case SingleLineComment(_) | MultiLineComment(_) ⇒ {
+              case SingleLineComment(_) | MultiLineComment(_) ⇒
                 if (builder.atBeginningOfLine)
                   builder.indent(commentIndentLevel, baseIndentOption)
                 else if (builder.atVisibleCharacter) // Separation from previous visible token
                   builder.append(" ")
                 builder.write(hiddenToken)
-              }
-              case Whitespace(token) ⇒ {
+              case Whitespace(token) ⇒
                 val newlineCount = token.getText.count(_ == '\n')
                 val newlinesToWrite = previousOpt match {
                   case Some(SingleLineComment(_)) ⇒ math.min(1, newlineCount)
@@ -186,21 +181,23 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                 }
                 for (i ← 1 to newlinesToWrite)
                   builder.newline()
-              }
             }
             if (nextOpt.isEmpty) {
               hiddenToken match {
-                case MultiLineComment(_) | ScalaDocComment(_) ⇒ {
+                case ScalaDocComment(_) ⇒
                   builder.newline()
                   builder.indent(indentLevel, baseIndentOption)
-                }
-                case SingleLineComment(token) ⇒ {
+                case SingleLineComment(_) ⇒
                   builder.indent(indentLevel, baseIndentOption)
-                }
-                case Whitespace(token) ⇒ {
-                  builder.ensureAtBeginningOfLine()
-                  builder.indent(indentLevel, baseIndentOption)
-                }
+                case MultiLineComment(_) ⇒
+                  builder.append(" ")
+                case Whitespace(token) ⇒
+                  if (previousOpt.exists(_.isInstanceOf[MultiLineComment]) && !token.getText.contains('\n'))
+                    builder.append(" ")
+                  else {
+                    builder.ensureAtBeginningOfLine()
+                    builder.indent(indentLevel, baseIndentOption)
+                  }
               }
             }
 
