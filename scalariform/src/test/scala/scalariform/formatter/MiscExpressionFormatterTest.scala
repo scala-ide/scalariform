@@ -385,6 +385,21 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |)""" ==>
   """(42,
     |  46)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
-
   
+  """a(b,
+    |c => {
+    |d})""" ==>
+  """a(b,
+    |  c => {
+    |    d
+    |  })"""
+
+  """a(b, 
+    |(c), {
+    |d})""" ==>
+  """a(b,
+    |  (c), {
+    |    d
+    |  })"""
+
 }
