@@ -28,7 +28,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
             case (_, _) if element.firstTokenOption exists { hiddenPredecessors(_).containsNewline } ⇒
-              nestedFormatterState = currentFormatterState.indent
+              if (!expressionBreakIndentHappened)
+                nestedFormatterState = currentFormatterState.indent
               nestedFormatterState.currentIndentLevelInstruction
           }
 
