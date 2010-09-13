@@ -35,7 +35,7 @@ trait XmlLexer extends Lexer {
     var offset = 0
     while (ch(offset) != EOF_CHAR && isSpace(ch(offset).asInstanceOf[Char]))
       offset += 1
-    ch(offset) == '<'
+    ch(offset) == '<' && isNameStart(ch(offset + 1).asInstanceOf[Char])
   }
 
   protected def fetchXmlToken() {

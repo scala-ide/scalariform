@@ -178,6 +178,8 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   """<!-- -->
      <bar/>""" producesTokens (XML_COMMENT, XML_PCDATA, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE)
 
+  "for(<book/><-Nil)Nil" producesTokens (FOR, LPAREN, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE, LARROW, VARID, RPAREN, VARID)
+
   class TestString(s: String) {
 
     def producesTokens(toks: TokenType*) {
