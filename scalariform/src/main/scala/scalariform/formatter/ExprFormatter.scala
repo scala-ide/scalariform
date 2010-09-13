@@ -53,7 +53,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             }
           }
           formatResult ++= format(element)(nestedFormatterState)
-          currentFormatterState = nestedFormatterState
+          if (currentFormatterState != nestedFormatterState) {
+            expressionBreakIndentHappened = true
+            currentFormatterState = nestedFormatterState
+          }
         case None ⇒
           formatResult ++= format(element)(currentFormatterState)
       }
