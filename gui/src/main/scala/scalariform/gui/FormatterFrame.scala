@@ -133,11 +133,19 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       val outputText = try {
         specificFormatter.format(inputText)(OptionsPanel.getFormattingPreferences)
       } catch {
-        case e: ScalaParserException ⇒
+        case e: RuntimeException ⇒
           if (showAstCheckBox.isSelected) {
             val (lexer, tokens) = ScalaLexer.tokeniseFull(inputText)
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
+            try {
+              val parser = new ScalaCombinatorParser
+              val rawParseResult = specificFormatter.getParser(parser)(new ScalaLexerReader(tokens))
+              val parseResult = rawParseResult.get
+              val treeModel = new ParseTreeModel(parseResult)
+              astTree.setModel(treeModel)
+              expandAll(astTree)
+            } catch { case e: RuntimeException => }
           }
           throw e
       }
@@ -160,7 +168,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         val rawParseResult = try {
           specificFormatter.getParser(parser)(new ScalaLexerReader(tokens))
         } catch {
-          case e: ScalaParserException ⇒
+          case e: RuntimeException ⇒
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             throw e

@@ -13,6 +13,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = format(expr.contents)
 
   private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = {
+    if (exprElements flatMap { _.tokens } isEmpty)
+      return NoFormatResult
     var formatResult: FormatResult = NoFormatResult
 
     var currentFormatterState = formatterState
@@ -101,7 +103,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case template: Template ⇒ format(template)
     case statSeq: StatSeq ⇒ format(statSeq) // TODO: revisit
     case argumentExprs: ArgumentExprs ⇒ format(argumentExprs)
-
+    case anonymousFunction: AnonymousFunction ⇒ format(anonymousFunction)
     case GeneralTokens(_) ⇒ NoFormatResult
     case PrefixExprElement(_) ⇒ NoFormatResult
     case InfixExprElement(_) ⇒ NoFormatResult
@@ -109,10 +111,23 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case annotation: Annotation ⇒ format(annotation)
     case typeExprElement: TypeExprElement ⇒ format(typeExprElement.contents)
     case expr: Expr ⇒ format(expr.contents)
-    case AnonymousFunctionStart(contents, arrow) ⇒ format(contents)
     case xmlExpr: XmlExpr ⇒ format(xmlExpr)
     case parenExpr: ParenExpr ⇒ format(parenExpr)
     case _ ⇒ NoFormatResult
+  }
+
+  def format(anonymousFunction: AnonymousFunction)(implicit formatterState: FormatterState): FormatResult = { // <-- Also formatted specially in BlockExpr
+    val AnonymousFunction(parameters, arrow, body) = anonymousFunction
+    var formatResult: FormatResult = NoFormatResult
+    formatResult ++= format(parameters)
+    val bodyFirstTokenOpt = body flatMap { _.tokens } headOption;
+    val newlineBeforeBody = bodyFirstTokenOpt exists { hiddenPredecessors(_).containsNewline }
+    if (newlineBeforeBody) {
+      formatResult = formatResult.before(bodyFirstTokenOpt.get, formatterState.nextIndentLevelInstruction)
+      formatResult ++= format(body)(formatterState.indent)
+    } else
+      formatResult ++= format(body)(formatterState)
+    formatResult
   }
 
   def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = argumentExprs match {
@@ -436,12 +451,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         if (!singleLineBlock) {
           if (statSeq.firstTokenOption.isDefined) {
             statSeq.firstStatOpt match {
-              case Some(Expr(List(AnonymousFunctionStart(params, _), subStatSeq))) ⇒
+              case Some(Expr(List(anonFn@AnonymousFunction(params, arrowToken, body)))) ⇒
                 formatResult = formatResult.before(statSeq.firstToken, CompactEnsuringGap)
-                for (firstToken ← subStatSeq.firstTokenOption)
+                for (firstToken ← body.headOption flatMap { _.firstTokenOption })
                   formatResult = formatResult.before(firstToken, newFormatterState.nextIndentLevelInstruction)
                 formatResult ++= format(params)
-                formatResult ++= format(subStatSeq)(newFormatterState.indent)
+                formatResult ++= format(body)(newFormatterState.indent)
               case _ ⇒
                 val instruction =
                   if (statSeq.selfReferenceOpt.isDefined)

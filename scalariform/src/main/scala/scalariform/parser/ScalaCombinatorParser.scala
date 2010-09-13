@@ -236,12 +236,14 @@ class ScalaCombinatorParser extends Parsers {
     lazy val postArrow = if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten
     //lazy val arrowSuffix = ARROW ~ postArrow ^^ exprElementFlatten
     lazy val typeParamList = LPAREN ~ opt(id ~ ascription ~ rep(COMMA ~ id ~ ascription)) ~ RPAREN ^^ exprElementFlatten
-    lazy val anonymousFunctionStart = typeParamList ~ ARROW ^^ { case typeParamList ~ arrow ⇒ AnonymousFunctionStart(typeParamList, arrow) }
+    lazy val anonymousFunction: Parser[AnonymousFunction] = typeParamList ~ ARROW ~ postArrow ^^ {
+      case typeParamList ~ arrow ~ postArrow => AnonymousFunction(typeParamList, arrow, postArrow)
+    }
     lazy val potentialAnonymousFunction = res ~ opt(when(location != InTemplate, ARROW ~ postArrow)) ^^ {
-      case res ~ Some(arrow ~ postArrow) ⇒ exprElementFlatten2((AnonymousFunctionStart(res, arrow), postArrow))
+      case res ~ Some(arrow ~ postArrow) ⇒ exprElementFlatten2(AnonymousFunction(res, arrow, postArrow))
       case res ~ None ⇒ res
     }
-    lazy val res1 = (anonymousFunctionStart ~ postArrow |/ potentialAnonymousFunction) ^^ exprElementFlatten
+    lazy val res1 = (anonymousFunction |/ potentialAnonymousFunction) ^^ exprElementFlatten
     res1 ^^ { Expr(_) }
   }
 
@@ -274,11 +276,11 @@ class ScalaCombinatorParser extends Parsers {
 
   lazy val throwExpr = THROW ~ expr ^^ exprElementFlatten
 
-  def implicitClosure(location: Location) = { // Note: nsc's implicitClosure() doesn't include the initial IMPLICIT token
-    val anonFnStart = IMPLICIT ~ id ~ ARROW ^^ {
-      case implicitToken ~ id ~ arrowToken ⇒ AnonymousFunctionStart(exprElementFlatten2(implicitToken, id), arrowToken)
+  def implicitClosure(location: Location): Parser[AnonymousFunction] = { // Note: nsc's implicitClosure() doesn't include the initial IMPLICIT token
+    lazy val body = if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten
+    IMPLICIT ~ id ~ ARROW ~ body ^^ {
+      case implicitToken ~ id ~ arrowToken ~ body ⇒ AnonymousFunction(exprElementFlatten2(implicitToken, id), arrowToken, body)
     }
-    anonFnStart ~ (if (location == InBlock) block ^^ exprElementFlatten else expr ^^ exprElementFlatten) ^^ exprElementFlatten
   }
 
   lazy val postfixExpr = { // TODO: Clean this up

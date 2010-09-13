@@ -404,10 +404,10 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   """a(
     |    () => 
-    |    b)""" =/=>
+    |    b)""" ==>
   """a(
     |  () =>
-    |    b)""" because "Need to fix this"
+    |    b)"""
 
  """foobar(
     |(1,2),
