@@ -119,8 +119,7 @@ Example usage::
 Maven (using sbt)::
 
   val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5-SNAPSHOT"
-
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5"
 
 Preferences
 -----------
