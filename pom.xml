@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.scalariform</groupId>
   <artifactId>scalariform.parent</artifactId>
-  <version>0.0.5-SNAPSHOT</version>
+  <version>0.0.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
     <tycho.version>0.9.0</tycho.version>
