@@ -131,8 +131,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = argumentExprs match {
-    case BlockArgumentExprs(contents) => format(contents)
-    case ParenArgumentExprs(lparen, contents, rparen) => format(GeneralTokens(List(lparen)) :: contents)
+    case BlockArgumentExprs(contents) ⇒ format(contents)
+    case ParenArgumentExprs(lparen, contents, rparen) ⇒ format(GeneralTokens(List(lparen)) :: contents)
   }
 
   private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): FormatResult = format(parenExpr.contents)

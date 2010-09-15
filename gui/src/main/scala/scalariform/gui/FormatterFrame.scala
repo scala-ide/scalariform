@@ -145,7 +145,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
               val treeModel = new ParseTreeModel(parseResult)
               astTree.setModel(treeModel)
               expandAll(astTree)
-            } catch { case e: RuntimeException => }
+            } catch { case e: RuntimeException ⇒ }
           }
           throw e
       }

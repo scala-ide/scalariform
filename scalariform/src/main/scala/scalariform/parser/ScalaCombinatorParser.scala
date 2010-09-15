@@ -237,7 +237,7 @@ class ScalaCombinatorParser extends Parsers {
     //lazy val arrowSuffix = ARROW ~ postArrow ^^ exprElementFlatten
     lazy val typeParamList = LPAREN ~ opt(id ~ ascription ~ rep(COMMA ~ id ~ ascription)) ~ RPAREN ^^ exprElementFlatten
     lazy val anonymousFunction: Parser[AnonymousFunction] = typeParamList ~ ARROW ~ postArrow ^^ {
-      case typeParamList ~ arrow ~ postArrow => AnonymousFunction(typeParamList, arrow, postArrow)
+      case typeParamList ~ arrow ~ postArrow ⇒ AnonymousFunction(typeParamList, arrow, postArrow)
     }
     lazy val potentialAnonymousFunction = res ~ opt(when(location != InTemplate, ARROW ~ postArrow)) ^^ {
       case res ~ Some(arrow ~ postArrow) ⇒ exprElementFlatten2(AnonymousFunction(res, arrow, postArrow))
@@ -317,14 +317,13 @@ class ScalaCombinatorParser extends Parsers {
       DOT ~ id ~ simpleExprRest(canApply = true)
       |/ (typeArgs(isPattern = false) ^^ { TypeExprElement(_) }) ~ simpleExprRest(canApply = true) // TODO: Check grammar for condition
       |/ (when(canApply, (opt(NEWLINE whenFollowedBy LBRACE) ~ argumentExprs) ~ simpleExprRest(canApply = true)))
-      |/ (USCORE ^^ { PostfixExprElement(_) })
-      ) ^^ exprElementFlatten
+      |/ (USCORE ^^ { PostfixExprElement(_) })) ^^ exprElementFlatten
   }
 
   lazy val argumentExprs: Parser[ArgumentExprs] = {
     val blockArgumentExprs = blockExpr ^^ { x ⇒ BlockArgumentExprs(exprElementFlatten2(x)) }
     val parenArgumentExprs = LPAREN ~ opt(expr ~ rep(COMMA ~ expr)) ~ RPAREN ^^ {
-      case lparen ~ body ~ rparen => ParenArgumentExprs(lparen, exprElementFlatten2(body), rparen)
+      case lparen ~ body ~ rparen ⇒ ParenArgumentExprs(lparen, exprElementFlatten2(body), rparen)
     }
     blockArgumentExprs | parenArgumentExprs
   }

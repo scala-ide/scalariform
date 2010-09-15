@@ -23,7 +23,7 @@ object Main {
       println("Scalariform " + scalariform.VERSION)
       exit(0)
     }
-    
+
     var errors: List[String] = Nil
     var showUsage = false
 

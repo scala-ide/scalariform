@@ -63,7 +63,6 @@ object Keywords extends (String ⇒ Option[TokenType]) {
     "*" -> STAR,
     "|" -> PIPE,
     "~" -> TILDE,
-    "!" -> EXCLAMATION
-    )
+    "!" -> EXCLAMATION)
 
 }
