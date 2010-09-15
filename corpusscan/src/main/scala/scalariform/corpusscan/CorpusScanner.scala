@@ -21,7 +21,7 @@ object CorpusScanner extends SpecificFormatter {
   def attemptToParse(file: File): Option[ParseFault] = {
     try {
       val source = getText(file)
-      val sourceAgain = ScalaLexer.rawTokenise(source) map { _.getText } mkString ""
+      val sourceAgain = ScalaLexer.rawTokenise(source).map(_.getText).mkString
       if (source != sourceAgain)
         return Some(TokensDoNotCoverSource)
       val (lexer, tokens) = ScalaLexer.tokeniseFull(file)
@@ -38,11 +38,7 @@ object CorpusScanner extends SpecificFormatter {
     }
   }
 
-  private def getText(file: File) = {
-    val sb = new StringBuilder
-    Source.fromFile(file).addString(sb)
-    sb.toString
-  }
+  private def getText(file: File) = Source.fromFile(file).mkString
 
   def formatFile(file: File) {
     val source = getText(file)

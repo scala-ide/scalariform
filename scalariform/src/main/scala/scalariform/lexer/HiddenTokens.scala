@@ -8,8 +8,10 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
   def removeInitialWhitespace = new HiddenTokens(tokens.dropWhile(_.isInstanceOf[Whitespace]))
 
   def iterator: Iterator[HiddenToken] = tokens.iterator
-  val comments: List[Comment] = tokens.filter(token ⇒ token.isInstanceOf[Comment]).map(token ⇒ token.asInstanceOf[Comment]) // TODO: single method
-  val whitespaces: List[Whitespace] = tokens.filter(token ⇒ token.isInstanceOf[Whitespace]).map(token ⇒ token.asInstanceOf[Whitespace]) // TODO: single method
+
+  val comments: List[Comment] = tokens collect { case comment@Comment(_) ⇒ comment }
+
+  val whitespaces: List[Whitespace] = tokens collect { case whitespace@Whitespace(_) ⇒ whitespace }
 
   def firstTokenOption = tokens.headOption
   def lastTokenOption = tokens.lastOption
@@ -19,7 +21,8 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
   def containsComment = !comments.isEmpty
 
   lazy val text = tokens.map(_.token.getText).mkString
-  lazy val newlines: Option[Token] = {
+
+  lazy val newlines: Option[Token] =
     if (containsNewline) {
       require(!tokens.isEmpty)
       val tokenType = if (text matches HiddenTokens.BLANK_LINE_PATTERN) NEWLINES else NEWLINE
@@ -29,7 +32,6 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
       Some(token)
     } else
       None
-  }
 
 }
 

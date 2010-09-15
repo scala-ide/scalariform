@@ -12,6 +12,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   lazy val main = project("scalariform", "scalariform", new CoreProject(_))
   lazy val gui = project("gui", "gui", new GuiProject(_), main)
   lazy val corpusScan = project("corpusscan", "corpusscan", new CorpusScanProject(_), main)
+  lazy val perf = project("perf", "perf", new PerformanceProject(_), main)
 
   val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
   val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
@@ -48,6 +49,12 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
     val commonsIo = "commons-io" % "commons-io" % "1.4"
 
     override def mainClass = Some("scalariform.corpusscan.Runner")
+
+  }
+
+  class PerformanceProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions {
+
+    override def mainClass = Some("scalariform.perf.LexerPerformanceTest")
 
   }
 

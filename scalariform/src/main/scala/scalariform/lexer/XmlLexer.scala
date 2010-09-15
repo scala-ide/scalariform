@@ -33,9 +33,9 @@ trait XmlLexer extends Lexer {
 
   private def moreXmlToCome: Boolean = {
     var offset = 0
-    while (ch(offset) != EOF_CHAR && isSpace(ch(offset).asInstanceOf[Char]))
+    while (ch(offset) != SU && isSpace(ch(offset)))
       offset += 1
-    ch(offset) == '<' && isNameStart(ch(offset + 1).asInstanceOf[Char])
+    ch(offset) == '<' && isNameStart(ch(offset + 1))
   }
 
   protected def fetchXmlToken() {
@@ -130,15 +130,15 @@ trait XmlLexer extends Lexer {
           switchToScalaModeAndFetchToken
         else
           getXmlCharData() // TODO: tagMode?
-      case EOF_CHAR ⇒ token(EOF)
+      case SU ⇒ token(EOF)
       case _ ⇒
-        if (tagMode && isNameStart(ch.asInstanceOf[Char])) {
+        if (tagMode && isNameStart(ch)) {
           getXmlName()
-        } else if (tagMode && isSpace(ch.asInstanceOf[Char])) {
+        } else if (tagMode && isSpace(ch)) {
           getXmlSpace()
         } else {
           getXmlCharData()
-          // throw new ScalaLexerException("illegal character in xml: " + Character.valueOf(ch.asInstanceOf[Char]))
+          // throw new ScalaLexerException("illegal character in xml: " + Character.valueOf(ch))
           // TODO
         }
 
@@ -152,7 +152,7 @@ trait XmlLexer extends Lexer {
       if (lookaheadIs("]]>")) {
         munch("]]>")
         continue = false
-      } else if (ch == EOF_CHAR)
+      } else if (ch == SU)
         throw new ScalaLexerException("Malformed XML CDATA")
       else
         nextChar()
@@ -171,7 +171,7 @@ trait XmlLexer extends Lexer {
           throw new ScalaLexerException("Malformed XML comment")
         nextChar()
         continue = false
-      } else if (ch == EOF_CHAR)
+      } else if (ch == SU)
         throw new ScalaLexerException("Malformed XML comment")
       else
         nextChar()
@@ -182,7 +182,7 @@ trait XmlLexer extends Lexer {
   private def getXmlCharData() {
     var continue = true
     while (continue) {
-      if (ch == EOF_CHAR || ch == '<')
+      if (ch == SU || ch == '<')
         continue = false
       else if (ch == '{')
         if (ch(1) == '{') {
@@ -197,28 +197,28 @@ trait XmlLexer extends Lexer {
 
   // S
   private def getXmlSpace() {
-    require(isSpace(ch.asInstanceOf[Char]))
+    require(isSpace(ch))
     nextChar()
-    while (ch != EOF_CHAR && isSpace(ch.asInstanceOf[Char]))
+    while (ch != SU && isSpace(ch))
       nextChar()
     token(XML_WHITESPACE)
   }
 
   private def getXmlName() {
-    require(isNameStart(ch.asInstanceOf[Char]))
+    require(isNameStart(ch))
     nextChar()
-    while (ch != EOF_CHAR && isNameChar(ch.asInstanceOf[Char]))
+    while (ch != SU && isNameChar(ch))
       nextChar()
     // TODO endswith colon?
     token(XML_NAME)
   }
 
-  private def getXmlAttributeValue(quote: Int) {
+  private def getXmlAttributeValue(quote: Char) {
     require(quote == '\'' || quote == '\"')
     require(ch == quote)
     nextChar()
     while (ch != quote) {
-      if (ch == EOF_CHAR) // TODO: line seps etc
+      if (ch == SU) // TODO: line seps etc
         throw new ScalaLexerException("Unterminated attribute value")
       else
         nextChar()

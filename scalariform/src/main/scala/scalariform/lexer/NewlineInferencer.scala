@@ -4,19 +4,25 @@ import scala.collection.immutable.Queue
 import scalariform.utils.Utils.boolean2ImpliesWrapper
 import scalariform.lexer.Tokens._
 import scala.annotation.tailrec
+import java.util.{ HashMap, Map ⇒ JMap }
 
 class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
   import NewlineInferencer._
 
   require(delegate.hasNext)
 
-  private var hiddenPredecessors: Map[Token, HiddenTokens] = Map()
-  private var hiddenSuccessors: Map[Token, HiddenTokens] = Map()
-  private var inferredNewlines: Map[Token, HiddenTokens] = Map()
+  private var hiddenPredecessors: JMap[Token, HiddenTokens] = new HashMap()
+  private var hiddenSuccessors: JMap[Token, HiddenTokens] = new HashMap()
+  private var inferredNewlines: JMap[Token, HiddenTokens] = new HashMap()
 
-  def getHiddenPredecessors = hiddenPredecessors
-  def getHiddenSuccessors = hiddenSuccessors
-  def getInferredNewlines = inferredNewlines
+  def isInferredNewline(token: Token): Boolean = inferredNewlines containsKey token
+
+  def inferredNewlines(token: Token): HiddenTokens = inferredNewlines get token
+
+  def hiddenPredecessors(token: Token): HiddenTokens = hiddenPredecessors get token
+
+  import scala.collection.JavaConversions._
+  lazy val allHiddenTokens = hiddenPredecessors.values ++ inferredNewlines.values
 
   private var buffer: Queue[(HiddenTokens, Token)] = Queue()
   @tailrec
@@ -40,51 +46,45 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
   def nextToken(): Token = {
     val token = nextTokenCore()
     token.getType match {
-      case LBRACE ⇒ multipleStatementRegionMarkerStack ::= RBRACE
-      case LPAREN ⇒ multipleStatementRegionMarkerStack ::= RPAREN
-      case LBRACKET ⇒ multipleStatementRegionMarkerStack ::= RBRACKET
-      case CASE ⇒
-        if (!buffer.isEmpty) {
-          val followingTokenType = buffer.front._2.getType
-          if (followingTokenType != CLASS && followingTokenType != OBJECT)
-            multipleStatementRegionMarkerStack ::= ARROW
-        }
+      case LBRACE ⇒
+        multipleStatementRegionMarkerStack ::= RBRACE
+      case LPAREN ⇒
+        multipleStatementRegionMarkerStack ::= RPAREN
+      case LBRACKET ⇒
+        multipleStatementRegionMarkerStack ::= RBRACKET
+      case CASE if !buffer.isEmpty ⇒
+        val followingTokenType = buffer.front._2.getType
+        if (followingTokenType != CLASS && followingTokenType != OBJECT)
+          multipleStatementRegionMarkerStack ::= ARROW
       case tokenType if multipleStatementRegionMarkerStack.headOption == Some(tokenType) ⇒
         multipleStatementRegionMarkerStack = multipleStatementRegionMarkerStack.tail
-      case _ ⇒ ()
+      case _ ⇒
     }
     previousTokenOption = Some(token)
     token
   }
 
-  private def nextTokenCore(): Token = tokenToEmitNextTime match {
-    case Some(token) ⇒ {
-      tokenToEmitNextTime = None
-      val dummyHiddenTokens = new HiddenTokens(Nil)
-      hiddenPredecessors += token -> dummyHiddenTokens
+  private def nextTokenCore(): Token = {
+    def updatePredecessorsAndSuccesors(token: Token, hiddenTokens: HiddenTokens) = {
+      hiddenPredecessors.put(token, hiddenTokens)
       for (previousToken ← previousTokenOption)
-        hiddenSuccessors += previousToken -> dummyHiddenTokens
+        hiddenSuccessors.put(previousToken, hiddenTokens)
       token
     }
-    case None ⇒ {
-      val (hiddenTokens, token) = consumeFromBuffer()
-      hiddenTokens.newlines match {
-        case Some(newlineToken) if shouldTranslateToNewline(nextToken = token) ⇒ {
-          tokenToEmitNextTime = Some(token)
-          inferredNewlines += newlineToken -> hiddenTokens
-          val dummyHiddenTokens = new HiddenTokens(Nil)
-          hiddenPredecessors += newlineToken -> dummyHiddenTokens
-          for (previousToken ← previousTokenOption)
-            hiddenSuccessors += previousToken -> dummyHiddenTokens
-          newlineToken
+    tokenToEmitNextTime match {
+      case Some(token) ⇒
+        tokenToEmitNextTime = None
+        updatePredecessorsAndSuccesors(token, new HiddenTokens(Nil))
+      case None ⇒
+        val (hiddenTokens, token) = consumeFromBuffer()
+        hiddenTokens.newlines match {
+          case Some(newlineToken) if shouldTranslateToNewline(nextToken = token) ⇒
+            tokenToEmitNextTime = Some(token)
+            inferredNewlines.put(newlineToken, hiddenTokens)
+            updatePredecessorsAndSuccesors(newlineToken, new HiddenTokens(Nil))
+          case _ ⇒
+            updatePredecessorsAndSuccesors(token, hiddenTokens)
         }
-        case _ ⇒ {
-          hiddenPredecessors += token -> hiddenTokens
-          for (previousToken ← previousTokenOption)
-            hiddenSuccessors += previousToken -> hiddenTokens
-          token
-        }
-      }
     }
   }
 
@@ -103,12 +103,12 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
     previousCanEndAStatement && nextCanBeginAStatement && multipleStatementsAllowed
   }
 
-  private def followingTokenIsClassOrObject: Boolean = {
+  private def followingTokenIsClassOrObject: Boolean =
     buffer.headOption match {
       case None ⇒ false
       case Some((_, followingToken)) ⇒ followingToken.getType == CLASS || followingToken.getType == OBJECT
     }
-  }
+
 }
 
 object NewlineInferencer {

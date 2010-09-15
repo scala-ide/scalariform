@@ -37,10 +37,10 @@ trait SpecificFormatter {
       println(source)
       println("Tokens:")
       tokens foreach println
-      println("Hidden:")
-      println("hiddenPredecessors: " + lexer.getHiddenPredecessors)
-      println("hiddenSuccessors: " + lexer.getHiddenSuccessors)
-      println("inferredNewlines: " + lexer.getInferredNewlines)
+      // println("Hidden:")
+      // println("hiddenPredecessors: " + lexer.getHiddenPredecessors)
+      // println("hiddenSuccessors: " + lexer.getHiddenSuccessors)
+      // println("inferredNewlines: " + lexer.getInferredNewlines)
     }
     val parser = new ScalaCombinatorParser
     val rawParseResult = getParser(parser)(new ScalaLexerReader(tokens))
@@ -55,7 +55,7 @@ trait SpecificFormatter {
 
     var actualFormattingPreferences = baseFormattingPreferences
     for {
-      hiddenTokens ← (lexer.getHiddenPredecessors.valuesIterator ++ lexer.getInferredNewlines.valuesIterator)
+      hiddenTokens ← lexer.allHiddenTokens
       hiddenToken ← hiddenTokens
       ToggleOption(onOrOff, optionName) ← FormatterDirectiveParser.getDirectives(hiddenToken.getText)
       rawPreference ← AllPreferences.preferencesByKey.get(optionName)
@@ -72,11 +72,11 @@ trait SpecificFormatter {
 
     val formatter = new ScalaFormatter() {
 
-      def isInferredNewline(token: Token): Boolean = lexer.getInferredNewlines.get(token).isDefined
+      def isInferredNewline(token: Token): Boolean = lexer.isInferredNewline(token)
 
-      def inferredNewlines(token: Token): HiddenTokens = lexer.getInferredNewlines(token)
+      def inferredNewlines(token: Token): HiddenTokens = lexer.inferredNewlines(token)
 
-      def hiddenPredecessors(token: Token): HiddenTokens = lexer.getHiddenPredecessors(token)
+      def hiddenPredecessors(token: Token): HiddenTokens = lexer.hiddenPredecessors(token)
 
       val formattingPreferences: IFormattingPreferences = actualFormattingPreferences
 

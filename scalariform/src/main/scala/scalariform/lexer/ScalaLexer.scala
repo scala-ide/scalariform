@@ -47,12 +47,13 @@ object ScalaLexer {
       -1
   }
 
-  def tokeniseFull(file: File): (NewlineInferencer, List[Token]) = tokeniseFull(new BufferedReader(new FileReader(file)))
+  def tokeniseFull(file: File): (NewlineInferencer, List[Token]) = {
+    val s = scala.io.Source.fromFile(file).mkString
+    tokeniseFull(s)
+  }
 
-  def tokeniseFull(s: String): (NewlineInferencer, List[Token]) = tokeniseFull(new StringReader(s))
-
-  def tokeniseFull(reader: Reader): (NewlineInferencer, List[Token]) = {
-    val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(new ScalaLexer(new UnicodeEscapeReader(reader))))
+  def tokeniseFull(s: String): (NewlineInferencer, List[Token]) = {
+    val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(new ScalaLexer(new UnicodeEscapeReader(s))))
     val tokenBuffer = new ListBuffer[Token]
     var continue = true
     while (continue) {
@@ -68,11 +69,24 @@ object ScalaLexer {
   def tokenise(s: String): List[Token] = tokeniseFull(s)._2
 
   def rawTokenise(s: String): List[Token] = {
-    val lexer = new ScalaLexer(new UnicodeEscapeReader(new StringReader(s)))
+    val lexer = new ScalaLexer(new UnicodeEscapeReader(s))
     var actualTokens: List[Token] = Nil
     var continue = true
     while (continue) {
       val token = lexer.nextToken()
+      actualTokens ::= token
+      if (token.getType == Tokens.EOF)
+        continue = false
+    }
+    (actualTokens.tail).reverse
+  }
+
+  def rawTokenise2(s: String): List[Token] = {
+    val lexer = new WhitespaceAndCommentsGrouper(new ScalaLexer(new UnicodeEscapeReader(s)))
+    var actualTokens: List[Token] = Nil
+    var continue = true
+    while (lexer.hasNext) {
+      val (_, token) = lexer.next()
       actualTokens ::= token
       if (token.getType == Tokens.EOF)
         continue = false

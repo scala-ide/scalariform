@@ -35,12 +35,8 @@ class WhitespaceAndCommentsGrouper(private val delegate: ScalaLexer) extends Ite
 
   private def makeHiddenToken(token: Token) = token.getType match {
     case LINE_COMMENT ⇒ SingleLineComment(token)
-    case MULTILINE_COMMENT ⇒ {
-      if (token.getText.startsWith("/**") && token.getText != "/**/")
-        ScalaDocComment(token)
-      else
-        MultiLineComment(token)
-    }
+    case MULTILINE_COMMENT if (token.getText.startsWith("/**") && token.getText != "/**/") ⇒ ScalaDocComment(token)
+    case MULTILINE_COMMENT ⇒ MultiLineComment(token)
     case WS ⇒ Whitespace(token)
   }
 

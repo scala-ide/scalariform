@@ -3,11 +3,14 @@ package scalariform.lexer
 import scala.annotation.{ switch, tailrec }
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
+import ScalaLexer._
+
+import CharConstants._
 
 trait ScalaOnlyLexer extends Lexer {
-  import ScalaLexer._
-  import CharConstants._
+
   import ScalaOnlyLexer._
+
   class ScalaMode(private var braceNestLevel: Int = 0) extends LexerMode {
     def nestBrace() { braceNestLevel += 1 }
     def unnestBrace(): Int = {
@@ -41,7 +44,7 @@ trait ScalaOnlyLexer extends Lexer {
         getIdentRest()
       case '<' ⇒
         lastCh match {
-          case EOF_CHAR | ' ' | '\t' | '\n' | '{' | '(' | '>' if ch(1) != EOF_CHAR && (isNameStart(ch(1).asInstanceOf[Char]) || ch(1) == '!' || ch(1) == '?') ⇒
+          case SU | ' ' | '\t' | '\n' | '{' | '(' | '>' if ch(1) != SU && (isNameStart(ch(1)) || ch(1) == '!' || ch(1) == '?') ⇒
             switchToXmlModeAndFetchToken()
           case _ ⇒
             nextChar()
@@ -117,7 +120,7 @@ trait ScalaOnlyLexer extends Lexer {
         nextChar(); token(LBRACKET)
       case ']' ⇒
         nextChar(); token(RBRACKET)
-      case EOF_CHAR ⇒ token(EOF)
+      case SU ⇒ token(EOF)
       case _ ⇒
         if (ch == '\u21D2') {
           nextChar(); token(ARROW)
@@ -156,7 +159,7 @@ trait ScalaOnlyLexer extends Lexer {
     nextChar()
     @tailrec
     def scanForClosingQuotes(firstTime: Boolean): Unit = ch match {
-      case EOF_CHAR ⇒ throw new ScalaLexerException(errorMsg)
+      case _ if eof ⇒ throw new ScalaLexerException(errorMsg)
       case '\r' | '\n' if !isUnicodeEscape ⇒ throw new ScalaLexerException(errorMsg)
       case `delimiter` if firstTime && errorMsgOnEmpty.isDefined ⇒ throw new ScalaLexerException(errorMsgOnEmpty.get)
       case `delimiter` ⇒ nextChar(); token(tokenType)
@@ -193,7 +196,7 @@ trait ScalaOnlyLexer extends Lexer {
         munch("\"\"\"")
         while (ch == '\"') { nextChar() }
         token(STRING_LITERAL)
-      } else if (ch == EOF_CHAR)
+      } else if (eof)
         throw new ScalaLexerException("unclosed multi-line string literal")
       else {
         nextChar()
@@ -227,9 +230,8 @@ trait ScalaOnlyLexer extends Lexer {
       if (Character.isUnicodeIdentifierPart(ch) && ch != SU) {
         nextChar()
         getIdentRest()
-      } else {
+      } else
         finishNamed()
-      }
   }
 
   private def getOperatorRest(): Unit = (ch: @switch) match {
@@ -288,7 +290,7 @@ trait ScalaOnlyLexer extends Lexer {
       case '\r' if ch(1) != '\n' ⇒
         nextChar()
         token(LINE_COMMENT)
-      case EOF_CHAR ⇒
+      case SU if eof ⇒
         token(LINE_COMMENT)
       case _ ⇒
         nextChar()
@@ -315,7 +317,7 @@ trait ScalaOnlyLexer extends Lexer {
             nextChar()
             nextChar()
             consumeUntilSplatSlash(nesting + 1)
-          case EOF_CHAR ⇒
+          case SU if eof ⇒
             throw new ScalaLexerException("Unterminated comment")
           case _ ⇒
             nextChar()
@@ -356,7 +358,7 @@ trait ScalaOnlyLexer extends Lexer {
   }
 
   private def getNumber(base: Int) {
-    def isDigit(c: Int) = if (c < 0) false else (java.lang.Character isDigit (c.asInstanceOf[Char]))
+    def isDigit(c: Char) = if (c == SU) false else (Character isDigit c)
     val base1 = if (base < 10) 10 else base
 
     // read 8,9's even if format is octal, produce a malformed number error afterwards.
@@ -438,37 +440,26 @@ trait ScalaOnlyLexer extends Lexer {
   }
 
   // TODO: Grab from lib?
-  def isIdentifierStart(i: Int): Boolean =
-    if (i == EOF_CHAR)
+  def isIdentifierStart(c: Char) =
+    if (c == SU)
       false
-    else {
-      val c = i.asInstanceOf[Char]
-      ('A' <= c && c <= 'Z') ||
-        ('a' <= c && c <= 'a') ||
-        (c == '_') || (c == '$') ||
-        Character.isUnicodeIdentifierStart(c)
-    }
+    else
+      ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'a') || (c == '_') || (c == '$') || Character.isUnicodeIdentifierStart(c)
 
-  def isIdentifierPart(i: Int) = {
-    if (i == EOF_CHAR)
+  def isIdentifierPart(c: Char) =
+    if (c == SU)
       false
-    else {
-      val c = i.asInstanceOf[Char]
-      isIdentifierStart(c) ||
-        ('0' <= c && c <= '9') ||
-        Character.isUnicodeIdentifierPart(c)
-    }
-  }
+    else
+      isIdentifierStart(c) || ('0' <= c && c <= '9') || Character.isUnicodeIdentifierPart(c)
 
 }
 
 object ScalaOnlyLexer {
 
-  def isOperatorPart(i: Int): Boolean = {
-    if (i == CharConstants.EOF_CHAR)
+  def isOperatorPart(c: Char): Boolean =
+    if (c == SU)
       false
-    else {
-      val c = i.asInstanceOf[Char]
+    else
       (c: @switch) match {
         case '~' | '!' | '@' | '#' | '%' |
           '^' | '*' | '+' | '-' | '<' |
@@ -476,18 +467,14 @@ object ScalaOnlyLexer {
           '|' | '/' | '\\' ⇒ true
         case c ⇒ isSpecial(c)
       }
-    }
-  }
 
-  def isSpecial(i: Int) = {
-    if (i == CharConstants.EOF_CHAR)
+  def isSpecial(c: Char) =
+    if (c == SU)
       false
     else {
-      val c = i.asInstanceOf[Char]
       val chtp = Character.getType(c)
       chtp == Character.MATH_SYMBOL.toInt || chtp == Character.OTHER_SYMBOL.toInt
     }
-  }
 
 }
 

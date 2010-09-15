@@ -88,5 +88,13 @@ object Utils {
     }
   }
 
+  def time[T](s: String)(f: ⇒ T): T = {
+    val start = System.currentTimeMillis
+    val result = f
+    val duration = System.currentTimeMillis - start
+    println(s + ": " + duration + "ms")
+    result
+  }
+
 }
 

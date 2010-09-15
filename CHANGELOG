@@ -1,4 +1,5 @@
 0.0.6 (..)
+* Lexer performance tweaks
 
 0.0.5 (15/September/10)
 * Support Scala scripts
