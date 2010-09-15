@@ -26,7 +26,7 @@ object CorpusScanner extends SpecificFormatter {
         return Some(TokensDoNotCoverSource)
       val (lexer, tokens) = ScalaLexer.tokeniseFull(file)
       val parser = new ScalaCombinatorParser
-      val rawParseResult = (parser.phrase(parser.compilationUnit))(new ScalaLexerReader(tokens))
+      val rawParseResult = parser.compilationUnitOrScript(new ScalaLexerReader(tokens))
       if (!rawParseResult.successful)
         Some(UnsuccessfulParse)
       else if (rawParseResult.get.tokens != tokens.init) /* drop EOF */
@@ -56,7 +56,7 @@ object CorpusScanner extends SpecificFormatter {
 
   type Result = CompilationUnit
 
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.compilationUnit)
+  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 

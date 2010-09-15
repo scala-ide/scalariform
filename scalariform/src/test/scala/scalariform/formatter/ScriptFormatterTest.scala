@@ -4,18 +4,14 @@ import scalariform.parser._
 import scalariform.formatter._
 
 // format: OFF
-class ImportFormatterTest extends AbstractFormatterTest {
+class ScriptFormatterTest extends AbstractFormatterTest {
 
-  "import foo . _" ==> "import foo._" 
-  "import foo . bar" ==> "import foo.bar" 
-  "import foo.{bar=>baz}" ==> "import foo.{ bar => baz }"
-  "import foo.{bar=>baz},baz.biz" ==> "import foo.{ bar => baz }, baz.biz"
+  """println("Hello world")""" ==> """println("Hello world")"""
 
-  """import foo.{bar => baz,
-    |wibble => wobble}""" ==>
-  """import foo.{
-    |  bar => baz,
-    |  wibble => wobble
+  """def sayHi() { println("Hello")
+    |}""" ==>
+  """def sayHi() {
+    |  println("Hello")
     |}"""
 
   override val debug = false

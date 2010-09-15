@@ -10,7 +10,7 @@ class PackageFormatterTest extends AbstractFormatterTest {
 
   type Result = CompilationUnit
   
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.compilationUnit)
+  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
   
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 

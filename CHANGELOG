@@ -1,12 +1,13 @@
 0.0.5 (..)
-* Set up publish to Scala Tools repo
+* Support Scala scripts
 * Better staircase expr formatting
-* Bug fixes for if/for/while inside paren expressions
 * Handle Scala parsing exceptions in command-line tool
+* Set up publish to Scala Tools repo
+* Bug fixes for if/for/while inside paren expressions
 * Parse and format a sequence of XML nodes correctly
 * No longer force empty blocks to be single line (class A {})
-* Bug fix for implicit closure formatting
-* Fix for a package / NEWLINE parsing bug
+* FIX: implicit closure formatting
+* FIX: a package / NEWLINE parsing bug
 
 0.0.4 (17/July/10)
 * Add Maven/Tycho build

@@ -727,7 +727,12 @@ templateBodyOpt ⇒
       }
     }
   }
+
   lazy val compilationUnit: Parser[CompilationUnit] = topStats ^^ { CompilationUnit(_) }
+
+  lazy val scriptBody: Parser[CompilationUnit] = templateStatSeq ^^ { CompilationUnit(_) }
+
+  lazy val compilationUnitOrScript = phrase(compilationUnit) | phrase(scriptBody)
 
   def xmlStartTag(isPattern: Boolean): Parser[XmlStartTag] =
     XML_START_OPEN ~ XML_NAME ~ pairRep(opt(XML_WHITESPACE), xmlAttribute(isPattern)) ~ opt(XML_WHITESPACE) ~ XML_TAG_CLOSE ^^ {

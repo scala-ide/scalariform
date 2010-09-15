@@ -32,7 +32,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
   type Result = CompilationUnit
 
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.compilationUnit)
+  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
@@ -349,7 +349,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
       type Result = CompilationUnit
 
-      def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.compilationUnit)
+      def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
 
       def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
@@ -368,7 +368,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     }
 
     val productions = List(
-      new ProductionItem("Compilation unit", compilationUnitFormatter),
+      new ProductionItem("Compilation unit or script", compilationUnitFormatter),
       new ProductionItem("Expression", expressionFormatter))
 
     override def getSize = productions.size
