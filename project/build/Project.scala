@@ -3,9 +3,9 @@ import com.github.olim7t.sbtscalariform._
 
 class Project(info: ProjectInfo) extends ParentProject(info) {
 
-  trait FormatterOptions extends ScalariformPlugin {
+  trait FormatterOptions /* extends ScalariformPlugin */ {
 
-    override def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true))
+    /* override */ def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true))
 
   }
 

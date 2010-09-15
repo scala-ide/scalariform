@@ -9,3 +9,4 @@ docs/source/conf.py
 scalariform/META-INF/MANIFEST.MF
 scalariform.feature/feature.xml
 scalariform.update/site.xml
+scalariform/src/main/scala/scalariform/package.scala

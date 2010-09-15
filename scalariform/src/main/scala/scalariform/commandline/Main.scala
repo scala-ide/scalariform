@@ -19,6 +19,11 @@ object Main {
       exit(0)
     }
 
+    if (arguments contains Version) {
+      println("Scalariform " + scalariform.VERSION)
+      exit(0)
+    }
+    
     var errors: List[String] = Nil
     var showUsage = false
 
@@ -191,7 +196,8 @@ object Main {
     println("  --inPlace, -i                   Replace the input file(s) in place with a formatted version.")
     println("  --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
     println("  --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)")
-    println("  --verbose -v                    Verbose output")
+    println("  --verbose, -v                   Verbose output")
+    println("  --version                       Show Scalariform version")
     println()
     println("Preferences:")
     for (key ← AllPreferences.preferencesByKey.keySet.toList.sorted) {
