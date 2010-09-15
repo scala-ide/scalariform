@@ -35,4 +35,9 @@ class PackageFormatterTest extends AbstractFormatterTest {
     |package wibble""" ==>
   """/* foo */
     |package wibble"""
+
+  """package a 
+     |{}""" ==>
+  """package a {}"""
+
 }

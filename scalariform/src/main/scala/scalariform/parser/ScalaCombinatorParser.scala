@@ -716,7 +716,7 @@ templateBodyOpt ⇒
     val packageBit4 = PACKAGE ~ qualId ^^ {
       case packageToken ~ name ⇒ StatSeq(None, Some(PackageStat(packageToken, name)), Nil)
     }
-    packageBit1 | packageBit2 | packageBit3 | packageBit4
+    packageBit1 | packageBit3 | packageBit2 | packageBit4
   }
 
   lazy val topStats: Parser[StatSeq] = {
