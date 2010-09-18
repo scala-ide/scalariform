@@ -74,7 +74,8 @@ trait SpecificFormatter {
 
       def isInferredNewline(token: Token): Boolean = lexer.isInferredNewline(token)
 
-      def inferredNewlines(token: Token): HiddenTokens = lexer.inferredNewlines(token)
+      /** requires isInferredNewline(token) == true */
+      def inferredNewlines(token: Token): HiddenTokens = lexer.inferredNewlines(token).get
 
       def hiddenPredecessors(token: Token): HiddenTokens = lexer.hiddenPredecessors(token)
 

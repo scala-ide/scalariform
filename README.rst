@@ -116,11 +116,10 @@ Example usage::
   
   }
 
-Maven (using sbt)::
+Dependency via sbt::
 
-  val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.6-SNAPSHOT"
-
+  val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Releases" at "http://scala-tools.org/repo-releases"
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5"
 
 Preferences
 -----------

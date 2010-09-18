@@ -12,12 +12,11 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
   require(delegate.hasNext)
 
   private var hiddenPredecessors: JMap[Token, HiddenTokens] = new HashMap()
-  private var hiddenSuccessors: JMap[Token, HiddenTokens] = new HashMap()
   private var inferredNewlines: JMap[Token, HiddenTokens] = new HashMap()
 
   def isInferredNewline(token: Token): Boolean = inferredNewlines containsKey token
 
-  def inferredNewlines(token: Token): HiddenTokens = inferredNewlines get token
+  def inferredNewlines(token: Token): Option[HiddenTokens] = Option(inferredNewlines get token)
 
   def hiddenPredecessors(token: Token): HiddenTokens = hiddenPredecessors get token
 
@@ -67,8 +66,6 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
   private def nextTokenCore(): Token = {
     def updatePredecessorsAndSuccesors(token: Token, hiddenTokens: HiddenTokens) = {
       hiddenPredecessors.put(token, hiddenTokens)
-      for (previousToken ← previousTokenOption)
-        hiddenSuccessors.put(previousToken, hiddenTokens)
       token
     }
     tokenToEmitNextTime match {

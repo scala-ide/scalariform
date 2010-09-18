@@ -404,7 +404,7 @@ object ScalaFormatter {
   // format: ON
 
   @throws(classOf[ScalaParserException])
-  def format(source: String, formattingPreferences: IFormattingPreferences): String = {
+  def format(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences()): String = {
     val edits = formatAsEdits(source, formattingPreferences)
     TextEditProcessor.runEdits(source, edits)
   }

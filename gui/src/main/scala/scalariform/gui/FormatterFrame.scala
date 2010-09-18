@@ -97,20 +97,17 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
       for (token ← tokens) {
         highlightToken(token)
-        for (hiddenToken ← lexer.getHiddenPredecessors(token))
+        for (hiddenToken ← lexer.hiddenPredecessors(token))
           highlightToken(hiddenToken.token)
-        for (hiddenTokens ← lexer.getInferredNewlines.get(token); hiddenToken ← hiddenTokens)
+        for (hiddenTokens ← lexer.inferredNewlines(token); hiddenToken <- hiddenTokens)
           highlightToken(hiddenToken.token)
       }
-      for (token ← tokens.takeRight(2).headOption)
-        for (hiddenToken ← lexer.getHiddenSuccessors(token))
-          highlightToken(hiddenToken.token)
     }
   }
 
   setLayout(new BorderLayout)
 
-  setTitle("Scalariform")
+  setTitle("Scalariform " + scalariform.VERSION)
 
   val textFont = new Font("monospaced", Font.PLAIN, 14)
 
