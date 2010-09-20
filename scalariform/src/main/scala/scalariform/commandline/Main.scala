@@ -166,16 +166,16 @@ object Main {
             Some(ScalaFormatter.format(original, preferences))
           } catch {
             case e: ScalaParserException ⇒
-              log("[Could not parse] " + file.getPath)
+              log("[Parse error]   " + file.getPath)
               problems = true
               None
           }
           for (formatted ← formattedOption) {
             if (inPlace)
               if (formatted == original)
-                log("[Already formatted correctly] " + file)
+                log(".              " + file)
               else {
-                log("[Reformat] " + file)
+                log("[Reformatted]  " + file)
                 writeText(file, formatted)
               }
             else

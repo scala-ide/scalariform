@@ -61,7 +61,7 @@ trait ScalaOnlyLexer extends Lexer {
           case '/' ⇒ getSingleLineComment()
           case '*' ⇒ getMultilineComment()
           case _ ⇒ nextChar(); getOperatorRest()
-      }
+        }
       case '0' ⇒
         if (ch(1) == 'x' || ch(1) == 'X')
           getHexNumber()
@@ -243,7 +243,7 @@ trait ScalaOnlyLexer extends Lexer {
       (ch(1): @switch) match {
         case '/' | '*' ⇒ finishNamed()
         case _ ⇒ nextChar(); getOperatorRest()
-    }
+      }
     case _ ⇒
       if (isSpecial(ch)) { nextChar(); getOperatorRest() } else finishNamed()
   }

@@ -99,7 +99,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         highlightToken(token)
         for (hiddenToken ← lexer.hiddenPredecessors(token))
           highlightToken(hiddenToken.token)
-        for (hiddenTokens ← lexer.inferredNewlines(token); hiddenToken <- hiddenTokens)
+        for (hiddenTokens ← lexer.inferredNewlines(token); hiddenToken ← hiddenTokens)
           highlightToken(hiddenToken.token)
       }
     }
@@ -183,7 +183,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       }
     } catch {
       case e ⇒ outputTextPane.setText(e.toString + "\n" + e.getStackTrace.mkString("\n"))
-      outputTextPane.setCaretPosition(0)
+        outputTextPane.setCaretPosition(0)
     }
 
   }
@@ -407,8 +407,8 @@ class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends A
       case 2 ⇒ token.startIndex.asInstanceOf[java.lang.Integer]
       case 3 ⇒ token.stopIndex.asInstanceOf[java.lang.Integer]
       case 4 ⇒ {
-        formatResult.predecessorFormatting.get(token) orElse formatResult.inferredNewlineFormatting.get(token) getOrElse ""
-      }
+          formatResult.predecessorFormatting.get(token) orElse formatResult.inferredNewlineFormatting.get(token) getOrElse ""
+        }
     }
   }
   override def getColumnName(col: Int) = col match {
