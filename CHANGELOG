@@ -1,6 +1,7 @@
 0.0.6 (..)
 * Lexer performance tweaks
 * FIX: whitespace in XML end tags (e.g. </a   >)
+* Tweak multiline case clause indentation
 
 0.0.5 (15/September/10)
 * Support Scala scripts

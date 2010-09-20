@@ -39,5 +39,24 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |    }
     |}"""
 
+  """a match {
+    |    case b => c();
+    |d()
+    |  }""" ==>
+  """a match {
+    |  case b => c();
+    |    d()
+    |}"""
+
+  """a match {
+    |case b => {
+    |c
+    |}
+    |}""" ==>
+  """a match {
+    |  case b => {
+    |      c
+    |    }
+    |}"""
 
 }

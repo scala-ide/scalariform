@@ -83,15 +83,13 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |1.toString
     |}
     |)
-    |}""" =/=>
+    |}""" ==>
   """class A {
-    |  ( 
-    |  null match {
-    |case b => val c = {d: Int => 1}
-    |1.toString
-    |}
-    |)
-    |}""" because "block indent after mid-expr indent, also multiline case indent"
+    |  (null match {
+    |    case b => val c = { d: Int => 1 }
+    |      1.toString
+    |  })
+    |}"""
 
   """class C1492 {
     |

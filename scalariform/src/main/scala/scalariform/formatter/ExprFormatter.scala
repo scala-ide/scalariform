@@ -494,8 +494,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     if (indentBlock)
       formatResult = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
 
-    val blockFormatterState = if (indentBlock) formatterState.indent else formatterState
-    formatResult ++= format(statSeq)(blockFormatterState)
+    formatResult ++= format(statSeq)(formatterState.indent)
     formatResult
   }
 

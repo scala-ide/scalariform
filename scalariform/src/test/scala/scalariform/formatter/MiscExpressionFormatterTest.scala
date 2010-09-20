@@ -328,14 +328,13 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  b, c)"""
 
   """1 + (
-    |  a, b, c)""" =/=>
-  """1 + (
-    |  a, b, c)""" because "How to format?"
+    |  a, b, c)""" ==>
+  """1 + (a, b, c)"""
 
   """1 + (a
     |, b, c)""" =/=>
-  """1 + (a
-    |  , b, c)""" because "Permit newline before comma ?"
+  """1 + (a,
+    |  b, c)""" because "disallow newlines before commas? or swap newline to after the comma?"
 
   "()" ==> "()"
 
