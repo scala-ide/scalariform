@@ -18,6 +18,12 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   "2.345" ==> "2.345"
   "2 + 2" ==> "2 + 2"
 
+  "a max(b)" ==> "a max (b)"
+  "-5f max(2)" ==> "-5f max (2)"
+  "-5 max(2)" ==> "-5 max (2)"
+  "-5f.max(2)" ==> "-5f.max(2)"
+  "-5.max(2)" ==> "-5.max(2)"
+ 
   "42" ==> "42"
   "-42" ==> "-42"
 

@@ -186,6 +186,11 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   "foo+\\u0061+bar" producesTokens (VARID, PLUS, VARID, PLUS, VARID)
 
+  "-5f.max(2)" producesTokens (MINUS, FLOATING_POINT_LITERAL, DOT, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
+  "-5f max(2)" producesTokens (MINUS, FLOATING_POINT_LITERAL, WS, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
+  "-5.max(2)" producesTokens (MINUS, INTEGER_LITERAL, DOT, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
+  "-5 max(2)" producesTokens (MINUS, INTEGER_LITERAL, WS, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
+
   class TestString(s: String) {
 
     def producesTokens(toks: TokenType*) {

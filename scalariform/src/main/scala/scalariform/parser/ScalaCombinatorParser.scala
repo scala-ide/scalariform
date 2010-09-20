@@ -272,7 +272,7 @@ class ScalaCombinatorParser extends Parsers {
     }
   }
 
-  lazy val returnExpr = RETURN ~ opt(expr) ^^ exprElementFlatten
+  lazy val returnExpr = RETURN ~ (guard(isExprIntro) ~> expr |/ literal) ^^ exprElementFlatten
 
   lazy val throwExpr = THROW ~ expr ^^ exprElementFlatten
 
@@ -283,8 +283,8 @@ class ScalaCombinatorParser extends Parsers {
     }
   }
 
-  lazy val postfixExpr = { // TODO: Clean this up
-    val remainder = newlineOpt ~ prefixExpr ^^ exprElementFlatten
+  lazy val postfixExpr = {
+    val remainder = (newlineOpt whenFollowedBy isExprIntro) ~ (guard(isExprIntro) ~> prefixExpr) ^^ exprElementFlatten
     val postfixPart = id ~ opt(remainder) ^^ {
       case (identifier ~ Some(other)) ⇒ InfixExprElement(identifier) :: other
       case (identifier ~ None) ⇒ List(PostfixExprElement(identifier))
@@ -293,7 +293,8 @@ class ScalaCombinatorParser extends Parsers {
   }
 
   lazy val prefixExpr = {
-    val withMinusPrefix = (MINUS ^^ { PrefixExprElement(_) }) ~ (INTEGER_LITERAL |/ simpleExpr)
+    val numericLit = INTEGER_LITERAL | FLOATING_POINT_LITERAL
+    val withMinusPrefix = (MINUS ^^ { PrefixExprElement(_) }) ~ (numericLit ~ simpleExprRest(canApply = true) |/ simpleExpr) ^^ exprElementFlatten
     val withOtherPrefix = ((PLUS | TILDE | EXCLAMATION) ^^ { PrefixExprElement(_) }) ~ simpleExpr
     (withMinusPrefix |/ withOtherPrefix |/ simpleExpr) ^^ exprElementFlatten
   }
@@ -341,6 +342,9 @@ class ScalaCombinatorParser extends Parsers {
 
   lazy val actualGuard = IF ~ postfixExpr ^^ { case ifToken ~ postfixExpr ⇒ Guard(ifToken, Expr(postfixExpr)) }
   lazy val guard: Parser[Option[Guard]] = opt(actualGuard)
+
+  lazy val isExprIntro: Parser[Token] = id | literal | THIS | SUPER | IF | FOR | NEW | USCORE | TRY | WHILE | DO | RETURN | THROW | LPAREN | LBRACE |
+    XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_PROCESSING_INSTRUCTION
 
   val definiteGuard: Parser[Guard] = guard(IF) ~> actualGuard
 
@@ -638,16 +642,14 @@ templateBodyOpt ⇒
     }
     val form1 = expr0(InTemplate) ~ opt((ARROW | statSep) ~ plainTemplateStatSeq) ^^ {
       case firstExpr ~ None ⇒ StatSeq(None, Some(firstExpr), Nil)
-      case firstExpr ~ Some(arrowToken ~ x) if arrowToken.getType == ARROW ⇒ { // WTF can't I inline x?
+      case firstExpr ~ Some(arrowToken ~ x) if arrowToken.getType == ARROW ⇒ // WTF can't I inline x?
         x match {
           case (firstStatOpt, otherStats) ⇒ StatSeq(Some((firstExpr, arrowToken)), firstStatOpt, otherStats)
         }
-      }
-      case firstExpr ~ Some(statSep ~ x) ⇒ {
+      case firstExpr ~ Some(statSep ~ x) ⇒
         x match {
           case (firstStatOpt, otherStats) ⇒ StatSeq(None, Some(firstExpr), (statSep, firstStatOpt) :: otherStats)
         }
-      }
     }
     val form2 = plainTemplateStatSeq ^^ { case (firstStatOpt, otherStats) ⇒ StatSeq(None, firstStatOpt, otherStats) }
     form1 | form2
