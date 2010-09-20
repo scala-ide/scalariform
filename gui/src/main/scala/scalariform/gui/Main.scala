@@ -9,7 +9,7 @@ object Main {
     onSwingThread {
       val frame = new FormatterFrame
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-      frame.setSize(800, 600)
+      frame.setSize(1280, 600)
       frame.setVisible(true)
     }
   }

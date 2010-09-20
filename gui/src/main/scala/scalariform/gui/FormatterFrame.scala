@@ -148,7 +148,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       }
       val duration = System.currentTimeMillis - startTime
       val tokenCount = getTokens(inputText).size
-      setTitle("Scalariform -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / duration) + " tokens/second")
+      setTitle("Scalariform " + scalariform.VERSION + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / duration) + " tokens/second")
       outputTextPane.setText(outputText)
       onSwingThread {
         syntaxHighlight(inputTextPane)
@@ -332,7 +332,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     samplesMenu.add(sample1Item)
     menuBar.add(samplesMenu)
     setJMenuBar(menuBar)
-    inputTextPane.setText(Samples.sample0)
+    inputTextPane.setText("")
   }
   def specificFormatter = productionComboBox.getSelectedItem.asInstanceOf[ProductionComboBoxModel.ProductionItem].formatter
 
