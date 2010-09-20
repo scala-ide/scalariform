@@ -52,6 +52,14 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     formatResult
   }
 
+  def format(xmlEnd: XmlEndTag)(implicit formatterState: FormatterState): FormatResult = {
+    val XmlEndTag(endOpen, name, whitespaceOption, tagClose) = xmlEnd
+    var formatResult: FormatResult = NoFormatResult
+    for (whitespace ← whitespaceOption if formattingPreferences(FormatXml))
+      formatResult = formatResult.replaceXml(whitespace, "")
+    formatResult
+  }
+
   def format(xmlAttribute: XmlAttribute)(implicit formatterState: FormatterState): FormatResult = {
     val XmlAttribute(name, whitespaceOption, equals, whitespaceOption2, valueOrEmbeddedScala: Either[Token, Expr]) = xmlAttribute
     var formatResult: FormatResult = NoFormatResult
@@ -73,6 +81,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     formatResult ++= contentsFormatResult
     if (multiline)
       formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
+    formatResult ++= format(endTag)
     formatResult
   }
 

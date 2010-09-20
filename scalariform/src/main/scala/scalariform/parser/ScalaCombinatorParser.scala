@@ -754,8 +754,8 @@ templateBodyOpt ⇒
     val contents = if (isPattern) (LBRACE ~ patterns(seqOK = true) ~ RBRACE ^^ exprElementFlatten) else blockExpr ^^ exprElementFlatten
     contents ^^ { x ⇒ Expr(exprElementFlatten2(x)) }
   }
-  def xmlEndTag: Parser[XmlEndTag] = XML_END_OPEN ~ XML_NAME ~ XML_TAG_CLOSE ^^ {
-    case endOpen ~ name ~ tagClose ⇒ XmlEndTag(endOpen, name, tagClose)
+  def xmlEndTag: Parser[XmlEndTag] = XML_END_OPEN ~ XML_NAME ~ opt(XML_WHITESPACE) ~ XML_TAG_CLOSE ^^ {
+    case endOpen ~ name ~ whitespaceOption ~ tagClose ⇒ XmlEndTag(endOpen, name, whitespaceOption, tagClose)
   }
 
   lazy val xmlPCDATA = XML_PCDATA ^^ { XmlPCDATA(_) }

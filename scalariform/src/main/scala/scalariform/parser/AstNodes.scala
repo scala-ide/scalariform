@@ -345,8 +345,8 @@ case class XmlAttribute(name: Token, whitespaceOption: Option[Token], equals: To
 case class XmlEmptyElement(startOpen: Token, name: Token, attributes: List[(Option[Token], XmlAttribute)], whitespaceOption: Option[Token], emptyClose: Token) extends XmlElement {
   lazy val tokens = flatten(startOpen, name, attributes, whitespaceOption, emptyClose)
 }
-case class XmlEndTag(endOpen: Token, name: Token, tagClose: Token) extends XmlExprElement {
-  lazy val tokens = flatten(endOpen, name, tagClose)
+case class XmlEndTag(endOpen: Token, name: Token, whitespaceOption: Option[Token], tagClose: Token) extends XmlExprElement {
+  lazy val tokens = flatten(endOpen, name, whitespaceOption, tagClose)
 }
 
 sealed trait XmlElement extends XmlContents

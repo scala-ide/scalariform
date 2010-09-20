@@ -11,6 +11,9 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "<a>{foo}</a>" ==> "<a>{ foo }</a>"
 
+  "<a></a>" ==> "<a></a>"
+  "<a></a >" ==> "<a></a>"
+
   "<a>{foo}{bar}</a>" ==> "<a>{ foo }{ bar }</a>"
   
   """<a>
