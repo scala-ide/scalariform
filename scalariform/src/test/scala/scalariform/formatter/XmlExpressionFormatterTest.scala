@@ -218,6 +218,14 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |
     |}"""
 
+  """{
+    |a
+    |<b/>
+    |}""" ==>
+  """{
+    |  a
+    |  <b/>
+    |}"""
 
   override val debug = false
 

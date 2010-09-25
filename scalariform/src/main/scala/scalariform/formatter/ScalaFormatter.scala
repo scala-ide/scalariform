@@ -116,7 +116,6 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                                 previousTokenIsPrintable: Boolean,
                                 tokenIndentMap: Map[Token, Int],
                                 positionHintOption: Option[Int] = None): Option[TextEdit] = {
-
     def writeIntertokenCompact() {
       val comments = hiddenTokens.comments
       for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {
@@ -301,7 +300,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val type2 = token2.getType
     if (type2 == EOF)
       return Compact
-    val xmlPreviousExceptions = Set(LBRACE, LPAREN)
+    val xmlPreviousExceptions = Set(LBRACE, LPAREN, NEWLINE, NEWLINES)
     if (type2 == XML_START_OPEN && !(xmlPreviousExceptions.contains(type1) || type1.isXml))
       return CompactEnsuringGap
     if (type1 == USCORE && IDS.contains(type2) && type2 != STAR)

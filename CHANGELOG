@@ -2,6 +2,7 @@
 * Lexer performance tweaks
 * FIX: whitespace in XML end tags (e.g. </a   >)
 * Tweak multiline case clause indentation
+* FIX: indentation problem with xml in StatSeq
 
 0.0.5 (15/September/10)
 * Support Scala scripts
