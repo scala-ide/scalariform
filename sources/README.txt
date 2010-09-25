@@ -2,9 +2,9 @@ Scalariform
 ===========
 
 Scalariform is a code formatter for Scala 2.8. It is a library and a
-stand-alone command line tool, with integrations for Eclipse, TextMate
-and sbt. Currently, Scalariform supports only a limited set of
-options, although it is intended to be compatible with the
+stand-alone command line tool, with integrations for Eclipse, ENSIME,
+TextMate and sbt. Currently, Scalariform supports only a limited set
+of options, although it is intended to be compatible with the
 recommendations of the `Scala Style Guide`_ (see below). Please let me
 know what other features people would like.
 
@@ -12,6 +12,17 @@ Scalariform is licenced under `The MIT Licence`_.
 
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
+
+Download
+--------
+
+Scalariform is available from Scala-tools.org:
+
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.5/
+
+If you're using sbt, you can declare a dependency as follows::
+
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5"
 
 Integration with Eclipse
 ------------------------
@@ -51,7 +62,7 @@ Integration with sbt
 Integration with TextMate
 -------------------------
 
-See Mads Jensen's Scala TextMate bundle::
+See Mads Jensen's Scala TextMate bundle:
 
   http://github.com/mads379/scala.tmbundle
 
@@ -63,7 +74,7 @@ Command line tool
 Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
-  scala -cp /path/to/scalariform-X.Y.Z.jar scalariform.commandline.Main "$@"
+  scala -cp /path/to/scalariform-0.0.5.jar scalariform.commandline.Main "$@"
 
 Usage::
 
@@ -75,7 +86,8 @@ Usage::
     --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
     --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
     --verbose -v                    Verbose output
-  
+    --version                       Show Scalariform version
+
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
@@ -91,7 +103,6 @@ Usage::
    find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
    echo 'class A ( n  :Int )' | scalariform
 
-
 Library
 -------
 
@@ -99,23 +110,22 @@ Example usage::
 
   import scalariform.formatter.preferences._
   import scalariform.formatter.ScalaFormatter
+  import scalariform.parser.ScalaParserException
   
   object Test extends Application {
   
-   val unformattedScala = """
-    class A  {
-    println (42)}"""
-   val preferences = FormattingPreferences().setPreference(IndentSpaces, 3)
-   val formattedScala = ScalaFormatter.format(unformattedScala, preferences)
-   println(formattedScala)
+    val unformattedScala = """
+      class A  {
+      println (42)}"""
+    val preferences = FormattingPreferences().setPreference(IndentSpaces, 3)
+    try {
+      val formattedScala = ScalaFormatter.format(unformattedScala, preferences)
+      println(formattedScala)
+    } catch {
+       case e: ScalaParserException => println("Syntax error in Scala source")
+    }
   
   }
-
-Maven (using sbt)::
-
-  val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5-SNAPSHOT"
-
 
 Preferences
 -----------

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Scalariform &mdash; Scalariform v0.0.5 documentation</title>
+    <title>Scalariform &mdash; Scalariform v0.0.6 documentation</title>
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '#',
-        VERSION:     '0.0.5',
+        VERSION:     '0.0.6',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="Scalariform v0.0.5 documentation" href="index.html" /> 
+    <link rel="top" title="Scalariform v0.0.6 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -28,7 +28,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="#">Scalariform v0.0.5 documentation</a> &raquo;</li> 
+        <li><a href="#">Scalariform v0.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -39,12 +39,22 @@
   <div class="section" id="scalariform">
 <h1>Scalariform<a class="headerlink" href="#scalariform" title="Permalink to this headline">¶</a></h1>
 <p>Scalariform is a code formatter for Scala 2.8. It is a library and a
-stand-alone command line tool, with integrations for Eclipse, TextMate
-and sbt. Currently, Scalariform supports only a limited set of
-options, although it is intended to be compatible with the
+stand-alone command line tool, with integrations for Eclipse, ENSIME,
+TextMate and sbt. Currently, Scalariform supports only a limited set
+of options, although it is intended to be compatible with the
 recommendations of the <a class="reference external" href="http://davetron5000.github.com/scala-style/">Scala Style Guide</a> (see below). Please let me
 know what other features people would like.</p>
 <p>Scalariform is licenced under <a class="reference external" href="http://www.opensource.org/licenses/mit-license.php">The MIT Licence</a>.</p>
+<div class="section" id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>Scalariform is available from Scala-tools.org:</p>
+<blockquote>
+<a class="reference external" href="http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.5/">http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.5/</a></blockquote>
+<p>If you&#8217;re using sbt, you can declare a dependency as follows:</p>
+<div class="highlight-scala"><div class="highlight"><pre><span class="k">val</span> <span class="n">scalariform</span> <span class="k">=</span> <span class="s">&quot;org.scalariform&quot;</span> <span class="o">%%</span> <span class="s">&quot;scalariform&quot;</span> <span class="o">%</span> <span class="s">&quot;0.0.5&quot;</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="integration-with-eclipse">
 <h2>Integration with Eclipse<a class="headerlink" href="#integration-with-eclipse" title="Permalink to this headline">¶</a></h2>
 <p>Scala IDE for Eclipse uses Scalariform for formatting:</p>
@@ -81,7 +91,7 @@ for more detailed instructions.)</p>
 <h2>Command line tool<a class="headerlink" href="#command-line-tool" title="Permalink to this headline">¶</a></h2>
 <p>Scalariform includes a stand-alone command line utility. Sample script:</p>
 <div class="highlight-scala"><pre>#!/bin/bash
-scala -cp /path/to/scalariform-X.Y.Z.jar scalariform.commandline.Main "$@"</pre>
+scala -cp /path/to/scalariform-0.0.5.jar scalariform.commandline.Main "$@"</pre>
 </div>
 <p>Usage:</p>
 <div class="highlight-scala"><pre>scalariform [options] [files...]
@@ -92,6 +102,7 @@ Options:
   --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
   --fileList=&lt;path&gt;, -l=&lt;path&gt;    Read the list of input file(s) from a text file (one per line)
   --verbose -v                    Verbose output
+  --version                       Show Scalariform version
 
 Preferences:
   [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
@@ -114,22 +125,22 @@ Examples:
 <p>Example usage:</p>
 <div class="highlight-scala"><div class="highlight"><pre><span class="k">import</span> <span class="nn">scalariform.formatter.preferences._</span>
 <span class="k">import</span> <span class="nn">scalariform.formatter.ScalaFormatter</span>
+<span class="k">import</span> <span class="nn">scalariform.parser.ScalaParserException</span>
 
 <span class="k">object</span> <span class="nc">Test</span> <span class="k">extends</span> <span class="nc">Application</span> <span class="o">{</span>
 
- <span class="k">val</span> <span class="n">unformattedScala</span> <span class="k">=</span> <span class="s">&quot;&quot;&quot;</span>
-<span class="s">  class A  {</span>
-<span class="s">  println (42)}&quot;&quot;&quot;</span>
- <span class="k">val</span> <span class="n">preferences</span> <span class="k">=</span> <span class="nc">FormattingPreferences</span><span class="o">().</span><span class="n">setPreference</span><span class="o">(</span><span class="nc">IndentSpaces</span><span class="o">,</span> <span class="mi">3</span><span class="o">)</span>
- <span class="k">val</span> <span class="n">formattedScala</span> <span class="k">=</span> <span class="nc">ScalaFormatter</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">unformattedScala</span><span class="o">,</span> <span class="n">preferences</span><span class="o">)</span>
- <span class="n">println</span><span class="o">(</span><span class="n">formattedScala</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">unformattedScala</span> <span class="k">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">    class A  {</span>
+<span class="s">    println (42)}&quot;&quot;&quot;</span>
+  <span class="k">val</span> <span class="n">preferences</span> <span class="k">=</span> <span class="nc">FormattingPreferences</span><span class="o">().</span><span class="n">setPreference</span><span class="o">(</span><span class="nc">IndentSpaces</span><span class="o">,</span> <span class="mi">3</span><span class="o">)</span>
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">formattedScala</span> <span class="k">=</span> <span class="nc">ScalaFormatter</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">unformattedScala</span><span class="o">,</span> <span class="n">preferences</span><span class="o">)</span>
+    <span class="n">println</span><span class="o">(</span><span class="n">formattedScala</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">{</span>
+     <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">ScalaParserException</span> <span class="o">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;Syntax error in Scala source&quot;</span><span class="o">)</span>
+  <span class="o">}</span>
 
 <span class="o">}</span>
-</pre></div>
-</div>
-<p>Maven (using sbt):</p>
-<div class="highlight-scala"><div class="highlight"><pre><span class="k">val</span> <span class="n">scalaToolsSnapshots</span> <span class="k">=</span> <span class="s">&quot;Scala-Tools Maven2 Snapshots Repository&quot;</span> <span class="n">at</span> <span class="s">&quot;http://scala-tools.org/repo-snapshots&quot;</span>
-<span class="k">val</span> <span class="n">scalariform</span> <span class="k">=</span> <span class="s">&quot;org.scalariform&quot;</span> <span class="o">%%</span> <span class="s">&quot;scalariform&quot;</span> <span class="o">%</span> <span class="s">&quot;0.0.5-SNAPSHOT&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -368,7 +379,7 @@ make uncompliant source more compliant.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="#">Scalariform v0.0.5 documentation</a> &raquo;</li> 
+        <li><a href="#">Scalariform v0.0.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
