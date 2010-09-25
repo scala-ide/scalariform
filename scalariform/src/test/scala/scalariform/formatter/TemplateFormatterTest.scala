@@ -359,11 +359,11 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     
   """class A(a: Int, 
     |b: Int)(c: { val d: Int
-    |})""" =/=>
+    |})""" ==>
   """class A(a: Int,
     |  b: Int)(c: {
-    |  val d: Int
-    |})""" because "need to thread formatter state between param clauses"
+    |    val d: Int
+    |  })"""
 
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentClassDeclaration, true)

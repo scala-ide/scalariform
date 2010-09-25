@@ -79,7 +79,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   }
                   formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
               }
-            else if (hiddenPredecessors(token).containsNewline && token.getType != COMMA) {
+            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType)) {
               if (not(expressionBreakIndentHappened)) {
                 currentFormatterState = currentFormatterState.indent
                 expressionBreakIndentHappened = true
@@ -656,12 +656,16 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   def formatParamClauses(paramClauses: ParamClauses, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): FormatResult = {
     val ParamClauses(initialNewlineOpt, paramClausesAndNewlines) = paramClauses
     var formatResult: FormatResult = NoFormatResult
-    for ((paramClause, newlineOption) ← paramClausesAndNewlines) // TODO: Newlines
-      formatResult ++= formatParamClause(paramClause, doubleIndentParams)
+    var currentFormatterState = formatterState
+    for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines
+      val (paramClauseFormatResult, newFormatterState) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
+      formatResult ++= paramClauseFormatResult
+      currentFormatterState = newFormatterState
+    }
     formatResult
   }
 
-  private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): FormatResult = {
+  private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
     val ParamClause(lparen, implicitOption, firstParamOption, otherParams, rparen) = paramClause
     val paramIndent = if (doubleIndentParams) 2 else 1
     val relativeToken = paramClause.tokens(1) // TODO
@@ -685,7 +689,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
       formatResult ++= format(param)(paramFormatterState)
     }
-    formatResult
+    (formatResult, paramFormatterState)
   }
 
   private def format(param: Param)(implicit formatterState: FormatterState): FormatResult = {
