@@ -29,7 +29,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (_, PostfixExprElement(_)) ⇒ CompactPreservingGap
             case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
-            case (_, _) if element.firstTokenOption exists { hiddenPredecessors(_).containsNewline } ⇒
+            case (_, _) if (element.firstTokenOption exists { hiddenPredecessors(_).containsNewline }) ⇒
               if (!expressionBreakIndentHappened)
                 nestedFormatterState = currentFormatterState.indent
               nestedFormatterState.currentIndentLevelInstruction
@@ -79,7 +79,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   }
                   formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
               }
-            else if (hiddenPredecessors(token).containsNewline) {
+            else if (hiddenPredecessors(token).containsNewline && token.getType != COMMA) {
               if (not(expressionBreakIndentHappened)) {
                 currentFormatterState = currentFormatterState.indent
                 expressionBreakIndentHappened = true
