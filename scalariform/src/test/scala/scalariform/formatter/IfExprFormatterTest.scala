@@ -280,12 +280,11 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |  c
     |  { d }
     |else 
-    |  e""" =/=>
+    |  e""" ==>
   """if (b)
-    |  c
-    |    { d }
+    |  c { d }
     |else
-    |  e""" // the { d } is parsed as an argument to c
+    |  e"""
 
   """if (a) {}
     |else b""" ==>
