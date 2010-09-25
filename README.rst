@@ -13,6 +13,17 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
+Download
+--------
+
+Scalariform is available from Scala-tools.org:
+
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.5/
+
+If you're using sbt, you can declare a dependency as follows::
+
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5"
+
 Integration with Eclipse
 ------------------------
 
@@ -63,7 +74,7 @@ Command line tool
 Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
-  scala -cp /path/to/scalariform-X.Y.Z.jar scalariform.commandline.Main "$@"
+  scala -cp /path/to/scalariform-0.0.5.jar scalariform.commandline.Main "$@"
 
 Usage::
 
@@ -75,7 +86,8 @@ Usage::
     --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
     --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
     --verbose -v                    Verbose output
-  
+    --version                       Show Scalariform version
+
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
@@ -90,7 +102,6 @@ Usage::
    scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
    find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
    echo 'class A ( n  :Int )' | scalariform
-
 
 Library
 -------
@@ -115,11 +126,6 @@ Example usage::
     }
   
   }
-
-Dependency via sbt::
-
-  val scalaToolsSnapshots = "Scala-Tools Maven2 Snapshots Releases" at "http://scala-tools.org/repo-releases"
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5"
 
 Preferences
 -----------
