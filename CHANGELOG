@@ -5,7 +5,7 @@
 * FIX: indentation problem with xml in StatSeq
 * Disallow staircase expression breaks before commas and colons
 * FIX: incorrect indentation within multiple param clauses
-* Newline before multiple line, multiple-statement case blocks
+* Improved formatting for case blocks
 
 0.0.5 (15/September/10)
 * Support Scala scripts

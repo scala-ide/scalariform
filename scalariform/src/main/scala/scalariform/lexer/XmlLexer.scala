@@ -41,54 +41,54 @@ trait XmlLexer extends Lexer {
   protected def fetchXmlToken() {
     (ch: @switch) match {
       case '<' ⇒ {
-          if (ch(1) == '/') {
-            nextChar()
-            nextChar()
-            token(XML_END_OPEN)
-            xmlMode.isTagMode = true
-            xmlMode.tagState = InEndTag
-          } else if (ch(1) == '!') {
-            if (ch(2) == '-') {
-              getXmlComment()
-              if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-                modeStack.pop()
-            } else if (ch(2) == '[') {
-              getXmlCDATA()
-              if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-                modeStack.pop()
-            } else
-              throw new ScalaLexerException("Bad XML")
-          } else if (ch(1) == '?') {
-            getXmlProcessingInstruction()
+        if (ch(1) == '/') {
+          nextChar()
+          nextChar()
+          token(XML_END_OPEN)
+          xmlMode.isTagMode = true
+          xmlMode.tagState = InEndTag
+        } else if (ch(1) == '!') {
+          if (ch(2) == '-') {
+            getXmlComment()
             if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
               modeStack.pop()
-          } else if (lookaheadIs("<xml:unparsed")) {
-            getXmlUnparsed()
+          } else if (ch(2) == '[') {
+            getXmlCDATA()
             if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
               modeStack.pop()
-          } else {
-            nextChar()
-            token(XML_START_OPEN)
-            xmlMode.isTagMode = true
-            xmlMode.tagState = InStartTag
-          }
-          // xmlMode.nestTag()
+          } else
+            throw new ScalaLexerException("Bad XML")
+        } else if (ch(1) == '?') {
+          getXmlProcessingInstruction()
+          if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+            modeStack.pop()
+        } else if (lookaheadIs("<xml:unparsed")) {
+          getXmlUnparsed()
+          if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+            modeStack.pop()
+        } else {
+          nextChar()
+          token(XML_START_OPEN)
+          xmlMode.isTagMode = true
+          xmlMode.tagState = InStartTag
         }
+        // xmlMode.nestTag()
+      }
       case '/' ⇒ {
-          if (tagMode) {
-            if (ch(1) == '>') {
-              nextChar()
-              nextChar()
-              token(XML_EMPTY_CLOSE)
-              xmlMode.isTagMode = false
-              xmlMode.tagState = Normal
-              if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-                modeStack.pop()
-            } else
-              getXmlCharData()
+        if (tagMode) {
+          if (ch(1) == '>') {
+            nextChar()
+            nextChar()
+            token(XML_EMPTY_CLOSE)
+            xmlMode.isTagMode = false
+            xmlMode.tagState = Normal
+            if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
+              modeStack.pop()
           } else
             getXmlCharData()
-        }
+        } else
+          getXmlCharData()
+      }
       case '>' ⇒
         if (tagMode) {
           nextChar()
@@ -97,10 +97,10 @@ trait XmlLexer extends Lexer {
           xmlMode.tagState match {
             case InStartTag ⇒ xmlMode.nestTag()
             case InEndTag ⇒ {
-                val nestingLevel = xmlMode.unnestTag()
-                if (nestingLevel == 0 && !moreXmlToCome)
-                  modeStack.pop()
-              }
+              val nestingLevel = xmlMode.unnestTag()
+              if (nestingLevel == 0 && !moreXmlToCome)
+                modeStack.pop()
+            }
             case Normal ⇒ throw new AssertionError("shouldn't reach here")
           }
         } else

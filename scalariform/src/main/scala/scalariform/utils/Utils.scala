@@ -48,9 +48,9 @@ object Utils {
     lst match {
       case Nil ⇒ Nil
       case (x :: xs) ⇒ {
-          val (ys, zs) = xs span { eq(x, _) }
-          (x :: ys) :: groupBy(eq, zs)
-        }
+        val (ys, zs) = xs span { eq(x, _) }
+        (x :: ys) :: groupBy(eq, zs)
+      }
     }
 
   // Swing ---------------------

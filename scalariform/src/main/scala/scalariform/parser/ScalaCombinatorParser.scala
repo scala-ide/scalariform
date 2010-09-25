@@ -122,11 +122,11 @@ class ScalaCombinatorParser extends Parsers {
     lazy val infixId = nonStarId ^^ { InfixTypeConstructor(_) }
     opt(infixId dependantParser {
       case InfixTypeConstructor(token) ⇒ {
-          val isLeftAssociative = !token.getText.endsWith(":")
-          lazy val leftAssociativeRemainder = compoundType(isPattern) ~ infixTypeRest(isPattern) ^^ typeElementFlatten
-          lazy val rightAssociativeRemainder = infixType(isPattern) ^^ typeElementFlatten
-          newlineOpt ~ (if (isLeftAssociative) leftAssociativeRemainder else rightAssociativeRemainder)
-        }
+        val isLeftAssociative = !token.getText.endsWith(":")
+        lazy val leftAssociativeRemainder = compoundType(isPattern) ~ infixTypeRest(isPattern) ^^ typeElementFlatten
+        lazy val rightAssociativeRemainder = infixType(isPattern) ^^ typeElementFlatten
+        newlineOpt ~ (if (isLeftAssociative) leftAssociativeRemainder else rightAssociativeRemainder)
+      }
     }) ^^ typeElementFlatten
   }
 
@@ -493,8 +493,8 @@ class ScalaCombinatorParser extends Parsers {
     val equalsClauseOption = pairOpt( /* not optional if typedOpt is None */ EQUALS, (expr | USCORE ^^ { uscore ⇒ Expr(List(GeneralTokens(List(uscore)))) } /* extra conditions...*/ ))
     (VAL | VAR) ~ pattern2(seqOK = false) ~ pairRep(COMMA, pattern2(seqOK = false)) ~ typedOpt ~ equalsClauseOption ^^ {
       case valOrVarToken ~ pattern ~ otherPatterns ~ typedOpt ~ equalsClauseOption ⇒ {
-          PatDefOrDcl(valOrVarToken, pattern, otherPatterns, typedOpt, equalsClauseOption)
-        }
+        PatDefOrDcl(valOrVarToken, pattern, otherPatterns, typedOpt, equalsClauseOption)
+      }
     }
 
   }
@@ -689,12 +689,12 @@ templateBodyOpt ⇒
   lazy val packageBit: Parser[StatSeq] = {
     val packageBit1 = PACKAGE ~ objectDef ~ opt(statSep ~ topStatSeq) ^^ {
       case packageToken ~ objectDef ~ remainderOpt ⇒ {
-          val packageStat = FullDefOrDcl(annotations = Nil, modifiers = List(SimpleModifier(packageToken)), defOrDcl = objectDef)
-          remainderOpt match {
-            case None ⇒ StatSeq(None, Some(packageStat), Nil)
-            case Some(statSep ~ StatSeq(_, statOption, otherStats)) ⇒ StatSeq(None, Some(packageStat), (statSep, statOption) :: otherStats)
-          }
+        val packageStat = FullDefOrDcl(annotations = Nil, modifiers = List(SimpleModifier(packageToken)), defOrDcl = objectDef)
+        remainderOpt match {
+          case None ⇒ StatSeq(None, Some(packageStat), Nil)
+          case Some(statSep ~ StatSeq(_, statOption, otherStats)) ⇒ StatSeq(None, Some(packageStat), (statSep, statOption) :: otherStats)
         }
+      }
 
     }
     val packageBit2 = PACKAGE ~ qualId ~ statSep ~ topStats ^^ {
@@ -703,16 +703,16 @@ templateBodyOpt ⇒
     }
     val packageBit3 = PACKAGE ~ qualId ~ newlineOpt ~ LBRACE ~ topStatSeq ~ RBRACE ~ topStatSeq ^^ {
       case packageToken ~ name ~ newlineOpt ~ lbrace ~ topStats ~ rbrace ~ StatSeq(_, statOption, otherStats) ⇒ {
-          val packageBlock = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
+        val packageBlock = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
 
-          // firstStatOpt: Option[Stat], 
-          // otherStats: List[(Token, Option[Stat])]
+        // firstStatOpt: Option[Stat], 
+        // otherStats: List[(Token, Option[Stat])]
 
-          require(statOption.isEmpty) // can be non-empty, something of an oddity in the grammar as implemented by 2.8, see 
-          // https://lampsvn.epfl.ch/trac/scala/ticket/2973
+        require(statOption.isEmpty) // can be non-empty, something of an oddity in the grammar as implemented by 2.8, see 
+        // https://lampsvn.epfl.ch/trac/scala/ticket/2973
 
-          StatSeq(None, Some(packageBlock), otherStats)
-        }
+        StatSeq(None, Some(packageBlock), otherStats)
+      }
     }
     val packageBit4 = PACKAGE ~ qualId ^^ {
       case packageToken ~ name ⇒ StatSeq(None, Some(PackageStat(packageToken, name)), Nil)
@@ -724,8 +724,8 @@ templateBodyOpt ⇒
     rep(SEMI) ~ (packageBit | topStatSeq) ^^ {
       case Nil ~ topStatSeq ⇒ topStatSeq
       case semis ~ StatSeq(_, statOption, otherStats) ⇒ {
-          StatSeq(None, None, (semis.init map { (_, None) }) ::: ((semis.last, statOption) :: otherStats))
-        }
+        StatSeq(None, None, (semis.init map { (_, None) }) ::: ((semis.last, statOption) :: otherStats))
+      }
     }
   }
 

@@ -408,8 +408,8 @@ class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends A
       case 2 ⇒ token.startIndex.asInstanceOf[java.lang.Integer]
       case 3 ⇒ token.stopIndex.asInstanceOf[java.lang.Integer]
       case 4 ⇒ {
-          formatResult.predecessorFormatting.get(token) orElse formatResult.inferredNewlineFormatting.get(token) getOrElse ""
-        }
+        formatResult.predecessorFormatting.get(token) orElse formatResult.inferredNewlineFormatting.get(token) getOrElse ""
+      }
     }
   }
   override def getColumnName(col: Int) = col match {

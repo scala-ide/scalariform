@@ -403,27 +403,27 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     formatResult = statSepOpt match {
       case Some(semi) if isInferredNewline(semi) ⇒ {
-          val instruction =
-            if (indentBody)
-              formatterState.currentIndentLevelInstruction
-            else if (bodyIsABlock && containsNewline(body))
-              CompactEnsuringGap
-            else
-              formatterState.currentIndentLevelInstruction
-          formatResult.formatNewline(semi, instruction)
-        }
+        val instruction =
+          if (indentBody)
+            formatterState.currentIndentLevelInstruction
+          else if (bodyIsABlock && containsNewline(body))
+            CompactEnsuringGap
+          else
+            formatterState.currentIndentLevelInstruction
+        formatResult.formatNewline(semi, instruction)
+      }
       case Some(_) | None ⇒ {
-          val instruction =
-            if (indentBody)
-              formatterState.currentIndentLevelInstruction
-            else if (bodyIsABlock && containsNewline(body))
-              CompactEnsuringGap
-            else if (hiddenPredecessors(whileToken).containsNewline)
-              formatterState.currentIndentLevelInstruction
-            else
-              CompactEnsuringGap
-          formatResult.before(whileToken, instruction)
-        }
+        val instruction =
+          if (indentBody)
+            formatterState.currentIndentLevelInstruction
+          else if (bodyIsABlock && containsNewline(body))
+            CompactEnsuringGap
+          else if (hiddenPredecessors(whileToken).containsNewline)
+            formatterState.currentIndentLevelInstruction
+          else
+            CompactEnsuringGap
+        formatResult.before(whileToken, instruction)
+      }
     }
 
     formatResult ++= format(condExpr)
@@ -491,27 +491,27 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for (guard ← guardOption)
       formatResult ++= format(guard)
 
-    val otherStatTokens = statSeq.otherStats flatMap { case (token, statOpt) ⇒ token :: (statOpt.toList flatMap { _.tokens }) }
-    val multipleStatsOnMultipleLines = !statSeq.otherStats.isEmpty && containsNewline(otherStatTokens)
-    val indentBlock = statSeq.firstTokenOption.isDefined && hiddenPredecessors(statSeq.firstToken).containsNewline || multipleStatsOnMultipleLines
+    val singleBlockExpr = cond(statSeq.firstStatOpt) { case Some(Expr(List(BlockExpr(_, _, _)))) ⇒ true } && statSeq.otherStats.isEmpty
+    val indentBlock = statSeq.firstTokenOption.isDefined && hiddenPredecessors(statSeq.firstToken).containsNewline || (containsNewline(statSeq) && !singleBlockExpr)
     if (indentBlock)
       formatResult = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
 
-    formatResult ++= format(statSeq)(formatterState.indent)
+    val stateForStatSeq = if (singleBlockExpr) formatterState else formatterState.indent
+    formatResult ++= format(statSeq)(stateForStatSeq)
     formatResult
   }
 
   def format(statSeq: StatSeq)(implicit formatterState: FormatterState): FormatResult = {
-    val StatSeq(selfReferenceOpt: Option[(Expr, Token)], statOption: Option[Stat], otherStats: List[(Token, Option[Stat])]) = statSeq
+    val StatSeq(selfReferenceOpt: Option[(Expr, Token)], firstStatOpt: Option[Stat], otherStats: List[(Token, Option[Stat])]) = statSeq
     var formatResult: FormatResult = NoFormatResult
 
     for ((selfReference, arrow) ← selfReferenceOpt) {
       formatResult ++= format(selfReference)
-      for (stat ← statOption if hiddenPredecessors(stat.firstToken).containsNewline)
+      for (stat ← firstStatOpt if hiddenPredecessors(stat.firstToken).containsNewline)
         formatResult = formatResult.before(stat.firstToken, formatterState.currentIndentLevelInstruction)
     }
 
-    for (stat ← statOption) {
+    for (stat ← firstStatOpt) {
       formatResult ++= format(stat)
     }
 
@@ -552,11 +552,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     var formatResult: FormatResult = NoFormatResult
     newlineOpt match {
       case Some(newline) ⇒ {
-          formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)
-        }
+        formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)
+      }
       case None ⇒ {
-          formatResult = formatResult.before(lbrace, CompactEnsuringGap)
-        }
+        formatResult = formatResult.before(lbrace, CompactEnsuringGap)
+      }
     }
 
     val dummyBlock = BlockExpr(lbrace, Right(topStats), rbrace)
@@ -633,24 +633,24 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for (funBody ← funBodyOpt) {
       funBody match {
         case ExprFunBody(equals: Token, body: Expr) ⇒ {
-            // TODO: see format(PatDefOrDcl)
-            val bodyToken = body.firstToken
-            val (formatInstruction, exprFormatterState) =
-              if (hiddenPredecessors(bodyToken).containsNewline)
-                (formatterState.nextIndentLevelInstruction, formatterState.indent)
-              else
-                (CompactEnsuringGap, formatterState)
-            formatResult = formatResult.before(bodyToken, formatInstruction)
-            formatResult ++= format(body)(exprFormatterState)
-          }
+          // TODO: see format(PatDefOrDcl)
+          val bodyToken = body.firstToken
+          val (formatInstruction, exprFormatterState) =
+            if (hiddenPredecessors(bodyToken).containsNewline)
+              (formatterState.nextIndentLevelInstruction, formatterState.indent)
+            else
+              (CompactEnsuringGap, formatterState)
+          formatResult = formatResult.before(bodyToken, formatInstruction)
+          formatResult ++= format(body)(exprFormatterState)
+        }
         case ProcFunBody(newlineOpt: Option[Token], bodyBlock: BlockExpr) ⇒ {
-            for (newline ← newlineOpt)
-              formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)
-            if (newlineOpt.isEmpty)
-              formatResult = formatResult.before(bodyBlock.firstToken, CompactEnsuringGap)
-            // TODO: else?
-            formatResult ++= format(bodyBlock)
-          }
+          for (newline ← newlineOpt)
+            formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)
+          if (newlineOpt.isEmpty)
+            formatResult = formatResult.before(bodyBlock.firstToken, CompactEnsuringGap)
+          // TODO: else?
+          formatResult ++= format(bodyBlock)
+        }
       }
     }
     formatResult
