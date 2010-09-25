@@ -182,7 +182,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         tokensTable.setModel(tableModel)
       }
     } catch {
-      case e ⇒ outputTextPane.setText(e.toString + "\n" + e.getStackTrace.mkString("\n"))
+      case e ⇒
+        outputTextPane.setText(e.toString + "\n" + e.getStackTrace.mkString("\n"))
         outputTextPane.setCaretPosition(0)
     }
 

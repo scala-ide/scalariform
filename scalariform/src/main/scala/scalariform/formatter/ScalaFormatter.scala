@@ -357,16 +357,16 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     Compact
   }
 
-  protected def containsNewline(astNode: AstNode): Boolean =
-    astNode.tokens exists { token ⇒
-      {
-        require(token != null)
-        require(token.getText != null, token)
-        token != astNode.tokens.head && hiddenPredecessors(token).containsNewline ||
-          token.getText.contains("\n") ||
-          isInferredNewline(token) && inferredNewlines(token).containsNewline // TODO: Why would an inferred newline not contain newline?
-      }
+  protected def containsNewline(tokens: List[Token]): Boolean =
+    tokens exists { token ⇒
+      require(token != null)
+      require(token.getText != null, token)
+      token != tokens.head && hiddenPredecessors(token).containsNewline ||
+        token.getText.contains("\n") ||
+        isInferredNewline(token) && inferredNewlines(token).containsNewline // TODO: Why would an inferred newline not contain newline?
     }
+
+  protected def containsNewline(astNode: AstNode): Boolean = containsNewline(astNode.tokens)
 
 }
 

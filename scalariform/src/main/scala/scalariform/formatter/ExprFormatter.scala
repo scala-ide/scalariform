@@ -490,7 +490,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(pattern)
     for (guard ← guardOption)
       formatResult ++= format(guard)
-    val indentBlock = statSeq.firstTokenOption.isDefined && hiddenPredecessors(statSeq.firstToken).containsNewline
+
+    val otherStatTokens = statSeq.otherStats flatMap { case (token, statOpt) ⇒ token :: (statOpt.toList flatMap { _.tokens }) }
+    val multipleStatsOnMultipleLines = !statSeq.otherStats.isEmpty && containsNewline(otherStatTokens)
+    val indentBlock = statSeq.firstTokenOption.isDefined && hiddenPredecessors(statSeq.firstToken).containsNewline || multipleStatsOnMultipleLines
     if (indentBlock)
       formatResult = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
 

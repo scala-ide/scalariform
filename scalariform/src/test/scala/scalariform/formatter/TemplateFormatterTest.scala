@@ -86,7 +86,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |}""" ==>
   """class A {
     |  (null match {
-    |    case b => val c = { d: Int => 1 }
+    |    case b =>
+    |      val c = { d: Int => 1 }
     |      1.toString
     |  })
     |}"""

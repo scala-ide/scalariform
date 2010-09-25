@@ -44,7 +44,8 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |d()
     |  }""" ==>
   """a match {
-    |  case b => c();
+    |  case b =>
+    |    c();
     |    d()
     |}"""
 
@@ -57,6 +58,32 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case b => {
     |      c
     |    }
+    |}""" // TODO: consider one less indent for c and the subsequent } if there's just one BlockExpr in the case (cf following test)
+
+  """a match {
+    |case b => {
+    |c
+    |}
+    |d
+    |}""" ==>
+  """a match {
+    |  case b =>
+    |    {
+    |      c
+    |    }
+    |    d
     |}"""
+
+  """a match { case a => b; c; d }""" ==>
+  """a match { case a => b; c; d }"""
+
+  """a match { case a => b; c;
+    |d }""" ==>
+  """a match {
+    |  case a =>
+    |    b; c;
+    |    d
+    |}"""
+
 
 }
