@@ -78,16 +78,17 @@ Scalariform includes a stand-alone command line utility. Sample script::
 
 Usage::
 
-  scalariform [options] [files...]
+  Usage: scalariform [options] [files...]
   
   Options:
+    --encoding=<encoding>           Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.
+    --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
     --help, -h                      Show help
     --inPlace, -i                   Replace the input file(s) in place with a formatted version.
     --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
-    --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
-    --verbose -v                    Verbose output
+    --verbose, -v                   Verbose output
     --version                       Show Scalariform version
-
+  
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals

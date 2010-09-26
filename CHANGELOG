@@ -6,6 +6,7 @@
 * Disallow staircase expression breaks before commas and colons
 * FIX: incorrect indentation within multiple param clauses
 * Improved formatting for case blocks
+* Command line tool learned "--encoding=" option 
 
 0.0.5 (15/September/10)
 * Support Scala scripts

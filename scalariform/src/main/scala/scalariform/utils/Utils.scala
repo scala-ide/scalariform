@@ -78,13 +78,14 @@ object Utils {
 
   // File ------------------
 
-  def writeText(file: java.io.File, text: String) {
-    import java.io.FileWriter
-    val fileWriter = new FileWriter(file);
+  def writeText(file: java.io.File, text: String, encodingOpt: Option[String] = None) {
+    import java.io.{ OutputStreamWriter, FileOutputStream }
+    val encoding = encodingOpt getOrElse (System getProperty "file.encoding")
+    val writer = new OutputStreamWriter(new FileOutputStream(file), encoding)
     try {
-      fileWriter.write(text);
+      writer.write(text)
     } finally {
-      fileWriter.close();
+      writer.close()
     }
   }
 

@@ -7,7 +7,7 @@ class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
 
   lazy val option: Parser[CommandLineArgument] =
     phrase(help) | phrase(version) | phrase(test) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
-      phrase(toggle) | phrase(preferenceOption) | phrase(badOption)
+      phrase(encoding) | phrase(toggle) | phrase(preferenceOption) | phrase(badOption)
 
   lazy val test = ("--test" | "-t") ^^^ Test
 
@@ -20,6 +20,8 @@ class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
   lazy val version = ("--version" | "-version") ^^^ Version
 
   lazy val fileList = ("--fileList=" | "-l=") ~ ".+".r ^^ { case (_ ~ name) ⇒ FileList(name) }
+
+  lazy val encoding = "--encoding=" ~ ".+".r ^^ { case (_ ~ encoding) ⇒ Encoding(encoding) }
 
   lazy val toggle = plusOrMinus ~ ident ^^ { case onOrOff ~ key ⇒ PreferenceOption(key, onOrOff.toString) }
 
@@ -37,6 +39,7 @@ sealed trait CommandLineArgument
 case class PreferenceOption(preferenceKey: String, value: String) extends CommandLineArgument
 case class FileName(name: String) extends CommandLineArgument
 case class FileList(name: String) extends CommandLineArgument
+case class Encoding(encoding: String) extends CommandLineArgument
 case object Test extends CommandLineArgument
 case object InPlace extends CommandLineArgument
 case object Verbose extends CommandLineArgument

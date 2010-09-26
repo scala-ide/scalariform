@@ -6,6 +6,7 @@ import scala.io.Source
 import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
 import scalariform.utils.Utils.writeText
+import java.nio.charset._
 
 object Main {
 
@@ -30,6 +31,19 @@ object Main {
     for (BadOption(s) ← arguments) {
       errors ::= "Unrecognised option: " + s
       showUsage = true
+    }
+
+    val encoding: String = arguments.collect {
+      case Encoding(encoding) ⇒ encoding
+    }.headOption.getOrElse(System getProperty "file.encoding")
+
+    try {
+      Charset.forName(encoding)
+    } catch {
+      case e: UnsupportedCharsetException ⇒
+        errors ::= "Unsupported encoding " + encoding
+      case e: IllegalCharsetNameException ⇒
+        errors ::= "Illegal encoding " + encoding
     }
 
     val preferenceOptions = (for (p@PreferenceOption(_, _) ← arguments) yield p)
@@ -73,7 +87,7 @@ object Main {
         else if (listFile.isDirectory)
           errors ::= "Path is a directory: file list " + listFile
         else
-          Source.fromFile(listFile).getLines foreach addFile
+          Source.fromFile(listFile, encoding).getLines foreach addFile
       }
       for (FileName(fileName) ← arguments) addFile(fileName)
       files.reverse
@@ -132,11 +146,11 @@ object Main {
         }
       }
       if (files.isEmpty) {
-        val formatResult = checkSource(Source.fromInputStream(System.in))
+        val formatResult = checkSource(Source.fromInputStream(System.in, encoding))
         allFormattedCorrectly &= (formatResult == FormattedCorrectly)
       } else
         for (file ← files) {
-          val formatResult = checkSource(Source.fromFile(file))
+          val formatResult = checkSource(Source.fromFile(file, encoding))
           val resultString = formatResult match {
             case FormattedCorrectly ⇒ "OK"
             case NotFormattedCorrectly ⇒ "FAILED"
@@ -149,7 +163,7 @@ object Main {
       exit(if (allFormattedCorrectly) 0 else 1)
     } else {
       if (files.isEmpty) {
-        val original = Source.fromInputStream(System.in).mkString
+        val original = Source.fromInputStream(System.in, encoding).mkString
         try {
           val formatted = ScalaFormatter.format(original, preferences)
           print(formatted)
@@ -161,7 +175,7 @@ object Main {
       } else {
         var problems = false
         for (file ← files) {
-          val original = Source.fromFile(file).mkString
+          val original = Source.fromFile(file, encoding).mkString
           val formattedOption = try {
             Some(ScalaFormatter.format(original, preferences))
           } catch {
@@ -176,7 +190,7 @@ object Main {
                 log(".              " + file)
               else {
                 log("[Reformatted]  " + file)
-                writeText(file, formatted)
+                writeText(file, formatted, Some(encoding))
               }
             else
               print(formatted)
@@ -192,10 +206,11 @@ object Main {
     println("Usage: scalariform [options] [files...]")
     println()
     println("Options:")
+    println("  --encoding=<encoding>           Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.")
+    println("  --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)")
     println("  --help, -h                      Show help")
     println("  --inPlace, -i                   Replace the input file(s) in place with a formatted version.")
     println("  --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
-    println("  --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)")
     println("  --verbose, -v                   Verbose output")
     println("  --version                       Show Scalariform version")
     println()
