@@ -109,19 +109,36 @@
       </repositories>
     </profile>
     <profile>
-      <id>scala-2.8.1.RC1</id>
+      <id>scala-2.8.1</id>
       <activation>
         <property>
           <name>scala.version</name>
-          <value>2.8.1.RC1</value>
+          <value>2.8.1</value>
         </property>
       </activation>
       <repositories>
         <repository>
-          <id>scala-toolchain-2.8.1.RC1</id>
-          <name>Scala Toolchain 2.8.1.RC1 p2 repository</name>
+          <id>scala-toolchain-2.8.1.final</id>
+          <name>Scala Toolchain 2.8.1.final p2 repository</name>
           <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.1.RC1</url>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.1.final</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala-2.8.1.RC2</id>
+      <activation>
+        <property>
+          <name>scala.version</name>
+          <value>2.8.1.RC2</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-2.8.1.RC2</id>
+          <name>Scala Toolchain 2.8.1.RC2 p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.1.RC2</url>
         </repository>
       </repositories>
     </profile>
