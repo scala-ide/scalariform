@@ -1,6 +1,6 @@
 #!/bin/bash
-PREVIOUS=0.0.6
-NEXT=0.0.7
+PREVIOUS=0.0.6-SNAPSHOT
+NEXT=0.0.6
 
 while read p; do
   echo "Changing $p"
