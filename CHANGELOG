@@ -1,4 +1,4 @@
-0.0.6 (..)
+0.0.6 (4/October/10)
 * Lexer performance tweaks
 * FIX: whitespace in XML end tags (e.g. </a   >)
 * Tweak multiline case clause indentation

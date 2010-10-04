@@ -18,11 +18,11 @@ Download
 
 Scalariform is available from Scala-tools.org:
 
-  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.5/
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.6/
 
 If you're using sbt, you can declare a dependency as follows::
 
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.5"
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.6"
 
 Integration with Eclipse
 ------------------------
@@ -74,7 +74,7 @@ Command line tool
 Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
-  scala -cp /path/to/scalariform-0.0.5.jar scalariform.commandline.Main "$@"
+  scala -cp /path/to/scalariform-0.0.6.jar scalariform.commandline.Main "$@"
 
 Usage::
 
