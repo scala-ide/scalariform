@@ -7,13 +7,16 @@ import scalariform.formatter.preferences._
 trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with ScalaFormatter ⇒
 
   def format(xmlExpr: XmlExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val XmlExpr(first: XmlContents, otherElements: List[XmlContents]) = xmlExpr
-    var formatResult: FormatResult = NoFormatResult
-    formatResult ++= format(first)
-    val nestedFormatterState = formatterState.alignWithToken(first.firstToken)
-    val (contentsFormatResult, multiline) = format(otherElements)(formatterState, nestedFormatterState)
-    formatResult ++= contentsFormatResult
-    formatResult
+    if (formattingPreferences(FormatXml)) {
+      val XmlExpr(first: XmlContents, otherElements: List[XmlContents]) = xmlExpr
+      var formatResult: FormatResult = NoFormatResult
+      formatResult ++= format(first)
+      val nestedFormatterState = formatterState.alignWithToken(first.firstToken)
+      val (contentsFormatResult, multiline) = format(otherElements)(formatterState, nestedFormatterState)
+      formatResult ++= contentsFormatResult
+      formatResult
+    } else
+      NoFormatResult
   }
 
   def format(xmlContent: XmlContents)(implicit formatterState: FormatterState): FormatResult = {

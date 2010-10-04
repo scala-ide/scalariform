@@ -227,8 +227,44 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  <b/>
     |}"""
 
-  override val debug = false
+  """a match {
+    |
+    |  case <b>c
+    |      </b> =>
+    |
+    |}""" ==>
+  """a match {
+    |
+    |  case <b>
+    |         c
+    |       </b> =>
+    |
+    |}"""
+  
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(FormatXml, false)
 
-  // implicit val formattingPreferences = FormattingPreferences.setPreference(FormatXml, true)
+    """<a>
+      |b</a>""" ==>
+    """<a>
+      |b</a>"""
+
+   """a match {
+     |
+     |  case <b>c
+     |       </b> =>
+     |
+     |}""" ==>
+   """a match {
+     |
+     |  case <b>c
+     |       </b> =>
+     |
+     |}"""
+
+  }
+
+
+  override val debug = false
 
 }

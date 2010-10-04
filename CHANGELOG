@@ -7,6 +7,7 @@
 * FIX: incorrect indentation within multiple param clauses
 * Improved formatting for case blocks
 * Command line tool learned "--encoding=" option 
+* FIX: honour previously-ignored formatXml preference
 
 0.0.5 (15/September/10)
 * Support Scala scripts
