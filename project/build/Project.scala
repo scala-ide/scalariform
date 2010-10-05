@@ -17,7 +17,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   val scalaToolsRepo = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-snapshots"
   val scalaToolsRepoReleases = "Scala-Tools Maven Repository" at "http://scala-tools.org/repo-releases"
 
-  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions {
+  class CoreProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions with posterous.Publish {
 
     val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test->default"
 
