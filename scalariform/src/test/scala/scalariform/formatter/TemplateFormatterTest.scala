@@ -147,7 +147,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |this: B => 
     |val c
     |}""" ==>
-    """trait A { this: B =>
+    """trait A {
+    |  this: B =>
     |  val c
     |}"""
 
@@ -155,7 +156,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |this: B => 
     |println("foo")
     |}""" ==>
-  """trait A { this: B =>
+  """trait A {
+    |  this: B =>
     |  println("foo")
     |}"""
 
@@ -249,6 +251,15 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |println("foo")
     |}""" ==>
   """class A { self: Int =>
+    |  println("foo")
+    |}"""
+
+  """class A {
+    |  self: Int =>
+    |  println("foo")
+    |}""" ==>
+  """class A {
+    |  self: Int =>
     |  println("foo")
     |}"""
 
