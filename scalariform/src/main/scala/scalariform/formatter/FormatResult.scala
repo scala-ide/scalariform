@@ -6,8 +6,8 @@ import scalariform.parser._
 import scalariform.utils._
 
 case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstruction],
-                        inferredNewlineFormatting: Map[Token, IntertokenFormatInstruction],
-                        xmlRewrites: Map[Token, String]) {
+  inferredNewlineFormatting: Map[Token, IntertokenFormatInstruction],
+  xmlRewrites: Map[Token, String]) {
 
   def replaceXml(token: Token, replacement: String) = {
     require(token.getType.isXml)
@@ -15,12 +15,18 @@ case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstru
   }
 
   def before(token: Token, formatInstruction: IntertokenFormatInstruction) = {
+    require(!token.isNewline, " cannot do 'before' formatting for NEWLINE* tokens: " + token + ", " + formatInstruction)
     copy(predecessorFormatting = predecessorFormatting + (token -> formatInstruction))
   }
 
   def formatNewline(token: Token, formatInstruction: IntertokenFormatInstruction) = {
+    require(token.isNewline, " cannot do 'newline' formatting for non-NEWLINE tokens: " + token + ", " + formatInstruction)
     copy(inferredNewlineFormatting = inferredNewlineFormatting + (token -> formatInstruction))
   }
+
+  def formatNewlineOrOrdinary(token: Token, formatInstruction: IntertokenFormatInstruction) =
+    if (token.isNewline) formatNewline(token, formatInstruction)
+    else before(token, formatInstruction)
 
   def mergeWith(other: FormatResult): FormatResult =
     FormatResult(this.predecessorFormatting ++ other.predecessorFormatting,

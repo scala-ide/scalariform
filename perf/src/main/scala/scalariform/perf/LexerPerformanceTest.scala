@@ -8,11 +8,13 @@ import scalariform.parser._
 
 object LexerPerformanceTest extends Application {
 
-  def parse(s: String) = {
+  def parse(s: String): List[Token] = {
     val (lexer, tokens) = ScalaLexer.tokeniseFull(file)
-    val parser = new ScalaCombinatorParser
-    val rawParseResult = parser.compilationUnitOrScript(new ScalaLexerReader(tokens))
-    rawParseResult.get.tokens
+    // val parser = new ScalaCombinatorParser
+    // val rawParseResult = parser.compilationUnitOrScript(new ScalaLexerReader(tokens))
+    // rawParseResult.get.tokens
+    new ScalaParser(tokens.toArray).compilationUnitOrScript()
+    tokens
   }
 
   val file = new File("/home/matt/corpus2/" + "scala/src/compiler/scala/tools/nsc/symtab/Types.scala")

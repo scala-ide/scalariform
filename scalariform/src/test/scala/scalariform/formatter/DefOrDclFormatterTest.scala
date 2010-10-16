@@ -91,9 +91,9 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   """def a() { return }""" ==>  """def a() { return }"""
 
+  def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
+
   type Result = FullDefOrDcl
-  
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.nonLocalDefOrDcl)
   
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 

@@ -36,7 +36,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           }
 
           lazy val containsPriorFormatting = formatResult.predecessorFormatting contains element.firstToken // in particular, from the String concatenation code
-          for (instruction ← instructionOption if not(containsPriorFormatting))
+          for (instruction ← instructionOption if !containsPriorFormatting && !element.firstToken.isNewline)
             formatResult = formatResult.before(element.firstToken, instruction)
 
           if (formattingPreferences(CompactStringConcatenation)) {
@@ -628,9 +628,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       returnTypeOpt: Option[(Token, Type)], funBodyOpt: Option[FunBody]) = funDefOrDcl
     for (typeParamClause ← typeParamClauseOpt)
       formatResult ++= format(typeParamClause.contents)
+    formatResult ++= formatParamClauses(paramClauses)
     for ((colon, type_) ← returnTypeOpt)
       formatResult ++= format(type_)
-    formatResult ++= formatParamClauses(paramClauses)
     for (funBody ← funBodyOpt) {
       funBody match {
         case ExprFunBody(equals: Token, body: Expr) ⇒ {
@@ -661,7 +661,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val ParamClauses(initialNewlineOpt, paramClausesAndNewlines) = paramClauses
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = formatterState
-    for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines
+    for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines. // maybe already done in some cases by format(tmplDef)?
+
       val (paramClauseFormatResult, newFormatterState) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
       formatResult ++= paramClauseFormatResult
       currentFormatterState = newFormatterState

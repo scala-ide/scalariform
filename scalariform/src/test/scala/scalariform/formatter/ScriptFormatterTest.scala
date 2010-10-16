@@ -17,8 +17,8 @@ class ScriptFormatterTest extends AbstractFormatterTest {
   override val debug = false
 
   type Result = CompilationUnit
-  
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
+
+  def parse(parser: ScalaParser) = parser.scriptBody()
   
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 

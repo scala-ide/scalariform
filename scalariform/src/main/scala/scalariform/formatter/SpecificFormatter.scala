@@ -12,7 +12,7 @@ trait SpecificFormatter {
 
   type Result <: AstNode
 
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result]
+  def parse(parser: ScalaParser): Result
 
   def format(formatter: ScalaFormatter, result: Result): FormatResult
 
@@ -27,8 +27,6 @@ trait SpecificFormatter {
   @throws(classOf[ScalaParserException])
   def fullFormat(source: String, lineDelimiter: Option[String] = None)(baseFormattingPreferences: IFormattingPreferences): (List[TextEdit], FormatResult) = {
     import scalariform.parser._
-    import scala.util.parsing.input._
-    import scala.util.parsing.combinator._
 
     val startTime = System.currentTimeMillis
     val (lexer, tokens) = ScalaLexer.tokeniseFull(source)
@@ -42,16 +40,10 @@ trait SpecificFormatter {
       // println("hiddenSuccessors: " + lexer.getHiddenSuccessors)
       // println("inferredNewlines: " + lexer.getInferredNewlines)
     }
-    val parser = new ScalaCombinatorParser
-    val rawParseResult = getParser(parser)(new ScalaLexerReader(tokens))
-    if (!rawParseResult.successful) { throw new ScalaParserException("Parse failed: " + rawParseResult) }
-    val parseResult = rawParseResult.get
-    //     println("parseResult: ")
-    //     for (token <- parseResult.tokens)
-    //       println(token)
-    //     println("original tokenise: ")
-    //     for (token <- tokens)
-    //       println(token)
+    
+    val parser = new ScalaParser(tokens.toArray)
+
+    val parseResult = parse(parser)
 
     var actualFormattingPreferences = baseFormattingPreferences
     for {

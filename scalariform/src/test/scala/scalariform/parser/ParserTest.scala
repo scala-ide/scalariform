@@ -9,14 +9,13 @@ import org.scalatest.matchers.ShouldMatchers
 // format: +preserveSpaceBeforeArguments
 class ParserTest extends FlatSpec with ShouldMatchers {
 
-  "Parser" should "not throw exception" in {
-    parseExpression("for {x <- b if }") should not be ('successful)
+  "Parser" should "throw a parse exception" in {
+    evaluating { parseExpression("for {x <- b if }") } should produce[ScalaParserException]
   }
 
   private def parseExpression(s: String) = {
     val (lexer, tokens) = ScalaLexer.tokeniseFull(s)
-    val parser = new ScalaCombinatorParser
-    (parser.phrase(parser.expr))(new ScalaLexerReader(tokens))
+    new ScalaParser(tokens.toArray).expr
   }
 
 }

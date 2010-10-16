@@ -104,4 +104,6 @@ object Tokens {
 
 case class TokenType(name: String, isXml: Boolean = false) {
   override lazy val toString = name
+
+  def isNewline = this == Tokens.NEWLINE || this == Tokens.NEWLINES
 }

@@ -21,8 +21,8 @@ class ImportFormatterTest extends AbstractFormatterTest {
   override val debug = false
 
   type Result = CompilationUnit
-  
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
+
+  def parse(parser: ScalaParser) = parser.compilationUnit()
   
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 

@@ -19,22 +19,19 @@ case class ParseException(e: Throwable) extends ParseFault
 object CorpusScanner extends SpecificFormatter {
 
   def attemptToParse(file: File): Option[ParseFault] = {
+    val source = getText(file)
+    val sourceAgain = ScalaLexer.rawTokenise(source).map(_.getText).mkString
+    if (source != sourceAgain)
+      return Some(TokensDoNotCoverSource)
+    val (lexer, tokens) = ScalaLexer.tokeniseFull(file)
     try {
-      val source = getText(file)
-      val sourceAgain = ScalaLexer.rawTokenise(source).map(_.getText).mkString
-      if (source != sourceAgain)
-        return Some(TokensDoNotCoverSource)
-      val (lexer, tokens) = ScalaLexer.tokeniseFull(file)
-      val parser = new ScalaCombinatorParser
-      val rawParseResult = parser.compilationUnitOrScript(new ScalaLexerReader(tokens))
-      if (!rawParseResult.successful)
-        Some(UnsuccessfulParse)
-      else if (rawParseResult.get.tokens != tokens.init) /* drop EOF */
+      val result = new ScalaParser(tokens.toArray).compilationUnitOrScript()
+      if (result.tokens != tokens.init) /* drop EOF */
         Some(BadAstTokens)
       else
         None
     } catch {
-      case e ⇒ Some(ParseException(e))
+      case e: ScalaParserException => Some(UnsuccessfulParse)
     }
   }
 
@@ -52,7 +49,7 @@ object CorpusScanner extends SpecificFormatter {
 
   type Result = CompilationUnit
 
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
+  def parse(parser: ScalaParser) = parser.compilationUnitOrScript()
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
@@ -78,11 +75,11 @@ object Runner {
 
   def formatInPlace() {
     var count = 0
-    for (file ← ScalaFileWalker.findScalaFiles("/home/matt/corpus-to-modify")) {
+    for (file ← ScalaFileWalker.findScalaFiles("/home/matt/corpus-to-modify-2")) {
       print("Formatting: " + file)
       CorpusScanner.formatFile(file)
       val parsed = CorpusScanner.attemptToParse(file)
-      require(parsed == None)
+      require(parsed == None, parsed.toString)
       println()
       count += 1
     }

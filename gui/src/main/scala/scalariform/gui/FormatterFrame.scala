@@ -32,7 +32,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
   type Result = CompilationUnit
 
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
+  def parse(parser: ScalaParser): Result = parser.compilationUnitOrScript
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
@@ -126,6 +126,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   def runFormatter() {
     try {
       val inputText = inputTextPane.getText
+
       val startTime = System.currentTimeMillis
       val outputText = try {
         specificFormatter.format(inputText)(OptionsPanel.getFormattingPreferences)
@@ -136,9 +137,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             try {
-              val parser = new ScalaCombinatorParser
-              val rawParseResult = specificFormatter.getParser(parser)(new ScalaLexerReader(tokens))
-              val parseResult = rawParseResult.get
+              val parseResult = specificFormatter.parse(new ScalaParser(tokens.toArray))             
               val treeModel = new ParseTreeModel(parseResult)
               astTree.setModel(treeModel)
               expandAll(astTree)
@@ -148,7 +147,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       }
       val duration = System.currentTimeMillis - startTime
       val tokenCount = getTokens(inputText).size
-      setTitle("Scalariform " + scalariform.VERSION + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / duration) + " tokens/second")
+      setTitle("Scalariform " + scalariform.VERSION + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / (duration + 1)) + " tokens/second")
       outputTextPane.setText(outputText)
       onSwingThread {
         syntaxHighlight(inputTextPane)
@@ -161,17 +160,14 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         import scala.util.parsing.combinator._
 
         val (lexer, tokens) = ScalaLexer.tokeniseFull(inputText)
-        val parser = new ScalaCombinatorParser
-        val rawParseResult = try {
-          specificFormatter.getParser(parser)(new ScalaLexerReader(tokens))
+        val parseResult = try {
+          specificFormatter.parse(new ScalaParser(tokens.toArray))
         } catch {
           case e: RuntimeException ⇒
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             throw e
         }
-        if (!rawParseResult.successful) { throw new RuntimeException("Parse failed: " + rawParseResult) }
-        val parseResult = rawParseResult.get
         val treeModel = new ParseTreeModel(parseResult)
         astTree.setModel(treeModel)
         expandAll(astTree)
@@ -335,6 +331,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     setJMenuBar(menuBar)
     inputTextPane.setText("")
   }
+
   def specificFormatter = productionComboBox.getSelectedItem.asInstanceOf[ProductionComboBoxModel.ProductionItem].formatter
 
   object ProductionComboBoxModel extends DefaultComboBoxModel {
@@ -347,7 +344,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
       type Result = CompilationUnit
 
-      def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
+      def parse(parser: ScalaParser): Result = parser.compilationUnitOrScript()
 
       def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
@@ -357,7 +354,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
       type Result = Expr
 
-      def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.expr)
+      def parse(parser: ScalaParser): Result = parser.expr() // TODO: EOF?
 
       def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 

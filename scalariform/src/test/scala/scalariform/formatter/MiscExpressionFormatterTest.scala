@@ -436,4 +436,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |: Int""" ==>
   """42: Int"""
 
+  "if (true) 1; else 2" ==> "if (true) 1; else 2" // Check SEMI + ELSE rule
+
 }

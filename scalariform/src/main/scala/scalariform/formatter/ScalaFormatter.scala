@@ -337,6 +337,9 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       return CompactEnsuringGap
     if (IDS.contains(type1) && IDS.contains(type2))
       return CompactEnsuringGap
+    val firstCharOfToken2 = token2.getText.head
+    if (type1 == AT && isOperatorPart(firstCharOfToken2))
+      return CompactEnsuringGap
     val lastCharOfToken1 = token1.getText.last
     val firstIsIdEndingWithOpChar = IDS.contains(type1) && (lastCharOfToken1 == '_' || isOperatorPart(lastCharOfToken1))
     if (Set(HASH, COLON, AT).contains(type2) && firstIsIdEndingWithOpChar)
@@ -414,7 +417,7 @@ object ScalaFormatter {
 
       type Result = CompilationUnit
 
-      def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.compilationUnitOrScript
+      def parse(parser: ScalaParser) = parser.compilationUnitOrScript()
 
       def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 

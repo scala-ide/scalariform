@@ -109,4 +109,6 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
     |
     |}"""
 
+  "{ ; a }" ==> "{ ; a }"
+
 }

@@ -23,12 +23,16 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
       accessModifier ← accessModifierOpt
       astNode ← (paramClausesOpt orElse templateInheritanceSectionOpt orElse templateBodyOption)
       firstToken ← astNode.firstTokenOption
-    } formatResult = formatResult.before(firstToken, CompactEnsuringGap)
+    } formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)
 
-    for (paramClauses ← paramClausesOpt) {
+    for {
+      paramClauses ← paramClausesOpt
+      firstToken <- paramClauses.firstTokenOption
+    } {
       if (annotations.size > 0)
-        formatResult = formatResult.before(paramClauses.firstToken, CompactEnsuringGap)
-      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration) && !templateInheritanceSectionOpt.exists { section ⇒ containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline } &&
+        formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)
+      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration) &&
+        !templateInheritanceSectionOpt.exists { section ⇒ containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline } &&
         templateBodyOption.exists(containsNewline(_))
       formatResult ++= formatParamClauses(paramClauses, doubleIndentParams)
     }

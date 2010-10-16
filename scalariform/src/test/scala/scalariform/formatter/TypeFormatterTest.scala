@@ -62,8 +62,8 @@ class TypeFormatterTest extends AbstractFormatterTest {
   override val debug = false
   
   type Result = Type
-  
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.typ(isPattern=false))
+
+  def parse(parser: ScalaParser) = parser.typ() // TODO: ensure EOF
   
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
   

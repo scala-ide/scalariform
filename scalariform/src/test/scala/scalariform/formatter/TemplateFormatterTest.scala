@@ -476,13 +476,60 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |
     |}"""
 
+  """class A {
+    |  val a = <xml:unparsed>&<<>""^%@$!#</xml:unparsed>
+    |}""" ==>
+  """class A {
+    |  val a = <xml:unparsed>&<<>""^%@$!#</xml:unparsed>
+    |}"""
+
+  """class A(b: (_ <: C, _ <: D))""" ==>
+  """class A(b: (_ <: C, _ <: D))"""
+
+  """class A {
+    |   def b() {
+    |     case class C
+    |   }
+    |}""" ==>
+  """class A {
+    |  def b() {
+    |    case class C
+    |  }
+    |}"""
+
+  """class A {
+    |  trait B <: { val x: Int = 3 }
+    |}""" ==>
+  """class A {
+    |  trait B <: { val x: Int = 3 }
+    |}"""
+
+  """class A  { b =>
+    |  c
+    |  d
+    |}""" ==>
+  """class A { b =>
+    |  c
+    |  d
+    |}"""
+
+  """class A1 private[B]
+    |()""" ==>
+  """class A1 private[B] ()"""
+
+  "class A @Deprecated ()" ==> "class A @Deprecated()"
+
+  """class A @B ()
+    |()""" ==>
+  """class A @B() ()"""
+
   // format: ON
 
   override val debug = false
 
-  type Result = FullDefOrDcl
+  def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
 
-  def getParser(parser: ScalaCombinatorParser): ScalaCombinatorParser#Parser[Result] = parser.phrase(parser.nonLocalDefOrDcl)
+  type Result = FullDefOrDcl
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
