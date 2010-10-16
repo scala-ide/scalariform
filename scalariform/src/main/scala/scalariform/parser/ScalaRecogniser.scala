@@ -1229,7 +1229,7 @@ class ScalaRecogniser(tokens: List[Token]) {
 
       } else if (IMPORT) {
         importClause()
-      } else if (CLASS || caseClass || TRAIT || OBJECT || caseObject || LBRACKET || AT || isModifier) {
+      } else if (CLASS || caseClass || TRAIT || OBJECT || caseObject || AT || isModifier) {
         topLevelTmplDef()
       } else if (!isStatSep)
         throw new ScalaParserException("expected class or object definition")
@@ -1255,7 +1255,7 @@ class ScalaRecogniser(tokens: List[Token]) {
         importClause()
       else if (isExprIntro)
         statement(InTemplate)
-      else if (isDefIntro || isModifier || LBRACKET || AT)
+      else if (isDefIntro || isModifier || AT)
         nonLocalDefOrDcl()
       else if (!isStatSep)
         throw new ScalaParserException("illegal start of definition: " + currentToken)

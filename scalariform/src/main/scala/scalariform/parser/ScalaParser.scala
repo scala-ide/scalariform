@@ -1456,7 +1456,7 @@ class ScalaParser(tokens: Array[Token]) {
           Some(packaging().complete(packageToken))
       } else if (IMPORT) {
         Some(importClause())
-      } else if (CLASS || caseClass || TRAIT || OBJECT || caseObject || LBRACKET || AT || isModifier) {
+      } else if (CLASS || caseClass || TRAIT || OBJECT || caseObject || AT || isModifier) {
         Some(topLevelTmplDef())
       } else if (!isStatSep)
         throw new ScalaParserException("expected class or object definition")
@@ -1489,7 +1489,7 @@ class ScalaParser(tokens: Array[Token]) {
         Some(importClause())
       else if (isExprIntro)
         Some(statement(InTemplate))
-      else if (isDefIntro || isModifier || LBRACKET || AT)
+      else if (isDefIntro || isModifier || AT)
         Some(nonLocalDefOrDcl())
       else if (!isStatSep)
         throw new ScalaParserException("illegal start of definition: " + currentToken)
