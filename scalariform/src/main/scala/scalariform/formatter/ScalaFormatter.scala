@@ -109,13 +109,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
   }
 
   private def writeHiddenTokens(builder: StringBuilder,
-                                hiddenTokens: HiddenTokens,
-                                instruction: IntertokenFormatInstruction,
-                                nextTokenUnindents: Boolean,
-                                nextTokenIsPrintable: Boolean,
-                                previousTokenIsPrintable: Boolean,
-                                tokenIndentMap: Map[Token, Int],
-                                positionHintOption: Option[Int] = None): Option[TextEdit] = {
+    hiddenTokens: HiddenTokens,
+    instruction: IntertokenFormatInstruction,
+    nextTokenUnindents: Boolean,
+    nextTokenIsPrintable: Boolean,
+    previousTokenIsPrintable: Boolean,
+    tokenIndentMap: Map[Token, Int],
+    positionHintOption: Option[Int] = None): Option[TextEdit] = {
     def writeIntertokenCompact() {
       val comments = hiddenTokens.comments
       for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {
@@ -279,6 +279,8 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val nextTypeOption = nextTokenOption map { _.getType }
     val result =
       if (previousTypeOption == Some(TYPE))
+        CompactEnsuringGap
+      else if (previousTypeOption == Some(RBRACKET) && nextTypeOption.exists(Set(CASE, CLASS, TRAIT, OBJECT, DEF, VAL, VAR, TYPE, ABSTRACT, FINAL, SEALED, OVERRIDE, IMPLICIT, LAZY)))
         CompactEnsuringGap
       else if (nextTypeOption == Some(LBRACE))
         CompactEnsuringGap

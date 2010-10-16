@@ -91,6 +91,15 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   """def a() { return }""" ==>  """def a() { return }"""
 
+  """def a[B,
+    |C]
+    |()""" ==>
+  """def a[B, C]()"""
+
+  """private [a]
+    |sealed trait B""" ==>
+  """private[a] sealed trait B"""
+
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl

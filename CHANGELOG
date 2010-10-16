@@ -3,6 +3,7 @@
 * Rewrite parser -> formatter now ~65% faster
 * Allow newline before self type declaration
 * FIX: avoid abutting @ and an operator, otherwise it merges into a single identifer
+* FIX: formatting for newline between private[foo] and trait/class/def etc
 
 0.0.6 (4/October/10)
 * Lexer performance tweaks

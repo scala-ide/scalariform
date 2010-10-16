@@ -469,6 +469,10 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "private [a] case class B" ==> "private[a] case class B"
   "private [a] object B" ==> "private[a] object B"
 
+  """private [a]
+    |trait b""" ==>
+  """private[a] trait b"""
+
   """class A {
     |
     |}""" ==>
