@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>scalariform.gui</groupId>
   <artifactId>scalariform.gui</artifactId>
-  <version>0.0.7-SNAPSHOT</version>
+  <version>0.0.7</version>
   <dependencies>
     <dependency>
       <groupId>com.miglayout</groupId>

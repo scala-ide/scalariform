@@ -1,6 +1,6 @@
 package object scalariform {
 
-  val VERSION = "0.0.7-SNAPSHOT"
+  val VERSION = "0.0.7"
 
 }
 
