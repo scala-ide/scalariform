@@ -103,6 +103,7 @@ Usage::
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
     [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
     [+|-]formatXml                      Enable/disable Format XML literals
+    [+|-]indentPackageBlocks            Enable/disable Indent package blocks
     -indentSpaces=[1-10]                Set Number of spaces to use for indentation
     [+|-]preserveSpaceBeforeArguments   Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols            Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
@@ -226,7 +227,28 @@ Default: ``true``
 
 Format embedded XML literals; if ``false`` they will be left untouched.
 
-indentSpaces 
+indentPackageBlocks
+~~~~~~~~~~~~~~~~~~~
+
+Default: ``true``
+
+Whether to indent package blocks. For example, if ``true``::
+
+  package foo {
+    package bar {
+      class Baz
+    }
+  }
+
+Else if ``false``::
+
+  package foo {
+  package bar {
+  class Baz
+  }
+  }
+
+indentSpaces
 ~~~~~~~~~~~~
 
 Default: ``2``

@@ -80,7 +80,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     }
 
     val dummyBlock = BlockExpr(lbrace, Right(statSeq), rbrace)
-    formatResult ++= format(dummyBlock)
+    formatResult ++= format(dummyBlock, indent = true)
     formatResult
   }
 
@@ -104,7 +104,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
       }
 
       val dummyBlock = BlockExpr(lbrace, Right(statSeq), rbrace)
-      formatResult ++= format(dummyBlock)
+      formatResult ++= format(dummyBlock, indent = true)
     }
 
     formatResult

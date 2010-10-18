@@ -55,7 +55,7 @@ abstract trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean]
 
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
-    PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml)
+    PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -115,3 +115,8 @@ case object FormatXml extends BooleanPreferenceDescriptor {
   val defaultValue = true
 }
 
+case object IndentPackageBlocks extends BooleanPreferenceDescriptor {
+  val key = "indentPackageBlocks"
+  val description = "Indent package blocks"
+  val defaultValue = true
+}

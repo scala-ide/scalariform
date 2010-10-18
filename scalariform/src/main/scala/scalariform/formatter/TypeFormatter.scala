@@ -52,7 +52,7 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def format(refinement: Refinement)(implicit formatterState: FormatterState): FormatResult = {
     val Refinement(lbrace: Token, statSeq: StatSeq, rbrace: Token) = refinement
     val dummyBlock = BlockExpr(lbrace, Right(statSeq), rbrace)
-    format(dummyBlock)
+    format(dummyBlock, indent = true)
   }
 
 }
