@@ -15,7 +15,17 @@ class ScalaParser(tokens: Array[Token]) {
   require(!tokens.isEmpty) // at least EOF
 
   def compilationUnitOrScript(): CompilationUnit = {
-    or(compilationUnit(), scriptBody())
+    val originalPos = pos
+    try {
+      compilationUnit()
+    } catch {
+      case e: ScalaParserException =>
+        pos = originalPos
+        if (logging) println("Rewinding to try alternative: " + currentToken)
+        try {
+          scriptBody()
+        } catch { case e2: ScalaParserException => throw e }
+    }
   }
 
   def scriptBody(): CompilationUnit = {

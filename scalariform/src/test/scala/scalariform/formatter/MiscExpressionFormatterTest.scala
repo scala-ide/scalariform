@@ -438,4 +438,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "if (true) 1; else 2" ==> "if (true) 1; else 2" // Check SEMI + ELSE rule
 
+  "a: ::" ==> "a: ::"
+
 }

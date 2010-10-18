@@ -58,6 +58,8 @@ class TypeFormatterTest extends AbstractFormatterTest {
    
   "(=> A with B Either (B, A)) => B" ==>
   "(=> A with B Either (B, A)) => B"
+  
+  "b[c# ::[d]]" ==> "b[c# ::[d]]"
 
   override val debug = false
   
