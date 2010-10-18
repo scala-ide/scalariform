@@ -229,7 +229,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
       if (bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(elseToken, CompactEnsuringGap)
-      else if (hiddenPredecessors(elseToken).containsNewline || containsNewline(body))
+      else if (hiddenPredecessors(elseToken).containsNewline || containsNewline(body) || (indentBody && (hiddenPredecessors(elseBody.firstToken).containsNewline || isBlockExpr(elseBody) || isIfExpr(elseBody))))
         formatResult = formatResult.before(elseToken, formatterState.currentIndentLevelInstruction)
 
       val indentElseBody =

@@ -7,6 +7,7 @@
 * FIX: formatting for newline between private[foo] and trait/class/def etc
 * Update parser to match changes from Scala trac #3672 (types on implicit parameters in function expressions)
 * FIX: avoid hash and operator merging (e.g. b[c# ::[d]])
+* Tweaks to else clause formatting
 
 0.0.6 (4/October/10)
 * Lexer performance tweaks
