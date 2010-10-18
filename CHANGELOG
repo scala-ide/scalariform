@@ -1,4 +1,4 @@
-0.0.7 (..)
+0.0.7 (18/October/10)
 
 * Rewrite parser; formatter is now ~60% faster
 * Add IndentPackageBlocks formatting preference

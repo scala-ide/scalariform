@@ -12,3 +12,4 @@ scalariform.update/site.xml
 scalariform/src/main/scala/scalariform/package.scala
 README.rst
 docs/source/README.rst
+perf/pom.xml
