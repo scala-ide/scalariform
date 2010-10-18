@@ -2,11 +2,11 @@ Scalariform
 ===========
 
 Scalariform is a code formatter for Scala 2.8. It is a library and a
-stand-alone command line tool, with integrations for Eclipse, ENSIME,
-jEdit, TextMate and sbt. Currently, Scalariform supports only a
-limited set of options, although it is intended to be compatible with
-the recommendations of the `Scala Style Guide`_ (see below). Please
-let me know what other features people would like.
+stand-alone command line tool, with integrations available for
+Eclipse, ENSIME, jEdit, sbt and TextMate. Currently, Scalariform
+supports only a limited set of options, although it is intended to be
+compatible with the recommendations of the `Scala Style Guide`_ (see
+below). Please let me know what other features people would like.
 
 Scalariform is licenced under `The MIT Licence`_.
 
@@ -55,7 +55,7 @@ Integration with ENSIME
 Integration with jEdit
 ----------------------
 
-See `ScalaSidekick` by Stefan Ettrup:
+See `ScalaSidekick`_ by Stefan Ettrup:
 
 .. _ScalaSidekick: http://github.com/StefanE/ScalaSidekick
 
