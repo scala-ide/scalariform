@@ -1,0 +1,8 @@
+* Rewrite parser; formatter is now ~60% faster
+* Add IndentPackageBlocks formatting preference
+* Allow newline before self type declaration
+* FIX: avoid abutting `@` and an operator, otherwise it merges into a single identifer
+* FIX: formatting for newline between `private[foo]` and trait/class/def etc
+* Update parser to match changes from Scala trac #3672 (types on implicit parameters in function expressions)
+* FIX: avoid hash and operator merging (e.g. `b[c# ::[d]]`)
+* Tweaks to else clause formatting
