@@ -255,6 +255,9 @@ class ScalaRecogniser(tokens: List[Token]) {
     infixTypeRest(isPattern)
   }
 
+  private def typeOrInfixType(location: Location) = 
+    if (location == Local) typ() else infixType(isPattern = false)
+
   private def infixTypeRest(isPattern: Boolean) {
     if (isIdent && !STAR) {
       val identToken = currentToken
@@ -465,8 +468,7 @@ class ScalaRecogniser(tokens: List[Token]) {
           } else if (AT) {
             annotations(skipNewLines = false, requireOneArgList = false)
           } else {
-            if (location == Local) typ() else infixType(isPattern = false)
-
+            typeOrInfixType(location)
           }
         } else if (MATCH) {
 
@@ -488,6 +490,10 @@ class ScalaRecogniser(tokens: List[Token]) {
 
   private def implicitClosure(location: Location) = {
     ident()
+    if (COLON) {
+      nextToken()
+      typeOrInfixType(location)
+    }
     accept(ARROW)
     if (location != InBlock) expr() else block()
   }

@@ -527,6 +527,30 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |()""" ==>
   """class A @B() ()"""
 
+
+  // See Scala trac #3672 for next two cases:
+
+  """object test {
+    |  val f: (Int => Int)  = { implicit x => x }
+    |  val g: (Int => Int)  = implicit x => x
+    |  val h: (Int => Int)  = {(); implicit x => x}
+    |}""" ==>
+  """object test {
+    |  val f: (Int => Int) = { implicit x => x }
+    |  val g: (Int => Int) = implicit x => x
+    |  val h: (Int => Int) = { (); implicit x => x }
+    |}"""
+
+  """object Test {
+    |  def foo(f: Int => Int) = () ; foo { implicit x : Int => x + 1 }
+    |  def bar(f: Int => Int) = () ; foo { x : Int => x + 1 }
+    |}""" ==>
+  """object Test {
+    |  def foo(f: Int => Int) = (); foo { implicit x: Int => x + 1 }
+    |  def bar(f: Int => Int) = (); foo { x: Int => x + 1 }
+    |}"""
+
+
   // format: ON
 
   override val debug = false

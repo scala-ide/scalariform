@@ -291,6 +291,13 @@ class ScalaParser(tokens: Array[Token]) {
     typeElementFlatten3(compoundType_, infixTypeRest_)
   }
 
+  private def typeOrInfixType(location: Location): TypeExprElement =
+    TypeExprElement(
+      if (location == Local)
+        typ().contents
+      else
+        infixType(isPattern = false))
+
   private def infixTypeRest(isPattern: Boolean): List[TypeElement] = {
     if (isIdent && !STAR) {
       val identToken = currentToken
@@ -530,10 +537,7 @@ class ScalaParser(tokens: Array[Token]) {
           } else if (AT) {
             exprElementFlatten2(colonToken, annotations(skipNewLines = false, requireOneArgList = false))
           } else {
-            val type_ = if (location == Local)
-              TypeExprElement(List(typ()))
-            else
-              TypeExprElement(infixType(isPattern = false))
+            val type_ = typeOrInfixType(location)
             exprElementFlatten2(colonToken, type_)
           }
         } else if (MATCH) {
@@ -566,9 +570,15 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def implicitClosure(location: Location, implicitToken: Token): AnonymousFunction = {
     val id = ident()
+    val colonTypeOpt = if (COLON) {
+      val colonToken = nextToken()
+      val type_ = typeOrInfixType(location)
+      Some(colonToken, type_)
+    } else
+      None
     val arrowToken = accept(ARROW)
     val body = exprElementFlatten2(if (location != InBlock) expr() else block())
-    AnonymousFunction(exprElementFlatten2(implicitToken, id), arrowToken, body)
+    AnonymousFunction(exprElementFlatten2(implicitToken, id, colonTypeOpt), arrowToken, body)
   }
 
   private def postfixExpr(): List[ExprElement] = {

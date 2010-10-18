@@ -4,6 +4,7 @@
 * Allow newline before self type declaration
 * FIX: avoid abutting @ and an operator, otherwise it merges into a single identifer
 * FIX: formatting for newline between private[foo] and trait/class/def etc
+* Update parser to match changes from Scala trac #3672 (types on implicit parameters in function expressions)
 
 0.0.6 (4/October/10)
 * Lexer performance tweaks
