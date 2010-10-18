@@ -31,7 +31,7 @@ object CorpusScanner extends SpecificFormatter {
       else
         None
     } catch {
-      case e: ScalaParserException => Some(UnsuccessfulParse)
+      case e: ScalaParserException ⇒ Some(UnsuccessfulParse)
     }
   }
 

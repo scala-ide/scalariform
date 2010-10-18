@@ -109,13 +109,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
   }
 
   private def writeHiddenTokens(builder: StringBuilder,
-    hiddenTokens: HiddenTokens,
-    instruction: IntertokenFormatInstruction,
-    nextTokenUnindents: Boolean,
-    nextTokenIsPrintable: Boolean,
-    previousTokenIsPrintable: Boolean,
-    tokenIndentMap: Map[Token, Int],
-    positionHintOption: Option[Int] = None): Option[TextEdit] = {
+                                hiddenTokens: HiddenTokens,
+                                instruction: IntertokenFormatInstruction,
+                                nextTokenUnindents: Boolean,
+                                nextTokenIsPrintable: Boolean,
+                                previousTokenIsPrintable: Boolean,
+                                tokenIndentMap: Map[Token, Int],
+                                positionHintOption: Option[Int] = None): Option[TextEdit] = {
     def writeIntertokenCompact() {
       val comments = hiddenTokens.comments
       for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {

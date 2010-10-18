@@ -10,14 +10,14 @@ import org.scalatest.matchers.ShouldMatchers
 class ScalaParserTest extends FlatSpec with ShouldMatchers {
 
   "Parser" should "not throw exception" in {
-//    parseExpression("class X")
-//    parseExpression("class X { }")
-//    parseExpression("class X { def method(n: Int) = 42 }")
+    //    parseExpression("class X")
+    //    parseExpression("class X { }")
+    //    parseExpression("class X { def method(n: Int) = 42 }")
     parseExpression {
-"""
+      """
 class C(@annotation(foo = {1 + 2}) n: Int)
 """
-}
+    }
 
   }
 

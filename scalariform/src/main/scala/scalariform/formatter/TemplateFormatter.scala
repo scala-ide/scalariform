@@ -27,7 +27,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
 
     for {
       paramClauses ← paramClausesOpt
-      firstToken <- paramClauses.firstTokenOption
+      firstToken ← paramClauses.firstTokenOption
     } {
       if (annotations.size > 0)
         formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)

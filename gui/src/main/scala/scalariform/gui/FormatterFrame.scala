@@ -137,7 +137,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             try {
-              val parseResult = specificFormatter.parse(new ScalaParser(tokens.toArray))             
+              val parseResult = specificFormatter.parse(new ScalaParser(tokens.toArray))
               val treeModel = new ParseTreeModel(parseResult)
               astTree.setModel(treeModel)
               expandAll(astTree)

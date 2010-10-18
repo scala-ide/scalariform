@@ -550,7 +550,6 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  def bar(f: Int => Int) = (); foo { x: Int => x + 1 }
     |}"""
 
-
   // format: ON
 
   override val debug = false

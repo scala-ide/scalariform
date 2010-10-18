@@ -40,7 +40,7 @@ trait SpecificFormatter {
       // println("hiddenSuccessors: " + lexer.getHiddenSuccessors)
       // println("inferredNewlines: " + lexer.getInferredNewlines)
     }
-    
+
     val parser = new ScalaParser(tokens.toArray)
 
     val parseResult = parse(parser)

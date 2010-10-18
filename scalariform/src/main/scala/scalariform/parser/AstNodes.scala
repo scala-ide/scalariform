@@ -306,7 +306,7 @@ case class PackageBlock(packageToken: Token, name: List[Token], newlineOpt: Opti
 }
 
 case class PrePackageBlock(name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) {
-  def  complete(packageToken: Token) = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
+  def complete(packageToken: Token) = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
 }
 
 case class PackageStat(packageToken: Token, name: List[Token]) extends Stat {

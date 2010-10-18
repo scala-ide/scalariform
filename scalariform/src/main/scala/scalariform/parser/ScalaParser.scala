@@ -19,12 +19,12 @@ class ScalaParser(tokens: Array[Token]) {
     try {
       compilationUnit()
     } catch {
-      case e: ScalaParserException =>
+      case e: ScalaParserException ⇒
         pos = originalPos
         if (logging) println("Rewinding to try alternative: " + currentToken)
         try {
           scriptBody()
-        } catch { case e2: ScalaParserException => throw e }
+        } catch { case e2: ScalaParserException ⇒ throw e }
     }
   }
 
@@ -40,7 +40,7 @@ class ScalaParser(tokens: Array[Token]) {
     else
       throw new ScalaParserException("Expected token " + tokenType + " but got " + currentToken)
 
-  private def surround[T](open: TokenType, close: TokenType)(f: => T): (Token, T, Token) = {
+  private def surround[T](open: TokenType, close: TokenType)(f: ⇒ T): (Token, T, Token) = {
     // println("Surround: " + currentToken)
     val openToken = accept(open)
     val body = f
@@ -56,60 +56,60 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isModifier = currentTokenType match {
     case ABSTRACT | FINAL | SEALED | PRIVATE |
-      PROTECTED | OVERRIDE | IMPLICIT | LAZY => true
-    case _ => false
+      PROTECTED | OVERRIDE | IMPLICIT | LAZY ⇒ true
+    case _ ⇒ false
   }
 
   private def isLocalModifier: Boolean = currentTokenType match {
-    case ABSTRACT | FINAL | SEALED | IMPLICIT | LAZY => true
-    case _ => false
+    case ABSTRACT | FINAL | SEALED | IMPLICIT | LAZY ⇒ true
+    case _ ⇒ false
   }
 
   private def isDefIntro: Boolean = currentTokenType match {
-    case VAL | VAR | DEF | TYPE | OBJECT | CLASS | TRAIT => true
-    case CASE if caseObject => true
-    case CASE if caseClass => true
-    case _ => false
+    case VAL | VAR | DEF | TYPE | OBJECT | CLASS | TRAIT ⇒ true
+    case CASE if caseObject ⇒ true
+    case CASE if caseClass ⇒ true
+    case _ ⇒ false
   }
 
   private def isDclIntro: Boolean = currentTokenType match {
-    case VAL | VAR | DEF | TYPE => true
-    case _ => false
+    case VAL | VAR | DEF | TYPE ⇒ true
+    case _ ⇒ false
   }
 
   private def isNumericLit: Boolean = currentTokenType match {
-    case INTEGER_LITERAL | FLOATING_POINT_LITERAL => true
-    case _ => false
+    case INTEGER_LITERAL | FLOATING_POINT_LITERAL ⇒ true
+    case _ ⇒ false
   }
 
   private def isUnaryOp: Boolean = currentTokenType match {
-    case MINUS | PLUS | TILDE | EXCLAMATION => true
-    case _ => false
+    case MINUS | PLUS | TILDE | EXCLAMATION ⇒ true
+    case _ ⇒ false
   }
 
   private def isIdent: Boolean = isIdent(currentTokenType)
 
   private def isIdent(tokenType: TokenType) = tokenType match {
-    case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION => true
-    case _ => false
+    case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION ⇒ true
+    case _ ⇒ false
   }
 
   private def isExprIntroToken(tokenType: TokenType): Boolean = tokenType match {
     case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL |
       STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL |
       THIS | SUPER | IF | FOR | NEW | USCORE | TRY | WHILE |
-      DO | RETURN | THROW | LPAREN | LBRACE => true
-    case XML_START_OPEN | XML_UNPARSED | XML_COMMENT | XML_CDATA | XML_PROCESSING_INSTRUCTION => true
-    case _ if isIdent(tokenType) => true
-    case _ => false
+      DO | RETURN | THROW | LPAREN | LBRACE ⇒ true
+    case XML_START_OPEN | XML_UNPARSED | XML_COMMENT | XML_CDATA | XML_PROCESSING_INSTRUCTION ⇒ true
+    case _ if isIdent(tokenType) ⇒ true
+    case _ ⇒ false
   }
 
   private def isExprIntro: Boolean = isExprIntroToken(currentTokenType)
 
   private def isTypeIntroToken(tokenType: TokenType): Boolean = tokenType match {
-    case THIS | SUPER | USCORE | LPAREN | AT => true
-    case _ if isIdent(tokenType) => true
-    case _ => false
+    case THIS | SUPER | USCORE | LPAREN | AT ⇒ true
+    case _ if isIdent(tokenType) ⇒ true
+    case _ ⇒ false
   }
 
   private def isTypeIntro: Boolean = isTypeIntroToken(currentTokenType)
@@ -119,7 +119,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isStatSep: Boolean = isStatSep(currentTokenType)
 
-  private def commaSeparated[T](runParser: => T): (T, List[(Token, T)]) = {
+  private def commaSeparated[T](runParser: ⇒ T): (T, List[(Token, T)]) = {
     val ts = new ListBuffer[(Token, T)]
     val first = runParser
     while (COMMA) {
@@ -232,7 +232,7 @@ class ScalaParser(tokens: Array[Token]) {
     else
       None
 
-  private def newLineOptWhenFollowing(pred: TokenType => Boolean) =
+  private def newLineOptWhenFollowing(pred: TokenType ⇒ Boolean) =
     if (NEWLINE && pred(lookahead(1)))
       newLineOpt()
     else
@@ -450,7 +450,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def expr0(location: Location): Expr = {
     makeExpr(currentTokenType match {
-      case IF =>
+      case IF ⇒
         val ifToken = nextToken()
         val condExpr_ = condExpr()
         val newLinesOpt_ = newLinesOpt()
@@ -465,7 +465,7 @@ class ScalaParser(tokens: Array[Token]) {
           None
         List(IfExpr(ifToken, condExpr_, newLinesOpt_, body, elseClauseOption))
 
-      case TRY =>
+      case TRY ⇒
         val tryToken = nextToken()
         val body: Expr = if (LBRACE) {
           val (lbrace, block_, rbrace) = surround(LBRACE, RBRACE)(block())
@@ -488,14 +488,14 @@ class ScalaParser(tokens: Array[Token]) {
           None
         List(TryExpr(tryToken, body, catchClauseOption, finallyClauseOption))
 
-      case WHILE =>
+      case WHILE ⇒
         val whileToken = nextToken()
         val condExpr_ = condExpr()
         val newLinesOpt_ = newLinesOpt()
         val body = expr()
         List(WhileExpr(whileToken, condExpr_, newLinesOpt_, body))
 
-      case DO =>
+      case DO ⇒
         val doToken = nextToken()
         val body = expr()
         val statSepOpt = if (isStatSep) Some(nextToken()) else None
@@ -503,7 +503,7 @@ class ScalaParser(tokens: Array[Token]) {
         val condExpr_ = condExpr()
         List(DoExpr(doToken, body, statSepOpt, whileToken, condExpr_))
 
-      case FOR =>
+      case FOR ⇒
         val forToken = nextToken()
         val (open, close) = if (LBRACE) (LBRACE, RBRACE) else (LPAREN, RPAREN)
         val (lParenOrBrace, enumerators_, rParenOrBrace) = surround(open, close)(enumerators())
@@ -515,21 +515,21 @@ class ScalaParser(tokens: Array[Token]) {
           (None, expr())
         List(ForExpr(forToken, lParenOrBrace, enumerators_, rParenOrBrace, newlinesOption, yieldOption, body))
 
-      case RETURN =>
+      case RETURN ⇒
         val returnToken = nextToken()
         val returnExpr = if (isExprIntro) Some(expr()) else None
         exprElementFlatten2(returnToken, returnExpr) // TODO: <-- use a different type?
 
-      case THROW =>
+      case THROW ⇒
         val throwToken = nextToken()
         val throwExpr = expr()
         exprElementFlatten2(throwToken, throwExpr)
 
-      case IMPLICIT =>
+      case IMPLICIT ⇒
         val implicitToken = nextToken()
         List(implicitClosure(location, implicitToken))
 
-      case _ =>
+      case _ ⇒
 
         val postfixExpr_ = postfixExpr()
         val equalsColonOrMatchSuffix = if (EQUALS) {
@@ -562,7 +562,7 @@ class ScalaParser(tokens: Array[Token]) {
           println("in expr0, postfixExpr = " + postfixExpr_)
 
         val intermediateResult = exprElementFlatten2(postfixExpr_, equalsColonOrMatchSuffix)
-        val lhsIsTypedParamList = cond(postfixExpr_) { case List(ParenExpr(_, _, _)) => true } // TODO: is this check sufficient?
+        val lhsIsTypedParamList = cond(postfixExpr_) { case List(ParenExpr(_, _, _)) ⇒ true } // TODO: is this check sufficient?
         if (ARROW && (location != InTemplate || lhsIsTypedParamList)) {
           val anonFuncOpt: Option[List[ExprElement]] = optional {
             val arrowToken = nextToken()
@@ -570,8 +570,8 @@ class ScalaParser(tokens: Array[Token]) {
             exprElementFlatten2(AnonymousFunction(intermediateResult, arrowToken, List(postArrow)))
           }
           anonFuncOpt match {
-            case None => intermediateResult
-            case Some(stuff) => stuff
+            case None ⇒ intermediateResult
+            case Some(stuff) ⇒ stuff
           } // erk, why can't I use getOrElse here!?
         } else
           intermediateResult
@@ -623,15 +623,15 @@ class ScalaParser(tokens: Array[Token]) {
   private def simpleExpr(): List[ExprElement] = {
     var canApply = true
     val firstPart = currentTokenType match {
-      case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL =>
+      case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
         exprElementFlatten2(literal())
-      case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION =>
+      case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
         exprElementFlatten2(xmlLiteral())
-      case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS | SUPER =>
+      case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS | SUPER ⇒
         exprElementFlatten2(path(thisOK = true, typeOK = false))
-      case USCORE =>
+      case USCORE ⇒
         exprElementFlatten2(nextToken())
-      case LPAREN =>
+      case LPAREN ⇒
         val lparen = nextToken
         val parenBody = if (RPAREN)
           None
@@ -639,15 +639,15 @@ class ScalaParser(tokens: Array[Token]) {
           Some(commaSeparated(expr))
         val rparen = accept(RPAREN)
         exprElementFlatten2(ParenExpr(lparen, exprElementFlatten2(parenBody), rparen))
-      case LBRACE =>
+      case LBRACE ⇒
         canApply = false
         exprElementFlatten2(blockExpr())
-      case NEW =>
+      case NEW ⇒
         canApply = false
         val newToken = nextToken()
         val template_ = template(isTrait = false)
         exprElementFlatten2(newToken, template_)
-      case _ =>
+      case _ ⇒
         throw new ScalaParserException("illegal start of simple expression: " + currentToken)
     }
     val remainder = simpleExprRest(canApply)
@@ -657,12 +657,12 @@ class ScalaParser(tokens: Array[Token]) {
   private def simpleExprRest(canApply: Boolean): List[ExprElement] = {
     val newLineOpt = if (canApply) newLineOptWhenFollowedBy(LBRACE) else None
     currentTokenType match {
-      case DOT =>
+      case DOT ⇒
         val dot = nextToken()
         val selector_ = selector()
         val simpleExprRest_ = simpleExprRest(canApply = true)
         exprElementFlatten2(newLineOpt, (dot, selector_, simpleExprRest_))
-      case LBRACKET =>
+      case LBRACKET ⇒
         val identifierCond = true /* TODO */ /*             case Ident(_) | Select(_, _) => */
         if (identifierCond) {
           val typeArgs_ = TypeExprElement(typeArgs(isPattern = false, isTypeApply = true))
@@ -670,13 +670,13 @@ class ScalaParser(tokens: Array[Token]) {
           exprElementFlatten2(newLineOpt, typeArgs_, simpleExprRest_)
         } else
           exprElementFlatten2(newLineOpt)
-      case LPAREN | LBRACE if canApply =>
+      case LPAREN | LBRACE if canApply ⇒
         val argumentExprs_ = argumentExprs()
         val simpleExprRest_ = simpleExprRest(canApply = true)
         exprElementFlatten2(newLineOpt, argumentExprs_, simpleExprRest_)
-      case USCORE =>
+      case USCORE ⇒
         exprElementFlatten2(newLineOpt, PostfixExprElement(nextToken()))
-      case _ =>
+      case _ ⇒
         exprElementFlatten2(newLineOpt)
     }
   }
@@ -844,22 +844,22 @@ class ScalaParser(tokens: Array[Token]) {
   private def simplePattern(seqOK: Boolean): List[ExprElement] = {
     // println("simplePattern: " + currentToken)
     currentTokenType match {
-      case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS =>
+      case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS ⇒
         val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
         val id = stableId()
         val literalOpt = currentTokenType match {
-          case INTEGER_LITERAL | FLOATING_POINT_LITERAL =>
+          case INTEGER_LITERAL | FLOATING_POINT_LITERAL ⇒
             if (nameIsMinus) Some(literal())
             else None
-          case _ => None // TODO: condOpt
+          case _ ⇒ None // TODO: condOpt
         }
         val argumentPatternsOpt = if (LPAREN) Some(argumentPatterns()) else None
         exprElementFlatten2(id, literalOpt, argumentPatternsOpt)
-      case USCORE =>
+      case USCORE ⇒
         exprElementFlatten2(nextToken())
-      case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL =>
+      case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
         exprElementFlatten2(literal())
-      case LPAREN =>
+      case LPAREN ⇒
         val lparen = nextToken()
         val patterns_ = if (RPAREN)
           Nil
@@ -867,9 +867,9 @@ class ScalaParser(tokens: Array[Token]) {
           patterns(seqOK = false)
         val rparen = accept(RPAREN)
         exprElementFlatten2(lparen, patterns_, rparen)
-      case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION =>
+      case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
         exprElementFlatten2(xmlLiteralPattern())
-      case _ =>
+      case _ ⇒
         throw new ScalaParserException("illegal start of simple pattern: " + currentToken)
     }
   }
@@ -898,11 +898,11 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def accessModifierOpt(): Option[AccessModifier] = {
     currentTokenType match {
-      case PRIVATE | PROTECTED =>
+      case PRIVATE | PROTECTED ⇒
         val privateOrProtected = nextToken()
         val accessQualifierOpt_ = accessQualifierOpt()
         Some(AccessModifier(privateOrProtected, accessQualifierOpt_))
-      case _ =>
+      case _ ⇒
         None
     }
   }
@@ -911,18 +911,18 @@ class ScalaParser(tokens: Array[Token]) {
     val modifiers = ListBuffer[Modifier]()
     def loop() {
       currentTokenType match {
-        case PRIVATE | PROTECTED =>
+        case PRIVATE | PROTECTED ⇒
           val privateOrProtected = nextToken()
           val accessQualifierOpt_ = accessQualifierOpt()
           modifiers += AccessModifier(privateOrProtected, accessQualifierOpt_)
           loop()
-        case ABSTRACT | FINAL | SEALED | OVERRIDE | IMPLICIT | LAZY =>
+        case ABSTRACT | FINAL | SEALED | OVERRIDE | IMPLICIT | LAZY ⇒
           modifiers += SimpleModifier(nextToken())
           loop()
-        case NEWLINE =>
+        case NEWLINE ⇒
           modifiers += SimpleModifier(nextToken()) // Investigate
           loop()
-        case _ =>
+        case _ ⇒
       }
     }
     loop()
@@ -933,10 +933,10 @@ class ScalaParser(tokens: Array[Token]) {
     val modifiers = ListBuffer[Modifier]()
     def loop() {
       currentTokenType match {
-        case ABSTRACT | FINAL | SEALED | IMPLICIT | LAZY =>
+        case ABSTRACT | FINAL | SEALED | IMPLICIT | LAZY ⇒
           modifiers += SimpleModifier(nextToken())
           loop()
-        case _ =>
+        case _ ⇒
       }
     }
     loop()
@@ -1189,11 +1189,11 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def defOrDcl(): DefOrDcl = {
     currentTokenType match {
-      case VAL => patDefOrDcl()
-      case VAR => patDefOrDcl()
-      case DEF => funDefOrDcl()
-      case TYPE => typeDefOrDcl()
-      case _ => tmplDef()
+      case VAL ⇒ patDefOrDcl()
+      case VAR ⇒ patDefOrDcl()
+      case DEF ⇒ funDefOrDcl()
+      case TYPE ⇒ typeDefOrDcl()
+      case _ ⇒ tmplDef()
     }
   }
 
@@ -1303,14 +1303,14 @@ class ScalaParser(tokens: Array[Token]) {
     val name = ident()
     val typeParamClauseOpt_ = typeParamClauseOpt()
     val extraTypeDclStuff = currentTokenType match {
-      case EQUALS =>
+      case EQUALS ⇒
         val equalsToken = nextToken()
         val typ_ = typ()
         Left(equalsToken, typ_)
-      case SUPERTYPE | SUBTYPE | SEMI | NEWLINE | NEWLINES | COMMA | RBRACE | EOF /* <-- for Scalariform tests */ =>
+      case SUPERTYPE | SUBTYPE | SEMI | NEWLINE | NEWLINES | COMMA | RBRACE | EOF /* <-- for Scalariform tests */ ⇒
         val typeBounds_ = typeBounds()
         Right(typeBounds_)
-      case _ =>
+      case _ ⇒
         throw new ScalaParserException("`=', `>:', or `<:' expected, but got " + currentToken)
     }
     TypeDefOrDcl(typeElementFlatten3(typeToken, newLinesOpt_, name, typeParamClauseOpt_, extraTypeDclStuff))
@@ -1325,12 +1325,12 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def tmplDef(): TmplDef = {
     currentTokenType match {
-      case TRAIT => classDef()
-      case CLASS => classDef()
-      case CASE if lookahead(1) == CLASS => classDef()
-      case OBJECT => objectDef()
-      case CASE if lookahead(1) == OBJECT => objectDef()
-      case _ => throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
+      case TRAIT ⇒ classDef()
+      case CLASS ⇒ classDef()
+      case CASE if lookahead(1) == CLASS ⇒ classDef()
+      case OBJECT ⇒ objectDef()
+      case CASE if lookahead(1) == OBJECT ⇒ objectDef()
+      case _ ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
     }
   }
 
@@ -1412,14 +1412,14 @@ class ScalaParser(tokens: Array[Token]) {
     if (EXTENDS) {
       val extendsToken = nextToken()
       template(isTrait) match {
-        case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) =>
+        case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) ⇒
           TemplateOpt(Some(TemplateInheritanceSection(extendsToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
       }
     } else if (SUBTYPE && isTrait) {
       val subtypeToken = nextToken()
       val template_ = template(isTrait = true)
       template_ match {
-        case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) =>
+        case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) ⇒
           TemplateOpt(Some(TemplateInheritanceSection(subtypeToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
       } // TODO: rm duplication with above
     } else {
@@ -1586,7 +1586,7 @@ class ScalaParser(tokens: Array[Token]) {
     var firstStatSeen = false
     val otherStats = ListBuffer[(Token, Option[Stat])]()
     var previousStatSepOpt: Option[Token] = None
-    for ((statOpt, statSepOpt) <- statAndStatSeps) {
+    for ((statOpt, statSepOpt) ← statAndStatSeps) {
       if (!firstStatSeen) {
         firstStatSeen = true
         firstStatOpt = statOpt
@@ -1596,7 +1596,7 @@ class ScalaParser(tokens: Array[Token]) {
       }
       previousStatSepOpt = statSepOpt
     }
-    for (statSep <- previousStatSepOpt)
+    for (statSep ← previousStatSepOpt)
       otherStats += ((statSep, None))
     StatSeq(selfReferenceOpt = None, firstStatOpt = firstStatOpt, otherStats = otherStats.toList)
   }
@@ -1662,13 +1662,13 @@ class ScalaParser(tokens: Array[Token]) {
     while (!XML_TAG_CLOSE) {
       whitespaceOption = nextTokenIf(XML_WHITESPACE)
       currentTokenType match {
-        case XML_NAME =>
+        case XML_NAME ⇒
           val attribute = xmlAttribute(isPattern)
           attributes += ((whitespaceOption, attribute))
           whitespaceOption = None
-        case XML_TAG_CLOSE =>
+        case XML_TAG_CLOSE ⇒
         // End loop
-        case _ =>
+        case _ ⇒
           throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken)
       }
     }
@@ -1682,9 +1682,9 @@ class ScalaParser(tokens: Array[Token]) {
     val equals = accept(XML_ATTR_EQ)
     val whitespaceOption2 = nextTokenIf(XML_WHITESPACE)
     val valueOrEmbeddedScala = currentTokenType match {
-      case XML_ATTR_VALUE =>
+      case XML_ATTR_VALUE ⇒
         Left(nextToken())
-      case LBRACE =>
+      case LBRACE ⇒
         Right(xmlEmbeddedScala(isPattern))
     }
     XmlAttribute(name, whitespaceOption, equals, whitespaceOption2, valueOrEmbeddedScala)
@@ -1698,13 +1698,13 @@ class ScalaParser(tokens: Array[Token]) {
     while (!XML_EMPTY_CLOSE) {
       whitespaceOption = nextTokenIf(XML_WHITESPACE)
       currentTokenType match {
-        case XML_NAME =>
+        case XML_NAME ⇒
           val attribute = xmlAttribute(isPattern)
           attributes += ((whitespaceOption, attribute))
           whitespaceOption = None
-        case XML_EMPTY_CLOSE =>
+        case XML_EMPTY_CLOSE ⇒
         // End loop
-        case _ =>
+        case _ ⇒
           throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken)
       }
     }
@@ -1735,14 +1735,14 @@ class ScalaParser(tokens: Array[Token]) {
     val contents = ListBuffer[XmlContents]()
     while (!XML_END_OPEN) {
       val content = currentTokenType match {
-        case XML_START_OPEN => xmlElement(isPattern)
-        case XML_PCDATA => XmlPCDATA(nextToken())
-        case XML_COMMENT => XmlComment(nextToken())
-        case XML_CDATA => XmlCDATA(nextToken())
-        case XML_UNPARSED => XmlUnparsed(nextToken())
-        case XML_PROCESSING_INSTRUCTION => XmlProcessingInstruction(nextToken())
-        case LBRACE => xmlEmbeddedScala(isPattern)
-        case _ => throw new ScalaParserException("Unexpected token in XML: " + currentToken)
+        case XML_START_OPEN ⇒ xmlElement(isPattern)
+        case XML_PCDATA ⇒ XmlPCDATA(nextToken())
+        case XML_COMMENT ⇒ XmlComment(nextToken())
+        case XML_CDATA ⇒ XmlCDATA(nextToken())
+        case XML_UNPARSED ⇒ XmlUnparsed(nextToken())
+        case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
+        case LBRACE ⇒ xmlEmbeddedScala(isPattern)
+        case _ ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
       }
       contents += content
     }
@@ -1757,13 +1757,13 @@ class ScalaParser(tokens: Array[Token]) {
   private def xml(isPattern: Boolean): XmlExpr = {
     def xmlContent(): XmlContents =
       currentTokenType match {
-        case XML_START_OPEN => xmlElement(isPattern)
-        case XML_PCDATA => XmlPCDATA(nextToken())
-        case XML_COMMENT => XmlComment(nextToken())
-        case XML_CDATA => XmlCDATA(nextToken())
-        case XML_UNPARSED => XmlUnparsed(nextToken())
-        case XML_PROCESSING_INSTRUCTION => XmlProcessingInstruction(nextToken())
-        case _ => throw new ScalaParserException("Expected XML: " + currentToken)
+        case XML_START_OPEN ⇒ xmlElement(isPattern)
+        case XML_PCDATA ⇒ XmlPCDATA(nextToken())
+        case XML_COMMENT ⇒ XmlComment(nextToken())
+        case XML_CDATA ⇒ XmlCDATA(nextToken())
+        case XML_UNPARSED ⇒ XmlUnparsed(nextToken())
+        case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
+        case _ ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
       }
     val first = xmlContent()
     val otherContents = ListBuffer[XmlContents]()
@@ -1832,15 +1832,15 @@ class ScalaParser(tokens: Array[Token]) {
       !token.getText.startsWith("`")
   }
 
-  private def optional[T](p: => T): Option[T] =
+  private def optional[T](p: ⇒ T): Option[T] =
     or(Some(p), None)
 
-  private def or[T](p1: => T, p2: => T): T = {
+  private def or[T](p1: ⇒ T, p2: ⇒ T): T = {
     val originalPos = pos
     try {
       p1
     } catch {
-      case e: ScalaParserException =>
+      case e: ScalaParserException ⇒
         pos = originalPos
         if (logging) println("Rewinding to try alternative: " + currentToken)
         p2
@@ -1856,7 +1856,7 @@ class ScalaParser(tokens: Array[Token]) {
       None
   }
 
-  private def log[T](s: String)(f: => T): T = {
+  private def log[T](s: String)(f: ⇒ T): T = {
     if (logging) {
       println("Enter " + s + " [" + currentToken + "]")
       val result = f

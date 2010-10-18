@@ -459,9 +459,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                 formatResult ++= format(body)(newFormatterState.indent)
               case _ ⇒
                 val instruction = statSeq.selfReferenceOpt match {
-                  case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline =>
+                  case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
                     CompactEnsuringGap
-                  case _ =>
+                  case _ ⇒
                     newFormatterState.nextIndentLevelInstruction
                 }
                 formatResult = formatResult.before(statSeq.firstToken, instruction)
