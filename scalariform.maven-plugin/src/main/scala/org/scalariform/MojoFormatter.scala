@@ -38,10 +38,28 @@ object MojoFormatter {
      findScalaFilesByFile(new File(dirpath), Nil)
   }
 
-  def format(path : String) {
+  def format(path : String, 
+             alignParameters : Boolean,
+             doubleIndentClassDeclaration : Boolean,
+             compactStringConcatenation : Boolean,
+             preserveSpaceBeforeArguments : Boolean,
+             rewriteArrowSymbols : Boolean,
+             spaceBeforeColon : Boolean,
+             indentSpaces : Int) {
+
+    val preferences = FormattingPreferences()
+      .setPreference(AlignParameters, alignParameters)
+      .setPreference(DoubleIndentClassDeclaration, doubleIndentClassDeclaration)
+      .setPreference(CompactStringConcatenation, compactStringConcatenation)
+      .setPreference(PreserveSpaceBeforeArguments, preserveSpaceBeforeArguments)
+      .setPreference(RewriteArrowSymbols, rewriteArrowSymbols)
+      .setPreference(SpaceBeforeColon, spaceBeforeColon)
+      .setPreference(IndentSpaces, indentSpaces)
+    
     findScalaFiles(path).foreach { file =>
+      println("formatting " + file)
       val original = Source.fromFile(file).mkString
-      writeText(new File(file), ScalaFormatter.format(original))
+      writeText(new File(file), ScalaFormatter.format(original, preferences))
     }
   }
 
