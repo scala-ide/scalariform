@@ -28,9 +28,9 @@ object MojoFormatter {
     def accept(dir : File ) = dir.isDirectory
   }
 
-  private def findScalaFiles(dirpath : String) : List[String] = {
-     def findScalaFilesByFile(path : File, list : List[String]) : List[String] = {
-       val runningList = path.listFiles(scalaFilter).map { _.getAbsolutePath }.toList ::: list
+  private def findScalaFiles(dirpath : String) : List[File] = {
+     def findScalaFilesByFile(path : File, list : List[File]) : List[File] = {
+       val runningList = path.listFiles(scalaFilter).toList ::: list
        path.listFiles(dirFilter).foldLeft(runningList) { (sum,dir) =>
          findScalaFilesByFile(dir, sum)
        }
@@ -58,7 +58,7 @@ object MojoFormatter {
     
     findScalaFiles(path).foreach { file =>
       val original = Source.fromFile(file).mkString
-      writeText(new File(file), ScalaFormatter.format(original, preferences))
+      writeText(file, ScalaFormatter.format(original, preferences))
     }
   }
 
