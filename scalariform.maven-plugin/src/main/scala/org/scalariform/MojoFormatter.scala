@@ -57,7 +57,6 @@ object MojoFormatter {
       .setPreference(IndentSpaces, indentSpaces)
     
     findScalaFiles(path).foreach { file =>
-      println("formatting " + file)
       val original = Source.fromFile(file).mkString
       writeText(new File(file), ScalaFormatter.format(original, preferences))
     }
