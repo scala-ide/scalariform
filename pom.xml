@@ -15,6 +15,7 @@
     <module>scalariform</module>
     <module>scalariform.feature</module>
     <module>scalariform.update</module>
+    <module>scalariform.maven-plugin</module>
   </modules>
   <dependencies>
     <dependency>
