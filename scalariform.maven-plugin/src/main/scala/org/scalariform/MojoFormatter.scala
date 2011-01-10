@@ -11,6 +11,8 @@ import scala.collection.JavaConversions._
 
 import scala.io.Source
 
+import org.apache.maven.plugin.logging.Log
+
 /**
  * Goal which formats scala source files
  *
@@ -38,10 +40,11 @@ object MojoFormatter {
      findScalaFilesByFile(new File(dirpath), Nil)
   }
 
-  def format(path : String, 
+  def format(path : String,
+             log : Log,
              alignParameters : Boolean,
-             doubleIndentClassDeclaration : Boolean,
              compactStringConcatenation : Boolean,
+             doubleIndentClassDeclaration : Boolean,
              preserveSpaceBeforeArguments : Boolean,
              rewriteArrowSymbols : Boolean,
              spaceBeforeColon : Boolean,
@@ -55,8 +58,12 @@ object MojoFormatter {
       .setPreference(RewriteArrowSymbols, rewriteArrowSymbols)
       .setPreference(SpaceBeforeColon, spaceBeforeColon)
       .setPreference(IndentSpaces, indentSpaces)
+
+    val files = findScalaFiles(path)
+
+    log.info("Formatting " + files.size + " scala files")
     
-    findScalaFiles(path).foreach { file =>
+    files.foreach { file =>
       val original = Source.fromFile(file).mkString
       writeText(file, ScalaFormatter.format(original, preferences))
     }
