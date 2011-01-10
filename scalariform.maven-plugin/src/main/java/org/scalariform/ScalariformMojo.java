@@ -64,7 +64,7 @@ public class ScalariformMojo extends AbstractMojo {
     
     public void execute() throws MojoExecutionException {
 
-	MojoFormatter.format(baseDir, 
+	MojoFormatter.format(baseDir, this.getLog(),
                              alignParameters, 
                              compactStringConcatenation,
                              doubleIndentClassDeclaration,
