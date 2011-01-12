@@ -1045,10 +1045,10 @@ class ScalaParser(tokens: Array[Token]) {
     Type(typeElementFlatten3(typeElements.toList))
   }
 
-  private def typeParamClauseOpt(): Option[TypeParamClause] = {
+  private def typeParamClauseOpt(allowVariance: Boolean): Option[TypeParamClause] = {
     def typeParam(): List[TypeElement] = {
       val typeElements = ListBuffer[TypeElementFlattenable]()
-      if (isIdent) { // TODO: condition 
+      if (allowVariance && isIdent) { // TODO: condition 
         if (PLUS)
           typeElements += VarianceTypeElement(nextToken())
         else if (MINUS)
@@ -1058,7 +1058,7 @@ class ScalaParser(tokens: Array[Token]) {
         typeElements += nextToken()
       else
         typeElements += ident()
-      typeElements += typeParamClauseOpt()
+      typeElements += typeParamClauseOpt(allowVariance = true)
       typeElements += typeBounds()
       while (VIEWBOUND) {
         typeElements += nextToken()
@@ -1246,7 +1246,7 @@ class ScalaParser(tokens: Array[Token]) {
       FunDefOrDcl(defToken, thisToken, None, paramClauses_, None, Some(funBody))
     } else {
       val nameToken = ident()
-      val typeParamClauseOpt_ = typeParamClauseOpt()
+      val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = false)
       val paramClauses_ = paramClauses()
       val newLineOpt_ = newLineOptWhenFollowedBy(LBRACE)
       val returnTypeOpt = typedOpt()
@@ -1301,7 +1301,7 @@ class ScalaParser(tokens: Array[Token]) {
     val typeToken = accept(TYPE)
     val newLinesOpt_ = newLinesOpt()
     val name = ident()
-    val typeParamClauseOpt_ = typeParamClauseOpt()
+    val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = true)
     val extraTypeDclStuff = currentTokenType match {
       case EQUALS ⇒
         val equalsToken = nextToken()
@@ -1341,7 +1341,7 @@ class ScalaParser(tokens: Array[Token]) {
     val isTrait: Boolean = TRAIT
     markerTokens = markerTokens :+ nextToken()
     val name = ident()
-    val typeParamClauseOpt_ = typeParamClauseOpt()
+    val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = true)
     val annotations_ = annotations(skipNewLines = false, requireOneArgList = true)
     val (accessModifierOpt_, paramClausesOpt) = if (isTrait)
       (None, None)

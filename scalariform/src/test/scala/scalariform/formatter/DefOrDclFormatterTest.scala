@@ -30,11 +30,13 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   "def foo(a: Int=123+2, b: Int=456+7)" ==> "def foo(a: Int = 123 + 2, b: Int = 456 + 7)"
   
-  "def foo [ - T , + U ] (t: T): U" ==> "def foo[-T, +U](t: T): U"
-
   "def foo[X<%T1,Y<:T2,Z>:T3]()" ==> "def foo[X <% T1, Y <: T2, Z >: T3]()"
 
   "def foo(x: =>Int, y: Int *)" ==> "def foo(x: => Int, y: Int*)"
+
+  "def a[+[+_]]" ==> "def a[+[+_]]"
+  "def a[+]" ==> "def a[+]"
+  "def a[-]" ==> "def a[-]"
 
   "def foo(x_ : Int)" ==> "def foo(x_ : Int)"
 

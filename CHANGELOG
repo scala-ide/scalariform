@@ -1,3 +1,7 @@
+0.0.8 (..)
+
+* FIX: Correctly handle use of +/- as type parameters in defs
+
 0.0.7 (18/October/10)
 
 * Rewrite parser; formatter is now ~60% faster
