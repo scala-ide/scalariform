@@ -64,8 +64,14 @@ object MojoFormatter {
     log.info("Formatting " + files.size + " scala files")
     
     files.foreach { file =>
-      val original = Source.fromFile(file).mkString
-      writeText(file, ScalaFormatter.format(original, preferences))
+      try {
+        val original = Source.fromFile(file).mkString
+        writeText(file, ScalaFormatter.format(original, preferences))
+      }
+      catch {
+        case ex : Exception => log.error("Error formatting " + file + ex.toString)
+      }
+
     }
   }
 
