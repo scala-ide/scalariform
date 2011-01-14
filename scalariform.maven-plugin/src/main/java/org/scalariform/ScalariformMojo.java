@@ -42,6 +42,16 @@ public class ScalariformMojo extends AbstractMojo {
     protected boolean doubleIndentClassDeclaration;
 
     /**
+     *  @parameter default-value=true
+     */
+    protected boolean formatXml;
+
+    /**
+     *  @parameter default-value=true
+     */
+    protected boolean indentPackageBlocks;
+
+    /**
      *  @parameter default-value=2
      */
     protected int indentSpaces;
@@ -68,6 +78,8 @@ public class ScalariformMojo extends AbstractMojo {
                              alignParameters, 
                              compactStringConcatenation,
                              doubleIndentClassDeclaration,
+                             formatXml,
+                             indentPackageBlocks,
                              preserveSpaceBeforeArguments,
                              rewriteArrowSymbols,
                              spaceBeforeColon,
