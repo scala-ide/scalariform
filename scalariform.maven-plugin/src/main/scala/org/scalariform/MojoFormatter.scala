@@ -6,9 +6,7 @@ import scalariform.parser.ScalaParserException
 import scalariform.utils.Utils.writeText
 
 import java.io.{ File, FilenameFilter, FileFilter }
-
 import scala.collection.JavaConversions._
-
 import scala.io.Source
 
 import org.apache.maven.plugin.logging.Log
@@ -61,18 +59,23 @@ object MojoFormatter {
 
     val files = findScalaFiles(path)
 
-    log.info("Formatting " + files.size + " scala files")
+    var count = 0
     
     files.foreach { file =>
       try {
         val original = Source.fromFile(file).mkString
-        writeText(file, ScalaFormatter.format(original, preferences))
+        val formatted = ScalaFormatter.format(original, preferences)
+        if(original != formatted) {
+          writeText(file, formatted)
+          count += 1
+        }	
       }
       catch {
-        case ex : Exception => log.error("Error formatting " + file + ex.toString)
+        case ex : Exception => log.error("Error formatting " + file + ": " + ex.toString)
       }
-
     }
+
+    log.info("Modified " + count + " of " + files.size + " .scala files")
   }
 
 }
