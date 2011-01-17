@@ -1,6 +1,7 @@
 0.0.8 (..)
 
 * FIX: Correctly handle use of +/- as type parameters in defs
+* Add Maven formatter plugin (contributed by Adam Crain -- https://github.com/jadamcrain)
 
 0.0.7 (18/October/10)
 

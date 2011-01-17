@@ -61,6 +61,33 @@ See `ScalaSidekick`_ by Stefan Ettrup:
 
 Run Plugins -> scalaSidekickPlugin -> Format Scala File
 
+Integration with Maven
+----------------------
+
+There is a Maven plugin to run Scalariform contributed by `Adam
+Crain`_. It is not yet on scala-tools, but you can build it from the
+source.
+
+.. _Adam Crain: https://github.com/jadamcrain
+
+Usage::
+
+  <plugin>
+    <groupId>org.scalariform</groupId>
+    <artifactId>scalariform-maven-plugin</artifactId>
+    <executions>
+      <execution>
+        <phase>process-sources</phase>
+        <goals>
+          <goal>format</goal>
+        </goals>
+        <configuration>
+          <rewriteArrowSymbols>true</rewriteArrowSymbols>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+
 Integration with sbt
 --------------------
 
