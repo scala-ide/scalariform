@@ -65,17 +65,25 @@ object MojoFormatter {
 
     val files = findScalaFiles(path)
 
-    log.info("Formatting " + files.size + " scala file" + (if (files.size == 1) "" else "s"))
+    var count = 0
 
     files.foreach { file ⇒
       try {
         val original = Source.fromFile(file).mkString
-        writeText(file, ScalaFormatter.format(original, preferences))
+        val formatted = ScalaFormatter.format(original, preferences)
+        if (original != formatted) {
+          writeText(file, formatted)
+          count += 1
+        }
       } catch {
-        case ex: ScalaParserException ⇒ log.error("Error formatting " + file + " -- " + ex.getMessage)
+        case ex: ScalaParserException ⇒
+          log.error("Error parsing Scala " + file + ": " + ex.getMessage)
+        case ex: Exception ⇒
+          log.error("Error formatting " + file + ": " + ex)
       }
-
     }
+    log.info("Modified " + count + " of " + files.size + " .scala files")
+
   }
 
 }
