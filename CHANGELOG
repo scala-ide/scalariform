@@ -3,6 +3,7 @@
 * FIX: Correctly handle use of +/- as type parameters in defs
 * Add Maven formatter plugin (contributed by Adam Crain -- https://github.com/jadamcrain)
 * FIX: Bug with lexing """ at end of text
+* Add AlignSingleLineCaseStatements preference to align the arrows of consecutive single-line case statements
 
 0.0.7 (18/October/10)
 

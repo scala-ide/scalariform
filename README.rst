@@ -127,6 +127,7 @@ Usage::
   
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
+    [+|-]alignSingleLineCaseStatements  Enable/disable Align the arrows of consecutive single-line case statements
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
     [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
     [+|-]formatXml                      Enable/disable Format XML literals
@@ -190,6 +191,27 @@ If ``true``, then::
                astrologicalSign: String,
                shoeSize: Int,
                favoriteColor: java.awt.Color)
+
+alignSingleLineCaseStatements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Align the arrows of consecutive single-line case statements. For example, if ``true``, then::
+
+  a match {
+    case b => 1
+    case ccc => 2
+    case dd => 3
+  }
+
+Is reformatted as::
+
+  a match {
+    case b   => 1
+    case ccc => 2
+    case dd  => 3
+  }
 
 compactStringConcatenation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

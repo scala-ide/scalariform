@@ -40,9 +40,11 @@ object NoFormatResult extends FormatResult(Map(), Map(), Map())
 
 abstract sealed class IntertokenFormatInstruction
 
-/** Packs the comments together as compactly as possible, eliminating
+/**
+ * Packs the comments together as compactly as possible, eliminating
  * as much non-comment whitespace as possible while ensuring that the
- * lexer produces the same tokens.*/
+ * lexer produces the same tokens.
+ */
 case object Compact extends IntertokenFormatInstruction
 
 /** Like "Compact", but ensures there is either some comment or a single space. */
@@ -53,3 +55,6 @@ case object CompactPreservingGap extends IntertokenFormatInstruction
 
 /** Ensures that the interttoken region ends with NEWLINE INDENT. */
 case class EnsureNewlineAndIndent(indentLevel: Int, relativeTo: Option[Token] = None) extends IntertokenFormatInstruction
+
+/** Places the token at spaces number of spaces after the indent level, padding with spaces if necessary */
+case class PlaceAtColumn(indentLevel: Int, spaces: Int) extends IntertokenFormatInstruction

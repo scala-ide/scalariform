@@ -722,7 +722,7 @@ class ScalaParser(tokens: Array[Token]) {
     val pattern_ = pattern()
     val guardOption = guard()
     val (arrow, blockStatSeq_) = caseBlock()
-    CaseClause(caseToken, pattern_, guardOption, arrow, blockStatSeq_)
+    CaseClause(CasePattern(caseToken, pattern_, guardOption, arrow), blockStatSeq_)
   }
 
   private def caseBlock(): (Token, StatSeq) = {

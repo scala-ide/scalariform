@@ -61,6 +61,33 @@ See `ScalaSidekick`_ by Stefan Ettrup:
 
 Run Plugins -> scalaSidekickPlugin -> Format Scala File
 
+Integration with Maven
+----------------------
+
+There is a Maven plugin to run Scalariform contributed by `Adam
+Crain`_. It is not yet on scala-tools, but you can build it from the
+source.
+
+.. _Adam Crain: https://github.com/jadamcrain
+
+Usage::
+
+  <plugin>
+    <groupId>org.scalariform</groupId>
+    <artifactId>scalariform-maven-plugin</artifactId>
+    <executions>
+      <execution>
+        <phase>process-sources</phase>
+        <goals>
+          <goal>format</goal>
+        </goals>
+        <configuration>
+          <rewriteArrowSymbols>true</rewriteArrowSymbols>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+
 Integration with sbt
 --------------------
 
@@ -100,6 +127,7 @@ Usage::
   
   Preferences:
     [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
+    [+|-]alignSingleLineCaseStatements  Enable/disable Align the arrows of consecutive single-line case statements
     [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
     [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
     [+|-]formatXml                      Enable/disable Format XML literals
@@ -163,6 +191,27 @@ If ``true``, then::
                astrologicalSign: String,
                shoeSize: Int,
                favoriteColor: java.awt.Color)
+
+alignSingleLineCaseStatements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Align the arrows of consecutive single-line case statements. For example, if ``true``, then::
+
+  a match {
+    case b => 1
+    case ccc => 2
+    case dd => 3
+  }
+
+Is reformatted as::
+
+  a match {
+    case b   => 1
+    case ccc => 2
+    case dd  => 3
+  }
 
 compactStringConcatenation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -4,11 +4,12 @@ import scalariform.lexer.Token
 import scalariform.lexer.Tokens._
 import scalariform.parser._
 import scalariform.utils.Utils
+import scalariform.utils.TextEditProcessor
 import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
 import PartialFunction._
 
-trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter ⇒
+trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter with CaseClauseFormatter ⇒
 
   def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = format(expr.contents)
 
@@ -352,7 +353,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult
   }
 
-  private def format(guard: Guard)(implicit formatterState: FormatterState): FormatResult = {
+  def format(guard: Guard)(implicit formatterState: FormatterState): FormatResult = {
     val Guard(ifToken: Token, expr: Expr) = guard
     format(expr)
   }
@@ -477,33 +478,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         } else
           formatResult ++= format(statSeq)(newFormatterState)
     }
-    formatResult
-  }
 
-  private def format(caseClauses: CaseClauses)(implicit formatterState: FormatterState): FormatResult = {
-    var formatResult: FormatResult = NoFormatResult
-    for ((previousOption, caseClause) ← Utils.pairWithPrevious(caseClauses.caseClauses)) {
-      if (previousOption.isDefined && hiddenPredecessors(caseClause.firstToken).containsNewline)
-        formatResult = formatResult.before(caseClause.caseToken, formatterState.currentIndentLevelInstruction)
-      formatResult ++= format(caseClause)
-    }
-    formatResult
-  }
-
-  private def format(caseClause: CaseClause)(implicit formatterState: FormatterState): FormatResult = {
-    val CaseClause(caseToken: Token, pattern: Expr, guardOption: Option[Guard], arrow: Token, statSeq: StatSeq) = caseClause
-    var formatResult: FormatResult = NoFormatResult
-    formatResult ++= format(pattern)
-    for (guard ← guardOption)
-      formatResult ++= format(guard)
-
-    val singleBlockExpr = cond(statSeq.firstStatOpt) { case Some(Expr(List(BlockExpr(_, _, _)))) ⇒ true } && statSeq.otherStats.isEmpty
-    val indentBlock = statSeq.firstTokenOption.isDefined && hiddenPredecessors(statSeq.firstToken).containsNewline || (containsNewline(statSeq) && !singleBlockExpr)
-    if (indentBlock)
-      formatResult = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
-
-    val stateForStatSeq = if (singleBlockExpr) formatterState else formatterState.indent
-    formatResult ++= format(statSeq)(stateForStatSeq)
     formatResult
   }
 

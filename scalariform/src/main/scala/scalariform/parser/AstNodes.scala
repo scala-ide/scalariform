@@ -183,8 +183,12 @@ case class FullDefOrDcl(annotations: List[Annotation], modifiers: List[Modifier]
   lazy val tokens = flatten(annotations, modifiers, defOrDcl)
 }
 
-case class CaseClause(caseToken: Token, pattern: Expr, guardOption: Option[Guard], arrow: Token, statSeq: StatSeq) extends AstNode {
-  lazy val tokens = flatten(caseToken, pattern, guardOption, arrow, statSeq)
+case class CaseClause(casePattern: CasePattern, statSeq: StatSeq) extends AstNode {
+  lazy val tokens = flatten(casePattern, statSeq)
+}
+
+case class CasePattern(caseToken: Token, pattern: Expr, guardOption: Option[Guard], arrow: Token) extends AstNode {
+  lazy val tokens = flatten(caseToken, pattern, guardOption, arrow)
 }
 
 case class CaseClauses(caseClauses: List[CaseClause]) extends AstNode {

@@ -34,6 +34,11 @@ public class ScalariformMojo extends AbstractMojo {
     /**
      *  @parameter default-value=false
      */
+    protected boolean alignSingleLineCaseStatements;
+
+    /**
+     *  @parameter default-value=false
+     */
     protected boolean compactStringConcatenation;
 
     /**
@@ -76,6 +81,7 @@ public class ScalariformMojo extends AbstractMojo {
 
 	MojoFormatter.format(baseDir, this.getLog(),
                              alignParameters, 
+                             alignSingleLineCaseStatements,
                              compactStringConcatenation,
                              doubleIndentClassDeclaration,
                              formatXml,

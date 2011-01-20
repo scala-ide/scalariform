@@ -43,6 +43,7 @@ object MojoFormatter {
   def format(path: String,
              log: Log,
              alignParameters: Boolean,
+             alignSingleLineCaseStatements: Boolean,
              compactStringConcatenation: Boolean,
              doubleIndentClassDeclaration: Boolean,
              formatXml: Boolean,
@@ -54,6 +55,7 @@ object MojoFormatter {
 
     val preferences = FormattingPreferences()
       .setPreference(AlignParameters, alignParameters)
+      .setPreference(AlignSingleLineCaseStatements, alignSingleLineCaseStatements)
       .setPreference(DoubleIndentClassDeclaration, doubleIndentClassDeclaration)
       .setPreference(CompactStringConcatenation, compactStringConcatenation)
       .setPreference(FormatXml, formatXml)

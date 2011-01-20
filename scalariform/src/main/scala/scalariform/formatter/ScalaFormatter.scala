@@ -20,9 +20,19 @@ trait HasHiddenTokenInfo {
 
 }
 
-abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter {
+abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter with CaseClauseFormatter {
 
   val newlineSequence: String
+
+  def getSource(astNode: AstNode): String = {
+    val sb = new StringBuilder
+    for (token ← astNode.tokens) {
+      if (token != astNode.tokens.head)
+        sb.append(hiddenPredecessors(token).text)
+      sb.append(token.text)
+    }
+    sb.toString
+  }
 
   def format(compilationUnit: CompilationUnit)(implicit formatterState: FormatterState = FormatterState()): FormatResult = {
     val topStats = compilationUnit.topStats
@@ -42,7 +52,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
 
   private def replaceEdit(token: Token, replacement: String): TextEdit = TextEdit(token.startIndex, token.text.length, replacement)
 
-  def writeTokens(s: String, tokens: List[Token], formatResult: FormatResult): List[TextEdit] = {
+  def writeTokens(s: String, tokens: List[Token], formatResult: FormatResult, offset: Int = 0): List[TextEdit] = {
     val FormatResult(predecessorFormatting, inferredNewlineFormatting, xmlRewrites) = formatResult
     val builder = new StringBuilder
     var tokenIndentMap: Map[Token, Int] = Map()
@@ -82,7 +92,11 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         }
       }
     }
-    edits.reverse filter { case TextEdit(start, length, replacement) ⇒ s.substring(start, start + length) != replacement } distinct
+    edits
+      .reverse
+      .flatMap { edit ⇒ if (edit.position >= offset) Some(edit.shift(-offset)) else None }
+      .filter { case TextEdit(position, length, replacement) ⇒ s.substring(position, position + length) != replacement }
+      .distinct
   }
 
   private def formatComment(comment: HiddenToken, indentLevel: Int) = {
@@ -153,6 +167,10 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           builder.append(" ")
         else
           writeIntertokenCompact()
+      case PlaceAtColumn(indentLevel, spaces) ⇒
+        writeIntertokenCompact()
+        val indentLength = Spaces(formattingPreferences(IndentSpaces)).length(indentLevel)
+        builder.append(" " * (indentLength + spaces - builder.currentIndent))
       case EnsureNewlineAndIndent(indentLevel, relativeTo) ⇒
         val baseIndentOption = relativeTo flatMap tokenIndentMap.get
         if (hiddenTokens.isEmpty) {

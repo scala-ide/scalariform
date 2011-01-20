@@ -18,7 +18,11 @@ case object Tabs extends IndentStyle {
 }
 
 case class Spaces(n: Int) extends IndentStyle {
+
   def indent(indentLevel: Int) = repeat(repeat(" ", n), indentLevel)
+
+  def length(indentLevel: Int) = indent(indentLevel).length
+
 }
 
 class FormattingPreferences(val preferencesMap: Map[PreferenceDescriptor[_], Any]) extends IFormattingPreferences {

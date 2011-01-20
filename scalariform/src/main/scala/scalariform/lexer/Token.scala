@@ -8,6 +8,6 @@ case class Token(tokenType: TokenType, text: String, startIndex: Int, stopIndex:
   lazy val getCharPositionInLine = -1 // TODO
   lazy val getStartIndex = startIndex // Delete me?
   lazy val getStopIndex = stopIndex // Delete me?
-
+  def length = stopIndex - startIndex + 1
   def isNewline = tokenType.isNewline
 }
