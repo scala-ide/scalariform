@@ -238,7 +238,8 @@ case class FunDefOrDcl(defToken: Token,
                        typeParamClauseOpt: Option[TypeParamClause],
                        paramClauses: ParamClauses,
                        returnTypeOpt: Option[(Token, Type)],
-                       funBodyOpt: Option[FunBody]) extends DefOrDcl {
+                       funBodyOpt: Option[FunBody],
+                       localDef: Boolean) extends DefOrDcl {
 
   lazy val tokens = flatten(defToken, nameToken, typeParamClauseOpt, paramClauses, returnTypeOpt, funBodyOpt)
 

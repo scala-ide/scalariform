@@ -4,6 +4,7 @@
 * Add Maven formatter plugin (contributed by Adam Crain -- https://github.com/jadamcrain)
 * FIX: Bug with lexing """ at end of text
 * Add AlignSingleLineCaseStatements preferences to align the arrows of consecutive single-line case statements
+* Add IndentLocalDefs preference to indent local methods an extra level
 
 0.0.7 (18/October/10)
 

@@ -5,7 +5,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   trait FormatterOptions /* extends ScalariformPlugin */ {
 
-    /* override */ def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true) /* AlignSingleLineCaseStatements(true) */)
+    /* override */ def scalariformOptions = Seq(VerboseScalariform, RewriteArrowSymbols(true), AlignParameters(true) /* AlignSingleLineCaseStatements(true) */ )
 
   }
 

@@ -132,6 +132,7 @@ Usage::
     [+|-]compactStringConcatenation                       Enable/disable Omit spaces when formatting a '+' operator on String literals
     [+|-]doubleIndentClassDeclaration                     Enable/disable Double indent either a class's parameters or its inheritance list
     [+|-]formatXml                                        Enable/disable Format XML literals
+    [+|-]indentLocalDefs                                  Enable/disable Indent local defs an extra level
     [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
     [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
@@ -293,6 +294,24 @@ formatXml
 Default: ``true``
 
 Format embedded XML literals; if ``false`` they will be left untouched.
+
+indentLocalDefs
+~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+If ``true``, indent local methods an extra level, with the intention of distinguishing them from other statements. For example,::
+
+  class A {
+    def find(...) = {
+      val x = ...
+        def find0() = {
+          ...
+        }
+      find0(...)
+    }
+  }
+
 
 indentPackageBlocks
 ~~~~~~~~~~~~~~~~~~~

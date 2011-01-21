@@ -2,6 +2,7 @@ package scalariform.formatter
 
 import scalariform.parser._
 import scalariform.formatter._
+import scalariform.formatter.preferences._
 
 // format: OFF
 class DefOrDclFormatterTest extends AbstractFormatterTest {
@@ -101,6 +102,40 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   """private [a]
     |sealed trait B""" ==>
   """private[a] sealed trait B"""
+
+  {
+
+  implicit val formattingPreferences = 
+    FormattingPreferences
+      .setPreference(IndentLocalDefs, true)
+
+  """class A {
+    |  def b() = {
+    |    def c() = 42
+    |    println("d")
+    |    def e() = 
+    |    42
+    |println("f")
+    |    def g() {
+    |println("h")
+    |}
+    |    c() * e()
+    |  }
+    |}""" ==>
+  """class A {
+    |  def b() = {
+    |      def c() = 42
+    |    println("d")
+    |      def e() =
+    |        42
+    |    println("f")
+    |      def g() {
+    |        println("h")
+    |      }
+    |    c() * e()
+    |  }
+    |}"""
+  }
 
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
 

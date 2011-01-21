@@ -1187,11 +1187,11 @@ class ScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def defOrDcl(): DefOrDcl = {
+  private def defOrDcl(localDef: Boolean = false): DefOrDcl = {
     currentTokenType match {
       case VAL  ⇒ patDefOrDcl()
       case VAR  ⇒ patDefOrDcl()
-      case DEF  ⇒ funDefOrDcl()
+      case DEF  ⇒ funDefOrDcl(localDef)
       case TYPE ⇒ typeDefOrDcl()
       case _    ⇒ tmplDef()
     }
@@ -1229,7 +1229,7 @@ class ScalaParser(tokens: Array[Token]) {
     PatDefOrDcl(valOrVarToken, pattern_, otherPatterns.toList, typedOpt_, equalsClauseOption)
   }
 
-  private def funDefOrDcl(): FunDefOrDcl = {
+  private def funDefOrDcl(localDef: Boolean): FunDefOrDcl = {
     val defToken = accept(DEF)
     if (THIS) {
       val thisToken = nextToken()
@@ -1243,7 +1243,7 @@ class ScalaParser(tokens: Array[Token]) {
         val constrExpr_ = constrExpr()
         ExprFunBody(equalsToken, constrExpr_)
       }
-      FunDefOrDcl(defToken, thisToken, None, paramClauses_, None, Some(funBody))
+      FunDefOrDcl(defToken, thisToken, None, paramClauses_, None, Some(funBody), localDef)
     } else {
       val nameToken = ident()
       val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = false)
@@ -1259,7 +1259,7 @@ class ScalaParser(tokens: Array[Token]) {
         val (equalsToken, expr_) = equalsExpr()
         Some(ExprFunBody(equalsToken, expr_))
       }
-      FunDefOrDcl(defToken, nameToken, typeParamClauseOpt_, paramClauses_, returnTypeOpt, funBodyOpt)
+      FunDefOrDcl(defToken, nameToken, typeParamClauseOpt_, paramClauses_, returnTypeOpt, funBodyOpt, localDef)
     }
   }
 
@@ -1544,7 +1544,7 @@ class ScalaParser(tokens: Array[Token]) {
     val localModifiers_ = localModifiers()
     // val modifierCondition = true // TODO: !!!!
 
-    val defOrDcl_ = or(defOrDcl(), tmplDef())
+    val defOrDcl_ = or(defOrDcl(localDef = true), tmplDef())
     FullDefOrDcl(annotations_, localModifiers_, defOrDcl_)
   }
 

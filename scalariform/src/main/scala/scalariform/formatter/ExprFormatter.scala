@@ -454,7 +454,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           formatResult ++= format(caseClauses)(newFormatterState)
 
       case Right(statSeq) ⇒
-        if (!singleLineBlock) {
+        if (singleLineBlock)
+          formatResult ++= format(statSeq)(newFormatterState)
+        else {
           if (statSeq.firstTokenOption.isDefined) {
             statSeq.firstStatOpt match {
               case Some(Expr(List(anonFn@AnonymousFunction(params, arrowToken, body)))) ⇒
@@ -468,49 +470,56 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
                     CompactEnsuringGap
                   case _ ⇒
-                    indentedInstruction
+                    statFormatterState(statSeq.firstStatOpt)(indentedState).currentIndentLevelInstruction
                 }
                 formatResult = formatResult.before(statSeq.firstToken, instruction)
                 formatResult ++= format(statSeq)(indentedState)
             }
           }
           formatResult = formatResult.before(rbrace, newFormatterState.currentIndentLevelInstruction)
-        } else
-          formatResult ++= format(statSeq)(newFormatterState)
+        }
     }
 
     formatResult
   }
 
+  private def statFormatterState(statOpt: Option[Stat])(implicit formatterState: FormatterState) = condOpt(statOpt) {
+    case Some(FullDefOrDcl(_, _, FunDefOrDcl(_, _, _, _, _, _, true))) if formattingPreferences(IndentLocalDefs) ⇒ formatterState.indent
+  } getOrElse formatterState
+
   def format(statSeq: StatSeq)(implicit formatterState: FormatterState): FormatResult = {
     val StatSeq(selfReferenceOpt: Option[(Expr, Token)], firstStatOpt: Option[Stat], otherStats: List[(Token, Option[Stat])]) = statSeq
     var formatResult: FormatResult = NoFormatResult
 
+    val firstStatFormatterState = statFormatterState(firstStatOpt)
+
     for ((selfReference, arrow) ← selfReferenceOpt) {
       formatResult ++= format(selfReference)
       for (stat ← firstStatOpt if hiddenPredecessors(stat.firstToken).containsNewline)
-        formatResult = formatResult.before(stat.firstToken, formatterState.currentIndentLevelInstruction)
+        formatResult = formatResult.before(stat.firstToken, firstStatFormatterState.currentIndentLevelInstruction)
     }
 
-    for (stat ← firstStatOpt) {
-      formatResult ++= format(stat)
-    }
+    for (stat ← firstStatOpt)
+      formatResult ++= format(stat)(firstStatFormatterState)
 
     for ((semi, otherStatOption) ← otherStats) {
 
+      val otherStatFormatterState = statFormatterState(otherStatOption)
+
       if (isInferredNewline(semi))
-        formatResult = formatResult.formatNewline(semi, formatterState.currentIndentLevelInstruction)
+        formatResult = formatResult.formatNewline(semi, otherStatFormatterState.currentIndentLevelInstruction)
 
       for (otherStat ← otherStatOption) {
         if (!isInferredNewline(semi)) {
           val firstToken = otherStat.firstToken
-          val instruction = if (hiddenPredecessors(firstToken).containsNewline)
-            formatterState.currentIndentLevelInstruction
-          else
-            CompactEnsuringGap
+          val instruction =
+            if (hiddenPredecessors(firstToken).containsNewline)
+              otherStatFormatterState.currentIndentLevelInstruction
+            else
+              CompactEnsuringGap
           formatResult = formatResult.before(firstToken, instruction)
         }
-        formatResult ++= format(otherStat)
+        formatResult ++= format(otherStat)(otherStatFormatterState)
       }
 
     }
@@ -605,7 +614,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     // TODO: Lots
     var formatResult: FormatResult = NoFormatResult
     val FunDefOrDcl(defToken: Token, nameToken: Token, typeParamClauseOpt: Option[TypeParamClause], paramClauses: ParamClauses,
-      returnTypeOpt: Option[(Token, Type)], funBodyOpt: Option[FunBody]) = funDefOrDcl
+      returnTypeOpt: Option[(Token, Type)], funBodyOpt: Option[FunBody], localDef: Boolean) = funDefOrDcl
     for (typeParamClause ← typeParamClauseOpt)
       formatResult ++= format(typeParamClause.contents)
     formatResult ++= formatParamClauses(paramClauses)
