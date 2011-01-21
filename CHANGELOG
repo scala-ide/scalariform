@@ -5,6 +5,9 @@
 * FIX: Bug with lexing """ at end of text
 * Add AlignSingleLineCaseStatements preferences to align the arrows of consecutive single-line case statements
 * Add IndentLocalDefs preference to indent local methods an extra level
+* Track changes in Scala 2.9:
+  * Type variables in a constructor pattern match
+  * Generalised catch clause
 
 0.0.7 (18/October/10)
 

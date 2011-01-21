@@ -119,5 +119,33 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
     |  println("foo")
     |}"""
 
+  // 2.9 generalised catch tests:
+
+  "try body catch implicitly[Handler[T]]" ==> "try body catch implicitly[Handler[T]]"
+
+  """try a catch {
+    |b
+    |}""" ==>
+  """try a catch {
+    |  b
+    |}"""
+
+  """try a catch
+    | {
+    |b
+    |}""" ==>
+  """try a catch {
+    |  b
+    |}"""
+
+  """try a catch
+    |b""" ==>
+  """try a catch
+    |  b"""
+
+  """try a
+    |catch b""" ==>
+  """try a
+    |catch b"""
 
 }

@@ -175,7 +175,11 @@ case class Guard(ifToken: Token, expr: Expr) extends AstNode with Enumerator {
   lazy val tokens = flatten(ifToken, expr)
 }
 
-case class TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[(Token, BlockExpr)], finallyClauseOption: Option[(Token, Expr)]) extends AstNode with ExprElement {
+case class CatchClause(catchToken: Token, catchBlockOrExpr: Either[BlockExpr, Expr]) extends AstNode {
+  lazy val tokens = flatten(catchToken, catchBlockOrExpr)
+}
+
+case class TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[CatchClause], finallyClauseOption: Option[(Token, Expr)]) extends AstNode with ExprElement {
   lazy val tokens = flatten(tryToken, body, catchClauseOption, finallyClauseOption)
 }
 

@@ -467,25 +467,37 @@ class ScalaParser(tokens: Array[Token]) {
 
       case TRY ⇒
         val tryToken = nextToken()
-        val body: Expr = if (LBRACE) {
-          val (lbrace, block_, rbrace) = surround(LBRACE, RBRACE)(block())
-          makeExpr(BlockExpr(lbrace, Right(block_), rbrace))
-        } else if (LPAREN)
-          makeExpr(surround(LPAREN, RPAREN)(expr()))
-        else
-          expr()
-        val catchClauseOption = if (CATCH) {
-          val catchToken = nextToken()
-          val (lbrace, caseClauses_, rbrace) = surround(LBRACE, RBRACE)(caseClauses())
-          Some(catchToken, BlockExpr(lbrace, Left(caseClauses_), rbrace))
-        } else
-          None
-        val finallyClauseOption = if (FINALLY) {
-          val finallyToken = nextToken()
-          val finallyExpr = expr()
-          Some(finallyToken, finallyExpr)
-        } else
-          None
+        val body: Expr = currentTokenType match {
+          case LBRACE ⇒
+            val (lbrace, block_, rbrace) = surround(LBRACE, RBRACE)(block())
+            makeExpr(BlockExpr(lbrace, Right(block_), rbrace))
+          case LPAREN ⇒ makeExpr(surround(LPAREN, RPAREN)(expr()))
+          case _      ⇒ expr
+        }
+        val catchClauseOption: Option[CatchClause] =
+          if (!CATCH)
+            None
+          else {
+            val catchToken = nextToken()
+            if (LBRACE) {
+              val (lbrace, caseClausesOrStatSeq, rbrace) = surround(LBRACE, RBRACE) {
+                if (CASE)
+                  Left(caseClauses())
+                else
+                  Right(StatSeq(selfReferenceOpt = None, firstStatOpt = Some(expr()), otherStats = Nil))
+              }
+              Some(CatchClause(catchToken, Left(BlockExpr(lbrace, caseClausesOrStatSeq, rbrace))))
+            } else
+              Some(CatchClause(catchToken, Right(expr())))
+          }
+        val finallyClauseOption = currentTokenType match {
+          case FINALLY ⇒
+            val finallyToken = nextToken()
+            val finallyExpr = expr()
+            Some(finallyToken, finallyExpr)
+          case _ ⇒
+            None
+        }
         List(TryExpr(tryToken, body, catchClauseOption, finallyClauseOption))
 
       case WHILE ⇒

@@ -139,7 +139,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): FormatResult = format(parenExpr.contents)
 
   private def format(tryExpr: TryExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[(Token, BlockExpr)], finallyClauseOption: Option[(Token, Expr)]) = tryExpr
+    val TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[CatchClause], finallyClauseOption: Option[(Token, Expr)]) = tryExpr
     var formatResult: FormatResult = NoFormatResult
 
     // TODO: similar to first half of ifExpr, whileExpr etc
@@ -163,11 +163,20 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(body)(bodyFormatterState)
 
     // TODO: Simplified version of elseClause formatting
-    for ((catchToken, catchBlock) ← catchClauseOption) {
+    for (CatchClause(catchToken, catchBlockOrExpr) ← catchClauseOption) {
       if (hiddenPredecessors(catchToken).containsNewline && !(isBlockExpr(body) && containsNewline(body)))
         formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
-      formatResult = formatResult.before(catchBlock.firstToken, CompactEnsuringGap)
-      formatResult ++= format(catchBlock)
+      catchBlockOrExpr match {
+        case Left(catchBlock) ⇒
+          formatResult = formatResult.before(catchBlock.firstToken, CompactEnsuringGap)
+          formatResult ++= format(catchBlock)
+        case Right(catchExpr) ⇒
+          val indentCatchExpr = hiddenPredecessors(catchExpr.firstToken).containsNewline
+          val instruction = if (indentCatchExpr) formatterState.nextIndentLevelInstruction else CompactEnsuringGap
+          formatResult = formatResult.before(catchExpr.firstToken, instruction)
+          val catchExprFormatterState = if (indentCatchExpr) formatterState.indent else formatterState
+          formatResult ++= format(catchExpr)(catchExprFormatterState)
+      }
     }
 
     // TODO: See elseClause formatting
