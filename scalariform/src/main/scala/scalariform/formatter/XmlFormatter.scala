@@ -21,10 +21,10 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
 
   def format(xmlContent: XmlContents)(implicit formatterState: FormatterState): FormatResult = {
     xmlContent match {
-      case expr@Expr(_) ⇒ format(expr)
+      case expr@Expr(_)                            ⇒ format(expr)
       case xmlNonEmpty@XmlNonEmptyElement(_, _, _) ⇒ format(xmlNonEmpty)
       case xmlEmpty@XmlEmptyElement(_, _, _, _, _) ⇒ format(xmlEmpty)
-      case _ ⇒ NoFormatResult // TODO
+      case _                                       ⇒ NoFormatResult // TODO
     }
   }
 

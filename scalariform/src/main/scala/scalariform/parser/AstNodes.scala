@@ -26,7 +26,7 @@ trait AstNode extends CaseClassReflector {
   protected implicit def pairToFlattenable[T1 <% Flattenable, T2 <% Flattenable](pair: (T1, T2)): Flattenable = new Flattenable { val tokens = pair._1.tokens ::: pair._2.tokens }
   protected implicit def eitherToFlattenable[T1 <% Flattenable, T2 <% Flattenable](either: T1 Either T2): Flattenable = new Flattenable {
     val tokens = either match {
-      case Left(f) ⇒ f.tokens
+      case Left(f)  ⇒ f.tokens
       case Right(f) ⇒ f.tokens
     }
   }

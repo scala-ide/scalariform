@@ -152,9 +152,9 @@ object Main {
         for (file ← files) {
           val formatResult = checkSource(Source.fromFile(file, encoding))
           val resultString = formatResult match {
-            case FormattedCorrectly ⇒ "OK"
+            case FormattedCorrectly    ⇒ "OK"
             case NotFormattedCorrectly ⇒ "FAILED"
-            case DidNotParse ⇒ "ERROR"
+            case DidNotParse           ⇒ "ERROR"
           }
           val padding = " " * (6 - resultString.length)
           log("[" + resultString + "]" + padding + " " + file)
@@ -231,7 +231,7 @@ object Main {
     for {
       key ← sortedPreferences
       preference = AllPreferences.preferencesByKey(key)
-      IntegerPreference(min, max) <- Some(preference.preferenceType)
+      IntegerPreference(min, max) ← Some(preference.preferenceType)
     } {
       val optionText = "  -" + key + "=[" + min + "-" + max + "]"
       val filler = " " * (descriptionColumn - optionText.length)

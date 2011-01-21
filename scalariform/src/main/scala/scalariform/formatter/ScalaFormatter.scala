@@ -116,7 +116,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     for ((previousOption, line) ← Utils.pairWithPrevious(lines)) {
       line match {
         case StarLine(fromStar) ⇒ sb.append(newlineSequence).indent(indentLevel).append(" ").append(fromStar)
-        case _ ⇒ sb.append(line)
+        case _                  ⇒ sb.append(line)
       }
     }
     sb.toString
@@ -194,7 +194,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                 val newlineCount = token.getText.count(_ == '\n')
                 val newlinesToWrite = previousOpt match {
                   case Some(SingleLineComment(_)) ⇒ math.min(1, newlineCount)
-                  case _ ⇒ math.min(2, newlineCount)
+                  case _                          ⇒ math.min(2, newlineCount)
                 }
                 for (i ← 1 to newlinesToWrite)
                   builder.newline()
@@ -250,9 +250,9 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     def write(token: Token, replacementOption: Option[String] = None): Option[TextEdit] = {
       val rewriteArrows = formattingPreferences(RewriteArrowSymbols)
       val actualReplacementOption = replacementOption orElse (condOpt(token.getType) {
-        case ARROW if rewriteArrows ⇒ "⇒"
+        case ARROW if rewriteArrows  ⇒ "⇒"
         case LARROW if rewriteArrows ⇒ "←"
-        case EOF ⇒ ""
+        case EOF                     ⇒ ""
       })
       builder.append(actualReplacementOption getOrElse token.getText)
       actualReplacementOption map { replaceEdit(token, _) }
@@ -368,14 +368,14 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       return CompactEnsuringGap
     type1 match {
       case ARROW if type2 != RPAREN ⇒ return CompactEnsuringGap // TODO: Redundant? no test fails.
-      case COMMA ⇒ return CompactEnsuringGap
-      case _ ⇒
+      case COMMA                    ⇒ return CompactEnsuringGap
+      case _                        ⇒
     }
     type2 match {
-      case IF if type1 != LPAREN ⇒ return CompactEnsuringGap
+      case IF if type1 != LPAREN    ⇒ return CompactEnsuringGap
       case ARROW if type1 != LPAREN ⇒ return CompactEnsuringGap
       case AT if IDS contains type2 ⇒ return CompactEnsuringGap
-      case _ ⇒
+      case _                        ⇒
     }
     Compact
   }

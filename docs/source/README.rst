@@ -218,7 +218,7 @@ Is reformatted as::
 alignSingleLineCaseStatements.maxArrowIndent
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default: ``25``
+Default: ``40``
 
 When using alignSingleLineCaseStatements == true, this is a limit on
 the number of spaces that can be inserted before an arrow to align it

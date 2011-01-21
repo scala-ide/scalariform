@@ -62,7 +62,7 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
     val virtualChar = chQueue.dequeue()
     tokenTextBuffer.append(virtualChar)
     val delta = unicodeEscapesQueue.dequeue() match {
-      case None ⇒ 1
+      case None    ⇒ 1
       case Some(s) ⇒ s.length
     }
     actualTokenTextLength += delta

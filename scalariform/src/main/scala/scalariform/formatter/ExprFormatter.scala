@@ -43,7 +43,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           if (formattingPreferences(CompactStringConcatenation)) {
             val infixPlus = element match {
               case InfixExprElement(Token(PLUS, _, _, _)) ⇒ true
-              case _ ⇒ false
+              case _                                      ⇒ false
             }
             val stringConcatenation = (previousElement, nextElementOption) match {
               case (GeneralTokens(tokens), _) if tokens.last.tokenType == STRING_LITERAL ⇒ true
@@ -95,26 +95,26 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(exprElement: ExprElement)(implicit formatterState: FormatterState): FormatResult = exprElement match {
-    case ifExpr: IfExpr ⇒ format(ifExpr)
-    case whileExpr: WhileExpr ⇒ format(whileExpr)
-    case doExpr: DoExpr ⇒ format(doExpr)
-    case blockExpr: BlockExpr ⇒ format(blockExpr, indent = true)
-    case forExpr: ForExpr ⇒ format(forExpr)
-    case tryExpr: TryExpr ⇒ format(tryExpr)
-    case template: Template ⇒ format(template)
-    case statSeq: StatSeq ⇒ format(statSeq) // TODO: revisit
-    case argumentExprs: ArgumentExprs ⇒ format(argumentExprs)
+    case ifExpr: IfExpr                       ⇒ format(ifExpr)
+    case whileExpr: WhileExpr                 ⇒ format(whileExpr)
+    case doExpr: DoExpr                       ⇒ format(doExpr)
+    case blockExpr: BlockExpr                 ⇒ format(blockExpr, indent = true)
+    case forExpr: ForExpr                     ⇒ format(forExpr)
+    case tryExpr: TryExpr                     ⇒ format(tryExpr)
+    case template: Template                   ⇒ format(template)
+    case statSeq: StatSeq                     ⇒ format(statSeq) // TODO: revisit
+    case argumentExprs: ArgumentExprs         ⇒ format(argumentExprs)
     case anonymousFunction: AnonymousFunction ⇒ format(anonymousFunction)
-    case GeneralTokens(_) ⇒ NoFormatResult
-    case PrefixExprElement(_) ⇒ NoFormatResult
-    case InfixExprElement(_) ⇒ NoFormatResult
-    case PostfixExprElement(_) ⇒ NoFormatResult
-    case annotation: Annotation ⇒ format(annotation)
-    case typeExprElement: TypeExprElement ⇒ format(typeExprElement.contents)
-    case expr: Expr ⇒ format(expr.contents)
-    case xmlExpr: XmlExpr ⇒ format(xmlExpr)
-    case parenExpr: ParenExpr ⇒ format(parenExpr)
-    case _ ⇒ NoFormatResult
+    case GeneralTokens(_)                     ⇒ NoFormatResult
+    case PrefixExprElement(_)                 ⇒ NoFormatResult
+    case InfixExprElement(_)                  ⇒ NoFormatResult
+    case PostfixExprElement(_)                ⇒ NoFormatResult
+    case annotation: Annotation               ⇒ format(annotation)
+    case typeExprElement: TypeExprElement     ⇒ format(typeExprElement.contents)
+    case expr: Expr                           ⇒ format(expr.contents)
+    case xmlExpr: XmlExpr                     ⇒ format(xmlExpr)
+    case parenExpr: ParenExpr                 ⇒ format(parenExpr)
+    case _                                    ⇒ NoFormatResult
   }
 
   def format(anonymousFunction: AnonymousFunction)(implicit formatterState: FormatterState): FormatResult = { // <-- Also formatted specially in BlockExpr
@@ -132,7 +132,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = argumentExprs match {
-    case BlockArgumentExprs(contents) ⇒ format(contents)
+    case BlockArgumentExprs(contents)                 ⇒ format(contents)
     case ParenArgumentExprs(lparen, contents, rparen) ⇒ format(GeneralTokens(List(lparen)) :: contents)
   }
 
@@ -337,9 +337,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(enumerator: Enumerator)(implicit formatterState: FormatterState): FormatResult = {
     enumerator match {
-      case expr@Expr(_) ⇒ format(expr)
+      case expr@Expr(_)                       ⇒ format(expr)
       case generator@Generator(_, _, _, _, _) ⇒ format(generator)
-      case guard@Guard(_, _) ⇒ format(guard: Guard)
+      case guard@Guard(_, _)                  ⇒ format(guard: Guard)
     }
   }
 
@@ -520,11 +520,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(stat: Stat)(implicit formatterState: FormatterState): FormatResult =
     stat match {
-      case expr: Expr ⇒ format(expr)
+      case expr: Expr                 ⇒ format(expr)
       case fullDefOrDcl: FullDefOrDcl ⇒ format(fullDefOrDcl)
-      case import_ : ImportClause ⇒ format(import_)
+      case import_ : ImportClause     ⇒ format(import_)
       case packageBlock: PackageBlock ⇒ format(packageBlock)
-      case _ ⇒ NoFormatResult // TODO
+      case _                          ⇒ NoFormatResult // TODO
     }
 
   def format(packageBlock: PackageBlock)(implicit formatterState: FormatterState): FormatResult = {
@@ -559,7 +559,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         formatResult = formatResult.before(annotation.firstToken, preAnnotationFormattingInstruction)
       if (nextOption.isEmpty) {
         val firstPostAnnotationToken = modifiers match {
-          case Nil ⇒ defOrDcl.firstToken
+          case Nil                ⇒ defOrDcl.firstToken
           case (modifier :: rest) ⇒ modifier.firstToken
         }
         formatResult = formatResult.before(firstPostAnnotationToken, preAnnotationFormattingInstruction)
@@ -570,11 +570,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(defOrDcl: DefOrDcl)(implicit formatterState: FormatterState): FormatResult = defOrDcl match {
-    case patDefOrDcl: PatDefOrDcl ⇒ format(patDefOrDcl)
+    case patDefOrDcl: PatDefOrDcl   ⇒ format(patDefOrDcl)
     case typeDefOrDcl: TypeDefOrDcl ⇒ format(typeDefOrDcl)
-    case funDefOrDcl: FunDefOrDcl ⇒ format(funDefOrDcl)
-    case tmplDef: TmplDef ⇒ format(tmplDef)
-    case _ ⇒ NoFormatResult // TODO
+    case funDefOrDcl: FunDefOrDcl   ⇒ format(funDefOrDcl)
+    case tmplDef: TmplDef           ⇒ format(tmplDef)
+    case _                          ⇒ NoFormatResult // TODO
   }
 
   private def format(patDefOrDcl: PatDefOrDcl)(implicit formatterState: FormatterState): FormatResult = {
@@ -699,7 +699,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(importExpr: ImportExpr)(implicit formatterState: FormatterState): FormatResult = importExpr match {
-    case expr@Expr(_) ⇒ format(expr)
+    case expr@Expr(_)                          ⇒ format(expr)
     case blockImportExpr@BlockImportExpr(_, _) ⇒ format(blockImportExpr)
   }
 

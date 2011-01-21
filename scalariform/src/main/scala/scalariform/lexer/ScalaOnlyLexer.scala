@@ -60,7 +60,7 @@ trait ScalaOnlyLexer extends Lexer {
         (ch(1): @switch) match {
           case '/' ⇒ getSingleLineComment()
           case '*' ⇒ getMultilineComment()
-          case _ ⇒ nextChar(); getOperatorRest()
+          case _   ⇒ nextChar(); getOperatorRest()
         }
       case '0' ⇒
         if (ch(1) == 'x' || ch(1) == 'X')
@@ -242,7 +242,7 @@ trait ScalaOnlyLexer extends Lexer {
     case '/' ⇒
       (ch(1): @switch) match {
         case '/' | '*' ⇒ finishNamed()
-        case _ ⇒ nextChar(); getOperatorRest()
+        case _         ⇒ nextChar(); getOperatorRest()
       }
     case _ ⇒
       if (isSpecial(ch)) { nextChar(); getOperatorRest() } else finishNamed()
@@ -367,11 +367,11 @@ trait ScalaOnlyLexer extends Lexer {
     def restOfUncertainToken() = {
       def isEfd = ch match {
         case 'e' | 'E' | 'f' | 'F' | 'd' | 'D' ⇒ true
-        case _ ⇒ false
+        case _                                 ⇒ false
       }
       def isL = ch match {
         case 'l' | 'L' ⇒ true
-        case _ ⇒ false
+        case _         ⇒ false
       }
 
       if (isEfd)

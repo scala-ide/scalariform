@@ -74,17 +74,17 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isDclIntro: Boolean = currentTokenType match {
     case VAL | VAR | DEF | TYPE ⇒ true
-    case _ ⇒ false
+    case _                      ⇒ false
   }
 
   private def isNumericLit: Boolean = currentTokenType match {
     case INTEGER_LITERAL | FLOATING_POINT_LITERAL ⇒ true
-    case _ ⇒ false
+    case _                                        ⇒ false
   }
 
   private def isUnaryOp: Boolean = currentTokenType match {
     case MINUS | PLUS | TILDE | EXCLAMATION ⇒ true
-    case _ ⇒ false
+    case _                                  ⇒ false
   }
 
   private def isIdent: Boolean = isIdent(currentTokenType)
@@ -108,8 +108,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isTypeIntroToken(tokenType: TokenType): Boolean = tokenType match {
     case THIS | SUPER | USCORE | LPAREN | AT ⇒ true
-    case _ if isIdent(tokenType) ⇒ true
-    case _ ⇒ false
+    case _ if isIdent(tokenType)             ⇒ true
+    case _                                   ⇒ false
   }
 
   private def isTypeIntro: Boolean = isTypeIntroToken(currentTokenType)
@@ -570,7 +570,7 @@ class ScalaParser(tokens: Array[Token]) {
             exprElementFlatten2(AnonymousFunction(intermediateResult, arrowToken, List(postArrow)))
           }
           anonFuncOpt match {
-            case None ⇒ intermediateResult
+            case None        ⇒ intermediateResult
             case Some(stuff) ⇒ stuff
           } // erk, why can't I use getOrElse here!?
         } else
@@ -1189,11 +1189,11 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def defOrDcl(): DefOrDcl = {
     currentTokenType match {
-      case VAL ⇒ patDefOrDcl()
-      case VAR ⇒ patDefOrDcl()
-      case DEF ⇒ funDefOrDcl()
+      case VAL  ⇒ patDefOrDcl()
+      case VAR  ⇒ patDefOrDcl()
+      case DEF  ⇒ funDefOrDcl()
       case TYPE ⇒ typeDefOrDcl()
-      case _ ⇒ tmplDef()
+      case _    ⇒ tmplDef()
     }
   }
 
@@ -1325,12 +1325,12 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def tmplDef(): TmplDef = {
     currentTokenType match {
-      case TRAIT ⇒ classDef()
-      case CLASS ⇒ classDef()
-      case CASE if lookahead(1) == CLASS ⇒ classDef()
-      case OBJECT ⇒ objectDef()
+      case TRAIT                          ⇒ classDef()
+      case CLASS                          ⇒ classDef()
+      case CASE if lookahead(1) == CLASS  ⇒ classDef()
+      case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _ ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
     }
   }
 
@@ -1735,14 +1735,14 @@ class ScalaParser(tokens: Array[Token]) {
     val contents = ListBuffer[XmlContents]()
     while (!XML_END_OPEN) {
       val content = currentTokenType match {
-        case XML_START_OPEN ⇒ xmlElement(isPattern)
-        case XML_PCDATA ⇒ XmlPCDATA(nextToken())
-        case XML_COMMENT ⇒ XmlComment(nextToken())
-        case XML_CDATA ⇒ XmlCDATA(nextToken())
-        case XML_UNPARSED ⇒ XmlUnparsed(nextToken())
+        case XML_START_OPEN             ⇒ xmlElement(isPattern)
+        case XML_PCDATA                 ⇒ XmlPCDATA(nextToken())
+        case XML_COMMENT                ⇒ XmlComment(nextToken())
+        case XML_CDATA                  ⇒ XmlCDATA(nextToken())
+        case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
-        case LBRACE ⇒ xmlEmbeddedScala(isPattern)
-        case _ ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
+        case LBRACE                     ⇒ xmlEmbeddedScala(isPattern)
+        case _                          ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
       }
       contents += content
     }
@@ -1757,13 +1757,13 @@ class ScalaParser(tokens: Array[Token]) {
   private def xml(isPattern: Boolean): XmlExpr = {
     def xmlContent(): XmlContents =
       currentTokenType match {
-        case XML_START_OPEN ⇒ xmlElement(isPattern)
-        case XML_PCDATA ⇒ XmlPCDATA(nextToken())
-        case XML_COMMENT ⇒ XmlComment(nextToken())
-        case XML_CDATA ⇒ XmlCDATA(nextToken())
-        case XML_UNPARSED ⇒ XmlUnparsed(nextToken())
+        case XML_START_OPEN             ⇒ xmlElement(isPattern)
+        case XML_PCDATA                 ⇒ XmlPCDATA(nextToken())
+        case XML_COMMENT                ⇒ XmlComment(nextToken())
+        case XML_CDATA                  ⇒ XmlCDATA(nextToken())
+        case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
-        case _ ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
+        case _                          ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
       }
     val first = xmlContent()
     val otherContents = ListBuffer[XmlContents]()
@@ -1877,7 +1877,7 @@ object ScalaParser {
   def groupGeneralTokens(xs: List[ExprElement]): List[ExprElement] = {
     val eq = (x: ExprElement, y: ExprElement) ⇒ (x, y) match {
       case (GeneralTokens(_), GeneralTokens(_)) ⇒ true
-      case _ ⇒ false
+      case _                                    ⇒ false
     }
     val groups = groupBy(eq, xs)
     groups map { group ⇒
@@ -1904,7 +1904,7 @@ object ScalaParser {
   implicit def tripleToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable, C <% ExprElementFlattenable](triple: (A, B, C)): ExprElementFlattenable =
     ExprElements(triple._1.elements ::: triple._2.elements ::: triple._3.elements)
   implicit def eitherToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable](either: Either[A, B]): ExprElementFlattenable = ExprElements(either match {
-    case Left(x) ⇒ x.elements
+    case Left(x)  ⇒ x.elements
     case Right(x) ⇒ x.elements
   })
   implicit def optionToExprFlattenable[T <% ExprElementFlattenable](option: Option[T]): ExprElementFlattenable = option.toList
@@ -1923,7 +1923,7 @@ object ScalaParser {
   implicit def listOfTokenToTypeFlattenable(tokens: List[Token]): TypeElementFlattenable = GeneralTokens(tokens)
   implicit def typeElementToTypeFlattenable(typeElement: TypeElement): TypeElementFlattenable = TypeElements(List(typeElement))
   implicit def eitherToTypeFlattenable[A <% TypeElementFlattenable, B <% TypeElementFlattenable](either: Either[A, B]): TypeElementFlattenable = TypeElements(either match {
-    case Left(x) ⇒ x.elements
+    case Left(x)  ⇒ x.elements
     case Right(x) ⇒ x.elements
   })
   implicit def pairToTypeFlattenable[A <% TypeElementFlattenable, B <% TypeElementFlattenable](pair: (A, B)): TypeElementFlattenable =

@@ -30,7 +30,7 @@ class WhitespaceAndCommentsGrouper(private val delegate: ScalaLexer) extends Ite
 
   private def isHiddenToken(token: Token) = token.getType match {
     case WS | LINE_COMMENT | MULTILINE_COMMENT ⇒ true
-    case _ ⇒ false
+    case _                                     ⇒ false
   }
 
   private def makeHiddenToken(token: Token) = token.getType match {

@@ -102,7 +102,7 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
 
   private def followingTokenIsClassOrObject: Boolean =
     buffer.headOption match {
-      case None ⇒ false
+      case None                      ⇒ false
       case Some((_, followingToken)) ⇒ followingToken.getType == CLASS || followingToken.getType == OBJECT
     }
 
