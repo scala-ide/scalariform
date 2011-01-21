@@ -341,8 +341,8 @@ trait ScalaOnlyLexer extends Lexer {
   }
 
   private def getHexNumber() {
-    require(ch == '0'); nextChar();
-    require(ch == 'x' || ch == 'X'); nextChar();
+    require(ch == '0'); nextChar()
+    require(ch == 'x' || ch == 'X'); nextChar()
     @tailrec
     def munchHexDigits(): Unit = (ch: @switch) match {
       case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ⇒
@@ -366,11 +366,11 @@ trait ScalaOnlyLexer extends Lexer {
 
     def restOfUncertainToken() = {
       def isEfd = ch match {
-        case 'e' | 'E' | 'f' | 'F' | 'd' | 'D' ⇒ true;
+        case 'e' | 'E' | 'f' | 'F' | 'd' | 'D' ⇒ true
         case _ ⇒ false
       }
       def isL = ch match {
-        case 'l' | 'L' ⇒ true;
+        case 'l' | 'L' ⇒ true
         case _ ⇒ false
       }
 

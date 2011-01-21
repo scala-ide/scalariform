@@ -8,6 +8,7 @@ import scalariform.utils.TextEditProcessor
 import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
 import PartialFunction._
+import scala.math.{ max, min }
 
 trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter with HasHiddenTokenInfo with ScalaFormatter ⇒
 
@@ -19,21 +20,28 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     var formatResult: FormatResult = NoFormatResult
     var first = true
     for (clauseGroup ← clauseGroups) {
+      def formatSingleCaseClause(caseClause: CaseClause) {
+        if (!first && hiddenPredecessors(caseClause.firstToken).containsNewline)
+          formatResult = formatResult.before(caseClause.firstToken, formatterState.currentIndentLevelInstruction)
+        formatResult ++= formatCaseClause(caseClause)
+        first = false
+      }
       clauseGroup match {
-        case Left(ConsecutiveSingleLineCaseClauses(caseClauses, largestCasePatternLength)) ⇒
-          for (caseClause@CaseClause(casePattern, statSeq) ← caseClauses) {
-            if (!first && hiddenPredecessors(casePattern.firstToken).containsNewline)
-              formatResult = formatResult.before(caseClause.firstToken, formatterState.currentIndentLevelInstruction)
-            val arrowInstruction = PlaceAtColumn(formatterState.indentLevel, largestCasePatternLength + 1)
-            formatResult ++= formatCaseClause(caseClause, Some(arrowInstruction))
-            first = false
+        case Left(consecutiveClauses@ConsecutiveSingleLineCaseClauses(caseClauses, largestCasePatternLength, smallestCasePatternLength)) ⇒
+          if (consecutiveClauses.patternLengthRange <= formattingPreferences(AlignSingleLineCaseStatements.MaxArrowIndent)) {
+            for (caseClause@CaseClause(casePattern, statSeq) ← caseClauses) {
+              if (!first && hiddenPredecessors(casePattern.firstToken).containsNewline)
+                formatResult = formatResult.before(caseClause.firstToken, formatterState.currentIndentLevelInstruction)
+              val arrowInstruction = PlaceAtColumn(formatterState.indentLevel, largestCasePatternLength + 1)
+              formatResult ++= formatCaseClause(caseClause, Some(arrowInstruction))
+              first = false
+            }
+          } else {
+            caseClauses foreach formatSingleCaseClause
           }
         case Right(caseClause) ⇒
-          if (!first && hiddenPredecessors(caseClause.firstToken).containsNewline)
-            formatResult = formatResult.before(caseClause.firstToken, formatterState.currentIndentLevelInstruction)
-          formatResult ++= formatCaseClause(caseClause)
+          formatSingleCaseClause(caseClause)
       }
-      first = false
     }
     formatResult
   }
@@ -64,16 +72,19 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
               case Left(consecutiveSingleLineCaseClauses) :: otherGroups ⇒
                 Left(consecutiveSingleLineCaseClauses.prepend(caseClause, casePatternLength)) :: otherGroups
               case _ ⇒
-                Left(ConsecutiveSingleLineCaseClauses(caseClause :: Nil, casePatternLength)) :: otherClausesGrouped
+                Left(ConsecutiveSingleLineCaseClauses(caseClause :: Nil, casePatternLength, casePatternLength)) :: otherClausesGrouped
             }
           }
       }
     groupClauses(caseClausesAstNode.caseClauses, first = true)
   }
 
-  private case class ConsecutiveSingleLineCaseClauses(clauses: List[CaseClause], largestCasePatternLength: Int) {
+  private case class ConsecutiveSingleLineCaseClauses(clauses: List[CaseClause], largestCasePatternLength: Int, smallestCasePatternLength: Int) {
     def prepend(clause: CaseClause, length: Int) =
-      ConsecutiveSingleLineCaseClauses(clause :: clauses, scala.math.max(length, largestCasePatternLength))
+      ConsecutiveSingleLineCaseClauses(clause :: clauses, max(length, largestCasePatternLength), min(length, smallestCasePatternLength))
+
+    def patternLengthRange = largestCasePatternLength - smallestCasePatternLength
+
   }
 
   private def formatCasePattern(casePattern: CasePattern, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {

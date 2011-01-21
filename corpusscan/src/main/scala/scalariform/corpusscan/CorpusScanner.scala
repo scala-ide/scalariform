@@ -37,10 +37,12 @@ object CorpusScanner extends SpecificFormatter {
 
   private def getText(file: File) = Source.fromFile(file).mkString
 
+  val prefs = FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true)
+
   def formatFile(file: File) {
     val source = getText(file)
-    val formatted = format(source)(FormattingPreferences())
-    val formatted2 = format(formatted)(FormattingPreferences())
+    val formatted = format(source)(prefs)
+    val formatted2 = format(formatted)(prefs)
     require(formatted == formatted2, "Idempotency failure")
     writeText(file, formatted)
     //    for (parseFault <- attemptToParse(file))
@@ -56,8 +58,11 @@ object CorpusScanner extends SpecificFormatter {
 }
 
 object Runner {
+
+  val corpusDir = "/home/matt/scala-corpus"
+
   def checkParser() {
-    val files = ScalaFileWalker.findScalaFiles("/home/matt/corpus")
+    val files = ScalaFileWalker.findScalaFiles(corpusDir)
     var count = 0
     var parsedCount = 0
     for (file ← files) {
@@ -75,7 +80,7 @@ object Runner {
 
   def formatInPlace() {
     var count = 0
-    for (file ← ScalaFileWalker.findScalaFiles("/home/matt/corpus-to-modify-2")) {
+    for (file ← ScalaFileWalker.findScalaFiles(corpusDir)) {
       print("Formatting: " + file)
       CorpusScanner.formatFile(file)
       val parsed = CorpusScanner.attemptToParse(file)

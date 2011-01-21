@@ -91,7 +91,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
             StyleConstants.setBold(style, false)
           val startIndex = token.getStartIndex
           val endIndex = token.getStopIndex
-          document.setCharacterAttributes(startIndex, endIndex - startIndex + 1, style, true);
+          document.setCharacterAttributes(startIndex, endIndex - startIndex + 1, style, true)
         }
       }
 

@@ -215,21 +215,29 @@ object Main {
     println("  --version                       Show Scalariform version")
     println()
     println("Preferences:")
-    for (key ← AllPreferences.preferencesByKey.keySet.toList.sorted) {
-      def handlePreference[T](preference: PreferenceDescriptor[T]) {
-        preference.preferenceType match {
-          case BooleanPreference ⇒
-            val optionText = "  [+|-]" + key
-            val filler = " " * (38 - optionText.length)
-            println(optionText + filler + "Enable/disable " + preference.description)
-          case IntegerPreference(min, max) ⇒
-            val optionText = "  -" + key + "=[" + min + "-" + max + "]"
-            val filler = " " * (38 - optionText.length)
-            println(optionText + filler + "Set " + preference.description)
-        }
-      }
-      handlePreference(AllPreferences.preferencesByKey(key))
+    val descriptionColumn = 56
+    val sortedPreferences = AllPreferences.preferencesByKey.keySet.toList.sorted
+
+    for {
+      key ← sortedPreferences
+      preference = AllPreferences.preferencesByKey(key)
+      if preference.preferenceType == BooleanPreference
+    } {
+      val optionText = "  [+|-]" + key
+      val filler = " " * (descriptionColumn - optionText.length)
+      println(optionText + filler + "Enable/disable " + preference.description)
     }
+
+    for {
+      key ← sortedPreferences
+      preference = AllPreferences.preferencesByKey(key)
+      IntegerPreference(min, max) <- Some(preference.preferenceType)
+    } {
+      val optionText = "  -" + key + "=[" + min + "-" + max + "]"
+      val filler = " " * (descriptionColumn - optionText.length)
+      println(optionText + filler + "Set " + preference.description)
+    }
+
     println()
     println("Examples:")
     println(" scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala")

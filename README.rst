@@ -3,10 +3,11 @@ Scalariform
 
 Scalariform is a code formatter for Scala 2.8. It is a library and a
 stand-alone command line tool, with integrations available for
-Eclipse, ENSIME, jEdit, sbt and TextMate. Currently, Scalariform
-supports only a limited set of options, although it is intended to be
-compatible with the recommendations of the `Scala Style Guide`_ (see
-below). Please let me know what other features people would like.
+Eclipse, Emacs (via ENSIME), jEdit, Maven, sbt and
+TextMate. Currently, Scalariform supports only a limited set of
+options, although it is intended to be compatible with the
+recommendations of the `Scala Style Guide`_ (see below). Please let me
+know what other features people would like.
 
 Scalariform is licenced under `The MIT Licence`_.
 
@@ -43,8 +44,8 @@ To configure preferences, go to Window -> Preferences -> Scala -> Formatter
 
 It can also perform formatting as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
 
-Integration with ENSIME
------------------------
+Integration with Emacs/ENSIME
+-----------------------------
 
 "`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer." 
 
@@ -126,16 +127,17 @@ Usage::
     --version                       Show Scalariform version
   
   Preferences:
-    [+|-]alignParameters                Enable/disable Align parameters on different lines in the same column
-    [+|-]alignSingleLineCaseStatements  Enable/disable Align the arrows of consecutive single-line case statements
-    [+|-]compactStringConcatenation     Enable/disable Omit spaces when formatting a '+' operator on String literals
-    [+|-]doubleIndentClassDeclaration   Enable/disable Double indent either a class's parameters or its inheritance list
-    [+|-]formatXml                      Enable/disable Format XML literals
-    [+|-]indentPackageBlocks            Enable/disable Indent package blocks
-    -indentSpaces=[1-10]                Set Number of spaces to use for indentation
-    [+|-]preserveSpaceBeforeArguments   Enable/disable Preserve a space before a parenthesis argument
-    [+|-]rewriteArrowSymbols            Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
-    [+|-]spaceBeforeColon               Enable/disable Add a space before colons
+    [+|-]alignParameters                                  Enable/disable Align parameters on different lines in the same column
+    [+|-]alignSingleLineCaseStatements                    Enable/disable Align the arrows of consecutive single-line case statements
+    [+|-]compactStringConcatenation                       Enable/disable Omit spaces when formatting a '+' operator on String literals
+    [+|-]doubleIndentClassDeclaration                     Enable/disable Double indent either a class's parameters or its inheritance list
+    [+|-]formatXml                                        Enable/disable Format XML literals
+    [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
+    [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
+    [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
+    [+|-]spaceBeforeColon                                 Enable/disable Add a space before colons
+    -alignSingleLineCaseStatements.maxArrowIndent=[1-100] Set Maximum number of spaces inserted before an arrow to align case statements
+    -indentSpaces=[1-10]                                  Set Number of spaces to use for indentation
   
   Examples:
    scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
@@ -212,6 +214,22 @@ Is reformatted as::
     case ccc => 2
     case dd  => 3
   }
+
+alignSingleLineCaseStatements.maxArrowIndent
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``25``
+
+When using alignSingleLineCaseStatements == true, this is a limit on
+the number of spaces that can be inserted before an arrow to align it
+with other case statements. This can be used to avoid very large gaps,
+e.g.::
+
+  a match {
+    case Some(wibble, wobble) if wibble + wibble > wobble * wibble => 1
+    case ccc                                                       => 2
+  }
+
 
 compactStringConcatenation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

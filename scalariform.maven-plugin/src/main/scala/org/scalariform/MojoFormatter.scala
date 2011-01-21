@@ -44,6 +44,7 @@ object MojoFormatter {
              log: Log,
              alignParameters: Boolean,
              alignSingleLineCaseStatements: Boolean,
+             alignSingleLineCaseStatements_maxArrowIndent: Boolean,
              compactStringConcatenation: Boolean,
              doubleIndentClassDeclaration: Boolean,
              formatXml: Boolean,
@@ -56,6 +57,7 @@ object MojoFormatter {
     val preferences = FormattingPreferences()
       .setPreference(AlignParameters, alignParameters)
       .setPreference(AlignSingleLineCaseStatements, alignSingleLineCaseStatements)
+      .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, alignSingleLineCaseStatements_maxArrowIndent)
       .setPreference(DoubleIndentClassDeclaration, doubleIndentClassDeclaration)
       .setPreference(CompactStringConcatenation, compactStringConcatenation)
       .setPreference(FormatXml, formatXml)

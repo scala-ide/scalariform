@@ -191,4 +191,22 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   }
 
+  {
+
+  implicit val formattingPreferences = 
+    FormattingPreferences
+      .setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 5)
+
+  """x match {
+    |  case 123456789 => a
+    |  case _ => b
+    |}""" ==>
+  """x match {
+    |  case 123456789 => a
+    |  case _ => b
+    |}"""
+
+  }
+
 }
