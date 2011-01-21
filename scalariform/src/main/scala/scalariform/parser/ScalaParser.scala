@@ -4,7 +4,7 @@ import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.utils.Utils._
 import scala.collection.mutable.ListBuffer
-import PartialFunction.cond
+import PartialFunction._
 
 class ScalaParser(tokens: Array[Token]) {
 
@@ -803,17 +803,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def pattern2(seqOK: Boolean): Expr = {
     val firstPattern = pattern3(seqOK)
     val atOtherOpt = if (AT) {
-      // val identWildcard = false
-      // val varPattern = false
-      //        case Ident(name) =>       if (name == nme.WILDCARD) {
-      // if (identWildcard) {
-      //   nextToken()
-      //   pattern3(seqOK)
-      // } else if (varPattern) { // (treeInfo.isVarPattern(p)) {
-      //   nextToken()
-      //   pattern3(seqOK)
-      // }
-
+      // TODO: Compare Parsers.scala
       optional {
         val atToken = nextToken()
         val otherPattern = pattern3(seqOK)
@@ -847,14 +837,14 @@ class ScalaParser(tokens: Array[Token]) {
       case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS ⇒
         val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
         val id = stableId()
-        val literalOpt = currentTokenType match {
-          case INTEGER_LITERAL | FLOATING_POINT_LITERAL ⇒
-            if (nameIsMinus) Some(literal())
-            else None
-          case _ ⇒ None // TODO: condOpt
+        val literalOpt = condOpt(currentTokenType) {
+          case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal()
         }
+        val typeArgsOpt: Option[List[ExprElement]] =
+          if (LBRACKET) Some(List(TypeExprElement(typeArgs(isPattern = true, isTypeApply = false))))
+          else None
         val argumentPatternsOpt = if (LPAREN) Some(argumentPatterns()) else None
-        exprElementFlatten2(id, literalOpt, argumentPatternsOpt)
+        exprElementFlatten2((id, literalOpt), typeArgsOpt, argumentPatternsOpt)
       case USCORE ⇒
         exprElementFlatten2(nextToken())
       case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒

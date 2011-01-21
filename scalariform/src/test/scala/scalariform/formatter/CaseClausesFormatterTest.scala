@@ -176,6 +176,14 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   "{ case a=> b }" ==> "{ case a => b }"}
 
+  """t match {
+    |  case Cell [ a ] (x: Int) => c.x = 5
+    |}""" ==>
+  """t match {
+    |  case Cell[a](x: Int) => c.x = 5
+    |}"""
+
+
   {
   implicit val formattingPreferences = 
     FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true).setPreference(RewriteArrowSymbols, true)
