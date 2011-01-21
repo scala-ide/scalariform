@@ -50,6 +50,8 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
     val extra = offset + 1 - chQueue.size
     for (n ← 1 to extra) {
       chQueue.enqueue(reader.read())
+      if (reader.isEof)
+        eof = true
       unicodeEscapesQueue.enqueue(reader.unicodeEscapeOfPreviousRead)
     }
     chQueue(offset)

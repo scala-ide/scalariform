@@ -191,6 +191,10 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   "-5.max(2)" producesTokens (MINUS, INTEGER_LITERAL, DOT, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
   "-5 max(2)" producesTokens (MINUS, INTEGER_LITERAL, WS, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
 
+  "Lexer" should "throw a lexer exception" in {
+    evaluating { ScalaLexer.rawTokenise("\"\"\"") } should produce[ScalaLexerException]
+  }
+
   class TestString(s: String) {
 
     def producesTokens(toks: TokenType*) {
