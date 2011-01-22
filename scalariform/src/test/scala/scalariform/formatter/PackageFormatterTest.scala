@@ -28,8 +28,6 @@ class PackageFormatterTest extends AbstractFormatterTest {
     |  }
     |}"""
 
-  "package a {}class B" =/=> "package a {} class B" because "maybe it is, maybe it isn't legal Scala"
-
   "package foo" ==> "package foo"
 
   """/* foo */

@@ -35,7 +35,7 @@ class ScalaParser(tokens: Array[Token]) {
     (openToken, contents, closeToken)
   }
 
-  // TODO: makeParens
+  def makeParens[T](body: ⇒ T) = inParens { if (RPAREN) None else Some(body) }
 
   def compilationUnitOrScript(): CompilationUnit = {
     val originalPos = pos
@@ -163,6 +163,153 @@ class ScalaParser(tokens: Array[Token]) {
   private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, true, part)._2
   private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, true, part)._2
 
+  trait PatternContextSensitive {
+
+    def argType(): List[TypeElement]
+    def functionArgType(): List[TypeElement]
+
+    private def tupleInfixType() = {
+      val lparen = nextToken()
+      if (RPAREN) {
+        val rparen = nextToken()
+        val arrowToken = accept(ARROW)
+        val typ_ = typ()
+        typeElementFlatten3(lparen, rparen, arrowToken, typ_)
+      } else {
+        val types_ = functionTypes()
+        val rparen = accept(RPAREN)
+        val others = if (ARROW) {
+          val arrowToken = nextToken()
+          val typ_ = typ()
+          typeElementFlatten3(arrowToken, typ_)
+        } else {
+          val simpleTypeRest_ = simpleTypeRest()
+          val annotTypeRest_ = annotTypeRest()
+          val compoundTypeRest_ = compoundTypeRest()
+          val infixTypeRest_ = infixTypeRest()
+          typeElementFlatten3(simpleTypeRest_, annotTypeRest_, compoundTypeRest_, infixTypeRest_)
+        }
+        typeElementFlatten3(lparen, types_, rparen, others)
+      }
+    }
+
+    private def makeExistentialTypeTree() = refinement()
+
+    def typ(): Type = {
+      val others2 =
+        if (LPAREN) tupleInfixType()
+        else infixType()
+
+      val others3 = currentTokenType match {
+        case ARROW ⇒
+          val arrowToken = nextToken()
+          val typ_ = typ()
+          typeElementFlatten3(arrowToken, typ_)
+        case FORSOME ⇒
+          val forSomeToken = nextToken()
+          val refinement_ = makeExistentialTypeTree()
+          typeElementFlatten3(forSomeToken, refinement_)
+        case _ ⇒
+          Nil
+      }
+      Type(typeElementFlatten3(others2, others3))
+    }
+
+    def typeArgs(): List[TypeElement] = {
+      val (lbracket, types_, rbracket) = inBrackets(types())
+      typeElementFlatten3(lbracket, types_, rbracket)
+    }
+
+    def annotType(): List[TypeElement] = {
+      val simpleType_ = simpleType()
+      val annotTypeRest_ = annotTypeRest()
+      typeElementFlatten3(simpleType_, annotTypeRest_)
+    }
+
+    def simpleType(): List[TypeElement] = {
+      val firstPart = currentTokenType match {
+        case LPAREN ⇒
+          val (lparen, types_, rparen) = inParens(types())
+          typeElementFlatten3(lparen, types_, rparen)
+        case USCORE ⇒
+          val uscore = nextToken()
+          val wildcardType_ = wildcardType()
+          typeElementFlatten3(uscore, wildcardType_)
+        case _ ⇒
+          typeElementFlatten3(path(thisOK = false, typeOK = true))
+      }
+      val simpleTypeRest_ = simpleTypeRest()
+      typeElementFlatten3(firstPart, simpleTypeRest_)
+    }
+
+    private def typeProjection() = {
+      val hashToken = nextToken()
+      val id = ident()
+      (hashToken, id)
+    }
+
+    private def simpleTypeRest(): List[TypeElement] = currentTokenType match {
+      case HASH ⇒
+        val (hashToken, id) = typeProjection()
+        val simpleTypeRest_ = simpleTypeRest()
+        typeElementFlatten3(hashToken, id, simpleTypeRest_)
+      case LBRACKET ⇒
+        val typeArgs_ = typeArgs()
+        val simpleTypeRest_ = simpleTypeRest()
+        typeElementFlatten3(typeArgs_, simpleTypeRest_)
+      case _ ⇒
+        Nil
+    }
+
+    def compoundType(): List[TypeElement] = {
+      val annotTypeOpt = if (LBRACE) None else Some(annotType())
+      val rest = compoundTypeRest()
+      typeElementFlatten3(annotTypeOpt, rest)
+    }
+
+    private def compoundTypeRest(): List[TypeElement] = {
+      val withTypes = ListBuffer[(Token, List[TypeElement])]()
+      while (WITH) {
+        val withToken = nextToken()
+        val annotType_ = annotType()
+        withTypes += ((withToken, annotType_))
+      }
+      val newLineOpt = newLineOptWhenFollowedBy(LBRACE)
+      val refinementOpt = if (LBRACE) Some(refinement()) else None
+      typeElementFlatten3(withTypes.toList, newLineOpt, refinementOpt)
+    }
+
+    def infixTypeRest(): List[TypeElement] = {
+      if (isIdent && !STAR) {
+        val identToken = currentToken
+        val id = InfixTypeConstructor(ident())
+        val newLineOpt = newLineOptWhenFollowing(isTypeIntroToken)
+        if (isLeftAssoc(identToken)) {
+          val compoundType_ = compoundType()
+          val infixTypeRest_ = infixTypeRest()
+          typeElementFlatten3(id, newLineOpt, compoundType_, infixTypeRest_)
+        } else {
+          val infixType_ = infixType()
+          typeElementFlatten3(id, newLineOpt, infixType_)
+        }
+      } else
+        Nil
+    }
+
+    def infixType(): List[TypeElement] = {
+      val compoundType_ = compoundType()
+      val infixTypeRest_ = infixTypeRest()
+      typeElementFlatten3(compoundType_, infixTypeRest_)
+    }
+
+    private def types(): List[TypeElement] =
+      typeElementFlatten3(commaSeparated(argType()))
+
+    private def functionTypes(): List[TypeElement] =
+      typeElementFlatten3(commaSeparated(functionArgType()))
+
+  }
+
   private def ident(): Token =
     if (isIdent)
       nextToken()
@@ -275,180 +422,19 @@ class ScalaParser(tokens: Array[Token]) {
     } else
       None
 
-  private def types(isPattern: Boolean, isFuncArg: Boolean): List[TypeElement] = {
-    typeElementFlatten3(commaSeparated(argType(isPattern, isFuncArg)))
-  }
-
-  def typ(): Type = log("typ") {
-    typ(isPattern = false)
-  }
-
-  private def typ(isPattern: Boolean): Type = {
-    // println("typ(isPattern = " + isPattern + ")  " + currentToken)
-    val others2 = if (LPAREN) {
-      val lparen = nextToken()
-      if (RPAREN) {
-        val rparen = nextToken()
-        val arrowToken = accept(ARROW)
-        val typ_ = typ(isPattern)
-        typeElementFlatten3(lparen, rparen, arrowToken, typ_)
-      } else {
-        val types_ = types(isPattern, isFuncArg = true)
-        val rparen = accept(RPAREN)
-        val others = if (ARROW) {
-          val arrowToken = nextToken()
-          val typ_ = typ(isPattern)
-          typeElementFlatten3(arrowToken, typ_)
-        } else {
-          val simpleTypeRest_ = simpleTypeRest(isPattern)
-          val annotTypeRest_ = annotTypeRest()
-          val compoundTypeRest_ = compoundTypeRest(isPattern)
-          val infixTypeRest_ = infixTypeRest(isPattern)
-          typeElementFlatten3(simpleTypeRest_, annotTypeRest_, compoundTypeRest_, infixTypeRest_)
-        }
-        typeElementFlatten3(lparen, types_, rparen, others)
-      }
-    } else {
-      infixType(isPattern)
-    }
-    val others3 = if (ARROW) {
-      val arrowToken = nextToken()
-      val typ_ = typ(isPattern)
-      typeElementFlatten3(arrowToken, typ_)
-    } else if (FORSOME) {
-      val forSomeToken = nextToken()
-      val refinement_ = refinement()
-      typeElementFlatten3(forSomeToken, refinement_)
-    } else
-      Nil
-    Type(typeElementFlatten3(others2, others3))
-  }
-
-  private def infixType(isPattern: Boolean): List[TypeElement] = {
-    val compoundType_ = compoundType(isPattern)
-    val infixTypeRest_ = infixTypeRest(isPattern)
-    typeElementFlatten3(compoundType_, infixTypeRest_)
-  }
-
   private def typeOrInfixType(location: Location): TypeExprElement =
     TypeExprElement(
       if (location == Local)
         typ().contents
       else
-        infixType(isPattern = false))
-
-  private def infixTypeRest(isPattern: Boolean): List[TypeElement] = {
-    if (isIdent && !STAR) {
-      val identToken = currentToken
-      val id = InfixTypeConstructor(ident())
-      val newLineOpt = newLineOptWhenFollowing(isTypeIntroToken)
-      if (isLeftAssoc(identToken)) {
-        val compoundType_ = compoundType(isPattern)
-        val infixTypeRest_ = infixTypeRest(isPattern)
-        typeElementFlatten3(id, newLineOpt, compoundType_, infixTypeRest_)
-      } else {
-        val infixType_ = infixType(isPattern)
-        typeElementFlatten3(id, newLineOpt, infixType_)
-      }
-    } else
-      Nil
-  }
-
-  private def compoundType(isPattern: Boolean): List[TypeElement] = {
-    val annotTypeOpt = if (LBRACE) None else Some(annotType(isPattern))
-    val rest = compoundTypeRest(isPattern)
-    typeElementFlatten3(annotTypeOpt, rest)
-  }
-
-  private def compoundTypeRest(isPattern: Boolean): List[TypeElement] = {
-    val withTypes = ListBuffer[(Token, List[TypeElement])]()
-    while (WITH) {
-      val withToken = nextToken()
-      val annotType_ = annotType(isPattern)
-      withTypes += ((withToken, annotType_))
-    }
-    val newLineOpt = newLineOptWhenFollowedBy(LBRACE)
-    val refinementOpt = if (LBRACE) Some(refinement()) else None
-    typeElementFlatten3(withTypes.toList, newLineOpt, refinementOpt)
-  }
-
-  private def annotType(isPattern: Boolean): List[TypeElement] = {
-    val simpleType_ = simpleType(isPattern)
-    val annotTypeRest_ = annotTypeRest()
-    typeElementFlatten3(simpleType_, annotTypeRest_)
-  }
+        startInfixType())
 
   private def annotTypeRest(): List[TypeElement] =
-    typeElementFlatten3(annotations(skipNewLines = false, requireOneArgList = false))
-
-  private def simpleType(isPattern: Boolean): List[TypeElement] = {
-    val firstPart = if (LPAREN) {
-      val lparen = nextToken()
-      val types_ = types(isPattern, isFuncArg = false)
-      val rparen = accept(RPAREN)
-      typeElementFlatten3(lparen, types_, rparen)
-    } else if (USCORE) {
-      val uscore = nextToken()
-      val wildcardType_ = wildcardType()
-      typeElementFlatten3(uscore, wildcardType_)
-    } else {
-      typeElementFlatten3(path(thisOK = false, typeOK = true))
-    }
-    val simpleTypeRest_ = simpleTypeRest(isPattern)
-    typeElementFlatten3(firstPart, simpleTypeRest_)
-  }
-
-  private def simpleTypeRest(isPattern: Boolean): List[TypeElement] = {
-    if (HASH) {
-      val hashToken = nextToken()
-      val id = ident()
-      val simpleTypeRest_ = simpleTypeRest(isPattern)
-      typeElementFlatten3(hashToken, id, simpleTypeRest_)
-    } else if (LBRACKET) {
-      val typeArgs_ = typeArgs(isPattern)
-      val simpleTypeRest_ = simpleTypeRest(isPattern)
-      typeElementFlatten3(typeArgs_, simpleTypeRest_)
-    } else
-      Nil
-  }
+    typeElementFlatten3(annotations(skipNewLines = false))
 
   private def wildcardType(): List[TypeElement] = {
     typeBounds()
   }
-
-  private def typeArgs(isPattern: Boolean): List[TypeElement] = {
-    val lbracket = accept(LBRACKET)
-    val types_ = types(isPattern, isFuncArg = false)
-    val rbracket = accept(RBRACKET)
-    typeElementFlatten3(lbracket, types_, rbracket)
-  }
-
-  private def argType(isPattern: Boolean, isFuncArg: Boolean): List[TypeElement] =
-    log("argType(isPattern = " + isPattern + ", isFuncArg = " + isFuncArg + ")") {
-      // println("argType: isPattern = " + isPattern + ", " + currentToken )
-      if (isPattern) {
-        if (USCORE) {
-          val uscore = nextToken()
-          val wildcardTypeOpt = if (SUBTYPE || SUPERTYPE) Some(wildcardType()) else None
-          typeElementFlatten3(uscore, wildcardTypeOpt)
-        } else if (isIdent && isVariableName(currentToken.getText)) {
-          typeElementFlatten3(ident())
-        } else
-          List(typ(isPattern = true))
-      } else if (isFuncArg) {
-        if (ARROW) {
-          val arrowToken = CallByNameTypeElement(nextToken())
-          val typ_ = typ()
-          typeElementFlatten3(arrowToken, typ_)
-        } else {
-          val typ_ = typ()
-          val starOpt = if (STAR) Some(VarargsTypeElement(nextToken())) else None
-          typeElementFlatten3(typ_, starOpt)
-        }
-      } else {
-        List(typ())
-      }
-    }
 
   private def equalsExpr() = {
     val equalsToken = accept(EQUALS)
@@ -589,7 +575,7 @@ class ScalaParser(tokens: Array[Token]) {
             val star = accept(STAR)
             exprElementFlatten2(colonToken, uscore, star)
           } else if (AT) {
-            exprElementFlatten2(colonToken, annotations(skipNewLines = false, requireOneArgList = false))
+            exprElementFlatten2(colonToken, annotations(skipNewLines = false))
           } else {
             val type_ = typeOrInfixType(location)
             exprElementFlatten2(colonToken, type_)
@@ -675,12 +661,7 @@ class ScalaParser(tokens: Array[Token]) {
       case USCORE ⇒
         exprElementFlatten2(nextToken())
       case LPAREN ⇒
-        val lparen = nextToken
-        val parenBody = if (RPAREN)
-          None
-        else
-          Some(commaSeparated(expr))
-        val rparen = accept(RPAREN)
+        val (lparen, parenBody, rparen) = makeParens(commaSeparated(expr))
         exprElementFlatten2(ParenExpr(lparen, exprElementFlatten2(parenBody), rparen))
       case LBRACE ⇒
         canApply = false
@@ -708,7 +689,7 @@ class ScalaParser(tokens: Array[Token]) {
       case LBRACKET ⇒
         val identifierCond = true /* TODO */ /*             case Ident(_) | Select(_, _) => */
         if (identifierCond) {
-          val typeArgs_ = TypeExprElement(typeArgs(isPattern = false))
+          val typeArgs_ = TypeExprElement(exprTypeArgs())
           val simpleExprRest_ = simpleExprRest(canApply = true)
           exprElementFlatten2(newLineOpt, typeArgs_, simpleExprRest_)
         } else
@@ -792,7 +773,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def generator(eqOK: Boolean): Generator = {
     val valOption = if (VAL) Some(nextToken()) else None
-    val pattern_ = pattern1(seqOK = false)
+    val pattern_ = noSeq.pattern1()
     val equalsOrArrowToken = if (EQUALS && eqOK) nextToken() else accept(LARROW)
     val expr_ = expr()
     val guards = ListBuffer[Guard]()
@@ -800,109 +781,132 @@ class ScalaParser(tokens: Array[Token]) {
     Generator(valOption, pattern_, equalsOrArrowToken, expr_, guards.toList)
   }
 
-  private def patterns(seqOK: Boolean): List[ExprElement] = {
-    exprElementFlatten2(commaSeparated(pattern(seqOK)))
-  }
+  trait SeqContextSensitive extends PatternContextSensitive {
 
-  private def pattern(seqOK: Boolean): Expr = {
-    val firstPattern = pattern1(seqOK)
-    val pipeOtherPatterns = ListBuffer[(InfixExprElement, Expr)]()
-    if (PIPE) {
-      while (PIPE) {
-        val pipeElement = InfixExprElement(nextToken())
-        val otherPattern = pattern1(seqOK)
-        pipeOtherPatterns += ((pipeElement, otherPattern))
-      }
+    def interceptStarPattern(): Option[Token]
+
+    def functionArgType() = argType()
+
+    def argType(): List[TypeElement] = currentTokenType match {
+      case USCORE ⇒
+        val uscore = nextToken()
+        val wildcardTypeOpt = if (SUBTYPE || SUPERTYPE) Some(wildcardType()) else None
+        typeElementFlatten3(uscore, wildcardTypeOpt)
+      case _ if isIdent && isVariableName(currentToken.getText) ⇒
+        typeElementFlatten3(ident())
+      case _ ⇒
+        List(typ())
     }
-    makeExpr(firstPattern, pipeOtherPatterns.toList)
-  }
 
-  private def pattern(): Expr = {
-    pattern(seqOK = false)
-  }
+    def patterns(): List[ExprElement] = {
+      exprElementFlatten2(commaSeparated(pattern()))
+    }
 
-  private def pattern1(seqOK: Boolean): Expr = {
-    val firstPattern = pattern2(seqOK)
-    val colonTypeOpt = if (COLON) { // TODO: case Ident(name) if (treeInfo.isVarPattern(p) && in.token == COLON)
-      val colonToken = nextToken()
-      val compoundType_ = Some(TypeExprElement(compoundType(isPattern = true)))
-      Some(colonToken, compoundType_)
-    } else
-      None
-    makeExpr(firstPattern, colonTypeOpt)
-  }
+    def pattern(): Expr = { // Scalac now uses a loop() method, but this is still OK:
+      val firstPattern = pattern1()
+      val pipeOtherPatterns = ListBuffer[(InfixExprElement, Expr)]()
+      if (PIPE)
+        while (PIPE) {
+          val pipeElement = InfixExprElement(nextToken())
+          val otherPattern = pattern1()
+          pipeOtherPatterns += ((pipeElement, otherPattern))
+        }
+      makeExpr(firstPattern, pipeOtherPatterns.toList)
+    }
 
-  private def pattern2(seqOK: Boolean): Expr = {
-    val firstPattern = pattern3(seqOK)
-    val atOtherOpt = if (AT) {
-      // TODO: Compare Parsers.scala
-      optional {
-        val atToken = nextToken()
-        val otherPattern = pattern3(seqOK)
-        (atToken, otherPattern)
-      }
-    } else
-      None
-    makeExpr(firstPattern, atOtherOpt)
-  }
+    def pattern1(): Expr = {
+      val firstPattern = pattern2()
+      val colonTypeOpt = if (COLON) { // TODO: case Ident(name) if (treeInfo.isVarPattern(p) && in.token == COLON)
+        val colonToken = nextToken()
+        val compoundType_ = Some(TypeExprElement(compoundType()))
+        Some(colonToken, compoundType_)
+      } else
+        None
+      makeExpr(firstPattern, colonTypeOpt)
+    }
 
-  private def pattern3(seqOK: Boolean): List[ExprElement] = {
+    def pattern2(): Expr = {
+      val firstPattern = pattern3()
+      val atOtherOpt = if (AT) {
+        // TODO: Compare Parsers.scala
+        optional {
+          val atToken = nextToken()
+          val otherPattern = pattern3()
+          (atToken, otherPattern)
+        }
+      } else
+        None
+      makeExpr(firstPattern, atOtherOpt)
+    }
 
-    val simplePattern1 = simplePattern(seqOK)
-    if (seqOK && STAR) {
-      val starToken = nextToken()
-      exprElementFlatten2(simplePattern1, starToken)
-    } else {
+    def pattern3(): List[ExprElement] = {
+      val simplePattern1 = simplePattern()
+      interceptStarPattern() foreach { x ⇒ return exprElementFlatten2(simplePattern1, x) }
+
       val idAndPatterns = ListBuffer[(Token, List[ExprElement])]()
       while (isIdent && !PIPE) {
         val id = ident()
-        val otherSimplePattern = simplePattern(seqOK)
+        val otherSimplePattern = simplePattern()
         idAndPatterns += ((id, otherSimplePattern))
       }
       exprElementFlatten2(simplePattern1, idAndPatterns.toList)
     }
+
+    def simplePattern(): List[ExprElement] = {
+      // println("simplePattern: " + currentToken)
+      currentTokenType match {
+        case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS ⇒
+          val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
+          val id = stableId()
+          val literalOpt = condOpt(currentTokenType) {
+            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal()
+          }
+          val typeArgsOpt: Option[List[ExprElement]] =
+            if (LBRACKET) Some(List(TypeExprElement(typeArgs())))
+            else None
+          val argumentPatternsOpt = if (LPAREN) Some(argumentPatterns()) else None
+          exprElementFlatten2((id, literalOpt), typeArgsOpt, argumentPatternsOpt)
+        case USCORE ⇒
+          exprElementFlatten2(nextToken())
+        case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
+          exprElementFlatten2(literal())
+        case LPAREN ⇒
+          val (lparen, patterns_, rparen) = makeParens(noSeq.patterns)
+          exprElementFlatten2(lparen, patterns_, rparen)
+        case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
+          exprElementFlatten2(xmlLiteralPattern())
+        case _ ⇒
+          throw new ScalaParserException("illegal start of simple pattern: " + currentToken)
+      }
+    }
+
   }
 
-  private def simplePattern(seqOK: Boolean): List[ExprElement] = {
-    // println("simplePattern: " + currentToken)
-    currentTokenType match {
-      case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS ⇒
-        val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
-        val id = stableId()
-        val literalOpt = condOpt(currentTokenType) {
-          case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal()
-        }
-        val typeArgsOpt: Option[List[ExprElement]] =
-          if (LBRACKET) Some(List(TypeExprElement(typeArgs(isPattern = true))))
-          else None
-        val argumentPatternsOpt = if (LPAREN) Some(argumentPatterns()) else None
-        exprElementFlatten2((id, literalOpt), typeArgsOpt, argumentPatternsOpt)
-      case USCORE ⇒
-        exprElementFlatten2(nextToken())
-      case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
-        exprElementFlatten2(literal())
-      case LPAREN ⇒
-        val lparen = nextToken()
-        val patterns_ = if (RPAREN)
-          Nil
-        else
-          patterns(seqOK = false)
-        val rparen = accept(RPAREN)
-        exprElementFlatten2(lparen, patterns_, rparen)
-      case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
-        exprElementFlatten2(xmlLiteralPattern())
-      case _ ⇒
-        throw new ScalaParserException("illegal start of simple pattern: " + currentToken)
-    }
+  object outPattern extends PatternContextSensitive {
+    def argType() = List(typ())
+    def functionArgType() = List(paramType())
   }
+
+  object seqOK extends SeqContextSensitive {
+    def interceptStarPattern() = if (STAR) Some(nextToken()) else None
+  }
+
+  object noSeq extends SeqContextSensitive {
+    def interceptStarPattern() = None
+  }
+
+  def typ() = outPattern.typ()
+  def startInfixType() = outPattern.infixType()
+  def startAnnotType() = outPattern.annotType()
+  def exprTypeArgs() = outPattern.typeArgs()
+  def exprSimpleType() = outPattern.simpleType()
+
+  def pattern() = noSeq.pattern()
+  def patterns() = noSeq.patterns()
+  def seqPatterns() = seqOK.patterns()
 
   private def argumentPatterns(): List[ExprElement] = {
-    val lparen = accept(LPAREN)
-    val patterns_ = if (RPAREN)
-      Nil
-    else
-      patterns(seqOK = true)
-    val rparen = accept(RPAREN)
+    val (lparen, patterns_, rparen) = inParens { if (RPAREN) Nil else seqPatterns() }
     exprElementFlatten2(lparen, patterns_, rparen)
   }
 
@@ -955,9 +959,9 @@ class ScalaParser(tokens: Array[Token]) {
     if (isLocalModifier) SimpleModifier(nextToken()) :: localModifiers()
     else Nil
 
-  private def annotations(skipNewLines: Boolean, requireOneArgList: Boolean): List[Annotation] =
+  private def annotations(skipNewLines: Boolean): List[Annotation] =
     readAnnots {
-      val (annotationType, argumentExprss) = annotationExpr(requireOneArgList)
+      val (annotationType, argumentExprss) = annotationExpr()
       val newLineOpt_ = if (skipNewLines) newLineOpt() else None
       (annotationType, argumentExprss, newLineOpt_)
     } map {
@@ -965,28 +969,27 @@ class ScalaParser(tokens: Array[Token]) {
         Annotation(atToken, annotationType, argumentExprss, newLineOpt_)
     }
 
-  // private def constructorAnnotations() = {
-  //    exprSimpleType()
-  //    argumentExprs()
-  // }
+  private def constructorAnnotations() =
+    readAnnots {
+      val annotationType = Type(exprSimpleType())
+      val argumentExprss = List(argumentExprs())
+      (annotationType, argumentExprss)
+    } map {
+      case (atToken, (annotationType, argumentExprss)) ⇒
+        Annotation(atToken, annotationType, argumentExprss, newlineOption = None)
+    }
 
-  private def annotationExpr(requireOneArgList: Boolean): (Type, List[ArgumentExprs]) = {
-    val annotationType = Type(simpleType(isPattern = false))
-    val argumentExprss = ListBuffer[ArgumentExprs]()
-    if (requireOneArgList)
-      argumentExprss += argumentExprs()
-    else if (LPAREN)
-      do {
-        argumentExprss += argumentExprs()
-      } while (LPAREN)
-    (annotationType, argumentExprss.toList)
+  private def annotationExpr(): (Type, List[ArgumentExprs]) = {
+    val annotationType = Type(exprSimpleType())
+    val argumentExprss = if (LPAREN) multipleArgumentExprs() else Nil
+    (annotationType, argumentExprss)
   }
 
   private def paramClauses(): ParamClauses = {
     var implicitmod = false
 
     def param(): Param = {
-      val annotations_ = annotations(skipNewLines = false, requireOneArgList = false)
+      val annotations_ = annotations(skipNewLines = false)
       val ownerIsTypeName = true // TODO: if (owner.isTypeName)
       val modifiers_ = ListBuffer[Modifier]()
       val valOrVarOpt = if (ownerIsTypeName) {
@@ -1080,7 +1083,7 @@ class ScalaParser(tokens: Array[Token]) {
     val newLineOpt = newLineOptWhenFollowedBy(LBRACKET)
     if (LBRACKET) {
       val bracketsContents =
-        inBrackets(commaSeparated((annotations(skipNewLines = true, requireOneArgList = false), typeParam())))
+        inBrackets(commaSeparated((annotations(skipNewLines = true), typeParam())))
       Some(TypeParamClause(typeElementFlatten3(newLineOpt, bracketsContents)))
     } else
       None
@@ -1172,7 +1175,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   def nonLocalDefOrDcl(): FullDefOrDcl = {
-    val annotations_ = annotations(skipNewLines = true, requireOneArgList = false)
+    val annotations_ = annotations(skipNewLines = true)
     val modifiers_ = modifiers()
     val defOrDcl_ = defOrDcl()
     FullDefOrDcl(annotations_, modifiers_, defOrDcl_)
@@ -1180,7 +1183,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def patDefOrDcl(): PatDefOrDcl = {
     val valOrVarToken = nextToken()
-    val (pattern_, otherPatterns) = commaSeparated(pattern2(seqOK = false))
+    val (pattern_, otherPatterns) = commaSeparated(noSeq.pattern2())
     val typedOpt_ = typedOpt()
     val equalsClauseOption = if (EQUALS) { // TODO: Check cond
       val equalsToken = accept(EQUALS)
@@ -1285,7 +1288,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def topLevelTmplDef(): FullDefOrDcl = {
-    val annotations_ = annotations(skipNewLines = true, requireOneArgList = false)
+    val annotations_ = annotations(skipNewLines = true)
     val modifiers_ = modifiers()
     val tmplDef_ = tmplDef()
     FullDefOrDcl(annotations_, modifiers_, tmplDef_)
@@ -1310,7 +1313,7 @@ class ScalaParser(tokens: Array[Token]) {
     markerTokens = markerTokens :+ nextToken()
     val name = ident()
     val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = true)
-    val annotations_ = annotations(skipNewLines = false, requireOneArgList = true)
+    val annotations_ = constructorAnnotations()
     val (accessModifierOpt_, paramClausesOpt) = if (isTrait)
       (None, None)
     else {
@@ -1342,14 +1345,14 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def templateParents(isTrait: Boolean): TemplateParents = {
-    val type1 = Type(annotType(isPattern = false))
+    val type1 = Type(startAnnotType())
     val argumentExprs_ =
       if (LPAREN && !isTrait) multipleArgumentExprs()
       else Nil
     val withTypes = ListBuffer[(Token, Type)]()
     while (WITH) {
       val withToken = nextToken()
-      val withType = Type(annotType(isPattern = false))
+      val withType = Type(startAnnotType())
       withTypes += ((withToken, withType))
     }
     TemplateParents(type1, argumentExprs_, withTypes.toList)
@@ -1502,7 +1505,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def localDef(): FullDefOrDcl = {
-    val annotations_ = annotations(skipNewLines = true, requireOneArgList = false)
+    val annotations_ = annotations(skipNewLines = true)
     val localModifiers_ = localModifiers()
     // val modifierCondition = true // TODO: !!!!
 
@@ -1592,8 +1595,8 @@ class ScalaParser(tokens: Array[Token]) {
             StatSeq(selfReferenceOpt = None, firstStatOpt = Some(PackageStat(packageToken, packageName)), (statSep, otherStatSeq.firstStatOpt) :: otherStatSeq.otherStats)
           } else {
             val (lbrace, packageBlockStats, rbrace) = inBraces(topStatSeq())
+            acceptStatSepOpt()
             val otherStatSeq = topStatSeq()
-
             val packageBlock = PackageBlock(packageToken, packageName, newLineOpt_, lbrace, packageBlockStats, rbrace)
 
             if (otherStatSeq.firstStatOpt.nonEmpty)
@@ -1675,7 +1678,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def xmlEmbeddedScala(isPattern: Boolean): Expr = {
     if (isPattern) {
       val lbrace = accept(LBRACE)
-      val pats = patterns(seqOK = true)
+      val pats = seqPatterns()
       val rbrace = accept(RBRACE)
       makeExpr(lbrace, pats, rbrace)
     } else
