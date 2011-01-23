@@ -39,6 +39,11 @@ class PackageFormatterTest extends AbstractFormatterTest {
      |{}""" ==>
   """package a {}"""
 
+  """package a {}
+     |""" ==>
+  """package a {}
+     |"""
+
   {
 
   implicit val formattingPreferences = FormattingPreferences.setPreference(IndentPackageBlocks, false)

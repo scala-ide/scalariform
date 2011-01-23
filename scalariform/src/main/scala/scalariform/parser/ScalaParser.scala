@@ -1595,13 +1595,8 @@ class ScalaParser(tokens: Array[Token]) {
             StatSeq(selfReferenceOpt = None, firstStatOpt = Some(PackageStat(packageToken, packageName)), (statSep, otherStatSeq.firstStatOpt) :: otherStatSeq.otherStats)
           } else {
             val (lbrace, packageBlockStats, rbrace) = inBraces(topStatSeq())
-            acceptStatSepOpt()
             val otherStatSeq = topStatSeq()
             val packageBlock = PackageBlock(packageToken, packageName, newLineOpt_, lbrace, packageBlockStats, rbrace)
-
-            if (otherStatSeq.firstStatOpt.nonEmpty)
-              throw new ScalaParserException("Expecting semi after package block") // can be non-empty, something of an oddity in the grammar as implemented by 2.8, see 
-            // https://lampsvn.epfl.ch/trac/scala/ticket/2973
             StatSeq(None, Some(packageBlock), otherStatSeq.otherStats)
           }
         }
