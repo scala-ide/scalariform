@@ -1,9 +1,9 @@
 Scalariform
 ===========
 
-Scalariform is a code formatter for Scala 2.8. It is a library and a
-stand-alone command line tool, with integrations available for
-Eclipse, Emacs (via ENSIME), jEdit, Maven, sbt and
+Scalariform is a code formatter for Scala 2.8+. It is a
+library and a stand-alone command line tool, with integrations
+available for Eclipse, Emacs (via ENSIME), jEdit, Maven, sbt and
 TextMate. Currently, Scalariform supports only a limited set of
 options, although it is intended to be compatible with the
 recommendations of the `Scala Style Guide`_ (see below). Please let me
@@ -19,11 +19,11 @@ Download
 
 Scalariform is available from Scala-tools.org:
 
-  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.7/
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.8/
 
 If you're using sbt, you can declare a dependency as follows::
 
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.7"
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.8"
 
 Integration with Eclipse
 ------------------------
@@ -111,7 +111,7 @@ Command line tool
 Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
-  scala -cp /path/to/scalariform-0.0.7.jar scalariform.commandline.Main "$@"
+  scala -cp /path/to/scalariform-0.0.8.jar scalariform.commandline.Main "$@"
 
 Usage::
 
@@ -387,8 +387,8 @@ If ``true``, then::
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~
 
-Scalariform is "compatible" with the `Scala Style Guide`_ v1.1.0 in the
-sense that, given the right preference settings, source code that is
+Scalariform is compatible with the `Scala Style Guide`_ in the sense
+that, given the right preference settings, source code that is
 initially compiliant with the Style Guide will not become uncompliant
 after formatting. In a number of cases, running the formatter will
 make uncompliant source more compliant.

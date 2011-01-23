@@ -1,0 +1,11 @@
+* FIX: Correctly handle use of `+`/`-` as type parameters in defs
+* Add Maven formatter plugin (contributed by Adam Crain -- [Adam Crain][1])
+* FIX: Bug with lexing `"""` at end of text
+* Add `AlignSingleLineCaseStatements` preferences to align the arrows of consecutive single-line case statements
+* Add `IndentLocalDefs` preference to indent local methods an extra level
+* Track parser changes in Scala 2.9:
+    * Type variables in a constructor pattern match
+    * Generalised catch clause
+    * Mirror code reorganisation of scala.tools.nsc.ast.parser.Parsers
+
+  [1]: https://github.com/jadamcrain
