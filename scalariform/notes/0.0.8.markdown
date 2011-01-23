@@ -1,5 +1,5 @@
 * FIX: Correctly handle use of `+`/`-` as type parameters in defs
-* Add Maven formatter plugin (contributed by Adam Crain -- [Adam Crain][1])
+* Add Maven formatter plugin (contributed by [Adam Crain][1])
 * FIX: Bug with lexing `"""` at end of text
 * Add `AlignSingleLineCaseStatements` preferences to align the arrows of consecutive single-line case statements
 * Add `IndentLocalDefs` preference to indent local methods an extra level
