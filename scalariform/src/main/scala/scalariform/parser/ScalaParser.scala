@@ -392,6 +392,12 @@ class ScalaParser(tokens: Array[Token]) {
     tokens.toList
   }
 
+  private def pkgQualId() = {
+    val pkg = qualId()
+    val newLineOpt = newLineOptWhenFollowedBy(LBRACE)
+    (pkg, newLineOpt)
+  }
+
   private def literal(): Token =
     if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
       nextToken()
@@ -1377,19 +1383,12 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def templateOpt(isTrait: Boolean): TemplateOpt = {
-    if (EXTENDS) {
-      val extendsToken = nextToken()
+    if (EXTENDS || SUBTYPE && isTrait) {
+      val extendsOrSubtypeToken = nextToken()
       template(isTrait) match {
         case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) ⇒
-          TemplateOpt(Some(TemplateInheritanceSection(extendsToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
+          TemplateOpt(Some(TemplateInheritanceSection(extendsOrSubtypeToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
       }
-    } else if (SUBTYPE && isTrait) {
-      val subtypeToken = nextToken()
-      val template_ = template(isTrait = true)
-      template_ match {
-        case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) ⇒
-          TemplateOpt(Some(TemplateInheritanceSection(subtypeToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
-      } // TODO: rm duplication with above
     } else {
       // val newLineOpt = newLineOptWhenFollowedBy(LBRACE) // Will be picked up by templateBodyOpt ... TODO: double check this
 
@@ -1420,8 +1419,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def packaging(): PrePackageBlock = {
-    val packageName = qualId()
-    val newLineOpt_ = newLineOptWhenFollowedBy(LBRACE)
+    val (packageName, newLineOpt_) = pkgQualId()
     val (lbrace, statSeq, rbrace) = inBraces(topStatSeq())
     PrePackageBlock(packageName, newLineOpt_, lbrace, statSeq, rbrace)
   }
@@ -1585,8 +1583,7 @@ class ScalaParser(tokens: Array[Token]) {
             StatSeq(selfReferenceOpt = None, firstStatOpt = Some(packageObjectStat), otherStats = (statSep, statSeq.firstStatOpt) :: statSeq.otherStats)
           }
         } else {
-          val packageName = qualId()
-          val newLineOpt_ = newLineOptWhenFollowedBy(LBRACE)
+          val (packageName, newLineOpt_) = pkgQualId()
           if (EOF)
             StatSeq(selfReferenceOpt = None, firstStatOpt = Some(PackageStat(packageToken, packageName)), otherStats = Nil)
           else if (isStatSep) {
