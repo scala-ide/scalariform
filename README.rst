@@ -66,8 +66,7 @@ Integration with Maven
 ----------------------
 
 There is a Maven plugin to run Scalariform contributed by `Adam
-Crain`_. It is not yet on scala-tools, but you can build it from the
-source.
+Crain`_ on scala-tools.
 
 .. _Adam Crain: https://github.com/jadamcrain
 
@@ -76,6 +75,7 @@ Usage::
   <plugin>
     <groupId>org.scalariform</groupId>
     <artifactId>scalariform-maven-plugin</artifactId>
+    <version>0.0.8</version>
     <executions>
       <execution>
         <phase>process-sources</phase>

@@ -1,0 +1,61 @@
+# 1. Prepare trunk
+
+export FROM=0.0.7
+export TO=0.0.8
+export NEW=0.0.9
+
+sed -i s/$FROM/$TO/g README.rst
+sed -i s/$FROM/$TO/g docs/source/README.rst
+git diff README.rst docs/source/README.rst
+
+# + data to CHANGELOG
+# create scalariform/notes/0.0.8.markdown, check at at http://wmd-editor.com/demo
+
+# 2. Branch
+
+git add .
+git commit -a -m "Preparing for $TO release"
+
+git checkout -b $TO
+
+scripts/update-version.sh $TO-SNAPSHOT $TO
+
+git grep -n $TO-SNAPSHOT # $FROM etc
+
+# edit project/build/Project.scala -- switch publishTo line to releases at ScalaTools
+
+git commit -a -m "Update versions for $TO release"
+
+# 3. Publish
+
+sbt
+
+> +test    
+> project scalariform
+> +publish
+
+# Check at
+
+ http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/
+
+# Publish to posterous: 
+
+> project scalariform
+> preview-notes
+> check-posterous
+> publish-notes
+
+# (https://github.com/softprops/posterous-sbt)
+
+# Publish maven plugin
+
+cd scalariform.maven-plugin
+mvn deploy
+
+# Push branch
+
+# 4. Update master
+
+scripts/update-version.sh $TO-SNAPSHOT $NEW-SNAPSHOT
+
+git commit -a -m "Update versions for $NEW-SNAPSHOT"

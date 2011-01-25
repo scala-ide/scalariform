@@ -44,7 +44,7 @@ object MojoFormatter {
              log: Log,
              alignParameters: Boolean,
              alignSingleLineCaseStatements: Boolean,
-             alignSingleLineCaseStatements_maxArrowIndent: Boolean,
+             alignSingleLineCaseStatements_maxArrowIndent: Int,
              compactStringConcatenation: Boolean,
              doubleIndentClassDeclaration: Boolean,
              formatXml: Boolean,
