@@ -15,5 +15,4 @@ corpusscan/lib_managed/
 corpusscan/src_managed/
 docs/build
 .settings
-.ensime
 nohup.out
