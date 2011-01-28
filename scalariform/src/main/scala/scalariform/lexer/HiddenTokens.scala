@@ -44,6 +44,7 @@ object HiddenTokens {
 abstract sealed class HiddenToken(val token: Token) {
   lazy val newlineful = token.getText contains '\n'
   lazy val getText = token.getText
+  def text = getText
 }
 
 case class Whitespace(override val token: Token) extends HiddenToken(token)

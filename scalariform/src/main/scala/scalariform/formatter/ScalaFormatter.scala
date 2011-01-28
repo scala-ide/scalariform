@@ -20,7 +20,7 @@ trait HasHiddenTokenInfo {
 
 }
 
-abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter with CaseClauseFormatter {
+abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter with CaseClauseFormatter with CommentFormatter {
 
   val newlineSequence: String
 
@@ -74,7 +74,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       } else {
         val formattingInstruction = predecessorFormatting.get(token) orElse
           previousTokenOption.map(defaultFormattingInstruction(_, token)) getOrElse
-          Compact
+          (if (token.getType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */ else Compact)
         alterSuspendFormatting(hiddenPredecessors(token).text) foreach { suspendFormatting = _ }
         if (suspendFormatting) {
           builder.append(hiddenPredecessors(token).text)
@@ -97,29 +97,6 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       .flatMap { edit ⇒ if (edit.position >= offset) Some(edit.shift(-offset)) else None }
       .filter { case TextEdit(position, length, replacement) ⇒ s.substring(position, position + length) != replacement }
       .distinct
-  }
-
-  private def formatComment(comment: HiddenToken, indentLevel: Int) = {
-
-    object StarLine {
-      def unapply(line: String): Option[String] = {
-        val isStarLine = line matches """^\s*\*.*"""
-        if (isStarLine) {
-          Some(line.substring(line.indexOf('*'), line.length))
-        } else
-          None
-      }
-    }
-
-    val sb = new StringBuilder
-    val lines = comment.getText split "\r?\n"
-    for ((previousOption, line) ← Utils.pairWithPrevious(lines)) {
-      line match {
-        case StarLine(fromStar) ⇒ sb.append(newlineSequence).indent(indentLevel).append(" ").append(fromStar)
-        case _                  ⇒ sb.append(line)
-      }
-    }
-    sb.toString
   }
 
   private def writeHiddenTokens(builder: StringBuilder,
