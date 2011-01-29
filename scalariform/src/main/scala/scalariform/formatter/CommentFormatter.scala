@@ -8,11 +8,8 @@ import scalariform.formatter.preferences._
 trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
   private def getLines(comment: String): (String, List[String]) = {
-    val (start, rest) =
-      if (comment startsWith "/**")
-        comment.splitAt("/**".length)
-      else
-        comment.splitAt("/*".length)
+    val prefix = List("/** ", "/**", "/* ", "/*").find(comment.startsWith).get
+    val (start, rest) = comment.splitAt(prefix.length)
     val (contents, _) = rest.splitAt(rest.length - "*/".length)
     val lines = contents.split("""\r?\n([ \t]*\*?[ \t]?)?""", Integer.MAX_VALUE).toList
     (start, lines)
@@ -35,7 +32,7 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
       val lines = pruneEmptyFinal(pruneEmptyInitial(rawLines))
 
       // println("formatComment: " + (start, lines))
-      sb.append(start)
+      sb.append(start.trim)
       for (line ← lines) {
         val trimmedLine = removeTrailingWhitespace(line)
         sb.append(newlineSequence).indent(indentLevel).append(" *")

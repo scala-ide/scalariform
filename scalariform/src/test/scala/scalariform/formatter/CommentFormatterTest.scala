@@ -81,4 +81,12 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */
     |"""
 
+  """/** a
+    |  * b */""" ==>
+  """/**
+    | * a
+    | * b
+    | */
+    |"""
+
 }
