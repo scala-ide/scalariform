@@ -33,6 +33,8 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
     } else
       None
 
+  def rawTokens = tokens.map { _.token }
+
 }
 
 object HiddenTokens {

@@ -100,10 +100,34 @@ object Tokens {
   val XML_UNPARSED = TokenType("XML_UNPARSED", isXml = true)
   val XML_PROCESSING_INSTRUCTION = TokenType("XML_PROCESSING_INSTRUCTION", isXml = true)
 
+  val KEYWORDS = Set(
+    ABSTRACT, CASE, CATCH, CLASS, DEF,
+    DO, ELSE, EXTENDS, FINAL,
+    FINALLY, FOR, FORSOME, IF, IMPLICIT,
+    IMPORT, LAZY, MATCH, NEW,
+    OBJECT, OVERRIDE, PACKAGE, PRIVATE, PROTECTED,
+    REQUIRES, RETURN, SEALED, SUPER, THIS,
+    THROW, TRAIT, TRY, TYPE,
+    VAL, VAR, WHILE, WITH, YIELD)
+
+  val COMMENTS = Set(LINE_COMMENT, MULTILINE_COMMENT, XML_COMMENT)
+ 
+  val IDS = Set(VARID, OTHERID, PLUS, MINUS, STAR, PIPE, TILDE, EXCLAMATION)
+
+  val LITERALS = Set(CHARACTER_LITERAL, INTEGER_LITERAL, FLOATING_POINT_LITERAL, STRING_LITERAL, SYMBOL_LITERAL, TRUE, FALSE, NULL)
+
 }
 
 case class TokenType(name: String, isXml: Boolean = false) {
   override lazy val toString = name
 
   def isNewline = this == Tokens.NEWLINE || this == Tokens.NEWLINES
+
+  def isKeyword = Tokens.KEYWORDS contains this
+
+  def isComment = Tokens.COMMENTS contains this
+
+  def isId = Tokens.IDS contains this
+
+  def isLiteral = Tokens.LITERALS contains this
 }

@@ -1,10 +1,10 @@
 package scalariform.parser
 
 import scalariform.utils.CaseClassReflector
-
+import scalariform.utils.Range
 import scalariform.lexer.Token
 
-trait AstNode extends CaseClassReflector {
+sealed trait AstNode extends CaseClassReflector {
 
   def tokens: List[Token]
 
@@ -33,6 +33,32 @@ trait AstNode extends CaseClassReflector {
   protected implicit def tokenToFlattenable(token: Token): Flattenable = new Flattenable { val tokens = List(token) }
 
   protected def flatten(flattenables: Flattenable*): List[Token] = flattenables.toList flatMap { _.tokens }
+  
+  def immediateChildren: List[AstNode] = productIterator.toList flatten immediateAstNodes
+
+  private def immediateAstNodes(n: Any): List[AstNode] = n match {
+    case a: AstNode                ⇒ List(a)
+    case t: Token                  ⇒ Nil
+    case Some(x)                   ⇒ immediateAstNodes(x)
+    case xs@(_ :: _)               ⇒ xs flatMap { immediateAstNodes(_) }
+    case Left(x)                   ⇒ immediateAstNodes(x)
+    case Right(x)                  ⇒ immediateAstNodes(x)
+    case (l, r)                    ⇒ immediateAstNodes(l) ++ immediateAstNodes(r)
+    case (x, y, z)                 ⇒ immediateAstNodes(x) ++ immediateAstNodes(y) ++ immediateAstNodes(z)
+    case true | false | Nil | None ⇒ Nil
+  }
+
+  /**
+   * Returns range of tokens in the node, or None if there are no tokens in the node
+   */
+  def rangeOpt: Option[Range] =
+    if (tokens.isEmpty)
+      None
+    else {
+      val firstIndex = tokens.head.startIndex
+      val lastIndex = tokens.last.stopIndex
+      Some(Range(firstIndex, lastIndex - firstIndex + 1))
+    }
 
 }
 

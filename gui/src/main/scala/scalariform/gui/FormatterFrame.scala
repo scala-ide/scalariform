@@ -17,9 +17,11 @@ import javax.swing.border.TitledBorder
 import javax.swing.{ JMenu, JMenuItem, JMenuBar, SwingConstants }
 
 import scalariform.utils.Utils._
+import scalariform.utils.Range
 import scalariform.parser._
 import scalariform.formatter._
 import scalariform.lexer._
+import scalariform.astselect._
 import scalariform.lexer.Tokens._
 import scalariform.formatter.preferences._
 
@@ -75,7 +77,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       }
     }
     if (highlightCheckBox.isSelected) {
-      val (lexer, tokens: List[Token]) = ScalaLexer.tokeniseFull(textPane.getText)
+      val (hiddenTokenInfo, tokens: List[Token]) = ScalaLexer.tokeniseFull(textPane.getText)
 
       val document = textPane.getStyledDocument
       def highlightToken(token: Token) {
@@ -97,9 +99,9 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
       for (token ← tokens) {
         highlightToken(token)
-        for (hiddenToken ← lexer.hiddenPredecessors(token))
+        for (hiddenToken ← hiddenTokenInfo.hiddenPredecessors(token))
           highlightToken(hiddenToken.token)
-        for (hiddenTokens ← lexer.inferredNewlines(token); hiddenToken ← hiddenTokens)
+        for (hiddenTokens ← hiddenTokenInfo.inferredNewlines(token); hiddenToken ← hiddenTokens)
           highlightToken(hiddenToken.token)
       }
     }
@@ -121,7 +123,33 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   setFont(outputTextPane, textFont)
   outputTextPane.setEditable(false)
 
+  var selectionStack: List[Range] = Nil
+
   val inputTextPane = new JTextPane
+  inputTextPane.addKeyListener(new KeyAdapter {
+    override def keyPressed(ev: KeyEvent) {
+      if (ev.isAltDown && ev.isShiftDown && ev.getKeyCode == KeyEvent.VK_UP) {
+        val caret = inputTextPane.getCaret
+        val smallest = math.min(caret.getMark, caret.getDot)
+        val largest = math.max(caret.getMark, caret.getDot)
+        val selectedRange = Range(smallest, largest - smallest)
+        new AstSelector(inputTextPane.getText).expandSelection(selectedRange) foreach {
+          case Range(offset, length) ⇒
+            selectionStack ::= selectedRange
+            caret.setDot(offset)
+            caret.moveDot(offset + length)
+        }
+      } else if (ev.isAltDown && ev.isShiftDown && ev.getKeyCode == KeyEvent.VK_DOWN)
+        selectionStack match {
+          case Range(offset, length) :: rest ⇒
+            selectionStack = rest
+            val caret = inputTextPane.getCaret
+            caret.setDot(offset)
+            caret.moveDot(offset + length)
+          case _ ⇒
+        }
+    }
+  })
   setFont(inputTextPane, textFont)
   def runFormatter() {
     try {
@@ -133,7 +161,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       } catch {
         case e: RuntimeException ⇒
           if (showAstCheckBox.isSelected) {
-            val (lexer, tokens) = ScalaLexer.tokeniseFull(inputText)
+            val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(inputText)
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             try {
@@ -159,7 +187,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         import scala.util.parsing.input._
         import scala.util.parsing.combinator._
 
-        val (lexer, tokens) = ScalaLexer.tokeniseFull(inputText)
+        val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(inputText)
         val parseResult = try {
           specificFormatter.parse(new ScalaParser(tokens.toArray))
         } catch {

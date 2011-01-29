@@ -14,7 +14,7 @@ object LexerPerformanceTest extends Application {
   }
 
   def parse(s: String) = {
-    val (lexer, tokens) = ScalaLexer.tokeniseFull(file)
+    val (_, tokens) = ScalaLexer.tokeniseFull(file)
     // val parser = new ScalaCombinatorParser
     // val rawParseResult = parser.compilationUnitOrScript(new ScalaLexerReader(tokens))
     // rawParseResult.get.tokens
