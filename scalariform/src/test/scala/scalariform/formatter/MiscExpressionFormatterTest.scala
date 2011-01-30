@@ -461,6 +461,15 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |,2)""" ==>
   """a(1, 2)"""
 
+  """a(
+    |b, 
+    |c + 
+    |d)""" ==>
+  """a(
+    |  b,
+    |  c +
+    |    d)"""
+
   """42
     |: Int""" ==>
   """42: Int"""

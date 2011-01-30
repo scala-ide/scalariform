@@ -58,6 +58,10 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "             $$$ "
   " $$$$$$$$$$$$$$$ "
 
+  " aa(bb + cc, dd * ee) " ~
+  "              $$$$$   " ~
+  "             $$$$$$$  "
+
   private def findSelectionRange(s: String): Range = { 
     val barLocation = s indexOf '|'
     if (barLocation >= 0)

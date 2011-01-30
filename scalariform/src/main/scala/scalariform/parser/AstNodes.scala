@@ -138,6 +138,10 @@ case class ParenArgumentExprs(lparen: Token, contents: List[ExprElement], rparen
   lazy val tokens = flatten(lparen, contents, rparen)
 }
 
+case class Argument(expr: Expr) extends AstNode with ExprElement { 
+  lazy val tokens = flatten(expr)
+}
+
 case class IfExpr(ifToken: Token,
                   condExpr: CondExpr,
                   newlinesOpt: Option[Token],

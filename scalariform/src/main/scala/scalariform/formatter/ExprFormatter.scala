@@ -29,6 +29,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (PrefixExprElement(_), _) ⇒ Compact
             case (_, PostfixExprElement(_)) ⇒ CompactPreservingGap
             case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
+            case (Argument(_), _) => Compact
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
             case (_, _) if (element.firstTokenOption exists { hiddenPredecessors(_).containsNewline }) ⇒
               if (!expressionBreakIndentHappened)
@@ -112,6 +113,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case annotation: Annotation               ⇒ format(annotation)
     case typeExprElement: TypeExprElement     ⇒ format(typeExprElement.contents)
     case expr: Expr                           ⇒ format(expr.contents)
+    case argument: Argument                   ⇒ format(argument.expr)
     case xmlExpr: XmlExpr                     ⇒ format(xmlExpr)
     case parenExpr: ParenExpr                 ⇒ format(parenExpr)
     case _                                    ⇒ NoFormatResult

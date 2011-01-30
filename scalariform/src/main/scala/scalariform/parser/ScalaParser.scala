@@ -713,7 +713,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def argumentExprs(): ArgumentExprs = {
     // println("argumentExprs(): " + currentToken)
-    def args() = commaSeparated(expr)
+    def argument() = Argument(expr())
+    def args() = commaSeparated(argument())
     currentTokenType match {
       case LBRACE ⇒ BlockArgumentExprs(exprElementFlatten2(blockExpr()))
       case LPAREN ⇒

@@ -37,7 +37,7 @@ object CorpusScanner extends SpecificFormatter {
 
   private def getText(file: File) = Source.fromFile(file).mkString
 
-  val prefs = FormattingPreferences()//.setPreference(AlignSingleLineCaseStatements, true)
+  val prefs = FormattingPreferences() //.setPreference(AlignSingleLineCaseStatements, true)
 
   def formatFile(file: File) {
     val source = getText(file)
