@@ -470,6 +470,11 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  c +
     |    d)"""
 
+  """(a -> 
+    |new B)""" ==>
+  """(a ->
+    |  new B)"""
+
   """42
     |: Int""" ==>
   """42: Int"""

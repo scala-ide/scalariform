@@ -18,8 +18,11 @@ object AstSelector {
       classOf[ParamClause],
       classOf[ParamClauses],
       classOf[PatDefOrDcl],
-      classOf[TemplateBody], 
-      classOf[TypeDefOrDcl])
+      classOf[Template],
+      classOf[TemplateBody],
+      classOf[TemplateParents],
+      classOf[TypeDefOrDcl],
+      classOf[TypeParamClause])
 }
 
 class AstSelector(source: String) {

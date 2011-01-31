@@ -142,6 +142,10 @@ case class Argument(expr: Expr) extends AstNode with ExprElement {
   lazy val tokens = flatten(expr)
 }
 
+case class New(newToken: Token, template: Template) extends ExprElement { 
+  lazy val tokens = flatten(newToken, template)
+}
+
 case class IfExpr(ifToken: Token,
                   condExpr: CondExpr,
                   newlinesOpt: Option[Token],

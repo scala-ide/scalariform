@@ -2,7 +2,7 @@
 * Improve basic formatting of Scaladoc comments
 * Add preference "PreserveDanglingCloseParenthesis" to keep newlines before a dangling right paren 
   (closes http://github.com/mdr/scalariform/issues#issue/6)
-* Improve stairway indenting of argument lists
+* Improve stairway indenting of argument lists, infix exprs
 * Add support for AST selection
 
 0.0.8 (23/January/11)

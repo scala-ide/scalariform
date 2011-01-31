@@ -28,13 +28,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           val instructionOption = condOpt(previousElement, element) {
             case (PrefixExprElement(_), _) ⇒ Compact
             case (_, PostfixExprElement(_)) ⇒ CompactPreservingGap
-            case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
-            case (Argument(_), _) => Compact
+            case (Argument(_), _) ⇒ Compact
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
-            case (_, _) if (element.firstTokenOption exists { hiddenPredecessors(_).containsNewline }) ⇒
+            case (_, _) if element.firstTokenOption exists { hiddenPredecessors(_).containsNewline } ⇒
               if (!expressionBreakIndentHappened)
                 nestedFormatterState = currentFormatterState.indent
               nestedFormatterState.currentIndentLevelInstruction
+            case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
           }
 
           lazy val containsPriorFormatting = formatResult.predecessorFormatting contains element.firstToken // in particular, from the String concatenation code
@@ -116,6 +116,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case argument: Argument                   ⇒ format(argument.expr)
     case xmlExpr: XmlExpr                     ⇒ format(xmlExpr)
     case parenExpr: ParenExpr                 ⇒ format(parenExpr)
+    case new_ : New                           ⇒ format(new_.template)
     case _                                    ⇒ NoFormatResult
   }
 

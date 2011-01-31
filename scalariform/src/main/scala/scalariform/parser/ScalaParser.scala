@@ -676,7 +676,7 @@ class ScalaParser(tokens: Array[Token]) {
         canApply = false
         val newToken = nextToken()
         val template_ = template(isTrait = false)
-        exprElementFlatten2(newToken, template_)
+        List(New(newToken, template_))
       case _ ⇒
         throw new ScalaParserException("illegal start of simple expression: " + currentToken)
     }
