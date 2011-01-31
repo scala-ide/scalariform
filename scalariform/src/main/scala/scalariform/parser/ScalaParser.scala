@@ -628,18 +628,16 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def postfixExpr(): List[ExprElement] = {
-    val prefixExpr_ = prefixExpr()
-    val postfixParts = ListBuffer[List[ExprElement]]()
+    var soFar: List[ExprElement] = prefixExpr()
     while (isIdent) {
       val id = ident()
       val newLineOpt = newLineOptWhenFollowing(isExprIntroToken)
-      val postfixPart = if (isExprIntro)
-        exprElementFlatten2(InfixExprElement(id), newLineOpt, prefixExpr())
+      if (isExprIntro) 
+        soFar = List(InfixExpr(soFar, id, newLineOpt, prefixExpr()))
       else
-        List(PostfixExprElement(id))
-      postfixParts += postfixPart
+        soFar = List(PostfixExpr(soFar, id))
     }
-    exprElementFlatten2(prefixExpr_, postfixParts.toList)
+    soFar
   }
 
   private def prefixExpr(): List[ExprElement] = {
@@ -648,8 +646,7 @@ class ScalaParser(tokens: Array[Token]) {
       val unaryId = PrefixExprElement(ident())
       if (isMinus && isNumericLit) {
         val literal_ = literal()
-        val simpleExprRest_ = simpleExprRest(true)
-        exprElementFlatten2(unaryId, literal_, simpleExprRest_)
+        simpleExprRest(exprElementFlatten2(unaryId, literal_), true)
       } else
         exprElementFlatten2(unaryId, simpleExpr())
     } else
@@ -680,34 +677,31 @@ class ScalaParser(tokens: Array[Token]) {
       case _ ⇒
         throw new ScalaParserException("illegal start of simple expression: " + currentToken)
     }
-    val remainder = simpleExprRest(canApply)
-    exprElementFlatten2(firstPart, remainder)
+    simpleExprRest(firstPart, canApply)
   }
 
-  private def simpleExprRest(canApply: Boolean): List[ExprElement] = {
+  private def simpleExprRest(previousPart: List[ExprElement], canApply: Boolean): List[ExprElement] = {
     val newLineOpt = if (canApply) newLineOptWhenFollowedBy(LBRACE) else None
     currentTokenType match {
       case DOT ⇒
         val dot = nextToken()
         val selector_ = selector()
-        val simpleExprRest_ = simpleExprRest(canApply = true)
-        exprElementFlatten2(newLineOpt, (dot, selector_, simpleExprRest_))
+        simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, (dot, selector_)), canApply = true)       
       case LBRACKET ⇒
         val identifierCond = true /* TODO */ /*             case Ident(_) | Select(_, _) => */
         if (identifierCond) {
           val typeArgs_ = TypeExprElement(exprTypeArgs())
-          val simpleExprRest_ = simpleExprRest(canApply = true)
-          exprElementFlatten2(newLineOpt, typeArgs_, simpleExprRest_)
+          simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, typeArgs_), canApply = true)
         } else
-          exprElementFlatten2(newLineOpt)
+          exprElementFlatten2(previousPart, newLineOpt)
       case LPAREN | LBRACE if canApply ⇒
         val argumentExprs_ = argumentExprs()
-        val simpleExprRest_ = simpleExprRest(canApply = true)
-        exprElementFlatten2(newLineOpt, argumentExprs_, simpleExprRest_)
+        simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, argumentExprs_), canApply = true)       
       case USCORE ⇒
-        exprElementFlatten2(newLineOpt, PostfixExprElement(nextToken()))
+        val uscore = nextToken()
+        List(PostfixExpr(exprElementFlatten2(previousPart, newLineOpt), uscore))
       case _ ⇒
-        exprElementFlatten2(newLineOpt)
+        exprElementFlatten2(previousPart, newLineOpt)
     }
   }
 
@@ -808,17 +802,17 @@ class ScalaParser(tokens: Array[Token]) {
     def patterns(): List[ExprElement] = {
       exprElementFlatten2(commaSeparated(pattern()))
     }
-
+ 
     def pattern(): Expr = { // Scalac now uses a loop() method, but this is still OK:
       val firstPattern = pattern1()
-      val pipeOtherPatterns = ListBuffer[(InfixExprElement, Expr)]()
+      var currentExpr: ExprElement = firstPattern
       if (PIPE)
         while (PIPE) {
-          val pipeElement = InfixExprElement(nextToken())
+          val pipeToken = nextToken()
           val otherPattern = pattern1()
-          pipeOtherPatterns += ((pipeElement, otherPattern))
+          currentExpr = InfixExpr(List(currentExpr), pipeToken, None, List(otherPattern))
         }
-      makeExpr(firstPattern, pipeOtherPatterns.toList)
+      makeExpr(currentExpr)
     }
 
     def pattern1(): Expr = {
@@ -1890,3 +1884,7 @@ object ScalaParser {
   implicit def listToTypeFlattenable[T <% TypeElementFlattenable](list: List[T]): TypeElementFlattenable = TypeElements(list flatMap { _.elements })
 
 }
+
+// Not AST nodes, used as an intermediate structures during parsing:
+
+case class TemplateOpt(templateInheritanceSectionOpt: Option[TemplateInheritanceSection], templateBodyOpt: Option[TemplateBody])

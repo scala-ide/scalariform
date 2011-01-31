@@ -111,16 +111,16 @@ case class ParenExpr(lparen: Token, contents: List[ExprElement], rparen: Token) 
   lazy val tokens = flatten(lparen, contents, rparen)
 }
 
-case class PrefixExprElement(id: Token) extends AstNode with ExprElement {
+case class PrefixExprElement(id: Token) extends ExprElement {
   lazy val tokens = flatten(id)
 }
 
-case class InfixExprElement(id: Token) extends AstNode with ExprElement {
-  lazy val tokens = flatten(id)
+case class PostfixExpr(first: List[ExprElement], postfixId: Token) extends ExprElement { 
+  lazy val tokens = flatten(first, postfixId)
 }
 
-case class PostfixExprElement(id: Token) extends AstNode with ExprElement {
-  lazy val tokens = flatten(id)
+case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Option[Token], right: List[ExprElement]) extends ExprElement { 
+  lazy val tokens = flatten(left, infixId, newlineOption, right)
 }
 
 case class TypeExprElement(contents: List[TypeElement]) extends AstNode with ExprElement {
@@ -414,6 +414,4 @@ case class XmlExpr(first: XmlContents, otherElements: List[XmlContents]) extends
   lazy val tokens = flatten(first, otherElements)
 }
 
-// Not an AST node, used as an intermediate structure during parsing
-case class TemplateOpt(templateInheritanceSectionOpt: Option[TemplateInheritanceSection], templateBodyOpt: Option[TemplateBody])
 

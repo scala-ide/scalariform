@@ -73,7 +73,15 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " new Wibble() " ~
   "         $$$  " ~
   " $$$$$$$$$$$$ "
-  
+
+  " a + b + c " ~
+  "   $       " ~
+  " $$$$$     " 
+
+  " a + b + c " ~
+  " $$$$$     " ~
+  " $$$$$$$$$ " 
+
   private def findSelectionRange(s: String): Range = { 
     val barLocation = s indexOf '|'
     if (barLocation >= 0)

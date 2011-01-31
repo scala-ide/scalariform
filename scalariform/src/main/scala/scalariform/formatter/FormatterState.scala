@@ -2,7 +2,11 @@ package scalariform.formatter
 
 import scalariform.lexer.Token
 
-case class FormatterState(indentLevel: Int = 0, indentRelativeToTokenOption: Option[Token] = None, val inSingleLineBlock: Boolean = false) {
+case class FormatterState(
+  indentLevel: Int = 0,
+  indentRelativeToTokenOption: Option[Token] = None,
+  val inSingleLineBlock: Boolean = false,
+  val expressionBreakHappened: Boolean = false) {
 
   private val nextIndentLevel = indentLevel + 1
 
@@ -15,5 +19,11 @@ case class FormatterState(indentLevel: Int = 0, indentRelativeToTokenOption: Opt
   def nextIndentLevelInstruction = EnsureNewlineAndIndent(nextIndentLevel, relativeTo = indentRelativeToTokenOption)
 
   def currentIndentLevelInstruction = EnsureNewlineAndIndent(indentLevel, relativeTo = indentRelativeToTokenOption)
+
+  def indentForExpressionBreak = indent.copy(expressionBreakHappened = true)
+
+  def indentForExpressionBreakIfNeeded = if (expressionBreakHappened) this else indent.copy(expressionBreakHappened = true)
+
+  def clearExpressionBreakHappened = copy(expressionBreakHappened = false)
 
 }
