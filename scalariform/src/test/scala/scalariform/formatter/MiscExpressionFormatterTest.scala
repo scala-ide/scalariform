@@ -341,6 +341,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)
     "(a: Int) => 3" ==> "(a : Int) => 3"
   }
+
   """{ // format: +spaceBeforeColon
     |  val a:Int = 2
     |}""" ==>   
@@ -412,6 +413,34 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """a(
     |  () =>
     |    b)"""
+
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(PreserveDanglingCloseParenthesis, true)
+
+  """Book(
+    |  name = "Name",
+    |  author = "Author",
+    |  rating = 5
+    |)""" ==>
+  """Book(
+    |  name = "Name",
+    |  author = "Author",
+    |  rating = 5
+    |)"""
+
+  }
+
+  """Book(
+    |  name = "Name",
+    |  author = "Author",
+    |  rating = 5
+    |)""" ==>
+  """Book(
+    |  name = "Name",
+    |  author = "Author",
+    |  rating = 5)"""
+
 
  """foobar(
     |(1,2),

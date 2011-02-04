@@ -56,7 +56,7 @@ abstract trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean]
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
-    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs)
+    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -139,5 +139,11 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
 case object IndentLocalDefs extends BooleanPreferenceDescriptor {
   val key = "indentLocalDefs"
   val description = "Indent local defs an extra level"
+  val defaultValue = false
+}
+
+case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor {
+  val key = "preserveDanglingCloseParenthesis"
+  val description = "Allow a newline before a ')' in an argument expression."
   val defaultValue = false
 }

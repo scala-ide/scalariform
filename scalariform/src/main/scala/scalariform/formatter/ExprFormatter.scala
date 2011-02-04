@@ -133,7 +133,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = argumentExprs match {
     case BlockArgumentExprs(contents)                 ⇒ format(contents)
-    case ParenArgumentExprs(lparen, contents, rparen) ⇒ format(GeneralTokens(List(lparen)) :: contents)
+    case ParenArgumentExprs(lparen, contents, rparen) ⇒ 
+      var formatResult = format(GeneralTokens(List(lparen)) :: contents)
+      if (formattingPreferences(PreserveDanglingCloseParenthesis) && hiddenPredecessors(rparen).containsNewline && contents.nonEmpty)
+        formatResult = formatResult.before(rparen, formatterState.currentIndentLevelInstruction)
+      formatResult
   }
 
   private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): FormatResult = format(parenExpr.contents)

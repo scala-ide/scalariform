@@ -134,6 +134,7 @@ Usage::
     [+|-]formatXml                                        Enable/disable Format XML literals
     [+|-]indentLocalDefs                                  Enable/disable Indent local defs an extra level
     [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
+    [+|-]preserveDanglingCloseParenthesis                 Enable/disable Allow a newline before a ')' in an argument expression.
     [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
     [+|-]spaceBeforeColon                                 Enable/disable Add a space before colons
@@ -340,6 +341,27 @@ indentSpaces
 Default: ``2``
 
 The number of spaces to use for each level of indentation.
+
+preserveDanglingCloseParenthesis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+If ``true``, it will keep a newline before a close parenthesis ')' in an
+argument expression. For example::
+
+  val book = Book(
+    name = "Name",
+    author = "Author",
+    rating = 5
+  )
+
+If ``false``, the parenthesis will be joined to the end of the argument list::
+
+  val book = Book(
+    name = "Name",
+    author = "Author",
+    rating = 5)
 
 preserveSpaceBeforeArguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
