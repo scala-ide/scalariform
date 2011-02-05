@@ -13,86 +13,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   def format(expr: Expr)(implicit formatterState: FormatterState): FormatResult = format(expr.contents)
 
-  private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = {
-    if (exprElements flatMap { _.tokens } isEmpty)
-      return NoFormatResult
-    var formatResult: FormatResult = NoFormatResult
-
-    var currentFormatterState = formatterState
-    var expressionBreakIndentHappened = false
-
-    for ((previousElementOption, element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
-      previousElementOption match {
-        case Some(previousElement) ⇒
-          var nestedFormatterState = currentFormatterState
-          val instructionOption = condOpt(previousElement, element) {
-            case (PrefixExprElement(_), _) ⇒ Compact
-            case (_, PostfixExprElement(_)) ⇒ CompactPreservingGap
-            case (InfixExprElement(_), _) | (_, InfixExprElement(_)) ⇒ CompactEnsuringGap
-            case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
-            case (_, _) if (element.firstTokenOption exists { hiddenPredecessors(_).containsNewline }) ⇒
-              if (!expressionBreakIndentHappened)
-                nestedFormatterState = currentFormatterState.indent
-              nestedFormatterState.currentIndentLevelInstruction
-          }
-
-          lazy val containsPriorFormatting = formatResult.predecessorFormatting contains element.firstToken // in particular, from the String concatenation code
-          for (instruction ← instructionOption if !containsPriorFormatting && !element.firstToken.isNewline)
-            formatResult = formatResult.before(element.firstToken, instruction)
-
-          if (formattingPreferences(CompactStringConcatenation)) {
-            val infixPlus = element match {
-              case InfixExprElement(Token(PLUS, _, _, _)) ⇒ true
-              case _                                      ⇒ false
-            }
-            val stringConcatenation = (previousElement, nextElementOption) match {
-              case (GeneralTokens(tokens), _) if tokens.last.tokenType == STRING_LITERAL ⇒ true
-              case (_, Some(GeneralTokens(tokens))) if tokens.head.tokenType == STRING_LITERAL ⇒ true
-              case _ ⇒ false
-            }
-            if (infixPlus and stringConcatenation) {
-              val Some(nextElement) = nextElementOption // Safe because current element is an infix operator
-              formatResult = formatResult.before(element.firstToken, Compact)
-              formatResult = formatResult.before(nextElement.firstToken, Compact)
-            }
-          }
-          formatResult ++= format(element)(nestedFormatterState)
-          if (currentFormatterState != nestedFormatterState) {
-            expressionBreakIndentHappened = true
-            currentFormatterState = nestedFormatterState
-          }
-        case None ⇒
-          formatResult ++= format(element)(currentFormatterState)
-      }
-
-      val firstToken = exprElements.head.tokens.head // TODO: 
-      element match {
-        case GeneralTokens(_) | PrefixExprElement(_) | InfixExprElement(_) | PostfixExprElement(_) ⇒
-          for (token ← element.tokens if token != firstToken)
-            if (isInferredNewline(token))
-              nextElementOption match {
-                case Some(_: ArgumentExprs) if token == element.tokens.last ⇒
-                  () //  Don't allow expression breaks immediately before an argument expression
-                case _ ⇒
-                  if (not(expressionBreakIndentHappened)) {
-                    currentFormatterState = currentFormatterState.indent
-                    expressionBreakIndentHappened = true
-                  }
-                  formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
-              }
-            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType)) {
-              if (not(expressionBreakIndentHappened)) {
-                currentFormatterState = currentFormatterState.indent
-                expressionBreakIndentHappened = true
-              }
-              formatResult = formatResult.before(token, currentFormatterState.currentIndentLevelInstruction)
-            }
-        case _ ⇒ // TODO:
-      }
-    }
-
-    formatResult
-  }
+  private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = formatExprElements(exprElements)._1
 
   private def format(exprElement: ExprElement)(implicit formatterState: FormatterState): FormatResult = exprElement match {
     case ifExpr: IfExpr                       ⇒ format(ifExpr)
@@ -107,14 +28,163 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case anonymousFunction: AnonymousFunction ⇒ format(anonymousFunction)
     case GeneralTokens(_)                     ⇒ NoFormatResult
     case PrefixExprElement(_)                 ⇒ NoFormatResult
-    case InfixExprElement(_)                  ⇒ NoFormatResult
-    case PostfixExprElement(_)                ⇒ NoFormatResult
+    case infixExpr: InfixExpr                 ⇒ format(infixExpr)._1
+    case postfixExpr: PostfixExpr             ⇒ format(postfixExpr)
     case annotation: Annotation               ⇒ format(annotation)
     case typeExprElement: TypeExprElement     ⇒ format(typeExprElement.contents)
     case expr: Expr                           ⇒ format(expr.contents)
+    case argument: Argument                   ⇒ format(argument.expr)
     case xmlExpr: XmlExpr                     ⇒ format(xmlExpr)
     case parenExpr: ParenExpr                 ⇒ format(parenExpr)
+    case new_ : New                           ⇒ format(new_.template)
+    case callExpr: CallExpr                   ⇒ format(callExpr)._1
     case _                                    ⇒ NoFormatResult
+  }
+
+  private def formatExprElements(exprElements: List[ExprElement])(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
+    if (exprElements flatMap { _.tokens } isEmpty)
+      return (NoFormatResult, formatterState)
+    var formatResult: FormatResult = NoFormatResult
+
+    var currentFormatterState = formatterState
+
+    for ((previousElementOption, element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
+      previousElementOption match {
+        case Some(previousElement) ⇒
+          var nestedFormatterState = currentFormatterState
+          val instructionOption = condOpt(previousElement, element) {
+            case (PrefixExprElement(_), _) ⇒ Compact
+            case (Argument(_), _) ⇒ Compact
+            case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
+            case (_, _) if element.firstTokenOption exists { hiddenPredecessors(_).containsNewline } ⇒
+              currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+              currentFormatterState.currentIndentLevelInstruction
+          }
+
+          for (instruction ← instructionOption if !element.firstToken.isNewline)
+            formatResult = formatResult.before(element.firstToken, instruction)
+        case None ⇒
+      }
+
+      val firstToken = exprElements.head.tokens.head
+      element match {
+        case infixExpr@InfixExpr(_, _, _, _) ⇒
+          val (extraFormatResult, newFormatterState) = format(infixExpr)(currentFormatterState)
+          formatResult ++= extraFormatResult
+          currentFormatterState = newFormatterState
+        case callExpr: CallExpr ⇒
+          val (extraFormatResult, newFormatterState) = format(callExpr)(currentFormatterState)
+          formatResult ++= extraFormatResult
+          currentFormatterState = newFormatterState
+        case GeneralTokens(_) | PrefixExprElement(_) ⇒
+          for (token ← element.tokens if token != firstToken)
+            if (isInferredNewline(token))
+              nextElementOption match {
+                case Some(_: ArgumentExprs) if token == element.tokens.last ⇒
+                  () //  We don't do expression breaks immediately before an argument expression
+                case _ ⇒
+                  currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+                  formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
+              }
+            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType)) {
+              currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+              formatResult = formatResult.before(token, currentFormatterState.currentIndentLevelInstruction)
+            }
+        case _ ⇒
+          formatResult ++= format(element)(currentFormatterState.clearExpressionBreakHappened)
+      }
+    }
+
+    (formatResult, currentFormatterState)
+  }
+
+  private def format(callExpr: CallExpr)(implicit initialFormatterState: FormatterState): (FormatResult, FormatterState) = {
+    val CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt) = callExpr
+
+    var formatResult: FormatResult = NoFormatResult
+    var currentFormatterState = initialFormatterState
+
+    for ((left, dot) ← exprDotOpt) {
+      val (leftResult, leftUpdatedFormatterState) = formatExprElements(left)
+      currentFormatterState = leftUpdatedFormatterState
+      formatResult ++= leftResult
+
+      if (hiddenPredecessors(dot).containsNewline) {
+        currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+        formatResult = formatResult.before(dot, currentFormatterState.currentIndentLevelInstruction)
+      }
+    }
+
+    if (hiddenPredecessors(id).containsNewline) {
+      currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+      formatResult = formatResult.before(id, currentFormatterState.currentIndentLevelInstruction)
+    }
+
+    for (typeArgs ← typeArgsOpt)
+      formatResult ++= format(typeArgs)(currentFormatterState.clearExpressionBreakHappened)
+
+    for ((newLineOpt, argumentExprs) ← newLineOptsAndArgumentExprss)
+      formatResult ++= format(argumentExprs)(currentFormatterState.clearExpressionBreakHappened)
+
+    for (uscore ← uscoreOpt)
+      formatResult = formatResult.before(uscore, CompactPreservingGap)
+
+    (formatResult, currentFormatterState)
+  }
+
+  private def format(infixExpr: InfixExpr)(implicit initialFormatterState: FormatterState): (FormatResult, FormatterState) = {
+    val InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Option[Token], right: List[ExprElement]) = infixExpr
+    var formatResult: FormatResult = NoFormatResult
+
+    var currentFormatterState = initialFormatterState
+
+    val (leftResult, updatedFormatterState) = formatExprElements(left)(currentFormatterState)
+    formatResult ++= leftResult
+    currentFormatterState = updatedFormatterState
+
+    val firstRightToken = right.head.firstToken
+    val lastLeftToken = left.last.lastToken
+    val stringLiteral = firstRightToken.tokenType == STRING_LITERAL || lastLeftToken.tokenType == STRING_LITERAL
+    val isStringConcatenation = infixId.tokenType == PLUS && formattingPreferences(CompactStringConcatenation) && stringLiteral
+
+    val (beforeInfixInstruction, updatedFormatterState2) =
+      if (isStringConcatenation)
+        (Compact, currentFormatterState)
+      else if (hiddenPredecessors(infixId).containsNewline) {
+        val newFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+        (newFormatterState.currentIndentLevelInstruction, newFormatterState)
+      } else
+        (CompactEnsuringGap, currentFormatterState)
+    formatResult = formatResult.before(infixId, beforeInfixInstruction)
+    currentFormatterState = updatedFormatterState2
+
+    currentFormatterState = newlineOption match {
+      case Some(newline) ⇒
+        val newFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+        formatResult = formatResult.formatNewline(newline, newFormatterState.currentIndentLevelInstruction)
+        newFormatterState
+      case None if hiddenPredecessors(firstRightToken).containsNewline ⇒
+        val newFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+        formatResult = formatResult.before(firstRightToken, newFormatterState.currentIndentLevelInstruction)
+        newFormatterState
+      case _ ⇒
+        formatResult = formatResult.before(firstRightToken, if (isStringConcatenation) Compact else CompactEnsuringGap)
+        currentFormatterState
+    }
+
+    val (rightResult, rightUpdatedFormatterState) = formatExprElements(right)(currentFormatterState)
+    formatResult ++= rightResult
+    currentFormatterState = rightUpdatedFormatterState
+
+    (formatResult, currentFormatterState)
+  }
+
+  private def format(postfixExpr: PostfixExpr)(implicit formatterState: FormatterState): FormatResult = {
+    val PostfixExpr(first: List[ExprElement], postfixId: Token) = postfixExpr
+    var formatResult: FormatResult = NoFormatResult
+    formatResult ++= format(first)
+    formatResult = formatResult.before(postfixId, CompactPreservingGap)
+    formatResult
   }
 
   def format(anonymousFunction: AnonymousFunction)(implicit formatterState: FormatterState): FormatResult = { // <-- Also formatted specially in BlockExpr

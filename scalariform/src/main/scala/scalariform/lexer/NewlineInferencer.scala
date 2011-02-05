@@ -6,7 +6,19 @@ import scalariform.lexer.Tokens._
 import scala.annotation.tailrec
 import java.util.{ HashMap, Map ⇒ JMap }
 
-class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) {
+trait HiddenTokenInfo { 
+
+  def isInferredNewline(token: Token): Boolean
+
+  def inferredNewlines(token: Token): Option[HiddenTokens]
+
+  def hiddenPredecessors(token: Token): HiddenTokens
+
+  def allHiddenTokens: Iterable[HiddenTokens] 
+
+}
+
+class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) extends HiddenTokenInfo {
   import NewlineInferencer._
 
   require(delegate.hasNext)

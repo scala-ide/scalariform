@@ -300,9 +300,9 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val xmlPreviousExceptions = Set(LBRACE, LPAREN, NEWLINE, NEWLINES)
     if (type2 == XML_START_OPEN && !(xmlPreviousExceptions.contains(type1) || type1.isXml))
       return CompactEnsuringGap
-    if (type1 == USCORE && IDS.contains(type2) && type2 != STAR)
+    if (type1 == USCORE && type2.isId && type2 != STAR)
       return CompactEnsuringGap
-    if (type2 == USCORE && IDS.contains(type1))
+    if (type2 == USCORE && type1.isId)
       return CompactEnsuringGap
     if ((type1 == RPAREN || type1 == RBRACKET) && type2 == LBRACE)
       return CompactEnsuringGap
@@ -314,31 +314,31 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       return Compact
     if (type1 == NEWLINE || type2 == NEWLINE || type1 == NEWLINES || type2 == NEWLINES)
       return Compact
-    if (IDS.contains(type1) && type2 == LBRACE)
+    if (type1.isId && type2 == LBRACE)
       return CompactEnsuringGap
     if (type1 == LBRACE && type2 == RBRACE)
       return Compact //CompactEnsuringGap
     if (type1 == RBRACE && type2 == LBRACE)
       return CompactEnsuringGap
-    if (type1 == RPAREN && LITERALS.contains(type2))
+    if (type1 == RPAREN && type2.isLiteral)
       return CompactEnsuringGap
-    if (type1 == RPAREN && IDS.contains(type2))
+    if (type1 == RPAREN && type2.isId)
       return CompactEnsuringGap
-    if (LITERALS.contains(type1) && IDS.contains(type2))
+    if (type1.isLiteral && type2.isId)
       return CompactEnsuringGap
-    if (IDS.contains(type1) && LITERALS.contains(type2))
+    if (type1.isId && type2.isLiteral)
       return CompactEnsuringGap
     if (ENSURE_SPACE_AFTER(type1))
       return CompactEnsuringGap
     if (ENSURE_SPACE_BEFORE(type2))
       return CompactEnsuringGap
-    if (IDS.contains(type1) && IDS.contains(type2))
+    if (type1.isId && type2.isId)
       return CompactEnsuringGap
     val firstCharOfToken2 = token2.getText.head
     if (Set(HASH, AT).contains(type1) && isOperatorPart(firstCharOfToken2))
       return CompactEnsuringGap
     val lastCharOfToken1 = token1.getText.last
-    val firstIsIdEndingWithOpChar = IDS.contains(type1) && (lastCharOfToken1 == '_' || isOperatorPart(lastCharOfToken1))
+    val firstIsIdEndingWithOpChar = type1.isId && (lastCharOfToken1 == '_' || isOperatorPart(lastCharOfToken1))
     if (Set(HASH, COLON, AT).contains(type2) && firstIsIdEndingWithOpChar)
       return CompactEnsuringGap
     if (type2 == COLON && formattingPreferences(SpaceBeforeColon))
@@ -351,7 +351,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     type2 match {
       case IF if type1 != LPAREN    ⇒ return CompactEnsuringGap
       case ARROW if type1 != LPAREN ⇒ return CompactEnsuringGap
-      case AT if IDS contains type2 ⇒ return CompactEnsuringGap
+      case AT if type2.isId ⇒ return CompactEnsuringGap
       case _                        ⇒
     }
     Compact
@@ -371,10 +371,6 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
 }
 
 object ScalaFormatter {
-
-  val IDS = Set(VARID, OTHERID, PLUS, MINUS, STAR, PIPE, TILDE, EXCLAMATION)
-
-  val LITERALS = Set(CHARACTER_LITERAL, INTEGER_LITERAL, FLOATING_POINT_LITERAL, STRING_LITERAL, SYMBOL_LITERAL, TRUE, FALSE, NULL)
 
   // format: OFF
   val ENSURE_SPACE_AFTER = Set(

@@ -461,6 +461,36 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |,2)""" ==>
   """a(1, 2)"""
 
+  """a(
+    |b, 
+    |c + 
+    |d)""" ==>
+  """a(
+    |  b,
+    |  c +
+    |    d)"""
+
+  """(a -> 
+    |new B)""" ==>
+  """(a ->
+    |  new B)"""
+
+  """(1
+    |  + {
+    |foo
+    |})""" ==>
+  """(1
+    |  + {
+    |    foo
+    |  })"""
+
+  """a +
+    |  b + (c +
+    |  d)""" ==>
+  """a +
+    |  b + (c +
+    |    d)"""
+
   """42
     |: Int""" ==>
   """42: Int"""
@@ -468,5 +498,98 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   "if (true) 1; else 2" ==> "if (true) 1; else 2" // Check SEMI + ELSE rule
 
   "a: ::" ==> "a: ::"
+
+
+  """(a
+    | + b 
+    |+ c)""" ==>
+  """(a
+    |  + b
+    |  + c)"""
+
+  """(a +
+    | b +
+    |c)""" ==>
+  """(a +
+    |  b +
+    |  c)"""
+
+  """(a +
+    |( b +
+    |c))""" ==>
+  """(a +
+    |  (b +
+    |    c))"""
+
+  """a + 
+    |b +
+    |c""" ==>
+  """a +
+    |  b +
+    |  c"""
+
+  """a match {
+    |      case wibble(
+    |        wobble(
+    |          wubble(x))) => y
+    |    }""" ==>
+  """a match {
+    |  case wibble(
+    |    wobble(
+    |      wubble(x))) => y
+    |}"""
+
+  """'a'
+    |.b
+    |.c""" ==>
+  """'a'
+    |  .b
+    |  .c"""
+
+ """a.
+    |b().c match {
+    |case d =>
+    |}""" ==>
+ """a.
+    |  b().c match {
+    |    case d =>
+    |  }""" 
+
+  """a()
+    |.b(c(
+    |d))""" ==>
+  """a()
+    |  .b(c(
+    |    d))"""
+
+  """a().
+    |b(c => {
+    |d
+    |})""" ==>
+  """a().
+    |  b(c => {
+    |    d
+    |  })"""
+
+  """((a).b
+    |{
+    |  c
+    |})""" ==>
+  """((a).b {
+    |  c
+    |})"""
+
+  """(a).b
+    |{
+    |  c
+    |}""" ==>
+  """(a).b {
+    |  c
+    |}"""
+
+  """('a'.b
+    |  (c))""" ==>
+  """('a'.b(c))"""
+
 
 }

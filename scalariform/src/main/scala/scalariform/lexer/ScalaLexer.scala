@@ -47,12 +47,12 @@ object ScalaLexer {
       -1
   }
 
-  def tokeniseFull(file: File): (NewlineInferencer, List[Token]) = {
+  def tokeniseFull(file: File): (HiddenTokenInfo, List[Token]) = {
     val s = scala.io.Source.fromFile(file).mkString
     tokeniseFull(s)
   }
 
-  def tokeniseFull(s: String): (NewlineInferencer, List[Token]) = {
+  def tokeniseFull(s: String): (HiddenTokenInfo, List[Token]) = {
     val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(new ScalaLexer(new UnicodeEscapeReader(s))))
     val tokenBuffer = new ListBuffer[Token]
     var continue = true

@@ -627,19 +627,75 @@ class ScalaParser(tokens: Array[Token]) {
     AnonymousFunction(exprElementFlatten2(implicitToken, id, colonTypeOpt), arrowToken, body)
   }
 
+  private final val otherLetters = Set[Char]('\u0024', '\u005F') // '$' and '_'
+  private final val letterGroups = {
+    import java.lang.Character._
+    Set[Byte](LOWERCASE_LETTER, UPPERCASE_LETTER, OTHER_LETTER, TITLECASE_LETTER, LETTER_NUMBER)
+  }
+  private def isScalaLetter(ch: Char) = letterGroups(java.lang.Character.getType(ch).toByte) || otherLetters(ch)
+
+  private def isOpAssignmentName(name: String) = name match {
+    case "!=" | "<=" | ">=" | "" ⇒ false
+    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && ScalaOnlyLexer.isOperatorPart(name(0))
+  }
+
+  private def precedence(id: String) = id(0) match {
+    case _ if isOpAssignmentName(id) ⇒ 0
+    case c if isScalaLetter(c)       ⇒ 1
+    case '|'                         ⇒ 2
+    case '^'                         ⇒ 3
+    case '&'                         ⇒ 4
+    case '=' | '!'                   ⇒ 5
+    case '<' | '>'                   ⇒ 6
+    case ':'                         ⇒ 7
+    case '+' | '-'                   ⇒ 8
+    case '*' | '/' | '%'             ⇒ 9
+    case _                           ⇒ 10
+  }
+
+  private def hasSamePrecedence(token1: Token, token2: Token) = precedence(token1.text) == precedence(token2.text)
+  private def hasHigherPrecedence(token1: Token, token2: Token) = precedence(token1.text) > precedence(token2.text)
+
+  private def isRightAssociative(token: Token) = token.text.endsWith(":")
+
+  private object NestedInfixExpr {
+    def unapply(infixExpr: InfixExpr) = condOpt(infixExpr) {
+      case InfixExpr(List(InfixExpr(x, op1, newLineOpt1, y)), op2, newLineOpt2, z) ⇒ (x, op1, newLineOpt1, y, op2, newLineOpt2, z)
+    }
+  }
+
+  private def rotateRight(infixExpr: InfixExpr): InfixExpr = {
+    val NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) = infixExpr
+    InfixExpr(x, op1, newLineOpt1, List(InfixExpr(y, op2, newLineOpt2, z)))
+  }
+
+  private def performRotationsForPrecedence(infixExpr: InfixExpr): InfixExpr = infixExpr match {
+    case NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) if hasHigherPrecedence(op2, op1) ⇒
+      InfixExpr(x, op1, newLineOpt1, List(performRotationsForPrecedence(InfixExpr(y, op2, newLineOpt2, z))))
+    case _ ⇒ infixExpr
+  }
+
+  private def performRotationsForRightAssociativity(infixExpr: InfixExpr): InfixExpr = infixExpr match {
+    case NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) if hasSamePrecedence(op1, op2) && isRightAssociative(op1) && isRightAssociative(op2) ⇒
+      InfixExpr(x, op1, newLineOpt1, List(performRotationsForRightAssociativity(InfixExpr(y, op2, newLineOpt2, z))))
+    case _ ⇒ infixExpr
+  }
+
   private def postfixExpr(): List[ExprElement] = {
-    val prefixExpr_ = prefixExpr()
-    val postfixParts = ListBuffer[List[ExprElement]]()
+    var soFar: List[ExprElement] = prefixExpr()
     while (isIdent) {
       val id = ident()
       val newLineOpt = newLineOptWhenFollowing(isExprIntroToken)
-      val postfixPart = if (isExprIntro)
-        exprElementFlatten2(InfixExprElement(id), newLineOpt, prefixExpr())
-      else
-        List(PostfixExprElement(id))
-      postfixParts += postfixPart
+      if (isExprIntro) {
+        val prefixExpr_ = prefixExpr()
+        var infixExpr_ = InfixExpr(soFar, id, newLineOpt, prefixExpr_)
+        infixExpr_ = performRotationsForPrecedence(infixExpr_)
+        infixExpr_ = performRotationsForRightAssociativity(infixExpr_)
+        soFar = List(infixExpr_)
+      } else
+        soFar = List(PostfixExpr(soFar, id))
     }
-    exprElementFlatten2(prefixExpr_, postfixParts.toList)
+    soFar
   }
 
   private def prefixExpr(): List[ExprElement] = {
@@ -648,72 +704,97 @@ class ScalaParser(tokens: Array[Token]) {
       val unaryId = PrefixExprElement(ident())
       if (isMinus && isNumericLit) {
         val literal_ = literal()
-        val simpleExprRest_ = simpleExprRest(true)
-        exprElementFlatten2(unaryId, literal_, simpleExprRest_)
+        simpleExprRest(exprElementFlatten2(unaryId, literal_), true)
       } else
         exprElementFlatten2(unaryId, simpleExpr())
     } else
       simpleExpr()
   }
 
-  private def simpleExpr(): List[ExprElement] = {
-    var canApply = true
-    val firstPart = if (isLiteral) exprElementFlatten2(literal())
-    else currentTokenType match {
-      case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
-        exprElementFlatten2(xmlLiteral())
-      case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS | SUPER ⇒
-        exprElementFlatten2(path(thisOK = true, typeOK = false))
-      case USCORE ⇒
-        exprElementFlatten2(nextToken())
-      case LPAREN ⇒
-        val (lparen, parenBody, rparen) = makeParens(commaSeparated(expr))
-        exprElementFlatten2(ParenExpr(lparen, exprElementFlatten2(parenBody), rparen))
-      case LBRACE ⇒
-        canApply = false
-        exprElementFlatten2(blockExpr())
-      case NEW ⇒
-        canApply = false
-        val newToken = nextToken()
-        val template_ = template(isTrait = false)
-        exprElementFlatten2(newToken, template_)
-      case _ ⇒
-        throw new ScalaParserException("illegal start of simple expression: " + currentToken)
+  private object PathEndingWithDotId {
+    def unapply(tokens: List[Token]) = condOpt(tokens.reverse) {
+      case lastId :: dot :: rest if isIdent(lastId.tokenType) && dot.tokenType == DOT ⇒ (rest.reverse, dot, lastId)
     }
-    val remainder = simpleExprRest(canApply)
-    exprElementFlatten2(firstPart, remainder)
   }
 
-  private def simpleExprRest(canApply: Boolean): List[ExprElement] = {
+  private def simpleExpr(): List[ExprElement] = {
+    var canApply = true
+    val firstPart =
+      if (isLiteral) exprElementFlatten2(literal())
+      else currentTokenType match {
+        case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
+          exprElementFlatten2(xmlLiteral())
+        case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS | SUPER ⇒
+          // val callExpr = CallExpr(Some(previousPart, dot), selector_, None, Nil, None)
+          val path_ = path(thisOK = true, typeOK = false)
+          path_ match {
+            case PathEndingWithDotId(prefix, dot, lastId) ⇒ List(CallExpr(Some(exprElementFlatten2(prefix), dot), lastId, None, Nil, None))
+            case _                                        ⇒ exprElementFlatten2(path_)
+          }
+        case USCORE ⇒
+          exprElementFlatten2(nextToken())
+        case LPAREN ⇒
+          val (lparen, parenBody, rparen) = makeParens(commaSeparated(expr))
+          exprElementFlatten2(ParenExpr(lparen, exprElementFlatten2(parenBody), rparen))
+        case LBRACE ⇒
+          canApply = false
+          exprElementFlatten2(blockExpr())
+        case NEW ⇒
+          canApply = false
+          val newToken = nextToken()
+          val template_ = template(isTrait = false)
+          List(New(newToken, template_))
+        case _ ⇒
+          throw new ScalaParserException("illegal start of simple expression: " + currentToken)
+      }
+    simpleExprRest(firstPart, canApply)
+  }
+
+  private def simpleExprRest(previousPart: List[ExprElement], canApply: Boolean): List[ExprElement] = {
     val newLineOpt = if (canApply) newLineOptWhenFollowedBy(LBRACE) else None
     currentTokenType match {
       case DOT ⇒
+        require(newLineOpt.isEmpty)
         val dot = nextToken()
         val selector_ = selector()
-        val simpleExprRest_ = simpleExprRest(canApply = true)
-        exprElementFlatten2(newLineOpt, (dot, selector_, simpleExprRest_))
+        val callExpr = CallExpr(Some(previousPart, dot), selector_, None, Nil, None)
+        simpleExprRest(List(callExpr), canApply = true)
       case LBRACKET ⇒
-        val identifierCond = true /* TODO */ /*             case Ident(_) | Select(_, _) => */
+        require(newLineOpt.isEmpty)
+        val identifierCond = true // TODO: missing check: case Ident(_) | Select(_, _) => OK, just means we accept multiple type param [X][Y] clauses
         if (identifierCond) {
           val typeArgs_ = TypeExprElement(exprTypeArgs())
-          val simpleExprRest_ = simpleExprRest(canApply = true)
-          exprElementFlatten2(newLineOpt, typeArgs_, simpleExprRest_)
+          val updatedPart = previousPart match {
+            case List(callExpr: CallExpr) ⇒ List(callExpr.copy(typeArgsOpt = Some(typeArgs_)))
+            case _                        ⇒ exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
+          }
+          simpleExprRest(updatedPart, canApply = true)
         } else
-          exprElementFlatten2(newLineOpt)
+          exprElementFlatten2(previousPart)
       case LPAREN | LBRACE if canApply ⇒
         val argumentExprs_ = argumentExprs()
-        val simpleExprRest_ = simpleExprRest(canApply = true)
-        exprElementFlatten2(newLineOpt, argumentExprs_, simpleExprRest_)
+        val updatedPart = previousPart match {
+          case List(callExpr: CallExpr) ⇒ List(callExpr.copy(newLineOptsAndArgumentExprss = callExpr.newLineOptsAndArgumentExprss :+ (newLineOpt, argumentExprs_)))
+          case _                        ⇒ exprElementFlatten2(previousPart, newLineOpt, argumentExprs_)
+        }
+        simpleExprRest(updatedPart, canApply = true)
       case USCORE ⇒
-        exprElementFlatten2(newLineOpt, PostfixExprElement(nextToken()))
+        require(newLineOpt.isEmpty)
+        val uscore = nextToken()
+        previousPart match {
+          case List(callExpr: CallExpr) ⇒ List(callExpr.copy(uscoreOpt = Some(uscore)))
+          case _                        ⇒ List(PostfixExpr(previousPart, uscore))
+        }
       case _ ⇒
-        exprElementFlatten2(newLineOpt)
+        require(newLineOpt.isEmpty)
+        previousPart
     }
   }
 
   private def argumentExprs(): ArgumentExprs = {
     // println("argumentExprs(): " + currentToken)
-    def args() = commaSeparated(expr)
+    def argument() = Argument(expr())
+    def args() = commaSeparated(argument())
     currentTokenType match {
       case LBRACE ⇒ BlockArgumentExprs(exprElementFlatten2(blockExpr()))
       case LPAREN ⇒
@@ -810,14 +891,14 @@ class ScalaParser(tokens: Array[Token]) {
 
     def pattern(): Expr = { // Scalac now uses a loop() method, but this is still OK:
       val firstPattern = pattern1()
-      val pipeOtherPatterns = ListBuffer[(InfixExprElement, Expr)]()
+      var currentExpr: ExprElement = firstPattern
       if (PIPE)
         while (PIPE) {
-          val pipeElement = InfixExprElement(nextToken())
+          val pipeToken = nextToken()
           val otherPattern = pattern1()
-          pipeOtherPatterns += ((pipeElement, otherPattern))
+          currentExpr = InfixExpr(List(currentExpr), pipeToken, None, List(otherPattern))
         }
-      makeExpr(firstPattern, pipeOtherPatterns.toList)
+      makeExpr(currentExpr)
     }
 
     def pattern1(): Expr = {
@@ -1889,3 +1970,7 @@ object ScalaParser {
   implicit def listToTypeFlattenable[T <% TypeElementFlattenable](list: List[T]): TypeElementFlattenable = TypeElements(list flatMap { _.elements })
 
 }
+
+// Not AST nodes, used as an intermediate structures during parsing:
+
+case class TemplateOpt(templateInheritanceSectionOpt: Option[TemplateInheritanceSection], templateBodyOpt: Option[TemplateBody])

@@ -18,7 +18,7 @@ class ParserTest extends FlatSpec with ShouldMatchers {
   }
 
   private def parseExpression(s: String) = {
-    val (lexer, tokens) = ScalaLexer.tokeniseFull(s)
+    val (_, tokens) = ScalaLexer.tokeniseFull(s)
     new ScalaParser(tokens.toArray).expr
   }
 
