@@ -76,11 +76,44 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
 
   " a + b + c " ~
   "   $       " ~
-  " $$$$$     " 
-
-  " a + b + c " ~
   " $$$$$     " ~
   " $$$$$$$$$ " 
+
+  " a + b + c " ~
+  "      $$$  " ~
+  " $$$$$$$$$ " 
+
+  " x + y * z " ~
+  "      $$$  " ~
+  "     $$$$$ " ~
+  " $$$$$$$$$ "
+
+  " a :: b :: c :: Nil " ~
+  "             $$     " ~
+  "           $$$$$$$$ " ~
+  "      $$$$$$$$$$$$$ " ~
+  " $$$$$$$$$$$$$$$$$$ "
+
+  " a :: b :: Nil ++ Nil " ~ 
+  "                  $$$ " ~ 
+  "           $$$$$$$$$$ " ~ 
+  "      $$$$$$$$$$$$$$$ " ~ 
+  " $$$$$$$$$$$$$$$$$$$$ "
+
+  " a + b :: b + c :: Nil ++ Nil " ~ 
+  "              $               " ~ 
+  "          $$$$$               " ~ 
+  "          $$$$$$$$$$$$$$$$$$$ " ~ 
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+
+  " i += 10 + 2 " ~
+  " $           " ~
+  " $$$$$$$$$$$ "
+
+  " i += 10 + 2 " ~
+  "      $$     " ~
+  "      $$$$$$ " ~
+  " $$$$$$$$$$$ "
 
   private def findSelectionRange(s: String): Range = { 
     val barLocation = s indexOf '|'
@@ -100,13 +133,14 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   }
 
   case class IntermediateTest(source: String, initialSelectionDiagram: String) { 
-    def ~(finalSelectionDiagram: String) { 
+    def ~(finalSelectionDiagram: String): IntermediateTest = { 
        val initialSelection = findSelectionRange(initialSelectionDiagram)      
        val actualFinalSelection = new AstSelector(source).expandSelection(initialSelection) getOrElse initialSelection
        val expectedFinalSelection = findSelectionRange(finalSelectionDiagram)
-       "source" should "expand\n>>>" + (initialSelectionDiagram + "<<<\n to \n>>>" + finalSelectionDiagram + "<<<\n") in {
+       ("source\n>>>" + source + "<<<\n") should "expand\n>>>" + (initialSelectionDiagram + "<<<\n to \n>>>" + finalSelectionDiagram + "<<<\n") in {
          actualFinalSelection should equal (expectedFinalSelection)
        }
+       IntermediateTest(source, initialSelectionDiagram = finalSelectionDiagram)
     }
   }
 }

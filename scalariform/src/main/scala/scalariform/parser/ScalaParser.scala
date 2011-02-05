@@ -627,14 +627,72 @@ class ScalaParser(tokens: Array[Token]) {
     AnonymousFunction(exprElementFlatten2(implicitToken, id, colonTypeOpt), arrowToken, body)
   }
 
+  private final val otherLetters = Set[Char]('\u0024', '\u005F') // '$' and '_'
+  private final val letterGroups = {
+    import java.lang.Character._
+    Set[Byte](LOWERCASE_LETTER, UPPERCASE_LETTER, OTHER_LETTER, TITLECASE_LETTER, LETTER_NUMBER)
+  }
+  private def isScalaLetter(ch: Char) = letterGroups(java.lang.Character.getType(ch).toByte) || otherLetters(ch)
+
+  private def isOpAssignmentName(name: String) = name match {
+    case "!=" | "<=" | ">=" | "" ⇒ false
+    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && ScalaOnlyLexer.isOperatorPart(name(0))
+  }
+
+  private def precedence(id: String) = id(0) match {
+    case _ if isOpAssignmentName(id) ⇒ 0
+    case c if isScalaLetter(c)       ⇒ 1
+    case '|'                         ⇒ 2
+    case '^'                         ⇒ 3
+    case '&'                         ⇒ 4
+    case '=' | '!'                   ⇒ 5
+    case '<' | '>'                   ⇒ 6
+    case ':'                         ⇒ 7
+    case '+' | '-'                   ⇒ 8
+    case '*' | '/' | '%'             ⇒ 9
+    case _                           ⇒ 10
+  }
+
+  private def hasSamePrecedence(token1: Token, token2: Token) = precedence(token1.text) == precedence(token2.text)
+  private def hasHigherPrecedence(token1: Token, token2: Token) = precedence(token1.text) > precedence(token2.text)
+
+  private def isRightAssociative(token: Token) = token.text.endsWith(":")
+
+  private object NestedInfixExpr {
+    def unapply(infixExpr: InfixExpr) = condOpt(infixExpr) {
+      case InfixExpr(List(InfixExpr(x, op1, newLineOpt1, y)), op2, newLineOpt2, z) ⇒ (x, op1, newLineOpt1, y, op2, newLineOpt2, z)
+    }
+  }
+
+  private def rotateRight(infixExpr: InfixExpr): InfixExpr = {
+    val NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) = infixExpr
+    InfixExpr(x, op1, newLineOpt1, List(InfixExpr(y, op2, newLineOpt2, z)))
+  }
+
+  private def performRotationsForPrecedence(infixExpr: InfixExpr): InfixExpr = infixExpr match {
+    case NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) if hasHigherPrecedence(op2, op1) ⇒
+      InfixExpr(x, op1, newLineOpt1, List(performRotationsForPrecedence(InfixExpr(y, op2, newLineOpt2, z))))
+    case _ ⇒ infixExpr
+  }
+
+  private def performRotationsForRightAssociativity(infixExpr: InfixExpr): InfixExpr = infixExpr match {
+    case NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) if hasSamePrecedence(op1, op2) && isRightAssociative(op1) && isRightAssociative(op2) ⇒
+      InfixExpr(x, op1, newLineOpt1, List(performRotationsForRightAssociativity(InfixExpr(y, op2, newLineOpt2, z))))
+    case _ ⇒ infixExpr
+  }
+
   private def postfixExpr(): List[ExprElement] = {
     var soFar: List[ExprElement] = prefixExpr()
     while (isIdent) {
       val id = ident()
       val newLineOpt = newLineOptWhenFollowing(isExprIntroToken)
-      if (isExprIntro) 
-        soFar = List(InfixExpr(soFar, id, newLineOpt, prefixExpr()))
-      else
+      if (isExprIntro) {
+        val prefixExpr_ = prefixExpr()
+        var infixExpr_ = InfixExpr(soFar, id, newLineOpt, prefixExpr_)
+        infixExpr_ = performRotationsForPrecedence(infixExpr_)
+        infixExpr_ = performRotationsForRightAssociativity(infixExpr_)
+        soFar = List(infixExpr_)
+      } else
         soFar = List(PostfixExpr(soFar, id))
     }
     soFar
@@ -686,7 +744,7 @@ class ScalaParser(tokens: Array[Token]) {
       case DOT ⇒
         val dot = nextToken()
         val selector_ = selector()
-        simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, (dot, selector_)), canApply = true)       
+        simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, (dot, selector_)), canApply = true)
       case LBRACKET ⇒
         val identifierCond = true /* TODO */ /*             case Ident(_) | Select(_, _) => */
         if (identifierCond) {
@@ -696,7 +754,7 @@ class ScalaParser(tokens: Array[Token]) {
           exprElementFlatten2(previousPart, newLineOpt)
       case LPAREN | LBRACE if canApply ⇒
         val argumentExprs_ = argumentExprs()
-        simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, argumentExprs_), canApply = true)       
+        simpleExprRest(exprElementFlatten2(previousPart, newLineOpt, argumentExprs_), canApply = true)
       case USCORE ⇒
         val uscore = nextToken()
         List(PostfixExpr(exprElementFlatten2(previousPart, newLineOpt), uscore))
@@ -802,7 +860,7 @@ class ScalaParser(tokens: Array[Token]) {
     def patterns(): List[ExprElement] = {
       exprElementFlatten2(commaSeparated(pattern()))
     }
- 
+
     def pattern(): Expr = { // Scalac now uses a loop() method, but this is still OK:
       val firstPattern = pattern1()
       var currentExpr: ExprElement = firstPattern
