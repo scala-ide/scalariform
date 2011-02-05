@@ -568,8 +568,8 @@ class ScalaParser(tokens: Array[Token]) {
       case _ ⇒
 
         val postfixExpr_ = postfixExpr()
-        val equalsColonOrMatchSuffix = if (EQUALS) {
-          exprElementFlatten2(optional { /* TODO: case Ident(_) | Select(_, _) | Apply(_, _) => */
+        val intermediateResult =  if (EQUALS) {
+          exprElementFlatten2(postfixExpr_, optional { /* TODO: case Ident(_) | Select(_, _) | Apply(_, _) => */
             val equalsToken = nextToken()
             val equalsExpr = expr()
             (equalsToken, equalsExpr)
@@ -579,25 +579,24 @@ class ScalaParser(tokens: Array[Token]) {
           if (USCORE) {
             val uscore = nextToken()
             val star = accept(STAR)
-            exprElementFlatten2(colonToken, uscore, star)
+            exprElementFlatten2(postfixExpr_, colonToken, (uscore, star))
           } else if (AT) {
-            exprElementFlatten2(colonToken, annotations(skipNewLines = false))
+            exprElementFlatten2(postfixExpr_, colonToken, annotations(skipNewLines = false))
           } else {
             val type_ = typeOrInfixType(location)
-            exprElementFlatten2(colonToken, type_)
+            exprElementFlatten2(postfixExpr_, colonToken, type_)
           }
         } else if (MATCH) {
           val matchToken = nextToken()
           val (lbrace, caseClauses_, rbrace) = inBraces(caseClauses())
           val blockExpr_ = BlockExpr(lbrace, Left(caseClauses_), rbrace)
-          exprElementFlatten2(matchToken, blockExpr_)
+          List(MatchExpr(postfixExpr_, matchToken, blockExpr_))
         } else
-          Nil
+          postfixExpr_
 
         if (logging)
           println("in expr0, postfixExpr = " + postfixExpr_)
 
-        val intermediateResult = exprElementFlatten2(postfixExpr_, equalsColonOrMatchSuffix)
         val lhsIsTypedParamList = cond(postfixExpr_) { case List(ParenExpr(_, _, _)) ⇒ true } // TODO: is this check sufficient?
         if (ARROW && (location != InTemplate || lhsIsTypedParamList)) {
           val anonFuncOpt: Option[List[ExprElement]] = optional {

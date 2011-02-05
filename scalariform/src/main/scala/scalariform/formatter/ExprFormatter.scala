@@ -18,6 +18,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def format(exprElement: ExprElement)(implicit formatterState: FormatterState): FormatResult = exprElement match {
     case ifExpr: IfExpr                       ⇒ format(ifExpr)
     case whileExpr: WhileExpr                 ⇒ format(whileExpr)
+    case matchExpr: MatchExpr                 ⇒ format(matchExpr)
     case doExpr: DoExpr                       ⇒ format(doExpr)
     case blockExpr: BlockExpr                 ⇒ format(blockExpr, indent = true)
     case forExpr: ForExpr                     ⇒ format(forExpr)
@@ -41,11 +42,21 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case _                                    ⇒ NoFormatResult
   }
 
+  private def format(matchExpr: MatchExpr)(implicit formatterState: FormatterState): FormatResult = {
+    val MatchExpr(left: List[ExprElement], matchToken: Token, block: BlockExpr) = matchExpr
+    var formatResult: FormatResult = NoFormatResult
+    var currentFormatterState = formatterState
+    val (leftFormatResult, updatedFormatterState) = formatExprElements(left)
+    currentFormatterState = updatedFormatterState
+    formatResult ++= leftFormatResult
+    formatResult ++= format(block)(currentFormatterState)
+    formatResult
+  }
+
   private def formatExprElements(exprElements: List[ExprElement])(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
     if (exprElements flatMap { _.tokens } isEmpty)
       return (NoFormatResult, formatterState)
     var formatResult: FormatResult = NoFormatResult
-
     var currentFormatterState = formatterState
 
     for ((previousElementOption, element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
@@ -202,8 +213,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def format(argumentExprs: ArgumentExprs)(implicit formatterState: FormatterState): FormatResult = argumentExprs match {
-    case BlockArgumentExprs(contents)                 ⇒ format(contents)
-    case ParenArgumentExprs(lparen, contents, rparen) ⇒ 
+    case BlockArgumentExprs(contents) ⇒ format(contents)
+    case ParenArgumentExprs(lparen, contents, rparen) ⇒
       var formatResult = format(GeneralTokens(List(lparen)) :: contents)
       if (formattingPreferences(PreserveDanglingCloseParenthesis) && hiddenPredecessors(rparen).containsNewline && contents.nonEmpty)
         formatResult = formatResult.before(rparen, formatterState.currentIndentLevelInstruction)

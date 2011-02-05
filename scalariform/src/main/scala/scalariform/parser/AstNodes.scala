@@ -225,6 +225,10 @@ case class FullDefOrDcl(annotations: List[Annotation], modifiers: List[Modifier]
   lazy val tokens = flatten(annotations, modifiers, defOrDcl)
 }
 
+case class MatchExpr(left: List[ExprElement], matchToken: Token, block: BlockExpr) extends ExprElement { 
+  lazy val tokens = flatten(left, matchToken, block)
+}
+
 case class CaseClause(casePattern: CasePattern, statSeq: StatSeq) extends AstNode {
   lazy val tokens = flatten(casePattern, statSeq)
 }
