@@ -123,6 +123,10 @@ case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Opt
   lazy val tokens = flatten(left, infixId, newlineOption, right)
 }
 
+case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt: Option[Token]) extends ExprElement { 
+  lazy val tokens = flatten(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, uscoreOpt)
+}
+
 case class TypeExprElement(contents: List[TypeElement]) extends AstNode with ExprElement {
   //require(!contents.isEmpty)
   lazy val tokens = flatten(contents)

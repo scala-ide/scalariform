@@ -13,6 +13,7 @@ object AstSelector {
   private val nonSelectableAstNodes: Set[Class[_]] =
     Set(
       classOf[ElseClause],
+      classOf[ExprFunBody],
       classOf[FunDefOrDcl],
       classOf[ParenArgumentExprs],
       classOf[ParamClause],
@@ -22,6 +23,7 @@ object AstSelector {
       classOf[TemplateBody],
       classOf[TemplateParents],
       classOf[TypeDefOrDcl],
+      classOf[TypeExprElement],
       classOf[TypeParamClause])
 }
 

@@ -539,4 +539,57 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |      wubble(x))) => y
     |}"""
 
+  """'a'
+    |.b
+    |.c""" ==>
+  """'a'
+    |  .b
+    |  .c"""
+
+ """a.
+    |b().c match {
+    |case d =>
+    |}""" ==>
+ """a.
+    |  b().c match {
+    |    case d =>
+    |  }""" 
+
+  """a()
+    |.b(c(
+    |d))""" ==>
+  """a()
+    |  .b(c(
+    |    d))"""
+
+  """a().
+    |b(c => {
+    |d
+    |})""" ==>
+  """a().
+    |  b(c => {
+    |    d
+    |  })"""
+
+  """((a).b
+    |{
+    |  c
+    |})""" ==>
+  """((a).b {
+    |  c
+    |})"""
+
+  """(a).b
+    |{
+    |  c
+    |}""" ==>
+  """(a).b {
+    |  c
+    |}"""
+
+  """('a'.b
+    |  (c))""" ==>
+  """('a'.b(c))"""
+
+
 }
