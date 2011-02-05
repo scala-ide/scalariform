@@ -818,12 +818,17 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def block(): StatSeq = blockStatSeq()
 
-  private def caseClauses(): CaseClauses = CaseClauses(caseSeparated {
-    (pattern(), guard(), caseBlock())
-  } map {
-    case (caseToken, (pattern_, guardOption, (arrow, blockStatSeq_))) ⇒
-      CaseClause(CasePattern(caseToken, pattern_, guardOption, arrow), blockStatSeq_)
-  })
+  private def caseClauses(): CaseClauses = {
+    val caseClauses_ = caseSeparated {
+      (pattern(), guard(), caseBlock())
+    } map {
+      case (caseToken, (pattern_, guardOption, (arrow, blockStatSeq_))) ⇒
+        CaseClause(CasePattern(caseToken, pattern_, guardOption, arrow), blockStatSeq_)
+    }
+    if (caseClauses_.isEmpty)
+      throw new ScalaParserException("No case clauses found")
+    CaseClauses(caseClauses_)
+  }
 
   private def caseBlock(): (Token, StatSeq) = {
     val arrowToken = accept(ARROW)

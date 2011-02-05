@@ -13,6 +13,10 @@ class ParserTest extends FlatSpec with ShouldMatchers {
     evaluating { parseExpression("for {x <- b if }") } should produce[ScalaParserException]
   }
 
+  "Parser" should "throw a parse exception for empty match " in {
+    evaluating { parseExpression("a match { }") } should produce[ScalaParserException]
+  }
+
   "Parser" should "not throw an exception" in {
     parseExpression("{ case List[String]() => 12 }")
   }
