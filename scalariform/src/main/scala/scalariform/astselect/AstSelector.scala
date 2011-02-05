@@ -6,6 +6,18 @@ import scalariform.utils.Range
 
 object AstSelector {
 
+  /**
+   * Expands the given selection in the source to the range of the closest appropriate
+   * enclosing AST element. Returns None if the source does not parse correctly, or if
+   * there is no strictly larger containing AST element.
+   */
+  def expandSelection(source: String, initialSelection: Range): Option[Range] =
+    try {
+      new AstSelector(source).expandSelection(initialSelection)
+    } catch {
+      case e: ScalaParserException ⇒ None
+    }
+
   import Tokens._
 
   private val selectableXmls = Set(XML_NAME, XML_ATTR_VALUE, XML_PCDATA, XML_COMMENT, XML_UNPARSED, XML_PCDATA)
