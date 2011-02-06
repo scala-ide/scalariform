@@ -37,6 +37,10 @@ object AstSelector {
       classOf[TypeDefOrDcl],
       classOf[TypeExprElement],
       classOf[TypeParamClause])
+
+  private val nonSelectableChildParentNodes: Set[(Class[_], Class[_])] =
+    Set(
+      (classOf[BlockExpr], classOf[MatchExpr]))
 }
 
 class AstSelector(source: String) {
@@ -46,7 +50,7 @@ class AstSelector(source: String) {
   private val compilationUnit = new ScalaParser(tokens.toArray).compilationUnitOrScript()
 
   def expandSelection(initialSelection: Range): Option[Range] =
-    expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection)
+    expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection, parent = None)
 
   private def expandToToken(initialSelection: Range): Option[Range] = {
     val Range(offset, length) = initialSelection
@@ -69,18 +73,22 @@ class AstSelector(source: String) {
     isLiteral || isKeyword || isComment || isId || (selectableXmls contains tokenType)
   }
 
-  private def expandToEnclosingAst(node: AstNode, initialSelection: Range): Option[Range] =
+  private def expandToEnclosingAst(node: AstNode, initialSelection: Range, parent: Option[AstNode]): Option[Range] =
     node.rangeOpt flatMap { nodeRange ⇒
       for {
         childNode ← node.immediateChildren
-        descendantRange ← expandToEnclosingAst(childNode, initialSelection)
+        descendantRange ← expandToEnclosingAst(childNode, initialSelection, parent = Some(node))
       } return Some(descendantRange)
-      if (nodeRange.contains(initialSelection) && nodeRange.length > initialSelection.length && isSelectableAst(node))
+      if (nodeRange.contains(initialSelection) && nodeRange.length > initialSelection.length && isSelectableAst(node, parent))
         Some(nodeRange)
       else
         None
     }
 
-  private def isSelectableAst(node: AstNode) = !(nonSelectableAstNodes contains node.getClass)
+  private def isSelectableAst(node: AstNode, parentOpt: Option[AstNode]) =
+    if (nonSelectableAstNodes contains node.getClass)
+      false
+    else
+      !(parentOpt exists { parent ⇒ nonSelectableChildParentNodes contains (node.getClass, parent.getClass) })
 
 }
