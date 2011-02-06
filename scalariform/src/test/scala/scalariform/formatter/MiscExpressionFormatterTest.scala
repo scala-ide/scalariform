@@ -591,5 +591,16 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  (c))""" ==>
   """('a'.b(c))"""
 
+  """a match {
+    |case b if c &&
+    |d => {e
+    |}
+    |}""" =/=>
+  """a match {
+    |  case b if c &&
+    |    d => {
+    |      e
+    |    }
+    |}""" because " we don't thread the expression break state through case statement"
 
 }
