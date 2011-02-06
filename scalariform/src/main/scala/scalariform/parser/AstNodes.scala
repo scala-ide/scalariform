@@ -33,7 +33,7 @@ sealed trait AstNode extends CaseClassReflector {
   protected implicit def tokenToFlattenable(token: Token): Flattenable = new Flattenable { val tokens = List(token) }
 
   protected def flatten(flattenables: Flattenable*): List[Token] = flattenables.toList flatMap { _.tokens }
-  
+
   def immediateChildren: List[AstNode] = productIterator.toList flatten immediateAstNodes
 
   private def immediateAstNodes(n: Any): List[AstNode] = n match {
@@ -115,15 +115,15 @@ case class PrefixExprElement(id: Token) extends ExprElement {
   lazy val tokens = flatten(id)
 }
 
-case class PostfixExpr(first: List[ExprElement], postfixId: Token) extends ExprElement { 
+case class PostfixExpr(first: List[ExprElement], postfixId: Token) extends ExprElement {
   lazy val tokens = flatten(first, postfixId)
 }
 
-case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Option[Token], right: List[ExprElement]) extends ExprElement { 
+case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Option[Token], right: List[ExprElement]) extends ExprElement {
   lazy val tokens = flatten(left, infixId, newlineOption, right)
 }
 
-case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt: Option[Token]) extends ExprElement { 
+case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt: Option[Token]) extends ExprElement {
   lazy val tokens = flatten(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, uscoreOpt)
 }
 
@@ -142,11 +142,11 @@ case class ParenArgumentExprs(lparen: Token, contents: List[ExprElement], rparen
   lazy val tokens = flatten(lparen, contents, rparen)
 }
 
-case class Argument(expr: Expr) extends AstNode with ExprElement { 
+case class Argument(expr: Expr) extends AstNode with ExprElement {
   lazy val tokens = flatten(expr)
 }
 
-case class New(newToken: Token, template: Template) extends ExprElement { 
+case class New(newToken: Token, template: Template) extends ExprElement {
   lazy val tokens = flatten(newToken, template)
 }
 
@@ -225,8 +225,12 @@ case class FullDefOrDcl(annotations: List[Annotation], modifiers: List[Modifier]
   lazy val tokens = flatten(annotations, modifiers, defOrDcl)
 }
 
-case class MatchExpr(left: List[ExprElement], matchToken: Token, block: BlockExpr) extends ExprElement { 
+case class MatchExpr(left: List[ExprElement], matchToken: Token, block: BlockExpr) extends ExprElement {
   lazy val tokens = flatten(left, matchToken, block)
+}
+
+case class EqualsExpr(lhs: List[ExprElement], equals: Token, rhs: Expr) extends ExprElement {
+  lazy val tokens = flatten(lhs, equals, rhs)
 }
 
 case class CaseClause(casePattern: CasePattern, statSeq: StatSeq) extends AstNode {
@@ -421,5 +425,4 @@ case class XmlProcessingInstruction(token: Token) extends XmlContents { lazy val
 case class XmlExpr(first: XmlContents, otherElements: List[XmlContents]) extends ExprElement {
   lazy val tokens = flatten(first, otherElements)
 }
-
 

@@ -39,7 +39,19 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     case parenExpr: ParenExpr                 ⇒ format(parenExpr)
     case new_ : New                           ⇒ format(new_.template)
     case callExpr: CallExpr                   ⇒ format(callExpr)._1
+    case equalsExpr: EqualsExpr               ⇒ format(equalsExpr)
     case _                                    ⇒ NoFormatResult
+  }
+
+  private def format(equalsExpr: EqualsExpr)(implicit formatterState: FormatterState): FormatResult = {
+    val EqualsExpr(lhs: List[ExprElement], equals: Token, rhs: Expr) = equalsExpr
+    var formatResult: FormatResult = NoFormatResult
+    var currentFormatterState = formatterState
+    val (leftFormatResult, updatedFormatterState) = formatExprElements(lhs)
+    currentFormatterState = updatedFormatterState
+    formatResult ++= leftFormatResult
+    formatResult ++= format(rhs)(currentFormatterState)
+    formatResult
   }
 
   private def format(matchExpr: MatchExpr)(implicit formatterState: FormatterState): FormatResult = {

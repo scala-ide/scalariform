@@ -569,11 +569,12 @@ class ScalaParser(tokens: Array[Token]) {
 
         val postfixExpr_ = postfixExpr()
         val intermediateResult =  if (EQUALS) {
-          exprElementFlatten2(postfixExpr_, optional { /* TODO: case Ident(_) | Select(_, _) | Apply(_, _) => */
-            val equalsToken = nextToken()
-            val equalsExpr = expr()
-            (equalsToken, equalsExpr)
-          })
+          optional { /* TODO: case Ident(_) | Select(_, _) | Apply(_, _) => */
+            (accept(EQUALS), expr())
+          } match { 
+            case Some((equalsToken, equalsExpr)) => List(EqualsExpr(postfixExpr_, equalsToken, equalsExpr))
+            case None => postfixExpr_
+	  }
         } else if (COLON) {
           val colonToken = nextToken()
           if (USCORE) {

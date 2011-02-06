@@ -138,11 +138,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $      " ~
   " $$$$$$ "
   
+  }
+
   " x = a + b " ~
   " $         " ~
   " $$$$$$$$$ "
-
-  }
 
   " a match { case b => } " ~
   " $                     " ~
