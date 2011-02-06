@@ -24,10 +24,13 @@ object AstSelector {
 
   private val nonSelectableAstNodes: Set[Class[_]] =
     Set(
+      classOf[CasePattern],
       classOf[ElseClause],
+      classOf[Enumerators],
       classOf[ExprFunBody],
       classOf[FunDefOrDcl],
       classOf[ParenArgumentExprs],
+      classOf[GeneralTokens],
       classOf[ParamClause],
       classOf[ParamClauses],
       classOf[PatDefOrDcl],
