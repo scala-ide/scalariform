@@ -603,4 +603,32 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    }
     |}""" because " we don't thread the expression break state through case statement"
 
+  """a =
+    |b""" ==>
+  """a =
+    |  b"""
+  """a =
+    |b + c +
+    |d""" ==>
+  """a =
+    |  b + c +
+    |    d"""
+
+  """a
+    |.b = 
+    |c""" ==>
+  """a
+    |  .b =
+    |    c"""
+
+  """a
+    |.b = {
+    |c
+    |}""" ==>
+  """a
+    |  .b = {
+    |    c
+    |  }"""
+
+
 }

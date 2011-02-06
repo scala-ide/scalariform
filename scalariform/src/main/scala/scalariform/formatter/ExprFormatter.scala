@@ -62,6 +62,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val (leftFormatResult, updatedFormatterState) = formatExprElements(lhs)
     currentFormatterState = updatedFormatterState
     formatResult ++= leftFormatResult
+    if (hiddenPredecessors(rhs.firstToken).containsNewline) { 
+      currentFormatterState = currentFormatterState.indent
+      formatResult = formatResult.before(rhs.firstToken, currentFormatterState.currentIndentLevelInstruction)
+    }
     formatResult ++= format(rhs)(currentFormatterState)
     formatResult
   }
