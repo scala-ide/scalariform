@@ -568,25 +568,26 @@ class ScalaParser(tokens: Array[Token]) {
       case _ ⇒
 
         val postfixExpr_ = postfixExpr()
-        val intermediateResult =  if (EQUALS) {
+        val intermediateResult = if (EQUALS) {
           optional { /* TODO: case Ident(_) | Select(_, _) | Apply(_, _) => */
             (accept(EQUALS), expr())
-          } match { 
-            case Some((equalsToken, equalsExpr)) => List(EqualsExpr(postfixExpr_, equalsToken, equalsExpr))
-            case None => postfixExpr_
-	  }
+          } match {
+            case Some((equalsToken, equalsExpr)) ⇒ List(EqualsExpr(postfixExpr_, equalsToken, equalsExpr))
+            case None                            ⇒ postfixExpr_
+          }
         } else if (COLON) {
           val colonToken = nextToken()
-          if (USCORE) {
+          val rhs = if (USCORE) {
             val uscore = nextToken()
             val star = accept(STAR)
-            exprElementFlatten2(postfixExpr_, colonToken, (uscore, star))
+            exprElementFlatten2(uscore, star)
           } else if (AT) {
-            exprElementFlatten2(postfixExpr_, colonToken, annotations(skipNewLines = false))
+            annotations(skipNewLines = false)
           } else {
             val type_ = typeOrInfixType(location)
-            exprElementFlatten2(postfixExpr_, colonToken, type_)
+            List(type_)
           }
+          List(AscriptionExpr(postfixExpr_, colonToken, rhs))
         } else if (MATCH) {
           val matchToken = nextToken()
           val (lbrace, caseClauses_, rbrace) = inBraces(caseClauses())
