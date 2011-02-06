@@ -17,13 +17,16 @@ class ParserTest extends FlatSpec with ShouldMatchers {
     evaluating { parseExpression("a match { }") } should produce[ScalaParserException]
   }
 
+  "Parser" should "produce a parse exception on a trailing close brace" in {
+    evaluating { parseCompilationUnit("class A{}}") } should produce[ScalaParserException]
+  }
+
   "Parser" should "not throw an exception" in {
     parseExpression("{ case List[String]() => 12 }")
   }
 
-  private def parseExpression(s: String) = {
-    val (_, tokens) = ScalaLexer.tokeniseFull(s)
-    new ScalaParser(tokens.toArray).expr
-  }
+  private def parser(s: String) = new ScalaParser(ScalaLexer.tokeniseFull(s)._2.toArray)
+  private def parseExpression(s: String) = parser(s).expr
+  private def parseCompilationUnit(s: String) = parser(s).compilationUnit
 
 }

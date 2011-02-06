@@ -1693,7 +1693,9 @@ class ScalaParser(tokens: Array[Token]) {
         StatSeq(selfReferenceOpt = None, firstStatOpt = None, otherStats = otherStats)
       }
     }
-    CompilationUnit(topstats())
+    val topStats_ = topstats()
+    accept(EOF)
+    CompilationUnit(topStats_)
   }
 
   private def xmlStartTag(isPattern: Boolean): XmlStartTag = {
