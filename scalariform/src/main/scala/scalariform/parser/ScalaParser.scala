@@ -935,14 +935,16 @@ class ScalaParser(tokens: Array[Token]) {
     def pattern3(): List[ExprElement] = {
       val simplePattern1 = simplePattern()
       interceptStarPattern() foreach { x ⇒ return exprElementFlatten2(simplePattern1, x) }
-
-      val idAndPatterns = ListBuffer[(Token, List[ExprElement])]()
+      var soFar: List[ExprElement] = simplePattern1
       while (isIdent && !PIPE) {
         val id = ident()
         val otherSimplePattern = simplePattern()
-        idAndPatterns += ((id, otherSimplePattern))
+        var infixExpr_ = InfixExpr(soFar, id, None, otherSimplePattern)
+        infixExpr_ = performRotationsForPrecedence(infixExpr_)
+        infixExpr_ = performRotationsForRightAssociativity(infixExpr_)
+        soFar = List(infixExpr_)
       }
-      exprElementFlatten2(simplePattern1, idAndPatterns.toList)
+      soFar
     }
 
     def simplePattern(): List[ExprElement] = {
