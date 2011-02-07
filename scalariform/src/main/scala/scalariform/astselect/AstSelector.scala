@@ -82,10 +82,27 @@ class AstSelector(source: String) {
         descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
       } return Some(descendantRange)
       if (nodeRange.contains(initialSelection) && nodeRange.length > initialSelection.length && isSelectableAst(node, enclosingNodes))
-        Some(nodeRange)
+        Some(prependScaladocIfPossible(node, nodeRange))
       else
         None
     }
+
+  private def getPredecessorNewline(token: Token): Option[HiddenTokens] =
+    tokens.indexOf(token) match {
+      case 0 ⇒ None
+      case n ⇒ hiddenTokenInfo.inferredNewlines(tokens(n - 1))
+    }
+
+  private def prependScaladocIfPossible(node: AstNode, range: Range): Range = {
+    val hiddenTokens = getPredecessorNewline(node.firstToken) getOrElse hiddenTokenInfo.hiddenPredecessors(node.firstToken)
+    hiddenTokens.scalaDocComments.lastOption match {
+      case Some(ScalaDocComment(token)) ⇒
+        val commentStart = token.startIndex
+        val difference = range.offset - token.startIndex
+        Range(token.startIndex, range.length + difference)
+      case None ⇒ range
+    }
+  }
 
   private def isSelectableAst(node: AstNode, enclosingNodes: List[AstNode]) = {
     // println((node:: enclosingNodes) map (_.getClass.getSimpleName) mkString " ")
