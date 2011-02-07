@@ -827,7 +827,7 @@ class ScalaParser(tokens: Array[Token]) {
         CaseClause(CasePattern(caseToken, pattern_, guardOption, arrow), blockStatSeq_)
     }
     if (caseClauses_.isEmpty)
-      throw new ScalaParserException("No case clauses found")
+      accept(CASE)
     CaseClauses(caseClauses_)
   }
 

@@ -31,9 +31,11 @@ object AstSelector {
       classOf[FunDefOrDcl],
       classOf[ParenArgumentExprs],
       classOf[GeneralTokens],
+      classOf[Guard],
       classOf[ParamClause],
       classOf[ParamClauses],
       classOf[PatDefOrDcl],
+      classOf[ProcFunBody],
       classOf[Template],
       classOf[TemplateBody],
       classOf[TemplateParents],
@@ -41,9 +43,6 @@ object AstSelector {
       classOf[TypeExprElement],
       classOf[TypeParamClause])
 
-  private val nonSelectableChildParentNodes: Set[(Class[_], Class[_])] =
-    Set(
-      (classOf[BlockExpr], classOf[MatchExpr]))
 }
 
 class AstSelector(source: String) {
@@ -53,7 +52,7 @@ class AstSelector(source: String) {
   private val compilationUnit = new ScalaParser(tokens.toArray).compilationUnitOrScript()
 
   def expandSelection(initialSelection: Range): Option[Range] =
-    expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection, parent = None)
+    expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection, enclosingNodes = Nil)
 
   private def expandToToken(initialSelection: Range): Option[Range] = {
     val Range(offset, length) = initialSelection
@@ -76,22 +75,32 @@ class AstSelector(source: String) {
     isLiteral || isKeyword || isComment || isId || (selectableXmls contains tokenType)
   }
 
-  private def expandToEnclosingAst(node: AstNode, initialSelection: Range, parent: Option[AstNode]): Option[Range] =
+  private def expandToEnclosingAst(node: AstNode, initialSelection: Range, enclosingNodes: List[AstNode]): Option[Range] =
     node.rangeOpt flatMap { nodeRange ⇒
       for {
         childNode ← node.immediateChildren
-        descendantRange ← expandToEnclosingAst(childNode, initialSelection, parent = Some(node))
+        descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
       } return Some(descendantRange)
-      if (nodeRange.contains(initialSelection) && nodeRange.length > initialSelection.length && isSelectableAst(node, parent))
+      if (nodeRange.contains(initialSelection) && nodeRange.length > initialSelection.length && isSelectableAst(node, enclosingNodes))
         Some(nodeRange)
       else
         None
     }
 
-  private def isSelectableAst(node: AstNode, parentOpt: Option[AstNode]) =
-    if (nonSelectableAstNodes contains node.getClass)
-      false
-    else
-      !(parentOpt exists { parent ⇒ nonSelectableChildParentNodes contains (node.getClass, parent.getClass) })
+  private def isSelectableAst(node: AstNode, enclosingNodes: List[AstNode]) = {
+    // println((node:: enclosingNodes) map (_.getClass.getSimpleName) mkString " ")
+    (node :: enclosingNodes) match {
+      case n1 :: n2 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[MatchExpr] ⇒ false
 
+      case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ForExpr] ⇒ false
+      case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ForExpr] ⇒ false
+
+      case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ExprFunBody] ⇒ false
+      case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ExprFunBody] ⇒ false
+
+      case n1 :: n2 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[ProcFunBody] ⇒ false
+
+      case _ ⇒ !(nonSelectableAstNodes contains node.getClass)
+    }
+  }
 }
