@@ -49,6 +49,8 @@ class AstSelector(source: String) {
   import AstSelector._
 
   private val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(source)
+  import hiddenTokenInfo._
+
   private val compilationUnit = new ScalaParser(tokens.toArray).compilationUnitOrScript()
 
   def expandSelection(initialSelection: Range): Option[Range] =
@@ -57,19 +59,44 @@ class AstSelector(source: String) {
   private def expandToToken(initialSelection: Range): Option[Range] = {
     val Range(offset, length) = initialSelection
     for (ordinaryToken ← tokens) {
-      val allTokens = hiddenTokenInfo.inferredNewlines(ordinaryToken) match {
+      val allTokens = inferredNewlines(ordinaryToken) match {
         case Some(hiddenTokens) ⇒ hiddenTokens.rawTokens
-        case None               ⇒ hiddenTokenInfo.hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
+        case None ⇒ hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
       }
       for {
-        token@Token(tokenType, _, startIndex, stopIndex) ← allTokens
-        if isSelectableToken(tokenType)
-        if offset >= startIndex && offset + length <= stopIndex + 1 && token.length > length
-      } return Some(Range(startIndex, token.length))
+        token ← allTokens
+        if isSelectableToken(token.tokenType)
+        if token.range contains initialSelection
+      } {
+        if (token.isScalaDocComment && token.range == initialSelection)
+          for (expandedToAstRange ← appendAstNodeIfPossible(compilationUnit, token))
+            return Some(expandedToAstRange)
+        if (token.length > length)
+          return Some(token.range)
+      }
     }
     None
   }
 
+  private def appendAstNodeIfPossible(node: AstNode, commentToken: Token): Option[Range] = {
+    //println("appendAstNodeIfPossible: " + node.getClass.getSimpleName)
+    node.firstTokenOption flatMap { firstToken ⇒
+      val hiddenTokens = getPriorHiddenTokens(firstToken)
+  //  println("hiddenTokens: " + hiddenTokens)
+      if (hiddenTokens.rawTokens contains commentToken) {
+        val Range(nodeStart, nodeLength) = node.rangeOpt.get
+        val commentStart = commentToken.startIndex
+        val difference = nodeStart - commentStart
+        Some(Range(commentStart, difference + nodeLength))
+      } else {
+        for {
+          childNode ← node.immediateChildren
+          result ← appendAstNodeIfPossible(childNode, commentToken)
+        } return Some(result)
+        None
+      }
+    }
+  }
   private def isSelectableToken(tokenType: TokenType) = {
     import tokenType._
     isLiteral || isKeyword || isComment || isId || (selectableXmls contains tokenType)
@@ -90,11 +117,13 @@ class AstSelector(source: String) {
   private def getPredecessorNewline(token: Token): Option[HiddenTokens] =
     tokens.indexOf(token) match {
       case 0 ⇒ None
-      case n ⇒ hiddenTokenInfo.inferredNewlines(tokens(n - 1))
+      case n ⇒ inferredNewlines(tokens(n - 1))
     }
 
+  private def getPriorHiddenTokens(token: Token) = getPredecessorNewline(token) getOrElse hiddenPredecessors(token)
+
   private def prependScaladocIfPossible(node: AstNode, range: Range): Range = {
-    val hiddenTokens = getPredecessorNewline(node.firstToken) getOrElse hiddenTokenInfo.hiddenPredecessors(node.firstToken)
+    val hiddenTokens = getPriorHiddenTokens(node.firstToken)
     hiddenTokens.scalaDocComments.lastOption match {
       case Some(ScalaDocComment(token)) ⇒
         val commentStart = token.startIndex

@@ -20,6 +20,8 @@ sealed trait AstNode extends CaseClassReflector {
     def tokens: List[Token]
   }
 
+  def isEmpty = tokens.isEmpty
+
   protected implicit def astNodeToFlattenable(node: AstNode): Flattenable = new Flattenable { val tokens = node.tokens }
   protected implicit def listToFlattenable[T <% Flattenable](list: List[T]): Flattenable = new Flattenable { val tokens = list flatMap { _.tokens } }
   protected implicit def optionToFlattenable[T <% Flattenable](option: Option[T]): Flattenable = new Flattenable { val tokens = option.toList flatMap { _.tokens } }
