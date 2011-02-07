@@ -11,7 +11,7 @@ object AstSelector {
    * enclosing AST element. Returns None if the source does not parse correctly, or if
    * there is no strictly larger containing AST element.
    */
-  def expandSelection(source: String, initialSelection: Range): Option[Range] =
+  def expandSelection(source: String, initialSelection: Range): Option[Range] = 
     try {
       new AstSelector(source).expandSelection(initialSelection)
     } catch {
@@ -56,22 +56,14 @@ class AstSelector(source: String) {
   /**
    * A node's adjusted range includes any Scaladoc immediately before it.
    */
-  private val adjustedNodeRangeMap: Map[AstNode, Range] = {
-
-    var nodeRangeMap: Map[AstNode, Range] = Map()
-
-    def process(node: AstNode) {
-      if (node.isEmpty) return
+  private def adjustedNodeRange(node: AstNode): Option[Range] =
+    if (node.isEmpty)
+      None
+    else {
       val nodeRange = node.rangeOpt.get
       val scaladocComments = getPriorHiddenTokens(node.firstToken).scalaDocComments
-      val adjustedRange = scaladocComments.lastOption map { comment ⇒ nodeRange mergeWith comment.token.range } getOrElse nodeRange
-      nodeRangeMap = nodeRangeMap + (node -> adjustedRange)
-      node.immediateChildren foreach process
+      scaladocComments.lastOption map { comment ⇒ nodeRange mergeWith comment.token.range } orElse Some(nodeRange)
     }
-    process(compilationUnit)
-
-    nodeRangeMap
-  }
 
   def expandSelection(initialSelection: Range): Option[Range] =
     expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection, enclosingNodes = Nil)
@@ -118,14 +110,17 @@ class AstSelector(source: String) {
   }
 
   private def expandToEnclosingAst(node: AstNode, initialSelection: Range, enclosingNodes: List[AstNode]): Option[Range] =
-    adjustedNodeRangeMap.get(node) flatMap { nodeRange ⇒
-      for {
-        childNode ← node.immediateChildren
-        descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
-      } return Some(descendantRange)
-      if ((nodeRange contains initialSelection) && (nodeRange isLargerThan initialSelection) && isSelectableAst(node, enclosingNodes))
-        Some(nodeRange)
-      else
+    adjustedNodeRange(node) flatMap { nodeRange ⇒
+      if (nodeRange contains initialSelection) {
+        for {
+          childNode ← node.immediateChildren
+          descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
+        } return Some(descendantRange)
+        if ((nodeRange contains initialSelection) && (nodeRange isLargerThan initialSelection) && isSelectableAst(node, enclosingNodes))
+          Some(nodeRange)
+        else
+          None
+      } else
         None
     }
 

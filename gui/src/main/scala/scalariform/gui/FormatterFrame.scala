@@ -133,7 +133,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         val smallest = math.min(caret.getMark, caret.getDot)
         val largest = math.max(caret.getMark, caret.getDot)
         val selectedRange = Range(smallest, largest - smallest)
-        new AstSelector(inputTextPane.getText).expandSelection(selectedRange) foreach {
+        AstSelector.expandSelection(inputTextPane.getText, selectedRange) foreach {
           case Range(offset, length) ⇒
             selectionStack ::= selectedRange
             caret.setDot(offset)
