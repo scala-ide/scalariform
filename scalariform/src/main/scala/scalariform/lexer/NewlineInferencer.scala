@@ -6,7 +6,7 @@ import scalariform.lexer.Tokens._
 import scala.annotation.tailrec
 import java.util.{ HashMap, Map ⇒ JMap }
 
-trait HiddenTokenInfo { 
+trait HiddenTokenInfo {
 
   def isInferredNewline(token: Token): Boolean
 
@@ -14,7 +14,7 @@ trait HiddenTokenInfo {
 
   def hiddenPredecessors(token: Token): HiddenTokens
 
-  def allHiddenTokens: Iterable[HiddenTokens] 
+  def allHiddenTokens: Iterable[HiddenTokens]
 
 }
 

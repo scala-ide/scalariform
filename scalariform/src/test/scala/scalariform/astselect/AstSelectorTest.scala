@@ -191,11 +191,15 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$         " ~
   " $$$$$$$$$$$$$$$$ "
 
-  if (false) { 
-
   " /** a */ class B; class C " ~
   " $$$$$$$$$$$$$$$$          " ~
   " $$$$$$$$$$$$$$$$$$$$$$$$$ "
+
+  " val a  = { b } " ~ 
+  "            $   " ~
+  "          $$$$$ " // A bit inconsistent with def's, but maybe OK
+
+  if (false) { 
 
   }
 

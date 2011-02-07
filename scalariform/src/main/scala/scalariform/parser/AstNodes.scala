@@ -231,7 +231,7 @@ case class MatchExpr(left: List[ExprElement], matchToken: Token, block: BlockExp
   lazy val tokens = flatten(left, matchToken, block)
 }
 
-case class AscriptionExpr(left: List[ExprElement], colon: Token, right: List[ExprElement]) extends ExprElement { 
+case class AscriptionExpr(left: List[ExprElement], colon: Token, right: List[ExprElement]) extends ExprElement {
   lazy val tokens = flatten(left, colon, right)
 }
 

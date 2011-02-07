@@ -53,6 +53,26 @@ class AstSelector(source: String) {
 
   private val compilationUnit = new ScalaParser(tokens.toArray).compilationUnitOrScript()
 
+  /**
+   * A node's adjusted range includes any Scaladoc immediately before it.
+   */
+  private val adjustedNodeRangeMap: Map[AstNode, Range] = {
+
+    var nodeRangeMap: Map[AstNode, Range] = Map()
+
+    def process(node: AstNode) {
+      if (node.isEmpty) return
+      val nodeRange = node.rangeOpt.get
+      val scaladocComments = getPriorHiddenTokens(node.firstToken).scalaDocComments
+      val adjustedRange = scaladocComments.lastOption map { comment ⇒ nodeRange mergeWith comment.token.range } getOrElse nodeRange
+      nodeRangeMap = nodeRangeMap + (node -> adjustedRange)
+      node.immediateChildren foreach process
+    }
+    process(compilationUnit)
+
+    nodeRangeMap
+  }
+
   def expandSelection(initialSelection: Range): Option[Range] =
     expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection, enclosingNodes = Nil)
 
@@ -61,7 +81,7 @@ class AstSelector(source: String) {
     for (ordinaryToken ← tokens) {
       val allTokens = inferredNewlines(ordinaryToken) match {
         case Some(hiddenTokens) ⇒ hiddenTokens.rawTokens
-        case None ⇒ hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
+        case None               ⇒ hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
       }
       for {
         token ← allTokens
@@ -78,17 +98,12 @@ class AstSelector(source: String) {
     None
   }
 
-  private def appendAstNodeIfPossible(node: AstNode, commentToken: Token): Option[Range] = {
-    //println("appendAstNodeIfPossible: " + node.getClass.getSimpleName)
+  private def appendAstNodeIfPossible(node: AstNode, commentToken: Token): Option[Range] =
     node.firstTokenOption flatMap { firstToken ⇒
       val hiddenTokens = getPriorHiddenTokens(firstToken)
-  //  println("hiddenTokens: " + hiddenTokens)
-      if (hiddenTokens.rawTokens contains commentToken) {
-        val Range(nodeStart, nodeLength) = node.rangeOpt.get
-        val commentStart = commentToken.startIndex
-        val difference = nodeStart - commentStart
-        Some(Range(commentStart, difference + nodeLength))
-      } else {
+      if (hiddenTokens.rawTokens contains commentToken)
+        Some(commentToken.range mergeWith node.rangeOpt.get)
+      else {
         for {
           childNode ← node.immediateChildren
           result ← appendAstNodeIfPossible(childNode, commentToken)
@@ -96,20 +111,20 @@ class AstSelector(source: String) {
         None
       }
     }
-  }
+
   private def isSelectableToken(tokenType: TokenType) = {
     import tokenType._
     isLiteral || isKeyword || isComment || isId || (selectableXmls contains tokenType)
   }
 
   private def expandToEnclosingAst(node: AstNode, initialSelection: Range, enclosingNodes: List[AstNode]): Option[Range] =
-    node.rangeOpt flatMap { nodeRange ⇒
+    adjustedNodeRangeMap.get(node) flatMap { nodeRange ⇒
       for {
         childNode ← node.immediateChildren
         descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
       } return Some(descendantRange)
-      if (nodeRange.contains(initialSelection) && nodeRange.length > initialSelection.length && isSelectableAst(node, enclosingNodes))
-        Some(prependScaladocIfPossible(node, nodeRange))
+      if ((nodeRange contains initialSelection) && (nodeRange isLargerThan initialSelection) && isSelectableAst(node, enclosingNodes))
+        Some(nodeRange)
       else
         None
     }
@@ -121,17 +136,6 @@ class AstSelector(source: String) {
     }
 
   private def getPriorHiddenTokens(token: Token) = getPredecessorNewline(token) getOrElse hiddenPredecessors(token)
-
-  private def prependScaladocIfPossible(node: AstNode, range: Range): Range = {
-    val hiddenTokens = getPriorHiddenTokens(node.firstToken)
-    hiddenTokens.scalaDocComments.lastOption match {
-      case Some(ScalaDocComment(token)) ⇒
-        val commentStart = token.startIndex
-        val difference = range.offset - token.startIndex
-        Range(token.startIndex, range.length + difference)
-      case None ⇒ range
-    }
-  }
 
   private def isSelectableAst(node: AstNode, enclosingNodes: List[AstNode]) = {
     // println((node:: enclosingNodes) map (_.getClass.getSimpleName) mkString " ")

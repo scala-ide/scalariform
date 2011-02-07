@@ -17,7 +17,7 @@ import org.apache.maven.plugin.logging.Log
  * Goal which formats scala source files
  *
  * @goal format
- * 
+ *
  * @phase process-sources
  */
 object MojoFormatter {

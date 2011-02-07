@@ -351,7 +351,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     type2 match {
       case IF if type1 != LPAREN    ⇒ return CompactEnsuringGap
       case ARROW if type1 != LPAREN ⇒ return CompactEnsuringGap
-      case AT if type2.isId ⇒ return CompactEnsuringGap
+      case AT if type2.isId         ⇒ return CompactEnsuringGap
       case _                        ⇒
     }
     Compact
