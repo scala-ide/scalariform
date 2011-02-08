@@ -101,12 +101,12 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     val CaseClause(casePattern: CasePattern, statSeq: StatSeq) = caseClause
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= formatCasePattern(casePattern, arrowInstructionOpt)
-    val singleBlockExpr = cond(statSeq.firstStatOpt) { case Some(Expr(List(BlockExpr(_, _, _)))) ⇒ true } && statSeq.otherStats.isEmpty
-    val indentBlock = statSeq.firstTokenOption.isDefined && hiddenPredecessors(statSeq.firstToken).containsNewline || (containsNewline(statSeq) && !singleBlockExpr)
+    val singleExpr = cond(statSeq.firstStatOpt) { case Some(Expr(_)) ⇒ true } && statSeq.otherStats.isEmpty
+    val indentBlock = statSeq.firstTokenOption.isDefined && newlineBefore(statSeq) || containsNewline(statSeq) && !singleExpr
     if (indentBlock)
       formatResult = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
 
-    val stateForStatSeq = if (singleBlockExpr) formatterState else formatterState.indent
+    val stateForStatSeq = if (singleExpr && !indentBlock) formatterState else formatterState.indent
     formatResult ++= format(statSeq)(stateForStatSeq)
     formatResult
   }

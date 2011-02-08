@@ -18,6 +18,9 @@ trait HasHiddenTokenInfo {
 
   def hiddenPredecessors(token: Token): HiddenTokens
 
+  def newlineBefore(token: Token): Boolean = hiddenPredecessors(token).containsNewline
+
+  def newlineBefore(node: AstNode): Boolean = newlineBefore(node.firstToken)
 }
 
 abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter with CaseClauseFormatter with CommentFormatter {
