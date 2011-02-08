@@ -163,15 +163,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
 
   " for (a ← b) { c } " ~
   "               $   " ~
-  " $$$$$$$$$$$$$$$$$ "
+  "             $$$$$ "
 
   " for (a <- b if c) {} " ~
   "                $     " ~ 
   "      $$$$$$$$$$$     "
-
-  " def a = { b } " ~
-  "           $   " ~
-  " $$$$$$$$$$$$$ "
 
   " def a { b } " ~
   "         $   " ~
@@ -199,7 +195,38 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "            $   " ~
   "          $$$$$ " // A bit inconsistent with def's, but maybe OK
 
+  " try a catch b " ~
+  "             $ " ~
+  " $$$$$$$$$$$$$ "
+
+  " if (a) b " ~
+  "     $    " ~
+  " $$$$$$$$ "
+
+  " def a = b(c) " ~
+  "          $$$ " ~
+  "         $$$$ " 
+
+  " def a = { b } " ~
+  "           $   " ~
+  "         $$$$$ "
+
+  " for (a <- b) c(d) " ~ 
+  "               $$$ " ~
+  "              $$$$ "
+
+  " def a[B <% C] " ~
+  "         $$    " ~
+  "       $$$$$$  "
+
+  " class A[B <% C, D <% E] " ~
+  "           $$            " ~
+  "         $$$$$$          " ~
+  " $$$$$$$$$$$$$$$$$$$$$$$ "
+
   if (false) { 
+
+
 
   }
 

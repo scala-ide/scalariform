@@ -25,6 +25,8 @@ object AstSelector {
   private val nonSelectableAstNodes: Set[Class[_]] =
     Set(
       classOf[CasePattern],
+      classOf[CatchClause],
+      classOf[CondExpr],
       classOf[ElseClause],
       classOf[Enumerators],
       classOf[ExprFunBody],
@@ -137,11 +139,11 @@ class AstSelector(source: String) {
     (node :: enclosingNodes) match {
       case n1 :: n2 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[MatchExpr] ⇒ false
 
-      case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ForExpr] ⇒ false
-      case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ForExpr] ⇒ false
+      // case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ForExpr] ⇒ false
+      // case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ForExpr] ⇒ false
 
-      case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ExprFunBody] ⇒ false
-      case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ExprFunBody] ⇒ false
+      // case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ExprFunBody] ⇒ false
+      // case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ExprFunBody] ⇒ false
 
       case n1 :: n2 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[ProcFunBody] ⇒ false
 

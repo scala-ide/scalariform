@@ -1153,7 +1153,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def typeParamClauseOpt(allowVariance: Boolean): Option[TypeParamClause] = {
-    def typeParam(): List[TypeElement] = {
+    def typeParam(): TypeParam = {
       val typeElements = ListBuffer[TypeElementFlattenable]()
       if (allowVariance && isIdent) { // TODO: condition 
         if (PLUS)
@@ -1172,7 +1172,7 @@ class ScalaParser(tokens: Array[Token]) {
         typeElements += nextToken()
         typeElements += typ()
       }
-      typeElementFlatten3(typeElements.toList)
+      TypeParam(typeElementFlatten3(typeElements.toList))
     }
 
     val newLineOpt = newLineOptWhenFollowedBy(LBRACKET)

@@ -72,6 +72,10 @@ case class Refinement(lbrace: Token, refineStatSeq: StatSeq, rbrace: Token) exte
   lazy val tokens = flatten(lbrace, refineStatSeq, rbrace)
 }
 
+case class TypeParam(contents: List[TypeElement]) extends AstNode with TypeElement {
+  lazy val tokens = flatten(contents)
+}
+
 case class TypeParamClause(contents: List[TypeElement]) extends AstNode with TypeElement {
   //require(!contents.isEmpty)
   lazy val tokens = flatten(contents)
