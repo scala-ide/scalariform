@@ -224,6 +224,10 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "         $$$$$$          " ~
   " $$$$$$$$$$$$$$$$$$$$$$$ "
 
+  " sealed class A " ~
+  "            $$$ " ~ 
+  " $$$$$$$$$$$$$$ "
+
   if (false) { 
 
 

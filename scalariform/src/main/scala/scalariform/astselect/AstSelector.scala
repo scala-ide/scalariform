@@ -41,6 +41,7 @@ object AstSelector {
       classOf[Template],
       classOf[TemplateBody],
       classOf[TemplateParents],
+      classOf[TmplDef],
       classOf[TypeDefOrDcl],
       classOf[TypeExprElement],
       classOf[TypeParamClause])
