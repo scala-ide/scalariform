@@ -94,8 +94,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           val instructionOption = condOpt(previousElement, element) {
             case (PrefixExprElement(_), _) ⇒ Compact
             case (Argument(_), _) ⇒ Compact
-            case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap
-            case (_, _) if element.firstTokenOption exists { hiddenPredecessors(_).containsNewline } ⇒
+            case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr
+            case (_, _) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.getType) } ⇒
               currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
               currentFormatterState.currentIndentLevelInstruction
           }
@@ -125,7 +125,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
                   formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
               }
-            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType)) {
+            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType))  {// TODO: Probably not needed now, see above
               currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
               formatResult = formatResult.before(token, currentFormatterState.currentIndentLevelInstruction)
             }
@@ -154,7 +154,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
     }
 
-    if (hiddenPredecessors(id).containsNewline) {
+    if (exprDotOpt.isDefined && hiddenPredecessors(id).containsNewline) {
       currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
       formatResult = formatResult.before(id, currentFormatterState.currentIndentLevelInstruction)
     }
@@ -162,8 +162,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for (typeArgs ← typeArgsOpt)
       formatResult ++= format(typeArgs)(currentFormatterState.clearExpressionBreakHappened)
 
-    for ((newLineOpt, argumentExprs) ← newLineOptsAndArgumentExprss)
+    for ((newlineOpt, argumentExprs) ← newLineOptsAndArgumentExprss) {
+      if (newlineOpt == None && formattingPreferences(PreserveSpaceBeforeArguments))
+        formatResult = formatResult.before(argumentExprs.firstToken, CompactPreservingGap)
       formatResult ++= format(argumentExprs)(currentFormatterState.clearExpressionBreakHappened)
+    }
 
     for (uscore ← uscoreOpt)
       formatResult = formatResult.before(uscore, CompactPreservingGap)

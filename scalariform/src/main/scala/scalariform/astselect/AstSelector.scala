@@ -11,7 +11,7 @@ object AstSelector {
    * enclosing AST element. Returns None if the source does not parse correctly, or if
    * there is no strictly larger containing AST element.
    */
-  def expandSelection(source: String, initialSelection: Range): Option[Range] = 
+  def expandSelection(source: String, initialSelection: Range): Option[Range] =
     try {
       new AstSelector(source).expandSelection(initialSelection)
     } catch {

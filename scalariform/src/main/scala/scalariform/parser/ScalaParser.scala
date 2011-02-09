@@ -714,7 +714,14 @@ class ScalaParser(tokens: Array[Token]) {
 
   private object PathEndingWithDotId {
     def unapply(tokens: List[Token]) = condOpt(tokens.reverse) {
-      case lastId :: dot :: rest if isIdent(lastId.tokenType) && dot.tokenType == DOT ⇒ (rest.reverse, dot, lastId)
+      case (lastId@Token(tokenType, _, _, _)) :: dot :: rest if (tokenType.isId || tokenType == THIS) && dot.tokenType == DOT ⇒
+        (rest.reverse, dot, lastId)
+    }
+  }
+
+  private object JustIdOrThis {
+    def unapply(tokens: List[Token]) = condOpt(tokens) {
+      case List(id@Token(tokenType, _, _, _)) if (tokenType.isId || tokenType == THIS) ⇒ id
     }
   }
 
@@ -730,6 +737,7 @@ class ScalaParser(tokens: Array[Token]) {
           val path_ = path(thisOK = true, typeOK = false)
           path_ match {
             case PathEndingWithDotId(prefix, dot, lastId) ⇒ List(CallExpr(Some(exprElementFlatten2(prefix), dot), lastId, None, Nil, None))
+            case JustIdOrThis(id)                         ⇒ List(CallExpr(None, id, None, Nil, None))
             case _                                        ⇒ exprElementFlatten2(path_)
           }
         case USCORE ⇒

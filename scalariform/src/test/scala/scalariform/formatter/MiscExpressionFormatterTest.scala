@@ -630,5 +630,20 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    c
     |  }"""
 
+  """(f
+    | (b))""" ==>
+  """(f(b))"""
+
+  {
+  
+  implicit val formattingPreferences = FormattingPreferences.setPreference(PreserveSpaceBeforeArguments, true)
+
+  "getDirectives(source) should be (expectedDirectives)" ==>
+  "getDirectives(source) should be (expectedDirectives)"
+
+  "getDirectives(source) should be(expectedDirectives)" ==>
+  "getDirectives(source) should be(expectedDirectives)"
+
+  }
 
 }

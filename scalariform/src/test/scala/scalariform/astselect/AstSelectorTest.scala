@@ -232,6 +232,19 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "           $        " ~
   " $$$$$$$$$$$$       "
 
+  " evaluating { stack.pop() } should produce [NoSuchElementException] " ~
+  "              $$$$$$$                                               " ~ 
+  "              $$$$$$$$$$$                                           " ~ 
+  "            $$$$$$$$$$$$$$$                                         " ~ 
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$                                         " ~ 
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+
+  " evaluating { stack.pop() } should produce [NoSuchElementException] " ~
+  "                                            $$$$$$$$$$$$$$$$$$$$$$  " ~ 
+  "                                   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " ~ 
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+
+
   if (false) { 
 
 
