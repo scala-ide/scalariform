@@ -24,6 +24,7 @@ object AstSelector {
 
   private val nonSelectableAstNodes: Set[Class[_]] =
     Set(
+      classOf[AccessQualifier],
       classOf[CasePattern],
       classOf[CatchClause],
       classOf[CondExpr],

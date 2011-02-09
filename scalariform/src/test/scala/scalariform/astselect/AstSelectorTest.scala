@@ -228,6 +228,10 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "            $$$ " ~ 
   " $$$$$$$$$$$$$$ "
 
+  " protected[a] val b " ~
+  "           $        " ~
+  " $$$$$$$$$$$$       "
+
   if (false) { 
 
 
