@@ -646,4 +646,9 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   }
 
+  """(if (a) b else c
+    |, d)""" ==>
+  """(if (a) b else c, d)"""
+
+
 }
