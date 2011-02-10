@@ -81,7 +81,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         alterSuspendFormatting(hiddenPredecessors(token).text) foreach { suspendFormatting = _ }
         if (suspendFormatting) {
           builder.append(hiddenPredecessors(token).text)
-          tokenIndentMap += (token -> builder.currentIndent)
+          tokenIndentMap += (token -> builder.currentColumn)
           builder.append(token.getText)
         } else {
           val nextTokenUnindents = token.getType == RBRACE
@@ -89,7 +89,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val hiddenTokens = hiddenPredecessors(token)
           val positionHintOption = if (hiddenTokens.isEmpty) Some(token.startIndex) else None
           edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap, positionHintOption).toList
-          tokenIndentMap += (token -> builder.currentIndent)
+          tokenIndentMap += (token -> builder.currentColumn)
           val newTokenTextOpt: Option[String] = if (xmlRewrites contains token) Some(xmlRewrites(token)) else None
           edits :::= builder.write(token, newTokenTextOpt).toList
         }
@@ -113,20 +113,22 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     def writeIntertokenCompact() {
       val comments = hiddenTokens.comments
       for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {
-        val needGapBetweenThisAndPrevious = previousCommentOption match {
+        val needGapBetweenThisAndPrevious = cond(previousCommentOption) {
           case Some(MultiLineComment(_)) | Some(ScalaDocComment(_)) ⇒ true
           case _ if comment == comments.head && previousTokenIsPrintable ⇒ true
-          case _ ⇒ false
         }
         if (needGapBetweenThisAndPrevious)
           builder.append(" ")
+        val extraIndentSpaces = comment match {
+           case SingleLineComment(_) => builder.currentIndentSpaces /* + formattingPreferences(IndentSpaces) */
+           case _ => 0             
+        }
         builder.write(comment.token)
+        builder.append(" " * extraIndentSpaces)
       }
-      val needGapBetweenThisAndFollowing = comments.lastOption match {
-        case Some(SingleLineComment(_)) ⇒ false
+      val needGapBetweenThisAndFollowing = cond(comments.lastOption) {
         case Some(MultiLineComment(_)) if nextTokenIsPrintable ⇒ true
         case Some(ScalaDocComment(_)) if nextTokenIsPrintable ⇒ true
-        case _ ⇒ false
       }
       if (needGapBetweenThisAndFollowing)
         builder.append(" ")
@@ -150,7 +152,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       case PlaceAtColumn(indentLevel, spaces) ⇒
         writeIntertokenCompact()
         val indentLength = Spaces(formattingPreferences(IndentSpaces)).length(indentLevel)
-        builder.append(" " * (indentLength + spaces - builder.currentIndent))
+        builder.append(" " * (indentLength + spaces - builder.currentColumn))
       case EnsureNewlineAndIndent(indentLevel, relativeTo) ⇒
         val baseIndentOption = relativeTo flatMap tokenIndentMap.get
         if (hiddenTokens.isEmpty) {
@@ -248,16 +250,25 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       builder
     }
 
-    def atBeginningOfLine = builder.length == 0 || lastChar == '\n'
+    def atBeginningOfLine = builder.isEmpty || lastChar == '\n'
 
-    private def lastChar = builder.charAt(builder.length - 1)
+    private def lastChar = builder(builder.length - 1)
 
-    def currentIndent = {
+    def currentColumn = {
       var pos = builder.length - 1
-      while (pos >= 0 && builder.charAt(pos) != '\n')
+      while (pos >= 0 && builder(pos) != '\n')
         pos -= 1
       builder.length - pos - 1
     }
+
+    def currentIndentSpaces = {
+       val current = currentColumn
+       val lineStart = builder.length - currentColumn
+       var pos = lineStart
+       while (pos < builder.length && builder(pos).isWhitespace)
+         pos += 1 
+       pos - lineStart
+    }    
 
     def lastCharacter = if (builder.length == 0) None else Some(lastChar)
 

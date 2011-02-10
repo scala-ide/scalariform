@@ -650,5 +650,27 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |, d)""" ==>
   """(if (a) b else c, d)"""
 
+  """a(b, 
+    |c) + {
+    |d
+    |}""" =/=>
+  """a(b, 
+    |  c) + {
+    |    d
+    |  }""" because "bug need fixing"
+
+  """    XScalaWT.shell("title",
+    |      label("label"),
+    |      popupMenu(
+    |        viewer(
+    |          // TODO
+    |        )
+    |      )
+    |    )""" ==>
+  """XScalaWT.shell("title",
+    |  label("label"),
+    |  popupMenu(
+    |    viewer( // TODO
+    |    )))"""
 
 }

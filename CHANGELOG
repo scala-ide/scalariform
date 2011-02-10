@@ -1,7 +1,8 @@
 0.0.9 (..)
 * Improve basic formatting of Scaladoc comments
-* Add preference "PreserveDanglingCloseParenthesis" to keep newlines before a dangling right paren 
-  (closes http://github.com/mdr/scalariform/issues#issue/6)
+* Add preference "PreserveDanglingCloseParenthesis" to keep newlines before a dangling right paren (issue #6)
+* Allow single-expression case clauses to be formatted adjacent to the case arrow (issue #7)
+* Improve formatting after a single-line comment (issue #8)
 * Improve stairway indenting of argument lists, infix exprs
 * Add support for AST selection
 
