@@ -158,7 +158,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def commaSeparated[T](part: ⇒ T) =
-    tokenSeparated(COMMA, false, part) match { case (Some(first), rest) ⇒ (first, rest) }
+    tokenSeparated(COMMA, false, part) match { case (firstOpt, rest) ⇒ (firstOpt.get, rest) }
 
   private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, true, part)._2
   private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, true, part)._2

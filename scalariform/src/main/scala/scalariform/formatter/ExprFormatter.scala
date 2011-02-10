@@ -4,8 +4,6 @@ import scalariform.lexer.Token
 import scalariform.lexer.Tokens._
 import scalariform.parser._
 import scalariform.utils.Utils
-import scalariform.utils.TextEditProcessor
-import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
 import PartialFunction._
 
@@ -125,7 +123,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
                   formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
               }
-            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType))  {// TODO: Probably not needed now, see above
+            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType)) { // TODO: Probably not needed now, see above
               currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
               formatResult = formatResult.before(token, currentFormatterState.currentIndentLevelInstruction)
             }

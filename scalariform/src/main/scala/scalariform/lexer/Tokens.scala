@@ -1,8 +1,5 @@
 package scalariform.lexer
 
-import java.io.BufferedReader
-import java.io.FileReader
-
 object Tokens {
 
   val PACKAGE = TokenType("PACKAGE")
