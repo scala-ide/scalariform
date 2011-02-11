@@ -10,6 +10,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   private val logging: Boolean = false
 
+  private val forgiving: Boolean = true
+
   import ScalaParser._
 
   require(!tokens.isEmpty) // at least EOF
@@ -1104,16 +1106,19 @@ class ScalaParser(tokens: Array[Token]) {
       } else
         None
       val id = ident()
-      val colonToken = accept(COLON)
-      val paramType_ = paramType()
-      val paramTypeOpt = Some(colonToken, paramType_)
-      val defaultValueOpt = if (EQUALS) {
-        val equalsToken = nextToken()
-        val expr_ = expr()
-        Some(equalsToken, expr_)
+      if (COLON || !forgiving) {
+        val colonToken = accept(COLON)
+        val paramType_ = paramType()
+        val paramTypeOpt = Some(colonToken, paramType_)
+        val defaultValueOpt = if (EQUALS) {
+          val equalsToken = nextToken()
+          val expr_ = expr()
+          Some(equalsToken, expr_)
+        } else
+          None
+        Param(annotations_, modifiers_.toList, valOrVarOpt, id, paramTypeOpt, defaultValueOpt)
       } else
-        None
-      Param(annotations_, modifiers_.toList, valOrVarOpt, id, paramTypeOpt, defaultValueOpt)
+        Param(annotations_, modifiers_.toList, valOrVarOpt, id, paramTypeOpt = None, defaultValueOpt = None)
     }
 
     // Differs from nsc in that we've pulled in lparen/rparen
