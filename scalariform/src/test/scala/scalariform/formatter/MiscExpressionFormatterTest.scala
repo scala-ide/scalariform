@@ -29,7 +29,9 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   """println("hello")""" ==> """println("hello")"""
   "1 * (2 + 3) * 4" ==> "1 * (2 + 3) * 4"
-  """println(getClass().getSimpleName() + " passed.")""" ==> """println(getClass().getSimpleName() + " passed.")"""
+
+  """println(getClass().getSimpleName() + " passed.")""" ==> 
+  """println(getClass().getSimpleName() + " passed.")"""
 
   "a(b).c" ==> "a(b).c"
 
@@ -202,7 +204,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "a match {case b => c; case d => e}" ==> "a match { case b => c; case d => e }"
   
-  "Option(foo) match { case Some(x)=> 42 case None => 12}" ==> "Option(foo) match { case Some(x) => 42 case None => 12 }"
+  "Option(foo) match { case Some(x)=> 42 case None => 12}" ==> 
+  "Option(foo) match { case Some(x) => 42 case None => 12 }"
     
   """a match { 
     |case b|(c) => 
@@ -653,11 +656,19 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """a(b, 
     |c) + {
     |d
-    |}""" =/=>
-  """a(b, 
+    |}""" ==>
+  """a(b,
     |  c) + {
     |    d
-    |  }""" because "bug need fixing"
+    |  }"""
+
+  """(b, 
+    |c) + {
+    |d}""" ==>
+  """(b,
+    |  c) + {
+    |    d
+    |  }"""
 
   """    XScalaWT.shell("title",
     |      label("label"),

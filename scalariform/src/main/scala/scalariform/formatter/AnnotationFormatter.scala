@@ -12,7 +12,7 @@ trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter wi
 
     formatResult ++= format(annotationType)
     for (argumentExprs ← argumentExprss)
-      formatResult ++= format(argumentExprs)
+      formatResult ++= format(argumentExprs)._1
     for (newline ← newlineOption)
       formatResult = formatResult.formatNewline(newline, Compact) // TODO: rethink
     formatResult

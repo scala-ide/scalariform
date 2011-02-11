@@ -52,7 +52,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
         val TemplateParents(type1: Type, argumentExprss: List[ArgumentExprs], withTypes: List[(Token, Type)]) = templateParents
         formatResult ++= format(type1)(currentFormatterState)
         for (argumentExprs ← argumentExprss)
-          formatResult ++= format(argumentExprs)(currentFormatterState)
+          formatResult ++= format(argumentExprs)(currentFormatterState)._1
         for ((withToken, type_) ← withTypes) {
           if (hiddenPredecessors(withToken).containsNewline) {
             currentFormatterState = formatterState.indent(inheritanceIndent)
@@ -113,7 +113,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
   private def format(templateParents: TemplateParents)(implicit formatterState: FormatterState): FormatResult = {
     var formatResult: FormatResult = NoFormatResult
     for (argumentExprs ← templateParents.argumentExprss)
-      formatResult ++= format(argumentExprs)
+      formatResult ++= format(argumentExprs)._1
     formatResult
   }
 
