@@ -550,6 +550,24 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  def bar(f: Int => Int) = (); foo { x: Int => x + 1 }
     |}"""
 
+  """class A {
+    |  @b // c
+    |   val d
+    |}""" ==>
+  """class A {
+    |  @b // c
+    |  val d
+    |}"""
+
+  """class A {
+    |@b /* */
+    |def c
+    |}""" ==>
+  """class A {
+    |  @b /* */
+    |  def c
+    |}"""
+
   // format: ON
 
   override val debug = false

@@ -61,6 +61,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     var tokenIndentMap: Map[Token, Int] = Map()
     var suspendFormatting = false
     var edits: List[TextEdit] = Nil // Stored in reverse
+
+    def printableFormattingInstruction(previousTokenOpt: Option[Token], token: Token) =
+      predecessorFormatting.get(token) orElse
+        previousTokenOpt.map(defaultFormattingInstruction(_, token)) getOrElse
+        (if (token.getType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */ else Compact)
+
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
       val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
       if (isInferredNewline(token)) {
@@ -71,24 +77,26 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val formattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
           val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
-          val nextTokenIsPrintable = nextTokenOption exists { !isInferredNewline(_) }
-          edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap).toList
+          val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
+            !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
+          }
+          edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents,
+            includeBufferBeforeNextToken, previousTokenIsPrintable, tokenIndentMap).toList
         }
       } else {
-        val formattingInstruction = predecessorFormatting.get(token) orElse
-          previousTokenOption.map(defaultFormattingInstruction(_, token)) getOrElse
-          (if (token.getType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */ else Compact)
         alterSuspendFormatting(hiddenPredecessors(token).text) foreach { suspendFormatting = _ }
         if (suspendFormatting) {
           builder.append(hiddenPredecessors(token).text)
           tokenIndentMap += (token -> builder.currentColumn)
           builder.append(token.getText)
         } else {
+          val formattingInstruction = printableFormattingInstruction(previousTokenOption, token)
           val nextTokenUnindents = token.getType == RBRACE
-          val nextTokenIsPrintable = true // <-- i.e. current token
+          val includeBufferBeforeNextToken = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
           val positionHintOption = if (hiddenTokens.isEmpty) Some(token.startIndex) else None
-          edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, nextTokenIsPrintable, previousTokenIsPrintable, tokenIndentMap, positionHintOption).toList
+          edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, includeBufferBeforeNextToken,
+            previousTokenIsPrintable, tokenIndentMap, positionHintOption).toList
           tokenIndentMap += (token -> builder.currentColumn)
           val newTokenTextOpt: Option[String] = if (xmlRewrites contains token) Some(xmlRewrites(token)) else None
           edits :::= builder.write(token, newTokenTextOpt).toList
@@ -106,29 +114,29 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                                 hiddenTokens: HiddenTokens,
                                 instruction: IntertokenFormatInstruction,
                                 nextTokenUnindents: Boolean,
-                                nextTokenIsPrintable: Boolean,
+                                includeBufferBeforeNextToken: Boolean,
                                 previousTokenIsPrintable: Boolean,
                                 tokenIndentMap: Map[Token, Int],
                                 positionHintOption: Option[Int] = None): Option[TextEdit] = {
     def writeIntertokenCompact() {
       val comments = hiddenTokens.comments
-      for ((previousCommentOption, comment) ← Utils.pairWithPrevious(comments)) {
+      for ((previousCommentOption, comment, nextCommentOption) ← Utils.withPreviousAndNext(comments)) {
         val needGapBetweenThisAndPrevious = cond(previousCommentOption) {
-          case Some(MultiLineComment(_)) | Some(ScalaDocComment(_)) ⇒ true
+          case Some(MultiLineComment(_)) | Some(ScalaDocComment(_))      ⇒ true
           case _ if comment == comments.head && previousTokenIsPrintable ⇒ true
         }
         if (needGapBetweenThisAndPrevious)
           builder.append(" ")
         val extraIndentSpaces = comment match {
-           case SingleLineComment(_) => builder.currentIndentSpaces /* + formattingPreferences(IndentSpaces) */
-           case _ => 0             
+          case SingleLineComment(_) if nextCommentOption.isDefined || includeBufferBeforeNextToken ⇒ builder.currentIndentSpaces
+          case _ ⇒ 0
         }
         builder.write(comment.token)
         builder.append(" " * extraIndentSpaces)
       }
       val needGapBetweenThisAndFollowing = cond(comments.lastOption) {
-        case Some(MultiLineComment(_)) if nextTokenIsPrintable ⇒ true
-        case Some(ScalaDocComment(_)) if nextTokenIsPrintable ⇒ true
+        case Some(MultiLineComment(_)) if includeBufferBeforeNextToken ⇒ true
+        case Some(ScalaDocComment(_)) if includeBufferBeforeNextToken  ⇒ true
       }
       if (needGapBetweenThisAndFollowing)
         builder.append(" ")
@@ -262,13 +270,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     }
 
     def currentIndentSpaces = {
-       val current = currentColumn
-       val lineStart = builder.length - currentColumn
-       var pos = lineStart
-       while (pos < builder.length && builder(pos).isWhitespace)
-         pos += 1 
-       pos - lineStart
-    }    
+      val current = currentColumn
+      val lineStart = builder.length - currentColumn
+      var pos = lineStart
+      while (pos < builder.length && builder(pos).isWhitespace)
+        pos += 1
+      pos - lineStart
+    }
 
     def lastCharacter = if (builder.length == 0) None else Some(lastChar)
 
