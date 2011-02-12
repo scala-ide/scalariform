@@ -114,9 +114,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           formatResult ++= extraFormatResult
           currentFormatterState = newFormatterState
         case parenExpr: ParenExpr ⇒
+          val expressionBreakHappened = currentFormatterState.expressionBreakHappened
           val (extraFormatResult, newFormatterState) = format(parenExpr)(currentFormatterState.clearExpressionBreakHappened)
           formatResult ++= extraFormatResult
-          currentFormatterState = newFormatterState
+          currentFormatterState = newFormatterState.copy(
+            expressionBreakHappened = expressionBreakHappened || newFormatterState.expressionBreakHappened)
         case GeneralTokens(_) | PrefixExprElement(_) ⇒
           for (token ← element.tokens if token != firstToken)
             if (isInferredNewline(token))
@@ -166,8 +168,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for ((newlineOpt, argumentExprs) ← newLineOptsAndArgumentExprss) {
       if (newlineOpt == None && formattingPreferences(PreserveSpaceBeforeArguments))
         formatResult = formatResult.before(argumentExprs.firstToken, CompactPreservingGap)
+      val expressionBreakHappened = currentFormatterState.expressionBreakHappened
       val (argResult, argUpdatedFormatterState) = format(argumentExprs)(currentFormatterState.clearExpressionBreakHappened)
-      currentFormatterState = argUpdatedFormatterState
+      currentFormatterState = argUpdatedFormatterState.copy(
+        expressionBreakHappened = expressionBreakHappened || argUpdatedFormatterState.expressionBreakHappened)
       formatResult ++= argResult
     }
 

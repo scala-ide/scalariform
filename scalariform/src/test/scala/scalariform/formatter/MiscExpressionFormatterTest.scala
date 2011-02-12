@@ -684,4 +684,36 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    viewer( // TODO
     |    )))"""
 
+  """a(b)
+    |.c(d)
+    |.e(f)
+    |.g""" ==>
+  """a(b)
+    |  .c(d)
+    |  .e(f)
+    |  .g"""
+
+  """(a, 
+    |b) + (c, 
+    |d) + (e,
+    | f) + g""" ==>
+  """(a,
+    |  b) + (c,
+    |    d) + (e,
+    |      f) + g"""
+
+  """a + (b,
+    |c) + 
+    |d""" ==>
+  """a + (b,
+    |  c) +
+    |  d"""
+
+  """a + f(b,
+    | c) + 
+    |d""" ==>
+  """a + f(b,
+    |  c) +
+    |  d"""
+
 }

@@ -77,7 +77,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val formattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
           val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
-          val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
+           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
             !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
           }
           edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents,
