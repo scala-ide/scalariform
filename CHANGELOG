@@ -4,6 +4,7 @@
 * Allow single-expression case clauses to be formatted adjacent to the case arrow (issue #7)
 * Improve formatting after a single-line comment (issue #8)
 * Allow missing param types for -Yinfer-argument-types (issue #9)
+* FIX: erroneous spaces after "type" (issue #10)
 * Improve stairway indenting of argument lists, infix exprs
 * Add support for AST selection
 

@@ -320,6 +320,8 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     if (type2 == EOF)
       return Compact
     val xmlPreviousExceptions = Set(LBRACE, LPAREN, NEWLINE, NEWLINES)
+    if (type1 == TYPE && type2.isId)
+      return CompactEnsuringGap    
     if (type2 == XML_START_OPEN && !(xmlPreviousExceptions.contains(type1) || type1.isXml))
       return CompactEnsuringGap
     if (type1 == USCORE && type2.isId && type2 != STAR)
@@ -402,7 +404,7 @@ object ScalaFormatter {
     IMPORT, LAZY, MATCH, NEW,
     OBJECT, OVERRIDE, PACKAGE, PRIVATE, PROTECTED,
     REQUIRES, RETURN, SEALED, /* SUPER, THIS, */
-    THROW, TRAIT, TRY, TYPE,
+    THROW, TRAIT, TRY, /* TYPE ,*/
     VAL, VAR, WHILE, WITH, YIELD, 
     /* USCORE, */ COLON, EQUALS, ARROW, LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /* HASH, AT */
     LBRACE, SEMI)

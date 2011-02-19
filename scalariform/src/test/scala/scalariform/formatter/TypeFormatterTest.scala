@@ -26,7 +26,9 @@ class TypeFormatterTest extends AbstractFormatterTest {
   "A_# #B" ==> "A_# #B"
 
   "this . type" ==> "this.type" 
-  
+  "List[a.type]" ==> "List[a.type]"
+  "(a.type, b.type)" ==> "(a.type, b.type)"
+
   "(A)#X" ==> "(A)#X"
 
   "A @cps[A, C]" ==> "A @cps[A, C]"
