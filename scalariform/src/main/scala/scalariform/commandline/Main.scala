@@ -96,11 +96,18 @@ object Main {
     val files = getFiles()
 
     val test = arguments contains Test
+    val forceOutput = arguments contains ForceOutput
     val inPlace = arguments contains InPlace
     val verbose = arguments contains Verbose
 
     if (inPlace && test)
       errors ::= "Incompatible arguments --test and --inPlace"
+
+    if (forceOutput && test)
+      errors ::= "Incompatible arguments --forceOutput and --inPlace"
+
+    if (forceOutput && files.nonEmpty)
+      errors ::= "Cannot use --forceOutput with files"
 
     if (inPlace && files.isEmpty)
       errors ::= "Need to provide at least one file to modify in place"
@@ -169,8 +176,10 @@ object Main {
           print(formatted)
         } catch {
           case e: ScalaParserException ⇒
-            System.err.println("Could not parse text as Scala.")
-            exit(1)
+            if (forceOutput) print(original) else {
+              System.err.println("Could not parse text as Scala.")
+              exit(1)
+            }
         }
       } else {
         var problems = false
@@ -211,6 +220,7 @@ object Main {
     println("  --help, -h                      Show help")
     println("  --inPlace, -i                   Replace the input file(s) in place with a formatted version.")
     println("  --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
+    println("  --forceOutput, -f               Return the input if it is not correctly formatted. (Only works for input on stdin)")
     println("  --verbose, -v                   Verbose output")
     println("  --version                       Show Scalariform version")
     println()

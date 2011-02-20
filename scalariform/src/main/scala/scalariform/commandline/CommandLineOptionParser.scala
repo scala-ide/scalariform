@@ -6,10 +6,12 @@ import scala.util.parsing.combinator._
 class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
 
   lazy val option: Parser[CommandLineArgument] =
-    phrase(help) | phrase(version) | phrase(test) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
+    phrase(help) | phrase(version) | phrase(test) | phrase(forceOutput) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
       phrase(encoding) | phrase(toggle) | phrase(preferenceOption) | phrase(badOption)
 
   lazy val test = ("--test" | "-t") ^^^ Test
+
+  lazy val forceOutput = ("--forceOutput" | "-f") ^^^ ForceOutput
 
   lazy val inPlace = ("--inPlace" | "-i") ^^^ InPlace
 
@@ -41,6 +43,7 @@ case class FileName(name: String) extends CommandLineArgument
 case class FileList(name: String) extends CommandLineArgument
 case class Encoding(encoding: String) extends CommandLineArgument
 case object Test extends CommandLineArgument
+case object ForceOutput extends CommandLineArgument
 case object InPlace extends CommandLineArgument
 case object Verbose extends CommandLineArgument
 case object Help extends CommandLineArgument
