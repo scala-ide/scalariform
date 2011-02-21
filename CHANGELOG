@@ -7,6 +7,7 @@
 * FIX: erroneous spaces after "type" (issue #10)
 * Improve stairway indenting of argument lists, infix exprs
 * Add support for AST selection
+* Add --forceOutput command-line argument to pass input through untouched if there is a parse error (#issue 11/12)
 
 0.0.8 (23/January/11)
 

@@ -112,7 +112,7 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gq`` command by adding
 the following to ``.vimrc`` ::
 
-  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.0.8.jar\ scalariform.commandline.Main
+  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.0.9.jar\ scalariform.commandline.Main\ --forceOutput
 
 Command line tool
 -----------------
@@ -132,6 +132,7 @@ Usage::
     --help, -h                      Show help
     --inPlace, -i                   Replace the input file(s) in place with a formatted version.
     --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
+    --forceOutput, -f               Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)
     --verbose, -v                   Verbose output
     --version                       Show Scalariform version
   

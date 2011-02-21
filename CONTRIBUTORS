@@ -2,3 +2,4 @@ Scalariform is maintained by Matt Russell (https://github.com/mdr/scalariform).
 
 * A command line option to read a list of files was contributed by Olivier Michallat (https://github.com/olim7t).
 * The Maven formatter plugin was written by Adam Crain (https://github.com/jadamcrain).
+* Better Vim integration via a command line option to return the input unchanged on parse error was contributed by Oliver Braun (https://github.com/obcode).
