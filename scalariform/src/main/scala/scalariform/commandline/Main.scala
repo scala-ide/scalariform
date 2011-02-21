@@ -11,18 +11,22 @@ import java.nio.charset._
 object Main {
 
   def main(args: Array[String]) {
+    exit(process(args))
+  }
+
+  def process(args: Array[String]): Int = {
 
     val parser = new CommandLineOptionParser
     val arguments = args.toList map parser.getArgument
 
     if (arguments contains Help) {
       printUsage()
-      exit(0)
+      return 0
     }
 
     if (arguments contains Version) {
       println("Scalariform " + scalariform.VERSION)
-      exit(0)
+      return 0
     }
 
     var errors: List[String] = Nil
@@ -122,7 +126,7 @@ object Main {
       errors.reverse foreach System.err.println
       if (showUsage)
         printUsage()
-      exit(1)
+      return 1
     }
 
     def log(s: String) = if (verbose) println(s)
@@ -167,7 +171,7 @@ object Main {
           log("[" + resultString + "]" + padding + " " + file)
           allFormattedCorrectly &= (formatResult == FormattedCorrectly)
         }
-      exit(if (allFormattedCorrectly) 0 else 1)
+      return (if (allFormattedCorrectly) 0 else 1)
     } else {
       if (files.isEmpty) {
         val original = Source.fromInputStream(System.in, encoding).mkString
@@ -178,7 +182,7 @@ object Main {
           case e: ScalaParserException ⇒
             if (forceOutput) print(original) else {
               System.err.println("Could not parse text as Scala.")
-              exit(1)
+              return 1
             }
         }
       } else {
@@ -206,9 +210,10 @@ object Main {
           }
         }
         if (problems)
-          exit(1)
+          return 1
       }
     }
+    return 0
   }
 
   private def printUsage() {
