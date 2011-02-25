@@ -55,7 +55,8 @@ class AstSelector(source: String) {
   private val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(source)
   import hiddenTokenInfo._
 
-  private val compilationUnit = new ScalaParser(tokens.toArray).compilationUnitOrScript()
+  private val parser = new ScalaParser(tokens.toArray)
+  private val compilationUnitOpt = parser.safeParse(parser.compilationUnitOrScript)
 
   /**
    * A node's adjusted range includes any Scaladoc immediately before it.
@@ -70,7 +71,8 @@ class AstSelector(source: String) {
     }
 
   def expandSelection(initialSelection: Range): Option[Range] =
-    expandToToken(initialSelection) orElse expandToEnclosingAst(compilationUnit, initialSelection, enclosingNodes = Nil)
+    expandToToken(initialSelection) orElse
+      (compilationUnitOpt flatMap { expandToEnclosingAst(_, initialSelection, enclosingNodes = Nil) })
 
   private def expandToToken(initialSelection: Range): Option[Range] = {
     val Range(offset, length) = initialSelection
@@ -85,8 +87,10 @@ class AstSelector(source: String) {
         if token.range contains initialSelection
       } {
         if (token.isScalaDocComment && token.range == initialSelection)
-          for (expandedToAstRange ← appendAstNodeIfPossible(compilationUnit, token))
-            return Some(expandedToAstRange)
+          for {
+            compilationUnit ← compilationUnitOpt
+            expandedToAstRange ← appendAstNodeIfPossible(compilationUnit, token)
+          } return Some(expandedToAstRange)
         if (token.length > length)
           return Some(token.range)
       }

@@ -14,6 +14,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   import ScalaParser._
 
+  def safeParse[T](production: => T): Option[T] = try Some(production) catch { case e: ScalaParserException => None }
+
   require(!tokens.isEmpty) // at least EOF
 
   def inParens[T](body: ⇒ T): (Token, T, Token) = {

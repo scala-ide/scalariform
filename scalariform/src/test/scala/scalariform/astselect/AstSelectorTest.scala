@@ -244,11 +244,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "                                   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " ~ 
   " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
 
+  " } wibble  " ~
+  "     $     " ~
+  "   $$$$$$  "
 
   if (false) { 
-
-
-
   }
 
   private def findSelectionRange(s: String): Range = { 
