@@ -406,8 +406,8 @@ class ScalaParser(tokens: Array[Token]) {
       baseCall
   }
 
-  private def pkgQualId() = {
-    val pkg = qualId().tokens
+  private def pkgQualId(): (CallExpr, Option[Token]) = {
+    val pkg = qualId()
     val newLineOpt = newLineOptWhenFollowedBy(LBRACE)
     (pkg, newLineOpt)
   }
@@ -2005,7 +2005,7 @@ object ScalaParser {
 
 case class TemplateOpt(templateInheritanceSectionOpt: Option[TemplateInheritanceSection], templateBodyOpt: Option[TemplateBody])
 
-case class PrePackageBlock(name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) {
+case class PrePackageBlock(name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) {
   def complete(packageToken: Token) = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
 }
 

@@ -260,6 +260,12 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$$$     " ~
   " $$$$$$$$$$$$$$$$$$ "
 
+  " package foo.bar.baz " ~
+  "         $$$         " ~ 
+  "         $$$$$$$     " ~
+  "         $$$$$$$$$$$ " ~
+  " $$$$$$$$$$$$$$$$$$$ "  
+
   if (false) { 
   }
 

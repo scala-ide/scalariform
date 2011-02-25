@@ -367,11 +367,11 @@ case class ImportSelectors(lbrace: Token, firstImportSelector: Expr, otherImport
   lazy val tokens = flatten(lbrace, firstImportSelector, otherImportSelectors, rbrace)
 }
 
-case class PackageBlock(packageToken: Token, name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) extends Stat {
+case class PackageBlock(packageToken: Token, name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) extends Stat {
   lazy val tokens = flatten(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
 }
 
-case class PackageStat(packageToken: Token, name: List[Token]) extends Stat {
+case class PackageStat(packageToken: Token, name: CallExpr) extends Stat {
   lazy val tokens = flatten(packageToken, name)
 }
 

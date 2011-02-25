@@ -673,7 +673,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     }
 
   def format(packageBlock: PackageBlock)(implicit formatterState: FormatterState): FormatResult = {
-    val PackageBlock(packageToken: Token, name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) = packageBlock
+    val PackageBlock(packageToken: Token, name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) = packageBlock
 
     var formatResult: FormatResult = NoFormatResult
     newlineOpt match {
