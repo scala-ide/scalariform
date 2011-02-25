@@ -17,6 +17,8 @@ class PackageFormatterTest extends AbstractFormatterTest {
 
   "" ==> ""
 
+  "package foo . bar . baz" ==> "package foo.bar.baz"
+
   """package foo {
     |package bar {
     |class Baz

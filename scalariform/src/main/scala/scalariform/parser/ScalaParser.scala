@@ -14,7 +14,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   import ScalaParser._
 
-  def safeParse[T](production: => T): Option[T] = try Some(production) catch { case e: ScalaParserException => None }
+  def safeParse[T](production: ⇒ T): Option[T] = try Some(production) catch { case e: ScalaParserException ⇒ None }
 
   require(!tokens.isEmpty) // at least EOF
 
@@ -322,82 +322,92 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def selector(): Token = ident()
 
-  private def path(thisOK: Boolean, typeOK: Boolean): List[Token] = {
-    val tokens = ListBuffer[Token]()
+  private def pathC(thisOK: Boolean, typeOK: Boolean): CallExpr = {
     if (THIS) {
-      tokens += nextToken()
+      val thisToken = nextToken()
+      val baseCall = CallExpr(None, thisToken)
       if (!thisOK || DOT) {
-        tokens += accept(DOT)
-        tokens ++= selectors(typeOK)
-      }
+        val dot = accept(DOT)
+        selectors((baseCall, dot), typeOK)
+      } else
+        baseCall
     } else if (SUPER) {
-      tokens += nextToken()
-      tokens ++= mixinQualifierOpt()
-      tokens += accept(DOT)
-      tokens += selector()
+      val superToken = nextToken()
+      val mixinQualifierOpt_ = mixinQualifierOpt()
+      val dot = accept(DOT)
+      val id = selector()
+      val subBaseCall = CallExpr(None, superToken, mixinQualifierOpt_)
+      val baseCall = CallExpr(Some(List(subBaseCall), dot), id)
       if (DOT) {
-        tokens += nextToken()
-        tokens ++= selectors(typeOK)
-      }
+        val dot2 = nextToken()
+        selectors((baseCall, dot2), typeOK)
+      } else
+        baseCall
     } else {
-      tokens += ident()
+      val id = ident()
+      val baseCall = CallExpr(None, id)
       if (DOT) {
-        tokens += nextToken()
+        val dot = nextToken()
         if (THIS) {
-          tokens += nextToken()
+          val thisToken = nextToken()
+          val baseCall2 = CallExpr(Some(List(baseCall), dot), thisToken)
           if (!thisOK || DOT) {
-            tokens += accept(DOT)
-            tokens ++= selectors(typeOK)
-          }
+            val dot2 = accept(DOT)
+            selectors((baseCall2, dot2), typeOK)
+          } else
+            baseCall
         } else if (SUPER) {
-          tokens += nextToken()
-          tokens ++= mixinQualifierOpt()
-          tokens += accept(DOT)
-          tokens += selector()
+          val superToken = nextToken()
+          val mixinQualifierOpt_ = mixinQualifierOpt()
+          val dot2 = accept(DOT)
+          val id2 = selector()
+          val baseCall2 = CallExpr(Some(List(CallExpr(Some(List(baseCall), dot), superToken, mixinQualifierOpt_)), dot2), id2)
           if (DOT) {
-            tokens += nextToken()
-            tokens ++= selectors(typeOK)
-          }
+            val dot3 = nextToken()
+            selectors((baseCall2, dot3), typeOK)
+          } else
+            baseCall2
         } else
-          tokens ++= selectors(typeOK)
-      }
+          selectors((baseCall, dot), typeOK)
+      } else
+        baseCall
     }
-    tokens.toList
   }
 
-  private def selectors(typeOK: Boolean): List[Token] = {
-    val tokens = ListBuffer[Token]()
+  private def path(thisOK: Boolean, typeOK: Boolean): List[Token] = pathC(thisOK, typeOK).tokens
+
+  private def selectors(previousAndDot: (CallExpr, Token), typeOK: Boolean): CallExpr = {
+    val exprDotOpt = Some(exprElementFlatten2(previousAndDot._1), previousAndDot._2)
     if (typeOK && TYPE)
-      tokens += nextToken()
+      CallExpr(exprDotOpt, nextToken())
     else {
-      tokens += selector()
+      val id = selector()
+      val baseCall = CallExpr(exprDotOpt, id)
       if (DOT) {
-        tokens += nextToken()
-        tokens ++= selectors(typeOK)
-      }
+        val dot = nextToken()
+        selectors((baseCall, dot), typeOK)
+      } else
+        baseCall
     }
-    tokens.toList
   }
 
-  def tripleToList[T](triple: (T, T, T)): List[T] = List(triple._1, triple._2, triple._3)
-
-  private def mixinQualifierOpt(): List[Token] =
-    if (LBRACKET) tripleToList(inBrackets(ident())) else Nil
+  private def mixinQualifierOpt(): Option[TypeExprElement] =
+    if (LBRACKET) Some(TypeExprElement(typeElementFlatten3(inBrackets(ident)))) else None
 
   private def stableId(): List[Token] = path(thisOK = false, typeOK = false)
 
-  private def qualId(): List[Token] = {
-    val tokens = ListBuffer[Token]()
-    tokens += ident()
+  private def qualId(): CallExpr = {
+    val id = ident()
+    val baseCall = CallExpr(None, id)
     if (DOT) {
-      tokens += nextToken()
-      tokens ++= selectors(typeOK = false)
-    }
-    tokens.toList
+      val dot = nextToken()
+      selectors((baseCall, dot), typeOK = false)
+    } else
+      baseCall
   }
 
   private def pkgQualId() = {
-    val pkg = qualId()
+    val pkg = qualId().tokens
     val newLineOpt = newLineOptWhenFollowedBy(LBRACE)
     (pkg, newLineOpt)
   }
@@ -738,12 +748,7 @@ class ScalaParser(tokens: Array[Token]) {
           exprElementFlatten2(xmlLiteral())
         case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS | SUPER ⇒
           // val callExpr = CallExpr(Some(previousPart, dot), selector_, None, Nil, None)
-          val path_ = path(thisOK = true, typeOK = false)
-          path_ match {
-            case PathEndingWithDotId(prefix, dot, lastId) ⇒ List(CallExpr(Some(exprElementFlatten2(prefix), dot), lastId, None, Nil, None))
-            case JustIdOrThis(id)                         ⇒ List(CallExpr(None, id, None, Nil, None))
-            case _                                        ⇒ exprElementFlatten2(path_)
-          }
+          List(pathC(thisOK = true, typeOK = false))
         case USCORE ⇒
           exprElementFlatten2(nextToken())
         case LPAREN ⇒
@@ -1999,3 +2004,8 @@ object ScalaParser {
 // Not AST nodes, used as an intermediate structures during parsing:
 
 case class TemplateOpt(templateInheritanceSectionOpt: Option[TemplateInheritanceSection], templateBodyOpt: Option[TemplateBody])
+
+case class PrePackageBlock(name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) {
+  def complete(packageToken: Token) = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
+}
+

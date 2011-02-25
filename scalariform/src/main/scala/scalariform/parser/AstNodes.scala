@@ -129,7 +129,8 @@ case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Opt
   lazy val tokens = flatten(left, infixId, newlineOption, right)
 }
 
-case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt: Option[Token]) extends ExprElement {
+case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement] = None,
+                    newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)] = Nil, uscoreOpt: Option[Token] = None) extends ExprElement {
   lazy val tokens = flatten(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, uscoreOpt)
 }
 
@@ -368,10 +369,6 @@ case class ImportSelectors(lbrace: Token, firstImportSelector: Expr, otherImport
 
 case class PackageBlock(packageToken: Token, name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) extends Stat {
   lazy val tokens = flatten(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
-}
-
-case class PrePackageBlock(name: List[Token], newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) {
-  def complete(packageToken: Token) = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
 }
 
 case class PackageStat(packageToken: Token, name: List[Token]) extends Stat {
