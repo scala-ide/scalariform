@@ -716,4 +716,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  c) +
     |  d"""
 
+  "Foo.this" ==> "Foo.this"
+
 }

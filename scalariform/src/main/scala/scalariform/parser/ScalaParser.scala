@@ -355,7 +355,7 @@ class ScalaParser(tokens: Array[Token]) {
             val dot2 = accept(DOT)
             selectors((baseCall2, dot2), typeOK)
           } else
-            baseCall
+            baseCall2
         } else if (SUPER) {
           val superToken = nextToken()
           val mixinQualifierOpt_ = mixinQualifierOpt()
