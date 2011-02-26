@@ -1,12 +1,13 @@
-0.0.9 (..)
+0.0.9 (26/February/11)
+
+* Add support for AST selection
 * Improve basic formatting of Scaladoc comments
+* Improve stairway indenting of argument lists, infix exprs
 * Add preference "PreserveDanglingCloseParenthesis" to keep newlines before a dangling right paren (issue #6)
 * Allow single-expression case clauses to be formatted adjacent to the case arrow (issue #7)
 * Improve formatting after a single-line comment (issue #8)
 * Allow missing param types for -Yinfer-argument-types (issue #9)
 * FIX: erroneous spaces after "type" (issue #10)
-* Improve stairway indenting of argument lists, infix exprs
-* Add support for AST selection
 * Add --forceOutput command-line argument to pass input through untouched if there is a parse error (#issue 11/12)
 * Pull out separate, non-System.exit()ing 'process' method separate to main() (issue #13)
 
@@ -34,6 +35,7 @@
 * Tweaks to else clause formatting
 
 0.0.6 (4/October/10)
+
 * Lexer performance tweaks
 * FIX: whitespace in XML end tags (e.g. </a   >)
 * Tweak multiline case clause indentation
@@ -45,6 +47,7 @@
 * FIX: honour previously-ignored formatXml preference
 
 0.0.5 (15/September/10)
+
 * Support Scala scripts
 * Better staircase expr formatting
 * Handle Scala parsing exceptions in command-line tool
@@ -56,6 +59,7 @@
 * FIX: a package / NEWLINE parsing bug
 
 0.0.4 (17/July/10)
+
 * Add Maven/Tycho build
 * Adjust spacing between comments and adjacent tokens
 * Improved formatting for import blocks
@@ -66,12 +70,15 @@
 * Add "listFiles" command line option -- thanks to Olivier Michallat (olim7t) for patch
 
 0.0.3 (9/June/10)
+
 * command line tool (scalariform.commandline.Main)
 * _~_ formatting fix
 
 0.0.2 (31/May/10) 
+
 * parser update for multiple guards in a generator to match new scalac behaviour
 * small compiler fixes to match trunk
 
 0.0.1 (11/April/10) 
+
 * initial release

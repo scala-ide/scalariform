@@ -1,15 +1,13 @@
 # 1. Prepare trunk
 
-export FROM=0.0.7
-export TO=0.0.8
-export NEW=0.0.9
+export FROM=0.0.8
+export TO=0.0.9
+export NEW=0.1.0
 
 sed -i s/$FROM/$TO/g README.rst
-sed -i s/$FROM/$TO/g docs/source/README.rst
-git diff README.rst docs/source/README.rst
 
-# + data to CHANGELOG
-# create scalariform/notes/0.0.8.markdown, check at at http://wmd-editor.com/demo
+# + date to CHANGELOG
+# create scalariform/notes/$TO.markdown, check at at http://wmd-editor.com/demo
 
 # 2. Branch
 

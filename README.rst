@@ -1,13 +1,14 @@
 Scalariform
 ===========
 
-Scalariform is a code formatter for Scala 2.8+. It is a
-library and a stand-alone command line tool, with integrations
-available for Eclipse, Emacs (via ENSIME), jEdit, Maven, sbt and
-TextMate. Currently, Scalariform supports only a limited set of
-options, although it is intended to be compatible with the
-recommendations of the `Scala Style Guide`_ (see below). Please let me
-know what other features people would like.
+Scalariform is a code formatter for Scala 2.8+. It is a library and a
+stand-alone command line tool, with integrations available for various
+editors (see below).
+
+Currently, Scalariform supports only a limited set of options. The
+plan is to add further features as and when people ask for them, so
+please do raise a ticket if it doesn't format your code the way you'd
+like it, and I'll see what I can do.
 
 Scalariform is licenced under `The MIT Licence`_.
 
@@ -19,11 +20,11 @@ Download
 
 Scalariform is available from Scala-tools.org:
 
-  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.8/
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.9/
 
 If you're using sbt, you can declare a dependency as follows::
 
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.8"
+  val scalariform = "org.scalariform" %% "scalariform" % "0.0.9"
 
 Integration with Eclipse
 ------------------------
@@ -75,7 +76,7 @@ Usage::
   <plugin>
     <groupId>org.scalariform</groupId>
     <artifactId>scalariform-maven-plugin</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.9</version>
     <executions>
       <execution>
         <phase>process-sources</phase>
@@ -120,7 +121,7 @@ Command line tool
 Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
-  scala -cp /path/to/scalariform-0.0.8.jar scalariform.commandline.Main "$@"
+  scala -cp /path/to/scalariform-0.0.9.jar scalariform.commandline.Main "$@"
 
 Usage::
 
