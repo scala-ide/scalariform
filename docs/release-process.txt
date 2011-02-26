@@ -1,8 +1,8 @@
 # 1. Prepare trunk
 
-export FROM=0.0.8
-export TO=0.0.9
-export NEW=0.1.0
+export FROM=0.0.9
+export TO=0.1.0
+export NEW=0.1.1
 
 sed -i s/$FROM/$TO/g README.rst
 
@@ -54,6 +54,9 @@ mvn deploy
 
 # 4. Update master
 
+git co master
+
 scripts/update-version.sh $TO-SNAPSHOT $NEW-SNAPSHOT
+scripts/update-version.sh $TO.qualifier $NEW.qualifier
 
 git commit -a -m "Update versions for $NEW-SNAPSHOT"
