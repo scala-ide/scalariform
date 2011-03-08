@@ -109,7 +109,7 @@ case class CallByNameTypeElement(arrow: Token) extends AstNode with TypeElement 
 
 sealed trait ExprElement extends AstNode
 
-case class Expr(contents: List[ExprElement]) extends AstNode with ExprElement with Stat with Enumerator with XmlContents with ImportExpr {
+case class Expr(contents: List[ExprElement]) extends AstNode with ExprElement with Stat with XmlContents with ImportExpr {
   lazy val tokens = flatten(contents)
 }
 
@@ -205,15 +205,12 @@ case class Enumerators(initialGenerator: Generator, rest: List[(Token, Enumerato
   lazy val tokens = flatten(initialGenerator, rest)
 }
 
-case class Generator(
-  valOption: Option[Token],
-  pattern: Expr,
-  equalsOrArrowToken: Token,
-  expr: Expr,
-  guards: List[Guard]) extends AstNode with Enumerator {
-
+case class Generator(valOption: Option[Token], pattern: Expr, equalsOrArrowToken: Token, expr: Expr, guards: List[Guard]) extends AstNode with Enumerator {
   lazy val tokens = flatten(valOption, pattern, equalsOrArrowToken, expr, guards)
+}
 
+case class OldForGuard(expr: Expr) extends AstNode with Enumerator {
+  lazy val tokens = flatten(expr)
 }
 
 case class Guard(ifToken: Token, expr: Expr) extends AstNode with Enumerator {

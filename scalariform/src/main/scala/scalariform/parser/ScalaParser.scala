@@ -874,7 +874,7 @@ class ScalaParser(tokens: Array[Token]) {
         else generator(eqOK = true)
       } else {
         if (VAL) generator(eqOK = true)
-        else expr()
+        else OldForGuard(expr())
       }
       otherEnumerators += ((statSep, enumerator))
     }

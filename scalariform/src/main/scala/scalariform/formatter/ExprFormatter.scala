@@ -471,13 +471,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult
   }
 
-  private def format(enumerator: Enumerator)(implicit formatterState: FormatterState): FormatResult = {
+  private def format(enumerator: Enumerator)(implicit formatterState: FormatterState): FormatResult =
     enumerator match {
-      case expr@Expr(_)                       ⇒ format(expr)
+      case expr@OldForGuard(subexpr)          ⇒ format(subexpr)
       case generator@Generator(_, _, _, _, _) ⇒ format(generator)
       case guard@Guard(_, _)                  ⇒ format(guard: Guard)
     }
-  }
 
   private def format(generator: Generator)(implicit formatterState: FormatterState): FormatResult = {
     val Generator(valOption: Option[Token], pattern: Expr, equalsOrArrowToken: Token, expr: Expr, guards: List[Guard]) = generator

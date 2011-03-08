@@ -15,9 +15,9 @@ class ScalaLexerReader(val tokens: List[Token]) extends Reader[Token] {
 
   private class ScalaLexerPosition(token: Token) extends Position {
 
-    def line: Int = token.getLine
+    def line: Int = -1
 
-    def column: Int = token.getCharPositionInLine
+    def column: Int = -1
 
     protected def lineContents: String = token.getText
 
