@@ -42,6 +42,44 @@ object ForExpander {
   private def token(tokenType: TokenType, text: String) =
     Token(tokenType, text, 0, text.length - 1)
 
+  private def makeBind(expr: Expr): Bind = expr match {
+    case Expr(List(bind@Bind(_, _, _))) ⇒ bind
+    case _                              ⇒ Bind(token(VARID, freshName()), token(AT, "@"), expr.contents)
+  }
+
+  private var n: Int = 1
+  private def freshName(): String = {
+    val name = "freshName" + n
+    n += 1
+    name
+  }
+
+  private def intersperse[A](sep: ⇒ A, c: List[A]): List[A] = c match {
+    case Nil     ⇒ Nil
+    case List(x) ⇒ List(x)
+    case x :: xs ⇒ x :: sep :: intersperse(sep, xs)
+  }
+
+  private def comma = token(COMMA, ",")
+
+  private def makeTuple(exprs: List[Expr]): Expr = {
+    val contents = intersperse(GeneralTokens(List(comma)), exprs)
+    Expr(List(ParenExpr(token(LPAREN, "("), contents, token(RPAREN, ")"))))
+  }
+
+  private def makeTupleTerm(uscoreOrIds: List[Token]): Expr = Expr(List(uscoreOrIds match {
+    case List(uscoreOrId) ⇒
+      GeneralTokens(List(uscoreOrId))
+    case _ ⇒
+      val contents = List(GeneralTokens(intersperse(comma, uscoreOrIds)))
+      ParenExpr(token(LPAREN, "("), contents, token(RPAREN, ")"))
+  }))
+
+  private def makePatDef(pat: ExprElement, rhs: Expr): List[FullDefOrDcl] =
+    List(FullDefOrDcl(Nil, Nil, PatDefOrDcl(token(VAL, "val"), pattern = Expr(List(pat)), otherPatterns = Nil, typedOpt = None, equalsClauseOption = Some(token(EQUALS, "="), rhs))))
+
+  private def makeValue(bind: Bind): Token = bind.uscoreOrId
+
   private def makeFor(mapName: String, flatMapName: String, enums: List[NscEnumerator], body: Expr): CallExpr = {
 
     def makeCombination(meth: String, qual: Expr, pat: Expr, body: Expr) = {
@@ -57,23 +95,26 @@ object ForExpander {
         makeCombination(flatMapName, rhs, pat, Expr(List(makeFor(mapName, flatMapName, rest, body))))
       case ValFrom(pat, rhs) :: Filter(test) :: rest ⇒
         makeFor(mapName, flatMapName, ValFrom(pat, Expr(List(makeCombination("withFilter", rhs, pat, test)))) :: rest, body)
-      case ValFrom(pat , rhs) :: rest ⇒
+      case ValFrom(pat, rhs) :: rest ⇒
         val valeqs = rest.take(MaxTupleArity - 1).takeWhile(_.isInstanceOf[ValEq])
         val rest1 = rest.drop(valeqs.length)
         val pats = valeqs map { case ValEq(pat, _) ⇒ pat }
         val rhss = valeqs map { case ValEq(_, rhs) ⇒ rhs }
-        
+
         val defpat1 = makeBind(pat)
         val defpats = pats map makeBind
-        val pdefs = (defpats, rhss).zipped flatMap makePatDef
+        val pdefs: List[Stat] = (defpats, rhss).zipped flatMap makePatDef
         val ids = (defpat1 :: defpats) map makeValue
-        val rhs1 = makeForYield(
-          List(ValFrom(pos, defpat1, rhs)),
-          Block(pdefs, atPos(wrappingPos(ids)) { makeTupleTerm(ids, true) }) setPos wrappingPos(pdefs))
-        val allpats = (pat :: pats) map (_.duplicate)
-        val vfrom1 = ValFrom(r2p(pos.startOrPoint, pos.point, rhs1.pos.endOrPoint), atPos(wrappingPos(allpats)) { makeTuple(allpats, false) }, rhs1)
+
+        val (firstStat :: otherStats) = pdefs :+ makeTupleTerm(ids)
+        val statSeq = Right(StatSeq(None, Some(firstStat), otherStats map { stat ⇒ (token(SEMI, ";"), Some(stat)) }))
+        val rhs1 = makeFor("map", "flatMap",
+          List(ValFrom(Expr(List(defpat1)), rhs)),
+          Expr(List(BlockExpr(token(LBRACE, "{"), statSeq, token(RBRACE, "}")))))
+
+        val allpats = pat :: pats
+        val vfrom1 = ValFrom(makeTuple(allpats), Expr(List(rhs1)))
         makeFor(mapName, flatMapName, vfrom1 :: rest1, body)
-        //throw new UnsupportedOperationException
     }
 
   }

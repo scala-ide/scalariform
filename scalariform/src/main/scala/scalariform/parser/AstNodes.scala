@@ -271,6 +271,10 @@ case class PatDefOrDcl(valOrVarToken: Token,
 
 }
 
+case class Bind(uscoreOrId: Token, at: Token, rhs: List[ExprElement]) extends ExprElement {
+  lazy val tokens = flatten(uscoreOrId, at, rhs)
+}
+
 sealed trait FunBody extends AstNode
 case class ProcFunBody(newlineOpt: Option[Token], bodyBlock: BlockExpr) extends FunBody {
   lazy val tokens = flatten(newlineOpt, bodyBlock)

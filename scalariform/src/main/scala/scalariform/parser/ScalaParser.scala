@@ -937,16 +937,17 @@ class ScalaParser(tokens: Array[Token]) {
 
     def pattern2(): Expr = {
       val firstPattern = pattern3()
-      val atOtherOpt = if (AT) {
-        // TODO: Compare Parsers.scala
-        optional {
-          val atToken = nextToken()
-          val otherPattern = pattern3()
-          (atToken, otherPattern)
+      if (AT) // TODO: Compare Parsers.scala
+        firstPattern match {
+          case List(GeneralTokens(List(lhsToken))) if lhsToken.tokenType == USCORE || lhsToken.tokenType.isId ⇒
+            val atToken = nextToken()
+            val otherPattern = pattern3()
+            makeExpr(Bind(lhsToken, atToken, otherPattern))
+          case _ ⇒
+            makeExpr(firstPattern)
         }
-      } else
-        None
-      makeExpr(firstPattern, atOtherOpt)
+      else
+        makeExpr(firstPattern)
     }
 
     def pattern3(): List[ExprElement] = {
