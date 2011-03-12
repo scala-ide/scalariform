@@ -5,7 +5,9 @@ import scalariform.utils.Utils
 
 import scala.collection.mutable.{ Queue, Stack, ListBuffer }
 
-class ScalaLexer(reader: UnicodeEscapeReader) extends Lexer(reader) with ScalaOnlyLexer with XmlLexer {
+class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false) extends Lexer(reader) with ScalaOnlyLexer with XmlLexer {
+
+  override val forgiveLexerErrors = forgiveErrors
 
   modeStack.push(new ScalaMode())
 
@@ -68,8 +70,8 @@ object ScalaLexer {
 
   def tokenise(s: String): List[Token] = tokeniseFull(s)._2
 
-  def rawTokenise(s: String): List[Token] = {
-    val lexer = new ScalaLexer(new UnicodeEscapeReader(s))
+  def rawTokenise(s: String, forgiveErrors: Boolean = false): List[Token] = {
+    val lexer = new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
     var actualTokens: List[Token] = Nil
     var continue = true
     while (continue) {

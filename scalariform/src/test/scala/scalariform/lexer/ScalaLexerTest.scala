@@ -11,7 +11,7 @@ import java.io._
 
 class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
-  implicit def string2TestString(s: String) = new TestString(s)
+  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false) = new TestString(s)(forgiveErrors)
 
   "println" producesTokens (VARID)
 
@@ -195,15 +195,26 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
     evaluating { ScalaLexer.rawTokenise("\"\"\"") } should produce[ScalaLexerException]
   }
 
-  class TestString(s: String) {
+  {
+    implicit val forgiveErrors = true
+
+    "\"\"\"" producesTokens (STRING_LITERAL)
+    "'" producesTokens (CHARACTER_LITERAL)
+    "\"unclosed" producesTokens (STRING_LITERAL)
+    "\\ufoob" producesTokens (WS)
+    "`unclosed" producesTokens (VARID)
+
+  }
+
+  class TestString(s: String)(implicit forgiveErrors: Boolean = false) {
 
     def producesTokens(toks: TokenType*) {
       check(s.stripMargin, toks.toList)
     }
 
     private def check(s: String, expectedTokens: List[TokenType]) {
-      it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<<") in {
-        val actualTokens: List[Token] = ScalaLexer.rawTokenise(s)
+      it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors) in {
+        val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors)
         val actualTokenTypes = actualTokens map { _.getType }
         val reconstitutedSource = actualTokens map { _.getText } mkString ""
         require(actualTokenTypes == expectedTokens, "tokens do not match expected: " + expectedTokens + " vs " + actualTokenTypes)

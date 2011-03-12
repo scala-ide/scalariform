@@ -56,8 +56,13 @@ trait XmlLexer extends Lexer {
             getXmlCDATA()
             if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
               modeStack.pop()
-          } else
-            throw new ScalaLexerException("Bad XML")
+          } else {
+            if (forgiveLexerErrors) {
+              munch("<!")
+              token(XML_COMMENT)
+            } else
+              throw new ScalaLexerException("Bad XML")
+          }
         } else if (ch(1) == '?') {
           getXmlProcessingInstruction()
           if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
@@ -153,7 +158,7 @@ trait XmlLexer extends Lexer {
         munch("]]>")
         continue = false
       } else if (ch == SU)
-        throw new ScalaLexerException("Malformed XML CDATA")
+        if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed XML CDATA")
       else
         nextChar()
     }
@@ -168,12 +173,12 @@ trait XmlLexer extends Lexer {
         nextChar()
         nextChar()
         if (ch != '>')
-          throw new ScalaLexerException("Malformed XML comment")
+          if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed XML comment")
         nextChar()
         continue = false
-      } else if (ch == SU)
-        throw new ScalaLexerException("Malformed XML comment")
-      else
+      } else if (ch == SU) {
+        if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed XML comment")
+      } else
         nextChar()
     }
     token(XML_COMMENT)
@@ -218,9 +223,13 @@ trait XmlLexer extends Lexer {
     require(ch == quote)
     nextChar()
     while (ch != quote) {
-      if (ch == SU) // TODO: line seps etc
-        throw new ScalaLexerException("Unterminated attribute value")
-      else
+      if (ch == SU) { // TODO: line seps etc
+        if (forgiveLexerErrors) {
+          token(XML_ATTR_VALUE)
+          return
+        } else
+          throw new ScalaLexerException("Unterminated attribute value")
+      } else
         nextChar()
     }
     require(ch == quote)

@@ -3,7 +3,7 @@ package scalariform.lexer
 import CharConstants._
 import ScalaLexer._
 
-class UnicodeEscapeReader(val s: String) {
+class UnicodeEscapeReader(val s: String, forgiveLexerErrors: Boolean = false) {
 
   private var pos: Int = 0
   private var consecutiveBackslashCount = 0
@@ -70,10 +70,10 @@ class UnicodeEscapeReader(val s: String) {
     sb.append(digitCh4)
     val digit4 = digit2int(digitCh4, base = 16)
 
-    if (digit1 < 0 || digit2 < 0 || digit3 < 0 || digit4 < 0)
-      throw new ScalaLexerException("error in unicode escape: " + sb.toString)
-
-    val decodedChar = (digit1 << 12 | digit2 << 8 | digit3 << 4 | digit4).toChar
+    val decodedChar = if (digit1 < 0 || digit2 < 0 || digit3 < 0 || digit4 < 0)
+      if (forgiveLexerErrors) ' ' else throw new ScalaLexerException("error in unicode escape: " + sb.toString)
+    else
+      (digit1 << 12 | digit2 << 8 | digit3 << 4 | digit4).toChar
 
     unicodeEscapeOfPreviousRead = Some(sb.toString)
     consecutiveBackslashCount = 0

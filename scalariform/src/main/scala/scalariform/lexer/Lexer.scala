@@ -1,5 +1,6 @@
 package scalariform.lexer
 
+import scala.math.min
 import scala.annotation.{ switch, tailrec }
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
@@ -13,6 +14,8 @@ object CharConstants {
 
 abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
   import CharConstants._
+
+  protected val forgiveLexerErrors: Boolean
 
   protected val tokenTextBuffer = new StringBuilder
 
@@ -72,7 +75,7 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
     val startIndex = actualTokenTextOffset
     val tokenLength = actualTokenTextLength
     require(tokenType == EOF || tokenLength > 0)
-    val stopIndex = startIndex + tokenLength - 1
+    val stopIndex = min(startIndex + tokenLength - 1, reader.s.length - 1) // min protects against overeager consumption past EOF in forgiving mode   
     val tokenText = reader.s.substring(actualTokenTextOffset, stopIndex + 1)
     val token = new Token(tokenType, tokenText, startIndex, stopIndex)
     builtToken = Some(token)

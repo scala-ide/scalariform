@@ -77,7 +77,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           val formattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
           val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
-           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
+          val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
             !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
           }
           edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents,
@@ -321,7 +321,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       return Compact
     val xmlPreviousExceptions = Set(LBRACE, LPAREN, NEWLINE, NEWLINES)
     if (type1 == TYPE && type2.isId)
-      return CompactEnsuringGap    
+      return CompactEnsuringGap
     if (type2 == XML_START_OPEN && !(xmlPreviousExceptions.contains(type1) || type1.isXml))
       return CompactEnsuringGap
     if (type1 == USCORE && type2.isId && type2 != STAR)

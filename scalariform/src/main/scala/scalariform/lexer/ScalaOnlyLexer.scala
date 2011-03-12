@@ -86,7 +86,7 @@ trait ScalaOnlyLexer extends Lexer {
           charLitOr(getOperatorRest)
         else {
           getLitChar()
-          if (ch == '\'') {
+          if (ch == '\'' || forgiveLexerErrors) {
             nextChar()
             token(CHARACTER_LITERAL)
           } else
@@ -131,6 +131,9 @@ trait ScalaOnlyLexer extends Lexer {
         } else if (isSpecial(ch)) {
           nextChar()
           getOperatorRest()
+        } else if (forgiveLexerErrors) {
+          nextChar()
+          getWhitespaceRest()
         } else
           throw new ScalaLexerException("illegal character: " + ch)
     }
@@ -158,9 +161,9 @@ trait ScalaOnlyLexer extends Lexer {
     nextChar()
     @tailrec
     def scanForClosingQuotes(firstTime: Boolean): Unit = ch match {
-      case _ if eof ⇒ throw new ScalaLexerException(errorMsg)
-      case '\r' | '\n' if !isUnicodeEscape ⇒ throw new ScalaLexerException(errorMsg)
-      case `delimiter` if firstTime && errorMsgOnEmpty.isDefined ⇒ throw new ScalaLexerException(errorMsgOnEmpty.get)
+      case _ if eof ⇒ if (forgiveLexerErrors) token(tokenType) else throw new ScalaLexerException(errorMsg)
+      case '\r' | '\n' if !isUnicodeEscape ⇒ if (forgiveLexerErrors) token(tokenType) else throw new ScalaLexerException(errorMsg)
+      case `delimiter` if firstTime && errorMsgOnEmpty.isDefined ⇒ if (forgiveLexerErrors) token(tokenType) else throw new ScalaLexerException(errorMsgOnEmpty.get)
       case `delimiter` ⇒ nextChar(); token(tokenType)
       case _ ⇒ getLitChar(); scanForClosingQuotes(firstTime = false)
     }
@@ -180,7 +183,7 @@ trait ScalaOnlyLexer extends Lexer {
         }
       } else (ch: @switch) match {
         case 'b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' ⇒ nextChar()
-        case _ ⇒ throw new ScalaLexerException("invalid escape character")
+        case _ ⇒ if (forgiveLexerErrors) nextChar() else throw new ScalaLexerException("invalid escape character")
       }
     } else
       nextChar()
@@ -195,9 +198,9 @@ trait ScalaOnlyLexer extends Lexer {
         munch("\"\"\"")
         while (ch == '\"') { nextChar() }
         token(STRING_LITERAL)
-      } else if (eof)
-        throw new ScalaLexerException("unclosed multi-line string literal")
-      else {
+      } else if (eof) {
+        if (forgiveLexerErrors) token(STRING_LITERAL) else throw new ScalaLexerException("unclosed multi-line string literal")
+      } else {
         nextChar()
         scanForClosingTripleQuotes()
       }
@@ -316,7 +319,7 @@ trait ScalaOnlyLexer extends Lexer {
             nextChar()
             consumeUntilSplatSlash(nesting + 1)
           case SU if eof ⇒
-            throw new ScalaLexerException("Unterminated comment")
+            if (forgiveLexerErrors) token(MULTILINE_COMMENT) else throw new ScalaLexerException("Unterminated comment")
           case _ ⇒
             nextChar()
             consumeUntilSplatSlash(nesting)
@@ -421,7 +424,7 @@ trait ScalaOnlyLexer extends Lexer {
   }
 
   private def checkNoLetter() {
-    if (isIdentifierPart(ch) && ch >= ' ')
+    if (isIdentifierPart(ch) && ch >= ' ' && !forgiveLexerErrors)
       throw new ScalaLexerException("Invalid literal number: " + ch)
   }
 
