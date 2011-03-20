@@ -49,6 +49,9 @@ object ScalaLexer {
       -1
   }
 
+  def createRawLexer(s: String, forgiveErrors: Boolean = false): ScalaLexer = 
+    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
+  
   def tokeniseFull(file: File): (HiddenTokenInfo, List[Token]) = {
     val s = scala.io.Source.fromFile(file).mkString
     tokeniseFull(s)
@@ -71,7 +74,7 @@ object ScalaLexer {
   def tokenise(s: String): List[Token] = tokeniseFull(s)._2
 
   def rawTokenise(s: String, forgiveErrors: Boolean = false): List[Token] = {
-    val lexer = new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
+    val lexer = createRawLexer(s, forgiveErrors)
     var actualTokens: List[Token] = Nil
     var continue = true
     while (continue) {
@@ -83,6 +86,9 @@ object ScalaLexer {
     (actualTokens.tail).reverse
   }
 
+  /**
+   * For performance tests only
+   */
   def rawTokenise2(s: String): List[Token] = {
     val lexer = new WhitespaceAndCommentsGrouper(new ScalaLexer(new UnicodeEscapeReader(s)))
     var actualTokens: List[Token] = Nil
