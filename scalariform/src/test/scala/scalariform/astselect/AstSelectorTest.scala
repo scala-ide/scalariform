@@ -289,7 +289,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   case class IntermediateTest(source: String, initialSelectionDiagram: String) { 
     def ~(finalSelectionDiagram: String): IntermediateTest = { 
        val initialSelection = findSelectionRange(initialSelectionDiagram)      
-       val actualFinalSelection = new AstSelector(source).expandSelection(initialSelection) getOrElse initialSelection
+       val actualFinalSelection = AstSelector.expandSelection(source, initialSelection) getOrElse initialSelection
        val expectedFinalSelection = findSelectionRange(finalSelectionDiagram)
        ("source\n>>>" + source + "<<<\n") should "expand\n>>>" + (initialSelectionDiagram + "<<<\n to \n>>>" + finalSelectionDiagram + "<<<\n") in {
          actualFinalSelection should equal (expectedFinalSelection)

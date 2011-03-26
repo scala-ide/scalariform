@@ -11,9 +11,9 @@ sealed trait PreferenceType[T] {
 case object BooleanPreference extends PreferenceType[Boolean] {
   def parseValue(s: String) =
     s.toLowerCase match {
-      case "true"  ⇒ Right(true)
+      case "true" ⇒ Right(true)
       case "false" ⇒ Right(false)
-      case _       ⇒ Left("Could not parse as boolean value: " + s)
+      case _ ⇒ Left("Could not parse as boolean value: " + s)
     }
 }
 
@@ -56,7 +56,8 @@ abstract trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean]
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
-    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis)
+    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
+    SpaceInsideParentheses, SpaceInsideBrackets)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -144,6 +145,18 @@ case object IndentLocalDefs extends BooleanPreferenceDescriptor {
 
 case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor {
   val key = "preserveDanglingCloseParenthesis"
-  val description = "Allow a newline before a ')' in an argument expression."
+  val description = "Allow a newline before a ')' in an argument expression"
+  val defaultValue = false
+}
+
+case object SpaceInsideParentheses extends BooleanPreferenceDescriptor {
+  val key = "spaceInsideParentheses"
+  val description = "Require a space after '(' and before ')'"
+  val defaultValue = false
+}
+
+case object SpaceInsideBrackets extends BooleanPreferenceDescriptor {
+  val key = "spaceInsideBrackets"
+  val description = "Require a space after '[' and before ']'"
   val defaultValue = false
 }

@@ -319,6 +319,14 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val type2 = token2.getType
     if (type2 == EOF)
       return Compact
+    if (type1 == LPAREN && type2 != RPAREN && formattingPreferences(SpaceInsideParentheses))
+      return CompactEnsuringGap
+    if (type1 != LPAREN && type2 == RPAREN && formattingPreferences(SpaceInsideParentheses))
+      return CompactEnsuringGap
+    if (type1 == LBRACKET && type2 != RBRACKET && formattingPreferences(SpaceInsideBrackets))
+      return CompactEnsuringGap
+    if (type1 != LBRACKET && type2 == RBRACKET && formattingPreferences(SpaceInsideBrackets))
+      return CompactEnsuringGap
     val xmlPreviousExceptions = Set(LBRACE, LPAREN, NEWLINE, NEWLINES)
     if (type1 == TYPE && type2.isId)
       return CompactEnsuringGap

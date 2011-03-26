@@ -149,6 +149,8 @@ Usage::
     [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
     [+|-]spaceBeforeColon                                 Enable/disable Add a space before colons
+    [+|-]spaceInsideBrackets                              Enable/disable Require a space after '[' and before ']'
+    [+|-]spaceInsideParentheses                           Enable/disable Require a space after '(' and before ')'
     -alignSingleLineCaseStatements.maxArrowIndent=[1-100] Set Maximum number of spaces inserted before an arrow to align case statements
     -indentSpaces=[1-10]                                  Set Number of spaces to use for indentation
   
@@ -417,6 +419,33 @@ If ``true``, then::
 
   def add(a : Int, b : Int) : Int = a + b
 
+spaceInsideBrackets
+~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Whether to use a space inside type brackets. For example, if ``true``, then::
+
+  Array[ String ]
+
+If ``false``, then::
+
+  Array[String]
+
+spaceInsideParentheses
+~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Whether to use a space inside non-empty parentheses. For example, if ``true``, then::
+
+  def main( args : Array[String] )
+
+If ``false``, then::
+
+  def main(args : Array[String])
+
+
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~
 
@@ -436,6 +465,8 @@ indentSpaces                 ``2``
 preserveSpaceBeforeArguments ``false`` 
 rewriteArrowSymbols          ``false`` 
 spaceBeforeColon             ``false`` 
+spaceInsideBrackets          ``false``
+spaceInsideParentheses       ``false``
 ============================ ========= =========
 
 Source directives
