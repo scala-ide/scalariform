@@ -9,12 +9,14 @@ sealed trait PreferenceType[T] {
 }
 
 case object BooleanPreference extends PreferenceType[Boolean] {
+  
   def parseValue(s: String) =
     s.toLowerCase match {
       case "true" ⇒ Right(true)
       case "false" ⇒ Right(false)
       case _ ⇒ Left("Could not parse as boolean value: " + s)
     }
+  
 }
 
 case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int] {
@@ -47,10 +49,14 @@ trait PreferenceDescriptor[T] {
 
 }
 
-abstract trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean] {
+trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean] {
 
   val preferenceType = BooleanPreference
 
+}
+
+trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
+  
 }
 
 object AllPreferences {
@@ -74,7 +80,7 @@ case object RewriteArrowSymbols extends BooleanPreferenceDescriptor {
   val defaultValue = false
 }
 
-case object IndentSpaces extends PreferenceDescriptor[Int] {
+case object IndentSpaces extends IntegerPreferenceDescriptor {
   val key = "indentSpaces"
   val description = "Number of spaces to use for indentation"
   val preferenceType = IntegerPreference(1, 10)
@@ -128,7 +134,7 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
   val description = "Align the arrows of consecutive single-line case statements"
   val defaultValue = false
 
-  case object MaxArrowIndent extends PreferenceDescriptor[Int] {
+  case object MaxArrowIndent extends IntegerPreferenceDescriptor {
     val key = "alignSingleLineCaseStatements.maxArrowIndent"
     val description = "Maximum number of spaces inserted before an arrow to align case statements"
     val preferenceType = IntegerPreference(1, 100)
