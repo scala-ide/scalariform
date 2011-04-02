@@ -57,8 +57,8 @@ object ScalaLexer {
     tokeniseFull(s)
   }
 
-  def tokeniseFull(s: String): (HiddenTokenInfo, List[Token]) = {
-    val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(new ScalaLexer(new UnicodeEscapeReader(s))))
+  def tokeniseFull(s: String, forgiveErrors: Boolean = false): (HiddenTokenInfo, List[Token]) = {
+    val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(createRawLexer(s, forgiveErrors)))
     val tokenBuffer = new ListBuffer[Token]
     var continue = true
     while (continue) {
