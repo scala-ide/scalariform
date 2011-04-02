@@ -6,6 +6,8 @@ trait IFormattingPreferences {
 
   def setPreference[T](preference: PreferenceDescriptor[T], value: T): IFormattingPreferences
 
+  def preferencesMap: Map[PreferenceDescriptor[_], Any]
+
 }
 
 abstract sealed class IndentStyle {

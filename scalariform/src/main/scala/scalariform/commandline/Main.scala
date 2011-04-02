@@ -1,12 +1,14 @@
 package scalariform.commandline
 
+import java.io.IOException
+import java.util.Properties
 import scalariform.formatter.preferences._
 import java.io.File
 import scala.io.Source
 import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
-import scalariform.utils.Utils.writeText
 import java.nio.charset._
+import scalariform.utils.Utils._
 
 object Main {
 
@@ -50,6 +52,18 @@ object Main {
         errors ::= "Illegal encoding " + encoding
     }
 
+    var preferences: IFormattingPreferences = FormattingPreferences()
+
+    arguments.collect {
+      case PreferenceFile(path) ⇒
+        try
+          preferences = PreferencesImporterExporter.loadPreferences(path)
+        catch {
+          case e: IOException ⇒
+            errors ::= "Error opening " + path + ": " + e.getMessage
+        }
+    }
+
     val preferenceOptions = (for (p@PreferenceOption(_, _) ← arguments) yield p)
 
     for (PreferenceOption(key, _) ← preferenceOptions if !(AllPreferences.preferencesByKey contains key)) {
@@ -57,8 +71,9 @@ object Main {
       showUsage = true
     }
 
-    val preferences = if (errors.isEmpty)
-      preferenceOptions.foldLeft(FormattingPreferences()) {
+    if (errors.isEmpty) {
+
+      preferences = preferenceOptions.foldLeft(preferences) {
         case (preferences, PreferenceOption(key, valueString)) ⇒
           val descriptor = AllPreferences.preferencesByKey(key)
           def processDescriptor[T](descriptor: PreferenceDescriptor[T]) = {
@@ -71,8 +86,7 @@ object Main {
           }
           processDescriptor(descriptor)
       }
-    else
-      FormattingPreferences()
+    }
 
     def getFiles(): List[File] = {
       var files: List[File] = Nil
@@ -220,17 +234,18 @@ object Main {
     println("Usage: scalariform [options] [files...]")
     println()
     println("Options:")
-    println("  --encoding=<encoding>           Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.")
-    println("  --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)")
-    println("  --help, -h                      Show help")
-    println("  --inPlace, -i                   Replace the input file(s) in place with a formatted version.")
-    println("  --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
-    println("  --forceOutput, -f               Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)")
-    println("  --verbose, -v                   Verbose output")
-    println("  --version                       Show Scalariform version")
+    println("  --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.")
+    println("  --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)")
+    println("  --help, -h                           Show help")
+    println("  --inPlace, -i                        Replace the input file(s) in place with a formatted version.")
+    println("  --preferenceFile=<path>, -p=<path>   Read preferences from a properties file")
+    println("  --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
+    println("  --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)")
+    println("  --verbose, -v                        Verbose output")
+    println("  --version                            Show Scalariform version")
     println()
     println("Preferences:")
-    val descriptionColumn = 56
+    val descriptionColumn = 61
     val sortedPreferences = AllPreferences.preferencesByKey.keySet.toList.sorted
 
     for {

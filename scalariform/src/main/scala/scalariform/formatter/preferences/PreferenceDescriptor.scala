@@ -9,14 +9,14 @@ sealed trait PreferenceType[T] {
 }
 
 case object BooleanPreference extends PreferenceType[Boolean] {
-  
+
   def parseValue(s: String) =
     s.toLowerCase match {
-      case "true" ⇒ Right(true)
+      case "true"  ⇒ Right(true)
       case "false" ⇒ Right(false)
-      case _ ⇒ Left("Could not parse as boolean value: " + s)
+      case _       ⇒ Left("Could not parse as boolean value: " + s)
     }
-  
+
 }
 
 case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int] {
@@ -56,7 +56,7 @@ trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean] {
 }
 
 trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
-  
+
 }
 
 object AllPreferences {

@@ -1,5 +1,8 @@
 package scalariform.utils
 
+import java.io.FileOutputStream
+import java.io.FileInputStream
+import java.io.IOException
 object Utils {
 
   def asInstanceOf[T](o: Any) = if (o.isInstanceOf[T]) Some(o.asInstanceOf[T]) else None
@@ -87,6 +90,28 @@ object Utils {
     } finally {
       writer.close()
     }
+  }
+
+  @throws(classOf[IOException])
+  def withFileInputStream[T](fileName: String)(p: FileInputStream ⇒ T): T = {
+    var fis: FileInputStream = null
+    try {
+      fis = new FileInputStream(fileName)
+      p(fis)
+    } finally
+      if (fis != null)
+        fis.close()
+  }
+
+  @throws(classOf[IOException])
+  def withFileOutputStream[T](fileName: String)(p: FileOutputStream ⇒ T): T = {
+    var fis: FileOutputStream = null
+    try {
+      fis = new FileOutputStream(fileName)
+      p(fis)
+    } finally
+      if (fis != null)
+        fis.close()
   }
 
   def time[T](s: String)(f: ⇒ T): T = {

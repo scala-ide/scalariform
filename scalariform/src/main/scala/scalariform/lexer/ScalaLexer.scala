@@ -49,9 +49,9 @@ object ScalaLexer {
       -1
   }
 
-  def createRawLexer(s: String, forgiveErrors: Boolean = false): ScalaLexer = 
+  def createRawLexer(s: String, forgiveErrors: Boolean = false): ScalaLexer =
     new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
-  
+
   def tokeniseFull(file: File): (HiddenTokenInfo, List[Token]) = {
     val s = scala.io.Source.fromFile(file).mkString
     tokeniseFull(s)

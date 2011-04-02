@@ -128,14 +128,15 @@ Usage::
   Usage: scalariform [options] [files...]
   
   Options:
-    --encoding=<encoding>           Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.
-    --fileList=<path>, -l=<path>    Read the list of input file(s) from a text file (one per line)
-    --help, -h                      Show help
-    --inPlace, -i                   Replace the input file(s) in place with a formatted version.
-    --test, -t                      Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
-    --forceOutput, -f               Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)
-    --verbose, -v                   Verbose output
-    --version                       Show Scalariform version
+    --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.
+    --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)
+    --help, -h                           Show help
+    --inPlace, -i                        Replace the input file(s) in place with a formatted version.
+    --preferenceFile=<path>, -p=<path>   Read preferences from a properties file
+    --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
+    --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)
+    --verbose, -v                        Verbose output
+    --version                            Show Scalariform version
   
   Preferences:
     [+|-]alignParameters                                  Enable/disable Align parameters on different lines in the same column
