@@ -291,7 +291,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     // TODO: Simplified version of elseClause formatting
     for (CatchClause(catchToken, catchBlockOrExpr) ← catchClauseOption) {
-      if (hiddenPredecessors(catchToken).containsNewline && !(isBlockExpr(body) && containsNewline(body)))
+      if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
         formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
       catchBlockOrExpr match {
         case Left(catchBlock) ⇒
@@ -306,10 +306,14 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
     }
 
+
     // TODO: See elseClause formatting
     for ((finallyToken, finallyBody) ← finallyClauseOption) {
 
-      if ((hiddenPredecessors(finallyToken).containsNewline || containsNewline(body)) && catchClauseOption.isDefined)
+      val previousIsMultilineBracesBlock = catchClauseOption.isEmpty && bodyIsABlock && containsNewline(body) || 
+        cond(catchClauseOption) { case Some(CatchClause(_, Left(catchBlock))) => containsNewline(catchBlock) }
+
+      if (hiddenPredecessors(finallyToken).containsNewline && !previousIsMultilineBracesBlock)
         formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
 
       val indentFinallyBody =

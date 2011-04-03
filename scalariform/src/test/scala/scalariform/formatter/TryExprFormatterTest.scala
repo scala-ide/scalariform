@@ -58,8 +58,7 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
     |{ 
     |println("foo") }""" ==>
   """try {
-    |} catch { case e => }
-    |finally {
+    |} catch { case e => } finally {
     |  println("foo")
     |}"""
 
@@ -117,6 +116,22 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
     |  println("bar")
     |} finally {
     |  println("foo")
+    |}"""
+
+  """try {
+    |
+    |  } catch {
+    |    case _ =>
+    |  }
+    |  finally {
+    |    close()
+    |  }""" ==>
+  """try {
+    |
+    |} catch {
+    |  case _ =>
+    |} finally {
+    |  close()
     |}"""
 
   // 2.9 generalised catch tests:
