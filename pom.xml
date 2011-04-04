@@ -147,7 +147,7 @@
       <activation>
         <property>
           <name>scala.version</name>
-          <value>2.9.0-SNAPSHOT</value>
+          <value>2.10.0-SNAPSHOT</value>
         </property>
       </activation>
       <repositories>
