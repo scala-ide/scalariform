@@ -48,10 +48,15 @@ object MojoFormatter {
              compactStringConcatenation: Boolean,
              doubleIndentClassDeclaration: Boolean,
              formatXml: Boolean,
+             indentLocalDefs: Boolean,
              indentPackageBlocks: Boolean,
+             preserveDanglingCloseParenthesis: Boolean,
              preserveSpaceBeforeArguments: Boolean,
              rewriteArrowSymbols: Boolean,
              spaceBeforeColon: Boolean,
+             spacesInsideBrackets: Boolean,
+             spacesInsideParentheses: Boolean,
+             spacesWithinPatternBinders: Boolean,
              indentSpaces: Int) {
 
     val preferences = FormattingPreferences()
@@ -61,10 +66,15 @@ object MojoFormatter {
       .setPreference(DoubleIndentClassDeclaration, doubleIndentClassDeclaration)
       .setPreference(CompactStringConcatenation, compactStringConcatenation)
       .setPreference(FormatXml, formatXml)
+      .setPreference(IndentLocalDefs, indentLocalDefs)
       .setPreference(IndentPackageBlocks, indentPackageBlocks)
+      .setPreference(PreserveDanglingCloseParenthesis, preserveDanglingCloseParenthesis)
       .setPreference(PreserveSpaceBeforeArguments, preserveSpaceBeforeArguments)
       .setPreference(RewriteArrowSymbols, rewriteArrowSymbols)
       .setPreference(SpaceBeforeColon, spaceBeforeColon)
+      .setPreference(SpacesInsideParentheses, spacesInsideParentheses)
+      .setPreference(SpacesInsideBrackets, spacesInsideBrackets)
+      .setPreference(SpacesWithinPatternBinders, spacesWithinPatternBinders)
       .setPreference(IndentSpaces, indentSpaces)
 
     val files = findScalaFiles(path)

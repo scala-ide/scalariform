@@ -88,6 +88,9 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   "a match { case b => ; c }" ==> "a match { case b => ; c }"
 
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+
   """a match {
     |  case b(c @ ~()) =>
     |  case b(c@ ~()) =>
@@ -96,7 +99,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case b(c@ ~()) =>
     |  case b(c@ ~()) =>
     |}"""
-
+  }
 
   {
 
@@ -255,5 +258,23 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |    }
     |}"""
 
+
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+
+  """(a: @switch)  match {
+    |case elem@Multi(values@_*) =>
+    |}""" ==>
+  """(a: @switch) match {
+    |  case elem@Multi(values@_*) =>
+    |}"""
+  }
+
+  """(a: @switch)  match {
+    |case elem@Multi(values@_*) =>
+    |}""" ==>
+  """(a: @switch) match {
+    |  case elem @ Multi(values @ _*) =>
+    |}"""
 
 }

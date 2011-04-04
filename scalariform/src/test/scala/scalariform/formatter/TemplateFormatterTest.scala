@@ -60,6 +60,16 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |@A/*b*/
     |@B(c = "d")/*c*/
     |abstract class/*d*/E/*e*/[F]/*f*/@G()/*g*/private/*h*/(val h: I)/*i*/(implicit j: K)/*j*/extends/*k*/{} with/*l*/L(2) with M/*m*/{}""" because "sort out what we want"
+  
+
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, true)
+
+  """@(Id@Field) class A""" ==>
+  """@(Id @Field)
+    |class A"""
+  
+  }
 
   """class A {
     |  

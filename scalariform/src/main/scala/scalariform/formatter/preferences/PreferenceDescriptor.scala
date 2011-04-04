@@ -63,7 +63,7 @@ object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
-    SpaceInsideParentheses, SpaceInsideBrackets)
+    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -165,4 +165,10 @@ case object SpaceInsideBrackets extends BooleanPreferenceDescriptor {
   val key = "spaceInsideBrackets"
   val description = "Require a space after '[' and before ']'"
   val defaultValue = false
+}
+
+case object SpacesWithinPatternBinders extends BooleanPreferenceDescriptor {
+  val key = "spacesWithinPatternBinders"
+  val description = "Add a space around the @ token in pattern binders"
+  val defaultValue = true
 }

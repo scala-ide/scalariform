@@ -152,6 +152,7 @@ Usage::
     [+|-]spaceBeforeColon                                 Enable/disable Add a space before colons
     [+|-]spaceInsideBrackets                              Enable/disable Require a space after '[' and before ']'
     [+|-]spaceInsideParentheses                           Enable/disable Require a space after '(' and before ')'
+    [+|-]spacesWithinPatternBinders                            Enable/disable Add a space around the @ token in pattern binders
     -alignSingleLineCaseStatements.maxArrowIndent=[1-100] Set Maximum number of spaces inserted before an arrow to align case statements
     -indentSpaces=[1-10]                                  Set Number of spaces to use for indentation
   
@@ -445,6 +446,19 @@ Whether to use a space inside non-empty parentheses. For example, if ``true``, t
 If ``false``, then::
 
   def main(args : Array[String])
+
+spacesWithinPatternBinders
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``true``
+
+Whether to add a space around the @ token in pattern binders. For example, if ``true``,::
+
+  case elem @ Multi(values @ _*) =>
+
+If ``false``,::
+
+  case elem@Multi(values@_*) =>
 
 
 Scala Style Guide

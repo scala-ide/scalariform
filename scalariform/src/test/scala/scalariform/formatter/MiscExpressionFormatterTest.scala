@@ -115,13 +115,18 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  } => 42
     |}"""
     
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+
   """42 match  {
     |  case foo_ @Bar =>
     |}""" ==>
   """42 match {
     |  case foo_ @Bar =>
     |}"""    
-    
+
+  }    
+
   "NEWLINE" ==> "NEWLINE"
   "NEWLINES" ==> "NEWLINES"
 
@@ -187,13 +192,16 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  println("bar")
     |})"""
 
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+
   """b match { 
     |case y@ <phone/> => 
     |}""" ==>
   """b match {
     |  case y@ <phone/> =>
     |}""" // TODO: Whitespace around @ in this case?
-
+  }
 
   """1 / // foo
     |2""" ==>

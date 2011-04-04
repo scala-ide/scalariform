@@ -367,6 +367,10 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     if (type1.isId && type2.isId)
       return CompactEnsuringGap
     val firstCharOfToken2 = token2.getText.head
+    if (formattingPreferences(SpacesWithinPatternBinders) && type1.isId && type2 == AT)
+      return CompactEnsuringGap
+    if (formattingPreferences(SpacesWithinPatternBinders) && type1 == AT)
+      return CompactEnsuringGap
     if (Set(HASH, AT).contains(type1) && isOperatorPart(firstCharOfToken2))
       return CompactEnsuringGap
     val lastCharOfToken1 = token1.getText.last

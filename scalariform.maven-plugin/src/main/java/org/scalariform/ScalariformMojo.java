@@ -51,6 +51,11 @@ public class ScalariformMojo extends AbstractMojo {
     protected boolean formatXml;
 
     /**
+     *  @parameter default-value=false
+     */
+    protected boolean indentLocalDefs;
+
+    /**
      *  @parameter default-value=true
      */
     protected boolean indentPackageBlocks;
@@ -59,6 +64,11 @@ public class ScalariformMojo extends AbstractMojo {
      *  @parameter default-value=2
      */
     protected int indentSpaces;
+
+    /**
+     *  @parameter default-value=false
+     */
+    protected boolean preserveDanglingCloseParenthesis;
 
     /**
      *  @parameter default-value=false
@@ -75,7 +85,21 @@ public class ScalariformMojo extends AbstractMojo {
      */
     protected boolean spaceBeforeColon;
 
+    /**
+     *  @parameter default-value=false
+     */
+    protected boolean spacesInsideBrackets;
+
+    /**
+     *  @parameter default-value=false
+     */
+    protected boolean spacesInsideParentheses;
     
+    /**
+     *  @parameter default-value=true
+     */
+    protected boolean spacesWithinPatternBinders;
+
     public void execute() throws MojoExecutionException {
 
 	MojoFormatter.format(baseDir, this.getLog(),
@@ -85,10 +109,15 @@ public class ScalariformMojo extends AbstractMojo {
                              compactStringConcatenation,
                              doubleIndentClassDeclaration,
                              formatXml,
+                             indentLocalDefs,
                              indentPackageBlocks,
+                             preserveDanglingCloseParenthesis,
                              preserveSpaceBeforeArguments,
                              rewriteArrowSymbols,
                              spaceBeforeColon,
+                             spacesInsideBrackets,
+                             spacesInsideParentheses,
+                             spacesWithinPatternBinders,
                              indentSpaces);
     }
 

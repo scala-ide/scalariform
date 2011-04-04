@@ -10,6 +10,7 @@ trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter wi
     val Annotation(atToken: Token, annotationType: Type, argumentExprss: List[ArgumentExprs], newlineOption: Option[Token]) = annotation
     var formatResult: FormatResult = NoFormatResult
 
+    formatResult = formatResult.before(annotationType.firstToken, Compact)
     formatResult ++= format(annotationType)
     for (argumentExprs ← argumentExprss)
       formatResult ++= format(argumentExprs)._1
