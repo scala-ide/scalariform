@@ -64,7 +64,7 @@ object Main {
         }
     }
 
-    val preferenceOptions = (for (p@PreferenceOption(_, _) ← arguments) yield p)
+    val preferenceOptions = (for (p @ PreferenceOption(_, _) ← arguments) yield p)
 
     for (PreferenceOption(key, _) ← preferenceOptions if !(AllPreferences.preferencesByKey contains key)) {
       errors ::= "Unrecognised preference: " + key

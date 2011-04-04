@@ -95,7 +95,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
       formatResult ++= format(templateParents)
 
     // TODO: Copy and paste from above
-    for (templateBody@TemplateBody(newlineOpt, lbrace, statSeq, rbrace) ← templateBodyOpt) {
+    for (templateBody @ TemplateBody(newlineOpt, lbrace, statSeq, rbrace) ← templateBodyOpt) {
       newlineOpt match {
         case Some(newline) ⇒
           formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)

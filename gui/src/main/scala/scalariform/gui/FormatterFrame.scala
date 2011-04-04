@@ -296,10 +296,10 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       for (preference ← AllPreferences.preferences) {
         val widget = preferenceToWidgetMap(preference)
         preference.preferenceType match {
-          case prefType@BooleanPreference ⇒
+          case prefType @ BooleanPreference ⇒
             val checkBox = widget.asInstanceOf[JCheckBox]
             preferences = preferences.setPreference(prefType.cast(preference), widget.asInstanceOf[JCheckBox].isSelected)
-          case prefType@IntegerPreference(min, max) ⇒
+          case prefType @ IntegerPreference(min, max) ⇒
             preferences = preferences.setPreference(prefType.cast(preference), Integer.parseInt(widget.asInstanceOf[JSpinner].getValue.toString))
         }
       }

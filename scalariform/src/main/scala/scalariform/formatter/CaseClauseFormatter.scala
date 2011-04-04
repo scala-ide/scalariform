@@ -27,9 +27,9 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
         first = false
       }
       clauseGroup match {
-        case Left(consecutiveClauses@ConsecutiveSingleLineCaseClauses(caseClauses, largestCasePatternLength, smallestCasePatternLength)) ⇒
+        case Left(consecutiveClauses @ ConsecutiveSingleLineCaseClauses(caseClauses, largestCasePatternLength, smallestCasePatternLength)) ⇒
           if (consecutiveClauses.patternLengthRange <= formattingPreferences(AlignSingleLineCaseStatements.MaxArrowIndent)) {
-            for (caseClause@CaseClause(casePattern, statSeq) ← caseClauses) {
+            for (caseClause @ CaseClause(casePattern, statSeq) ← caseClauses) {
               if (!first && hiddenPredecessors(casePattern.firstToken).containsNewline)
                 formatResult = formatResult.before(caseClause.firstToken, formatterState.currentIndentLevelInstruction)
               val arrowInstruction = PlaceAtColumn(formatterState.indentLevel, largestCasePatternLength + 1)
@@ -52,7 +52,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     def groupClauses(caseClauses: List[CaseClause], first: Boolean): List[Either[ConsecutiveSingleLineCaseClauses, CaseClause]] =
       caseClauses match {
         case Nil ⇒ Nil
-        case (caseClause@CaseClause(casePattern, statSeq)) :: otherClauses ⇒
+        case (caseClause @ CaseClause(casePattern, statSeq)) :: otherClauses ⇒
           val otherClausesGrouped = groupClauses(otherClauses, first = false)
 
           val casePatternSource = getSource(casePattern)

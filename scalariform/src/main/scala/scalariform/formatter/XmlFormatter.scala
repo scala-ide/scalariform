@@ -21,10 +21,10 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
 
   def format(xmlContent: XmlContents)(implicit formatterState: FormatterState): FormatResult = {
     xmlContent match {
-      case expr@Expr(_)                            ⇒ format(expr)
-      case xmlNonEmpty@XmlNonEmptyElement(_, _, _) ⇒ format(xmlNonEmpty)
-      case xmlEmpty@XmlEmptyElement(_, _, _, _, _) ⇒ format(xmlEmpty)
-      case _                                       ⇒ NoFormatResult // TODO
+      case expr @ Expr(_)                            ⇒ format(expr)
+      case xmlNonEmpty @ XmlNonEmptyElement(_, _, _) ⇒ format(xmlNonEmpty)
+      case xmlEmpty @ XmlEmptyElement(_, _, _, _, _) ⇒ format(xmlEmpty)
+      case _                                         ⇒ NoFormatResult // TODO
     }
   }
 
@@ -98,7 +98,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     var firstNonWhitespace = true
     for (previousAndThis ← Utils.pairWithPrevious(contents)) {
       previousAndThis match {
-        case (_, xmlContent@XmlPCDATA(token@Token(_, text@Trimmed(prefix, infix, suffix), _, _))) ⇒
+        case (_, xmlContent @ XmlPCDATA(token @ Token(_, text @ Trimmed(prefix, infix, suffix), _, _))) ⇒
           if (infix.isEmpty)
             formatResult = formatResult.replaceXml(token, "")
           else {
@@ -116,7 +116,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, nestedFormatterState.currentIndentLevelInstruction)
           formatResult ++= format(xmlContent)(nestedFormatterState)
-        case (Some(_), xmlContent@Expr(_)) ⇒
+        case (Some(_), xmlContent @ Expr(_)) ⇒
           firstNonWhitespace = false
           formatResult = formatResult.before(xmlContent.firstToken, Compact)
           formatResult ++= format(xmlContent)(if (multiline) nestedFormatterState else formatterState)

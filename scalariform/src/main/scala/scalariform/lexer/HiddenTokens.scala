@@ -9,11 +9,11 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
 
   def iterator: Iterator[HiddenToken] = tokens.iterator
 
-  val comments: List[Comment] = tokens collect { case comment@Comment(_) ⇒ comment }
+  val comments: List[Comment] = tokens collect { case comment @ Comment(_) ⇒ comment }
 
-  val scalaDocComments: List[ScalaDocComment] = tokens collect { case comment@ScalaDocComment(_) ⇒ comment }
+  val scalaDocComments: List[ScalaDocComment] = tokens collect { case comment @ ScalaDocComment(_) ⇒ comment }
 
-  val whitespaces: List[Whitespace] = tokens collect { case whitespace@Whitespace(_) ⇒ whitespace }
+  val whitespaces: List[Whitespace] = tokens collect { case whitespace @ Whitespace(_) ⇒ whitespace }
 
   def firstTokenOption = tokens.headOption
   def lastTokenOption = tokens.lastOption

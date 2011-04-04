@@ -42,7 +42,7 @@ sealed trait AstNode extends CaseClassReflector {
     case a: AstNode                ⇒ List(a)
     case t: Token                  ⇒ Nil
     case Some(x)                   ⇒ immediateAstNodes(x)
-    case xs@(_ :: _)               ⇒ xs flatMap { immediateAstNodes(_) }
+    case xs @ (_ :: _)             ⇒ xs flatMap { immediateAstNodes(_) }
     case Left(x)                   ⇒ immediateAstNodes(x)
     case Right(x)                  ⇒ immediateAstNodes(x)
     case (l, r)                    ⇒ immediateAstNodes(l) ++ immediateAstNodes(r)

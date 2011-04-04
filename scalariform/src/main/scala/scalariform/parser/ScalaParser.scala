@@ -728,14 +728,14 @@ class ScalaParser(tokens: Array[Token]) {
 
   private object PathEndingWithDotId {
     def unapply(tokens: List[Token]) = condOpt(tokens.reverse) {
-      case (lastId@Token(tokenType, _, _, _)) :: dot :: rest if (tokenType.isId || tokenType == THIS) && dot.tokenType == DOT ⇒
+      case (lastId @ Token(tokenType, _, _, _)) :: dot :: rest if (tokenType.isId || tokenType == THIS) && dot.tokenType == DOT ⇒
         (rest.reverse, dot, lastId)
     }
   }
 
   private object JustIdOrThis {
     def unapply(tokens: List[Token]) = condOpt(tokens) {
-      case List(id@Token(tokenType, _, _, _)) if (tokenType.isId || tokenType == THIS) ⇒ id
+      case List(id @ Token(tokenType, _, _, _)) if (tokenType.isId || tokenType == THIS) ⇒ id
     }
   }
 

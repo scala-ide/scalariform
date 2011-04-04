@@ -22,7 +22,7 @@ object PreferencesImporterExporter {
       }
 
     for {
-      key@(dummy: String) ← properties.propertyNames
+      key @ (dummy: String) ← properties.propertyNames
       descriptor ← AllPreferences.preferencesByKey.get(key)
       valueString = properties.getProperty(key)
     } setPreference(descriptor, valueString)

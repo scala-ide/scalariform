@@ -39,14 +39,14 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(typeElement: TypeElement)(implicit formatterState: FormatterState): FormatResult = {
     typeElement match {
-      case type_ @Type(_)                    ⇒ format(type_)
-      case refinement@Refinement(_, _, _)    ⇒ format(refinement)
-      case annotation@Annotation(_, _, _, _) ⇒ format(annotation)
-      case TypeParamClause(contents)         ⇒ format(contents)
-      case TypeParam(contents)               ⇒ format(contents)
-      case VarianceTypeElement(id)           ⇒ NoFormatResult
-      case VarargsTypeElement(star)          ⇒ NoFormatResult
-      case _                                 ⇒ NoFormatResult
+      case type_ @ Type(_)                     ⇒ format(type_)
+      case refinement @ Refinement(_, _, _)    ⇒ format(refinement)
+      case annotation @ Annotation(_, _, _, _) ⇒ format(annotation)
+      case TypeParamClause(contents)           ⇒ format(contents)
+      case TypeParam(contents)                 ⇒ format(contents)
+      case VarianceTypeElement(id)             ⇒ NoFormatResult
+      case VarargsTypeElement(star)            ⇒ NoFormatResult
+      case _                                   ⇒ NoFormatResult
     }
   }
 
