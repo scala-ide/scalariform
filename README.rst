@@ -146,6 +146,7 @@ Usage::
     [+|-]formatXml                                        Enable/disable Format XML literals
     [+|-]indentLocalDefs                                  Enable/disable Indent local defs an extra level
     [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
+    [+|-]multilineScaladocCommentsStartOnFirstLine        Enable/disable Start multiline Scaladoc comment body on same line as the opening '/**' 
     [+|-]preserveDanglingCloseParenthesis                 Enable/disable Allow a newline before a ')' in an argument expression.
     [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
@@ -356,6 +357,24 @@ indentSpaces
 Default: ``2``
 
 The number of spaces to use for each level of indentation.
+
+multilineScaladocCommentsStartOnFirstLine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+If ``true``, start a multi-line Scaladoc comment body on same line as the opening comment delimiter::
+
+  /** This method applies f to each 
+   *  element of the given list.
+   */
+
+If ``false``, start the comment body on a separate line below the opening delimiter::
+
+  /** 
+   * This method applies f to each 
+   * element of the given list.
+   */
 
 preserveDanglingCloseParenthesis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

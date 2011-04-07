@@ -50,6 +50,7 @@ object MojoFormatter {
              formatXml: Boolean,
              indentLocalDefs: Boolean,
              indentPackageBlocks: Boolean,
+             multilineScaladocCommentsStartOnFirstLine: Boolean,
              preserveDanglingCloseParenthesis: Boolean,
              preserveSpaceBeforeArguments: Boolean,
              rewriteArrowSymbols: Boolean,
@@ -68,6 +69,7 @@ object MojoFormatter {
       .setPreference(FormatXml, formatXml)
       .setPreference(IndentLocalDefs, indentLocalDefs)
       .setPreference(IndentPackageBlocks, indentPackageBlocks)
+      .setPreference(MultilineScaladocCommentsStartOnFirstLine, multilineScaladocCommentsStartOnFirstLine)
       .setPreference(PreserveDanglingCloseParenthesis, preserveDanglingCloseParenthesis)
       .setPreference(PreserveSpaceBeforeArguments, preserveSpaceBeforeArguments)
       .setPreference(RewriteArrowSymbols, rewriteArrowSymbols)

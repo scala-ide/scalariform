@@ -68,6 +68,11 @@ public class ScalariformMojo extends AbstractMojo {
     /**
      *  @parameter default-value=false
      */
+    protected int multilineScaladocCommentsStartOnFirstLine;
+
+    /**
+     *  @parameter default-value=false
+     */
     protected boolean preserveDanglingCloseParenthesis;
 
     /**
@@ -111,6 +116,7 @@ public class ScalariformMojo extends AbstractMojo {
                              formatXml,
                              indentLocalDefs,
                              indentPackageBlocks,
+                             multilineScaladocCommentsStartOnFirstLine,
                              preserveDanglingCloseParenthesis,
                              preserveSpaceBeforeArguments,
                              rewriteArrowSymbols,

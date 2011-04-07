@@ -5,6 +5,7 @@
 * Ability to import/export preferences as properties; --preferencesFile=<path> command-line option
 * FIX: incorrect indent behaviour for finally block after a catch block
 * Add SpacesWithinPatternBinders preference (issue #15)
+* Add MultilineScaladocCommentsStartOnFirstLine preference (issue #16)
 
 0.0.9 (26/February/11)
 

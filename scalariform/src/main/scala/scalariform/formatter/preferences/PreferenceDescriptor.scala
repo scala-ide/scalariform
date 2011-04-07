@@ -63,7 +63,7 @@ object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
-    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders)
+    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -171,4 +171,10 @@ case object SpacesWithinPatternBinders extends BooleanPreferenceDescriptor {
   val key = "spacesWithinPatternBinders"
   val description = "Add a space around the @ token in pattern binders"
   val defaultValue = true
+}
+
+case object MultilineScaladocCommentsStartOnFirstLine extends BooleanPreferenceDescriptor {
+  val key = "multilineScaladocCommentsStartOnFirstLine"
+  val description = "Start multiline Scaladoc comment body on same line as the opening '/**' "
+  val defaultValue = false
 }

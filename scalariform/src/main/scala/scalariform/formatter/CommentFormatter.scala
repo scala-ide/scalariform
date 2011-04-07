@@ -4,6 +4,7 @@ import scalariform.parser._
 import scalariform.utils._
 import scalariform.lexer._
 import scalariform.formatter.preferences._
+import scala.annotation.tailrec
 
 trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
@@ -11,9 +12,17 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
     val prefix = List("/** ", "/**", "/* ", "/*").find(comment.startsWith).get
     val (start, rest) = comment.splitAt(prefix.length)
     val (contents, _) = rest.splitAt(rest.length - "*/".length)
-    val lines = contents.split("""\r?\n([ \t]*\*?[ \t]?)?""", Integer.MAX_VALUE).toList
-    (start, lines)
+    val firstLine :: otherLines = contents.split("""\r?\n([ \t]*\*?)?""", Integer.MAX_VALUE).toList
+    val adjustedLines = dropInitialSpaces(firstLine, 1) :: (otherLines map { dropInitialSpaces(_, afterStarSpaces) })
+    (start, adjustedLines)
   }
+
+  @tailrec
+  private def dropInitialSpaces(s: String, maxSpacesToDrop: Int): String =
+    if (maxSpacesToDrop > 0 && s.startsWith(" "))
+      dropInitialSpaces(s drop 1, maxSpacesToDrop - 1)
+    else
+      s
 
   private def removeTrailingWhitespace(s: String) = s.reverse.dropWhile(_.isWhitespace).reverse
 
@@ -24,6 +33,8 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
   private def pruneEmptyFinal(lines: List[String]) = pruneEmptyInitial(lines.reverse).reverse
 
+  private def afterStarSpaces = if (formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)) 2 else 1
+
   def formatComment(comment: HiddenToken, indentLevel: Int): String =
     if (comment.text contains '\n') {
       val sb = new StringBuilder
@@ -31,13 +42,21 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
       val lines = pruneEmptyFinal(pruneEmptyInitial(rawLines))
 
-      // println("formatComment: " + (start, lines))
+      val startOnFirstLine = formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)
+
       sb.append(start.trim)
+      var firstLine = true
       for (line ← lines) {
         val trimmedLine = removeTrailingWhitespace(line)
-        sb.append(newlineSequence).indent(indentLevel).append(" *")
-        if (!trimmedLine.isEmpty)
-          sb.append(" ").append(trimmedLine)
+        if (firstLine && startOnFirstLine) {
+          if (!trimmedLine.isEmpty)
+            sb.append(" ").append(trimmedLine)
+        } else {
+          sb.append(newlineSequence).indent(indentLevel).append(" *")
+          if (!trimmedLine.isEmpty)
+            sb.append(" " * afterStarSpaces).append(trimmedLine)
+        }
+        firstLine = false
       }
       sb.append(newlineSequence).indent(indentLevel).append(" */")
       sb.toString

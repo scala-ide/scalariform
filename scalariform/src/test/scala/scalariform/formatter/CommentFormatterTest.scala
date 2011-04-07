@@ -89,4 +89,37 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */
     |"""
 
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
+
+  """/** This method applies f to each 
+    | *  element of the given list.
+    | */""" ==>
+  """/** This method applies f to each
+    | *  element of the given list.
+    | */
+    |""" 
+
+  """/** Foo
+    |Bar
+    |*Baz  */""" ==>
+  """/** Foo
+    | *  Bar
+    | *  Baz
+    | */
+    |"""
+
+  """/** Foo
+    |*/""" ==>
+  """/** Foo
+    | */
+    |"""
+
+  """/**
+    |*/""" ==>
+  """/**
+    | */
+    |"""
+  }
+
 }
