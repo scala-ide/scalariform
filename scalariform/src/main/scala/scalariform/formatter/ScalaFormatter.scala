@@ -435,20 +435,22 @@ object ScalaFormatter {
   // format: ON
 
   @throws(classOf[ScalaParserException])
-  def format(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences()): String = {
-    val edits = formatAsEdits(source, formattingPreferences)
+  def format(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences(), lineDelimiter: Option[String] = None,
+             initialIndentLevel: Int = 0): String = {
+    val edits = formatAsEdits(source, formattingPreferences, lineDelimiter, initialIndentLevel)
     TextEditProcessor.runEdits(source, edits)
   }
 
   @throws(classOf[ScalaParserException])
-  def formatAsEdits(source: String, formattingPreferences: IFormattingPreferences, lineDelimiter: Option[String] = None): List[TextEdit] = {
+  def formatAsEdits(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences(), lineDelimiter: Option[String] = None,
+                    initialIndentLevel: Int = 0): List[TextEdit] = {
     val specificFormatter = new SpecificFormatter {
 
       type Result = CompilationUnit
 
       def parse(parser: ScalaParser) = parser.compilationUnitOrScript()
 
-      def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
+      def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = initialIndentLevel))
 
     }
     val (edits, _) = specificFormatter.fullFormat(source)(formattingPreferences)
