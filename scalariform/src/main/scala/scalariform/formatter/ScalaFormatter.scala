@@ -74,8 +74,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         if (suspendFormatting)
           builder.append(token.getText)
         else {
-          val formattingInstruction = inferredNewlineFormatting.get(token) getOrElse
+          val basicFormattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
+          val formattingInstruction =
+            if (nextTokenOption.exists { _.getType == EOF } && basicFormattingInstruction.isInstanceOf[EnsureNewlineAndIndent])
+              EnsureNewlineAndIndent(0) // Adjustment for end of input when using non-zero initial indent
+            else
+              basicFormattingInstruction
           val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
             !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
