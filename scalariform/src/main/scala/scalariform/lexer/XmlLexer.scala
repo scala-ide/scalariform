@@ -244,6 +244,8 @@ trait XmlLexer extends Lexer {
       if (lookaheadIs("</xml:unparsed>")) {
         munch("</xml:unparsed>")
         continue = false
+      } else if (ch == SU) {
+        if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed Unparsed XML")
       } else
         nextChar()
     }
@@ -257,6 +259,8 @@ trait XmlLexer extends Lexer {
       if (lookaheadIs("?>")) {
         munch("?>")
         continue = false
+      } else if (ch == SU) {
+        if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed XML processing instruction")
       } else
         nextChar()
     }

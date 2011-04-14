@@ -193,6 +193,9 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   "Lexer" should "throw a lexer exception" in {
     evaluating { ScalaLexer.rawTokenise("\"\"\"") } should produce[ScalaLexerException]
+    evaluating { ScalaLexer.rawTokenise("<?") } should produce[ScalaLexerException]
+    evaluating { ScalaLexer.rawTokenise("<xml:unparsed>") } should produce[ScalaLexerException]
+
   }
 
   {
@@ -203,6 +206,8 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
     "\"unclosed" producesTokens (STRING_LITERAL)
     "\\ufoob" producesTokens (WS)
     "`unclosed" producesTokens (VARID)
+    "<?" producesTokens (XML_PROCESSING_INSTRUCTION)
+    "<xml:unparsed>" producesTokens (XML_UNPARSED)
 
   }
 

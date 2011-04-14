@@ -6,6 +6,7 @@
 * FIX: incorrect indent behaviour for finally block after a catch block
 * Add SpacesWithinPatternBinders preference (issue #15)
 * Add MultilineScaladocCommentsStartOnFirstLine preference (issue #16)
+* FIX: infinite loop in lexer on malformed XML processing instructions / unparsed
 
 0.0.9 (26/February/11)
 
