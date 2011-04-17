@@ -8,6 +8,8 @@ trait IFormattingPreferences {
 
   def preferencesMap: Map[PreferenceDescriptor[_], Any]
 
+  def indentStyle: IndentStyle
+
 }
 
 abstract sealed class IndentStyle {
@@ -34,6 +36,8 @@ class FormattingPreferences(val preferencesMap: Map[PreferenceDescriptor[_], Any
   def setPreference[T](preference: PreferenceDescriptor[T], value: T) = new FormattingPreferences(preferencesMap + (preference -> value))
 
   override def toString = getClass.getSimpleName + "(" + preferencesMap + ")"
+
+  val indentStyle = if (this(IndentWithTabs)) Tabs else Spaces(this(IndentSpaces))
 }
 
 case object FormattingPreferences extends FormattingPreferences(Map()) {

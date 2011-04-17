@@ -50,6 +50,8 @@ object MojoFormatter {
              formatXml: Boolean,
              indentLocalDefs: Boolean,
              indentPackageBlocks: Boolean,
+             indentSpaces: Int,
+             indentWithTabs: Boolean,
              multilineScaladocCommentsStartOnFirstLine: Boolean,
              preserveDanglingCloseParenthesis: Boolean,
              preserveSpaceBeforeArguments: Boolean,
@@ -57,8 +59,7 @@ object MojoFormatter {
              spaceBeforeColon: Boolean,
              spacesInsideBrackets: Boolean,
              spacesInsideParentheses: Boolean,
-             spacesWithinPatternBinders: Boolean,
-             indentSpaces: Int) {
+             spacesWithinPatternBinders: Boolean) {
 
     val preferences = FormattingPreferences()
       .setPreference(AlignParameters, alignParameters)
@@ -69,6 +70,8 @@ object MojoFormatter {
       .setPreference(FormatXml, formatXml)
       .setPreference(IndentLocalDefs, indentLocalDefs)
       .setPreference(IndentPackageBlocks, indentPackageBlocks)
+      .setPreference(IndentSpaces, indentSpaces)
+      .setPreference(IndentWithTabs, indentWithTabs)
       .setPreference(MultilineScaladocCommentsStartOnFirstLine, multilineScaladocCommentsStartOnFirstLine)
       .setPreference(PreserveDanglingCloseParenthesis, preserveDanglingCloseParenthesis)
       .setPreference(PreserveSpaceBeforeArguments, preserveSpaceBeforeArguments)
@@ -77,7 +80,6 @@ object MojoFormatter {
       .setPreference(SpacesInsideParentheses, spacesInsideParentheses)
       .setPreference(SpacesInsideBrackets, spacesInsideBrackets)
       .setPreference(SpacesWithinPatternBinders, spacesWithinPatternBinders)
-      .setPreference(IndentSpaces, indentSpaces)
 
     val files = findScalaFiles(path)
 

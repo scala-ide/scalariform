@@ -11,7 +11,9 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
       val XmlExpr(first: XmlContents, otherElements: List[XmlContents]) = xmlExpr
       var formatResult: FormatResult = NoFormatResult
       formatResult ++= format(first)
-      val nestedFormatterState = formatterState.alignWithToken(first.firstToken)
+      val nestedFormatterState =
+        if (formattingPreferences(IndentWithTabs)) formatterState
+        else formatterState.alignWithToken(first.firstToken)
       val (contentsFormatResult, multiline) = format(otherElements)(formatterState, nestedFormatterState)
       formatResult ++= contentsFormatResult
       formatResult
@@ -79,11 +81,17 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     val XmlNonEmptyElement(startTag: XmlStartTag, contents: List[XmlContents], endTag: XmlEndTag) = xmlNonEmpty
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(startTag)
-    val nestedFormatterState = formatterState.alignWithToken(startTag.firstToken).indent
+    val nestedFormatterState =
+      if (formattingPreferences(IndentWithTabs)) formatterState.indent
+      else formatterState.alignWithToken(startTag.firstToken).indent
     val (contentsFormatResult, multiline) = format(contents)(formatterState, nestedFormatterState)
     formatResult ++= contentsFormatResult
-    if (multiline)
-      formatResult = formatResult.before(endTag.firstToken, formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction)
+    if (multiline) {
+      val instruction =
+        if (formattingPreferences(IndentWithTabs)) formatterState.currentIndentLevelInstruction
+        else formatterState.alignWithToken(startTag.firstToken).currentIndentLevelInstruction
+      formatResult = formatResult.before(endTag.firstToken, instruction)
+    }
     formatResult ++= format(endTag)
     formatResult
   }

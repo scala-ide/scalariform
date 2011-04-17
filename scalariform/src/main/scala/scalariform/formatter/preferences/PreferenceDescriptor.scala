@@ -63,7 +63,7 @@ object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
-    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine)
+    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -176,5 +176,11 @@ case object SpacesWithinPatternBinders extends BooleanPreferenceDescriptor {
 case object MultilineScaladocCommentsStartOnFirstLine extends BooleanPreferenceDescriptor {
   val key = "multilineScaladocCommentsStartOnFirstLine"
   val description = "Start multiline Scaladoc comment body on same line as the opening '/**' "
+  val defaultValue = false
+}
+
+case object IndentWithTabs extends BooleanPreferenceDescriptor {
+  val key = "indentWithTabs"
+  val description = "Use a tab character for indentation"
   val defaultValue = false
 }

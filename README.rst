@@ -146,6 +146,7 @@ Usage::
     [+|-]formatXml                                        Enable/disable Format XML literals
     [+|-]indentLocalDefs                                  Enable/disable Indent local defs an extra level
     [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
+    [+|-]indentWithTabs                                   Enable/disable Use a tab character for indentation
     [+|-]multilineScaladocCommentsStartOnFirstLine        Enable/disable Start multiline Scaladoc comment body on same line as the opening '/**' 
     [+|-]preserveDanglingCloseParenthesis                 Enable/disable Allow a newline before a ')' in an argument expression.
     [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
@@ -153,7 +154,7 @@ Usage::
     [+|-]spaceBeforeColon                                 Enable/disable Add a space before colons
     [+|-]spaceInsideBrackets                              Enable/disable Require a space after '[' and before ']'
     [+|-]spaceInsideParentheses                           Enable/disable Require a space after '(' and before ')'
-    [+|-]spacesWithinPatternBinders                            Enable/disable Add a space around the @ token in pattern binders
+    [+|-]spacesWithinPatternBinders                       Enable/disable Add a space around the @ token in pattern binders
     -alignSingleLineCaseStatements.maxArrowIndent=[1-100] Set Maximum number of spaces inserted before an arrow to align case statements
     -indentSpaces=[1-10]                                  Set Number of spaces to use for indentation
   
@@ -212,6 +213,8 @@ If ``true``, then::
                shoeSize: Int,
                favoriteColor: java.awt.Color)
 
+This option is disabled if ``indentWithTabs`` is ``true``.
+
 alignSingleLineCaseStatements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -233,12 +236,14 @@ Is reformatted as::
     case dd  => 3
   }
 
+This option is disabled if ``indentWithTabs`` is ``true``.
+
 alignSingleLineCaseStatements.maxArrowIndent
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Default: ``40``
 
-When using alignSingleLineCaseStatements == true, this is a limit on
+When ``alignSingleLineCaseStatements`` is ``true``, this is a limit on
 the number of spaces that can be inserted before an arrow to align it
 with other case statements. This can be used to avoid very large gaps,
 e.g.::
@@ -248,13 +253,12 @@ e.g.::
     case ccc                                                       => 2
   }
 
-
 compactStringConcatenation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Default: ``false``
 
-Omit spaces when formatting a '+' operator on String literals". For example, If ``false``, then::
+Omit spaces when formatting a '+' operator on String literals. For example, If ``false``, then::
 
   "Hello " + name + "!"
 
@@ -356,7 +360,20 @@ indentSpaces
 
 Default: ``2``
 
-The number of spaces to use for each level of indentation.
+The number of spaces to use for each level of indentation. 
+
+This option is ignored if ``indentWithTabs`` is ``true``.
+
+indentWithTabs
+~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Use a tab for each level of indentation. When set to ``true``, this
+ignores any setting given for ``indentSpaces``. In addition, for the
+moment, ``alignSingleLineCaseStatements`` and ``alignParameters``
+options are not supported when indenting with tabs, and XML
+indentation is handled differently.
 
 multilineScaladocCommentsStartOnFirstLine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

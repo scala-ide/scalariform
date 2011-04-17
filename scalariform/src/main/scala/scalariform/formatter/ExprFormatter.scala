@@ -804,12 +804,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val relativeToken = paramClause.tokens(1) // TODO
     var formatResult: FormatResult = NoFormatResult
     var paramFormatterState = formatterState
+    val alignParameters = formattingPreferences(AlignParameters) && !formattingPreferences(IndentWithTabs)
     for (firstParam ← firstParamOption) {
       val token = implicitOption getOrElse firstParam.firstToken
       if (hiddenPredecessors(token).containsNewline) {
         formatResult = formatResult.before(token, formatterState.indent(paramIndent).currentIndentLevelInstruction)
-        paramFormatterState = if (formattingPreferences(AlignParameters)) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
-      } else if (containsNewline(firstParam) && formattingPreferences(AlignParameters))
+        paramFormatterState = if (alignParameters) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
+      } else if (containsNewline(firstParam) && alignParameters)
         paramFormatterState = formatterState.alignWithToken(relativeToken)
       formatResult ++= format(firstParam)(paramFormatterState)
     }
@@ -817,7 +818,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for ((comma, param) ← otherParams) {
       val token = param.firstToken
       if (hiddenPredecessors(token).containsNewline) {
-        paramFormatterState = if (formattingPreferences(AlignParameters)) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
+        paramFormatterState = if (alignParameters) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
         formatResult = formatResult.before(token, paramFormatterState.currentIndentLevelInstruction)
       }
       formatResult ++= format(param)(paramFormatterState)

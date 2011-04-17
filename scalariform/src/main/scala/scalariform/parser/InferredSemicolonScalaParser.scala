@@ -96,26 +96,26 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isTemplateIntro: Boolean = currentTokenType match {
     case OBJECT | CLASS | TRAIT ⇒ true
-    case CASE if caseObject ⇒ true
-    case CASE if caseClass ⇒ true
-    case _ ⇒ false
+    case CASE if caseObject     ⇒ true
+    case CASE if caseClass      ⇒ true
+    case _                      ⇒ false
   }
 
   private def isDclIntro: Boolean = currentTokenType match {
     case VAL | VAR | DEF | TYPE ⇒ true
-    case _ ⇒ false
+    case _                      ⇒ false
   }
 
   private def isDefIntro: Boolean = isTemplateIntro || isDclIntro
 
   private def isNumericLit: Boolean = currentTokenType match {
     case INTEGER_LITERAL | FLOATING_POINT_LITERAL ⇒ true
-    case _ ⇒ false
+    case _                                        ⇒ false
   }
 
   private def isUnaryOp: Boolean = currentTokenType match {
     case MINUS | PLUS | TILDE | EXCLAMATION ⇒ true
-    case _ ⇒ false
+    case _                                  ⇒ false
   }
 
   private def isIdent: Boolean = isIdent(currentTokenType)
@@ -146,8 +146,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isTypeIntroToken(tokenType: TokenType): Boolean = tokenType match {
     case THIS | SUPER | USCORE | LPAREN | AT ⇒ true
-    case _ if isIdent(tokenType) ⇒ true
-    case _ ⇒ false
+    case _ if isIdent(tokenType)             ⇒ true
+    case _                                   ⇒ false
   }
 
   private def isTypeIntro: Boolean = isTypeIntroToken(currentTokenType)
@@ -464,7 +464,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           case LBRACE ⇒
             inBraces(block())
           case LPAREN ⇒ inParens(expr())
-          case _ ⇒ expr
+          case _      ⇒ expr
         }
         val catchClauseOption =
           if (!CATCH)
@@ -578,7 +578,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isOpAssignmentName(name: String) = name match {
     case "!=" | "<=" | ">=" | "" ⇒ false
-    case _ ⇒ name.endsWith("=") && !name.startsWith("=") && ScalaOnlyLexer.isOperatorPart(name(0))
+    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && ScalaOnlyLexer.isOperatorPart(name(0))
   }
 
   private def postfixExpr() {
@@ -906,7 +906,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       if (ownerIsTypeName) {
         currentTokenType match {
           case VAL | VAR ⇒ nextToken()
-          case _ ⇒
+          case _         ⇒
         }
       }
       ident()
@@ -1050,11 +1050,11 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   private def defOrDcl(localDef: Boolean = false) = currentTokenType match {
-    case VAL ⇒ patDefOrDcl()
-    case VAR ⇒ patDefOrDcl()
-    case DEF ⇒ funDefOrDcl(localDef)
+    case VAL  ⇒ patDefOrDcl()
+    case VAR  ⇒ patDefOrDcl()
+    case DEF  ⇒ funDefOrDcl(localDef)
     case TYPE ⇒ typeDefOrDcl()
-    case _ ⇒ tmplDef()
+    case _    ⇒ tmplDef()
   }
 
   def nonLocalDefOrDcl() {
@@ -1159,12 +1159,12 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def tmplDef() {
     currentTokenType match {
-      case TRAIT ⇒ classDef()
-      case CLASS ⇒ classDef()
-      case CASE if lookahead(1) == CLASS ⇒ classDef()
-      case OBJECT ⇒ objectDef()
+      case TRAIT                          ⇒ classDef()
+      case CLASS                          ⇒ classDef()
+      case CASE if lookahead(1) == CLASS  ⇒ classDef()
+      case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _ ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
     }
   }
 
@@ -1448,14 +1448,14 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     xmlStartTag(isPattern)
     while (!XML_END_OPEN) {
       currentTokenType match {
-        case XML_START_OPEN ⇒ xmlElement(isPattern)
-        case XML_PCDATA ⇒ XmlPCDATA(nextToken())
-        case XML_COMMENT ⇒ XmlComment(nextToken())
-        case XML_CDATA ⇒ XmlCDATA(nextToken())
-        case XML_UNPARSED ⇒ XmlUnparsed(nextToken())
+        case XML_START_OPEN             ⇒ xmlElement(isPattern)
+        case XML_PCDATA                 ⇒ XmlPCDATA(nextToken())
+        case XML_COMMENT                ⇒ XmlComment(nextToken())
+        case XML_CDATA                  ⇒ XmlCDATA(nextToken())
+        case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
-        case LBRACE ⇒ xmlEmbeddedScala(isPattern)
-        case _ ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
+        case LBRACE                     ⇒ xmlEmbeddedScala(isPattern)
+        case _                          ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
       }
     }
     xmlEndTag()
@@ -1468,13 +1468,13 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private def xml(isPattern: Boolean) {
     def xmlContent() {
       currentTokenType match {
-        case XML_START_OPEN ⇒ xmlElement(isPattern)
-        case XML_PCDATA ⇒ XmlPCDATA(nextToken())
-        case XML_COMMENT ⇒ XmlComment(nextToken())
-        case XML_CDATA ⇒ XmlCDATA(nextToken())
-        case XML_UNPARSED ⇒ XmlUnparsed(nextToken())
+        case XML_START_OPEN             ⇒ xmlElement(isPattern)
+        case XML_PCDATA                 ⇒ XmlPCDATA(nextToken())
+        case XML_COMMENT                ⇒ XmlComment(nextToken())
+        case XML_CDATA                  ⇒ XmlCDATA(nextToken())
+        case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
-        case _ ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
+        case _                          ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
       }
       xmlContent()
     }

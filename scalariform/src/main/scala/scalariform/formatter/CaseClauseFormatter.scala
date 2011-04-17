@@ -13,7 +13,7 @@ import scala.math.{ max, min }
 trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter with HasHiddenTokenInfo with ScalaFormatter ⇒
 
   def format(caseClauses: CaseClauses)(implicit formatterState: FormatterState): FormatResult = {
-    val clauseGroups = if (formattingPreferences(AlignSingleLineCaseStatements))
+    val clauseGroups = if (formattingPreferences(AlignSingleLineCaseStatements) && !formattingPreferences(IndentWithTabs))
       groupClauses(caseClauses)
     else
       caseClauses.caseClauses.map(Right(_))

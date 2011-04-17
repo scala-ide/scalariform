@@ -132,12 +132,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         }
         if (needGapBetweenThisAndPrevious)
           builder.append(" ")
-        val extraIndentSpaces = comment match {
-          case SingleLineComment(_) if nextCommentOption.isDefined || includeBufferBeforeNextToken ⇒ builder.currentIndentSpaces
-          case _ ⇒ 0
+        val extraIndent = comment match {
+          case SingleLineComment(_) if nextCommentOption.isDefined || includeBufferBeforeNextToken ⇒ builder.currentIndent
+          case _ ⇒ ""
         }
         builder.write(comment.token)
-        builder.append(" " * extraIndentSpaces)
+        builder.append(extraIndent)
       }
       val needGapBetweenThisAndFollowing = cond(comments.lastOption) {
         case Some(MultiLineComment(_)) if includeBufferBeforeNextToken ⇒ true
@@ -163,10 +163,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         else
           writeIntertokenCompact()
       case PlaceAtColumn(indentLevel, spaces) ⇒
+        require(!formattingPreferences(IndentWithTabs))
         writeIntertokenCompact()
         val indentLength = Spaces(formattingPreferences(IndentSpaces)).length(indentLevel)
         builder.append(" " * (indentLength + spaces - builder.currentColumn))
       case EnsureNewlineAndIndent(indentLevel, relativeTo) ⇒
+        require(!(formattingPreferences(IndentWithTabs) && relativeTo.isDefined))
         val baseIndentOption = relativeTo flatMap tokenIndentMap.get
         if (hiddenTokens.isEmpty) {
           builder.ensureAtBeginningOfLine()
@@ -237,7 +239,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         baseIndent ← baseIndentOption
         n ← 1 to baseIndent
       } builder.append(" ")
-      val indentChars = Spaces(formattingPreferences(IndentSpaces)).indent(indentLevel)
+      val indentChars = formattingPreferences.indentStyle.indent(indentLevel)
       builder.append(indentChars)
       builder
     }
@@ -274,13 +276,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       builder.length - pos - 1
     }
 
-    def currentIndentSpaces = {
+    def currentIndent = {
       val current = currentColumn
       val lineStart = builder.length - currentColumn
       var pos = lineStart
       while (pos < builder.length && builder(pos).isWhitespace)
         pos += 1
-      pos - lineStart
+      builder.substring(lineStart, pos)
     }
 
     def lastCharacter = if (builder.length == 0) None else Some(lastChar)

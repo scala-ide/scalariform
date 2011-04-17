@@ -7,6 +7,7 @@
 * Add SpacesWithinPatternBinders preference (issue #15)
 * Add MultilineScaladocCommentsStartOnFirstLine preference (issue #16)
 * FIX: infinite loop in lexer on malformed XML processing instructions / unparsed
+* Add IndentWithTabs preference (issue #17)
 
 0.0.9 (26/February/11)
 
