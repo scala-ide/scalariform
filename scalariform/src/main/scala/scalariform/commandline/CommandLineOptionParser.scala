@@ -3,7 +3,7 @@ package scalariform.commandline
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 
-class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
+class CommandLineOptionParser extends RegexParsers {
 
   lazy val option: Parser[CommandLineArgument] =
     phrase(help) | phrase(version) | phrase(test) | phrase(forceOutput) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
@@ -25,13 +25,15 @@ class CommandLineOptionParser extends JavaTokenParsers with RegexParsers {
 
   lazy val encoding = "--encoding=" ~ ".+".r ^^ { case (_ ~ encoding) ⇒ Encoding(encoding) }
 
-  lazy val toggle = plusOrMinus ~ ident ^^ { case onOrOff ~ key ⇒ PreferenceOption(key, onOrOff.toString) }
+  lazy val toggle = plusOrMinus ~ preferenceKey ^^ { case onOrOff ~ key ⇒ PreferenceOption(key, onOrOff.toString) }
 
   lazy val plusOrMinus = "+" ^^^ true | "-" ^^^ false
 
   lazy val preferenceFile = ("--preferenceFile=" | "-p=") ~ ".+".r ^^ { case (_ ~ name) ⇒ PreferenceFile(name) }
 
-  lazy val preferenceOption = "-" ~ ident ~ "=" ~ """(\w|\.)+""".r ^^ { case (_ ~ key ~ _ ~ value) ⇒ PreferenceOption(key, value) }
+  lazy val preferenceOption = "-" ~ preferenceKey ~ "=" ~ """(\w|\.)+""".r ^^ { case (_ ~ key ~ _ ~ value) ⇒ PreferenceOption(key, value) }
+
+  lazy val preferenceKey: Parser[String] = """[a-zA-Z.]+""".r
 
   lazy val badOption = guard(plusOrMinus) ~> ".*".r ^^ { BadOption(_) }
 
