@@ -126,19 +126,19 @@
       </repositories>
     </profile>
     <profile>
-      <id>scala-2.8.x</id>
+      <id>scala-2.9.0</id>
       <activation>
         <property>
           <name>scala.version</name>
-          <value>2.8.1-SNAPSHOT</value>
+          <value>2.9.0</value>
         </property>
       </activation>
       <repositories>
         <repository>
-          <id>scala-toolchain-2.8.1.alpha</id>
-          <name>Scala Toolchain 2.8.1.alpha p2 repository</name>
+          <id>scala-toolchain-2.9.0.final</id>
+          <name>Scala Toolchain 2.9.0.final p2 repository</name>
           <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.1.alpha</url>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.0.final</url>
         </repository>
       </repositories>
     </profile>
