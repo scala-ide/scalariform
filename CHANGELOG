@@ -9,6 +9,7 @@
 * FIX: infinite loop in lexer on malformed XML processing instructions / unparsed
 * Add IndentWithTabs preference (issue #17)
 * FIX: Fix incorrectly parsed command line argument (issue #20)
+* Update for 2.9.0
 
 0.0.9 (26/February/11)
 

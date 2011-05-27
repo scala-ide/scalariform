@@ -20,7 +20,10 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions with posterous.Publish with ScctProject {
 
-    val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test->default"
+    val scalatest = buildScalaVersion match {
+     case "2.9.0" => "org.scalatest" %% "scalatest" % "1.4.1" % "test->default"
+     case _ =>       "org.scalatest" % "scalatest" % "1.2" % "test->default"
+    }
 
     override def mainClass = Some("scalariform.commandline.Main")
 
@@ -62,7 +65,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   class GuiProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions {
 
-    val miglayout = "com.miglayout" % "miglayout" % "3.7.1"
+    val miglayout = "com.miglayout" % "miglayout" % "3.7.4"
 
     override def mainClass = Some("scalariform.gui.Main")
 
