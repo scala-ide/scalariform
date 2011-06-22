@@ -45,6 +45,7 @@ object MojoFormatter {
              alignParameters: Boolean,
              alignSingleLineCaseStatements: Boolean,
              alignSingleLineCaseStatements_maxArrowIndent: Int,
+             compactControlReadability: Boolean,
              compactStringConcatenation: Boolean,
              doubleIndentClassDeclaration: Boolean,
              formatXml: Boolean,
@@ -66,6 +67,7 @@ object MojoFormatter {
       .setPreference(AlignSingleLineCaseStatements, alignSingleLineCaseStatements)
       .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, alignSingleLineCaseStatements_maxArrowIndent)
       .setPreference(DoubleIndentClassDeclaration, doubleIndentClassDeclaration)
+      .setPreference(CompactControlReadability, compactControlReadability)
       .setPreference(CompactStringConcatenation, compactStringConcatenation)
       .setPreference(FormatXml, formatXml)
       .setPreference(IndentLocalDefs, indentLocalDefs)

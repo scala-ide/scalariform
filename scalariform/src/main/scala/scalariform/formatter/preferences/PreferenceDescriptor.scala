@@ -184,3 +184,9 @@ case object IndentWithTabs extends BooleanPreferenceDescriptor {
   val description = "Use a tab character for indentation"
   val defaultValue = false
 }
+
+case object CompactControlReadability extends BooleanPreferenceDescriptor {
+  val key = "compactControlReadability"
+  val description = "Enable Compact Control Readability style"
+  val defaultValue = false
+}

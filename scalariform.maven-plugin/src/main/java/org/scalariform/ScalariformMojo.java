@@ -38,6 +38,11 @@ public class ScalariformMojo extends AbstractMojo {
     /**
      *  @parameter default-value=false
      */
+    protected boolean compactControlReadability;
+
+    /**
+     *  @parameter default-value=false
+     */
     protected boolean compactStringConcatenation;
 
     /**
@@ -116,6 +121,7 @@ public class ScalariformMojo extends AbstractMojo {
                              alignParameters, 
                              alignSingleLineCaseStatements,
                              alignSingleLineCaseStatements_maxArrowIndent,
+                             compactControlReadability,
                              compactStringConcatenation,
                              doubleIndentClassDeclaration,
                              formatXml,
