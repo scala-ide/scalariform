@@ -290,9 +290,14 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(body)(bodyFormatterState)
 
     // TODO: Simplified version of elseClause formatting
+    val cuddledBraces = formattingPreferences(CompactControlReadability)
     for (CatchClause(catchToken, catchBlockOrExpr) ← catchClauseOption) {
       if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
         formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
+      else if(cuddledBraces){
+        formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
+      }
+
       catchBlockOrExpr match {
         case Left(catchBlock) ⇒
           formatResult = formatResult.before(catchBlock.firstToken, CompactEnsuringGap)
@@ -314,6 +319,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
       if (hiddenPredecessors(finallyToken).containsNewline && !previousIsMultilineBracesBlock)
         formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
+      else if(cuddledBraces){
+        formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
+      }
 
       val indentFinallyBody =
         if (isBlockExpr(finallyBody))
@@ -365,9 +373,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(body)(bodyFormatterState)
 
     // TODO: take into account pre-Else semi
+    val cuddledBraces = formattingPreferences(CompactControlReadability)
     for (ElseClause(elseSemiOpt, elseToken, elseBody) ← elseClauseOption) {
-
-      if (bodyIsABlock && containsNewline(body))
+      if(cuddledBraces){
+        formatResult = formatResult.before(elseToken, formatterState.currentIndentLevelInstruction)
+      }
+      else if (bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(elseToken, CompactEnsuringGap)
       else if (hiddenPredecessors(elseToken).containsNewline || containsNewline(body) || (indentBody && (hiddenPredecessors(elseBody.firstToken).containsNewline || isBlockExpr(elseBody) || isIfExpr(elseBody))))
         formatResult = formatResult.before(elseToken, formatterState.currentIndentLevelInstruction)

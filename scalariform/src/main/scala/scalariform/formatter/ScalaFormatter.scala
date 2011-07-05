@@ -81,7 +81,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
               EnsureNewlineAndIndent(0) // Adjustment for end of input when using non-zero initial indent
             else
               basicFormattingInstruction
-          val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
+          val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE } //TODO: perhaps could just touch here to make newline unindenting?
           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
             !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
           }
@@ -96,7 +96,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           builder.append(token.getText)
         } else {
           val formattingInstruction = printableFormattingInstruction(previousTokenOption, token)
-          val nextTokenUnindents = token.getType == RBRACE
+          val nextTokenUnindents = token.getType == RBRACE                   //TODO: same here, could alter just this part too to make newline unindenting
           val includeBufferBeforeNextToken = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
           val positionHintOption = if (hiddenTokens.isEmpty) Some(token.startIndex) else None

@@ -10,6 +10,8 @@ case class FormatterState(
 
   private val nextIndentLevel = indentLevel + 1
 
+  private val previousIndentLevel = if(indentLevel > 0) indentLevel - 1 else indentLevel
+
   def indent: FormatterState = indent(1)
 
   def indent(n: Int): FormatterState = copy(indentLevel = indentLevel + n)
@@ -19,6 +21,8 @@ case class FormatterState(
   def nextIndentLevelInstruction = EnsureNewlineAndIndent(nextIndentLevel, relativeTo = indentRelativeToTokenOption)
 
   def currentIndentLevelInstruction = EnsureNewlineAndIndent(indentLevel, relativeTo = indentRelativeToTokenOption)
+
+  def previousIndentLevelInstruction = EnsureNewlineAndIndent(previousIndentLevel, relativeTo = indentRelativeToTokenOption)
 
   def indentForExpressionBreak = indent.copy(expressionBreakHappened = true)
 

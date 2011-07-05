@@ -1,5 +1,6 @@
 package scalariform.formatter
 
+import preferences.FormattingPreferences._
 import scalariform.parser._
 import scalariform.formatter._
 
