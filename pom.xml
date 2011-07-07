@@ -126,6 +126,23 @@
       </repositories>
     </profile>
     <profile>
+      <id>scala-2.8.2-SNAPSHOT</id>
+      <activation>
+        <property>
+          <name>scala.version</name>
+          <value>2.8.2-SNAPSHOT</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-2.8.2-SNAPSHOT</id>
+          <name>Scala Toolchain 2.8.2-SNAPSHOT p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.2-SNAPSHOT</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
       <id>scala-2.9.0</id>
       <activation>
         <property>
@@ -156,6 +173,23 @@
           <name>Scala Toolchain 2.9.0-1 p2 repository</name>
           <layout>p2</layout>
           <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.0-1</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala-2.9.1-SNAPSHOT</id>
+      <activation>
+        <property>
+          <name>scala.version</name>
+          <value>2.9.1-SNAPSHOT</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-2.9.1-SNAPSHOT</id>
+          <name>Scala Toolchain 2.9.1-SNAPSHOT p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.1-SNAPSHOT</url>
         </repository>
       </repositories>
     </profile>
