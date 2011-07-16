@@ -152,7 +152,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       formatResult ++= leftResult
 
       if (hiddenPredecessors(dot).containsNewline) {
-        currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+        currentFormatterState = initialFormatterState.indentForExpressionBreakIfNeeded
         formatResult = formatResult.before(dot, currentFormatterState.currentIndentLevelInstruction)
       }
     }

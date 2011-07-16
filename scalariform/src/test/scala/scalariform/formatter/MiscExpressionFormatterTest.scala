@@ -726,6 +726,16 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  c) +
     |  d"""
 
+  """a
+    |.b(
+    |c)
+    |.d""" ==>
+  """a
+    |  .b(
+    |    c)
+    |  .d"""
+
+
   "Foo.this" ==> "Foo.this"
 
   """List.range(1, r) flatMap (
