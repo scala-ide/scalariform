@@ -340,7 +340,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   """1 + (
     |  a, b, c)""" ==>
-  """1 + (a, b, c)"""
+  """1 + (
+    |  a, b, c)"""
 
   """1 + (a
     |, b, c)""" ==>
@@ -399,7 +400,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |42, 
     |46
     |)""" ==>
-  """(42,
+  """(
+    |  42,
     |  46)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
   
   """a(b,
@@ -725,5 +727,11 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  d"""
 
   "Foo.this" ==> "Foo.this"
+
+  """List.range(1, r) flatMap (
+    |   i => List.range(1, i) map (j => (i, j))
+    |)""" ==>
+  """List.range(1, r) flatMap (
+    |  i => List.range(1, i) map (j => (i, j)))"""
 
 }

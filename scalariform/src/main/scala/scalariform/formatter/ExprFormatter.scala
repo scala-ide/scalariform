@@ -263,7 +263,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       (formatResult, currentFormatterState)
   }
 
-  private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = formatExprElements(parenExpr.contents)
+  private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
+    val ParenExpr(lparen, contents, rparen) = parenExpr
+    format(ParenArgumentExprs(lparen, contents, rparen))
+  }
 
   private def format(tryExpr: TryExpr)(implicit formatterState: FormatterState): FormatResult = {
     val TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[CatchClause], finallyClauseOption: Option[(Token, Expr)]) = tryExpr
