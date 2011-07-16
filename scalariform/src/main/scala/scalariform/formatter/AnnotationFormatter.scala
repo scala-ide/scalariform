@@ -4,6 +4,7 @@ import scalariform.parser._
 import scalariform.utils._
 import scalariform.lexer._
 import scalariform.formatter.preferences._
+
 trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter with ExprFormatter ⇒
 
   def format(annotation: Annotation)(implicit formatterState: FormatterState): FormatResult = {
@@ -18,5 +19,6 @@ trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter wi
       formatResult = formatResult.formatNewline(newline, Compact) // TODO: rethink
     formatResult
   }
+
 }
 

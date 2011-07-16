@@ -6,6 +6,7 @@ import scalariform.lexer.Token
 import scalariform.parser._
 import scalariform.utils._
 import scalariform.formatter.preferences._
+
 trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with ExprFormatter with ScalaFormatter ⇒
 
   def format(tmplDef: TmplDef)(implicit formatterState: FormatterState): FormatResult = {

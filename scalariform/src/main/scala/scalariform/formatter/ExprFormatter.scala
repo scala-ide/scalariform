@@ -709,16 +709,25 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         CompactEnsuringGap
       else
         formatterState.currentIndentLevelInstruction
-    for ((previousOption, annotation, nextOption) ← Utils.withPreviousAndNext(annotations)) {
+    for ((previousAnnotationOpt, annotation, nextAnnotationOpt) ← Utils.withPreviousAndNext(annotations)) {
       formatResult ++= format(annotation)
-      if (previousOption.isDefined)
-        formatResult = formatResult.before(annotation.firstToken, preAnnotationFormattingInstruction)
-      if (nextOption.isEmpty) {
+      for (previousAnnotation ← previousAnnotationOpt) {
+        val instruction = if (annotation.newlineOption.isDefined)
+          formatterState.currentIndentLevelInstruction
+        else
+          CompactEnsuringGap
+        formatResult = formatResult.before(annotation.firstToken, instruction)
+      }
+      if (nextAnnotationOpt.isEmpty) {
         val firstPostAnnotationToken = modifiers match {
           case Nil                ⇒ defOrDcl.firstToken
           case (modifier :: rest) ⇒ modifier.firstToken
         }
-        formatResult = formatResult.before(firstPostAnnotationToken, preAnnotationFormattingInstruction)
+        val instruction = if (annotation.newlineOption.isDefined)
+          formatterState.currentIndentLevelInstruction
+        else
+          CompactEnsuringGap
+        formatResult = formatResult.before(firstPostAnnotationToken, instruction)
       }
     }
     formatResult ++= format(defOrDcl)

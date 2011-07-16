@@ -4,6 +4,7 @@
 * FIX: indent for indentLocalDefs on first line of function block (issue #24)
 * ParenExpr now allows newline after opening paren (issue #18)
 * FIX: spurious indentation in staggered dot expressions (issue #25)
+* Preserve newline before annotations (issue #28)
 
 0.1.0 (16/July/11)
 

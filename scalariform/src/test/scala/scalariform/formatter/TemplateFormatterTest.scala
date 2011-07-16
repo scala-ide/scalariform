@@ -44,9 +44,7 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "class A[B]@Annotation()private(val c: D)" ==> "class A[B] @Annotation() private (val c: D)"
 
   """@A@B(c = "d")abstract class E [F]@G()private(val h: I) (implicit j: K) extends{} with L(2) with M{}""" ==>
-  """@A
-    |@B(c = "d")
-    |abstract class E[F] @G() private (val h: I)(implicit j: K) extends {} with L(2) with M {}"""
+  """@A @B(c = "d") abstract class E[F] @G() private (val h: I)(implicit j: K) extends {} with L(2) with M {}"""
 
   """@A/*a*/@B
     |/*b*/class E""" =/=>
@@ -63,14 +61,13 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   
 
   {
+  
   implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, true)
 
-  """@(Id@Field) class A""" ==>
-  """@(Id @Field)
-    |class A"""
+  "@(Id@Field) class A" ==> "@(Id @Field) class A"
   
   }
-
+    
   """class A {
     |  
     |  class B
@@ -175,10 +172,15 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "object X0 { 0;  (a : Int, b : Int, c : Int) => println(List(a, b)) }" ==>
     "object X0 { 0; (a: Int, b: Int, c: Int) => println(List(a, b)) }" // Case for self type / anon function literal syntax disambig
 
-  "@serializable class A" ==>
-    """@serializable
-    |class A"""
+  "@serializable class A" ==> "@serializable class A"
 
+  "@volatile var nParticles = 0" ==> "@volatile var nParticles = 0" // Issue #28
+    
+  """@volatile
+    |var nParticles = 0""" ==>
+  """@volatile
+    |var nParticles = 0"""
+    
   """class A extends B[C] {
     |println("foo")
     |}""" ==>
