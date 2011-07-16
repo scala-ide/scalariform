@@ -20,11 +20,11 @@ Download
 
 Scalariform is available from Scala-tools.org:
 
-  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.0.9/
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.1.0/
 
 If you're using sbt, you can declare a dependency as follows::
 
-  val scalariform = "org.scalariform" %% "scalariform" % "0.0.9"
+  val scalariform = "org.scalariform" %% "scalariform" % "0.1.0"
 
 Integration with Eclipse
 ------------------------
@@ -76,7 +76,7 @@ Usage::
   <plugin>
     <groupId>org.scalariform</groupId>
     <artifactId>scalariform-maven-plugin</artifactId>
-    <version>0.0.9</version>
+    <version>0.1.0</version>
     <executions>
       <execution>
         <phase>process-sources</phase>
@@ -113,7 +113,7 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gq`` command by adding
 the following to ``.vimrc`` ::
 
-  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.0.9.jar\ scalariform.commandline.Main\ --forceOutput
+  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.1.0.jar\ scalariform.commandline.Main\ --forceOutput
 
 Command line tool
 -----------------
@@ -121,7 +121,7 @@ Command line tool
 Scalariform includes a stand-alone command line utility. Sample script::
 
   #!/bin/bash
-  scala -cp /path/to/scalariform-0.0.9.jar scalariform.commandline.Main "$@"
+  scala -cp /path/to/scalariform-0.1.0.jar scalariform.commandline.Main "$@"
 
 Usage::
 

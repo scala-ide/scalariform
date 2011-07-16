@@ -1,4 +1,4 @@
-0.1.0 (..)
+0.1.0 (16/July/11)
 
 * Add forgiving mode to lexer
 * Add SpaceInsideParentheses and SpaceInsideBrackets preferences (issue #14)
