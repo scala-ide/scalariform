@@ -57,8 +57,8 @@ object MojoFormatter {
              preserveSpaceBeforeArguments: Boolean,
              rewriteArrowSymbols: Boolean,
              spaceBeforeColon: Boolean,
-             spacesInsideBrackets: Boolean,
-             spacesInsideParentheses: Boolean,
+             spaceInsideBrackets: Boolean,
+             spaceInsideParentheses: Boolean,
              spacesWithinPatternBinders: Boolean) {
 
     val preferences = FormattingPreferences()
@@ -77,8 +77,8 @@ object MojoFormatter {
       .setPreference(PreserveSpaceBeforeArguments, preserveSpaceBeforeArguments)
       .setPreference(RewriteArrowSymbols, rewriteArrowSymbols)
       .setPreference(SpaceBeforeColon, spaceBeforeColon)
-      .setPreference(SpacesInsideParentheses, spacesInsideParentheses)
-      .setPreference(SpacesInsideBrackets, spacesInsideBrackets)
+      .setPreference(SpaceInsideParentheses, spaceInsideParentheses)
+      .setPreference(SpaceInsideBrackets, spaceInsideBrackets)
       .setPreference(SpacesWithinPatternBinders, spacesWithinPatternBinders)
 
     val files = findScalaFiles(path)
