@@ -135,6 +135,26 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
     |    c() * e()
     |  }
     |}"""
+
+  """val x = { i =>
+    |  def a
+    |  def b
+    |}""" ==>
+  """val x = { i =>
+    |    def a
+    |    def b
+    |}"""
+
+  // See issue #24
+  """val inc: Int => Int = { i =>
+    |  def plus1 = i + 1
+    |  plus1
+    |}""" ==>
+  """val inc: Int => Int = { i =>
+    |    def plus1 = i + 1
+    |  plus1
+    |}"""
+
   }
 
   """def foo(n, m)""" ==>

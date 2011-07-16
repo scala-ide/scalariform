@@ -396,7 +396,7 @@ case class AnonymousFunctionStart(parameters: List[ExprElement], arrow: Token) e
   lazy val tokens = flatten(parameters, arrow)
 }
 
-case class AnonymousFunction(parameters: List[ExprElement], arrow: Token, body: List[ExprElement]) extends ExprElement {
+case class AnonymousFunction(parameters: List[ExprElement], arrow: Token, body: StatSeq) extends ExprElement {
   lazy val tokens = flatten(parameters, arrow, body)
 }
 

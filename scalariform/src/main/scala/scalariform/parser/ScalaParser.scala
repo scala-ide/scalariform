@@ -617,8 +617,8 @@ class ScalaParser(tokens: Array[Token]) {
         if (ARROW && (location != InTemplate || lhsIsTypedParamList)) {
           val anonFuncOpt: Option[List[ExprElement]] = optional {
             val arrowToken = nextToken()
-            val postArrow = if (location != InBlock) expr() else block()
-            exprElementFlatten2(AnonymousFunction(intermediateResult, arrowToken, List(postArrow)))
+            val postArrow: StatSeq = if (location != InBlock) StatSeq(None, Some(expr()), Nil) else block()
+            exprElementFlatten2(AnonymousFunction(intermediateResult, arrowToken, postArrow))
           }
           anonFuncOpt match {
             case None        ⇒ intermediateResult
@@ -638,7 +638,7 @@ class ScalaParser(tokens: Array[Token]) {
     } else
       None
     val arrowToken = accept(ARROW)
-    val body = exprElementFlatten2(if (location != InBlock) expr() else block())
+    val body: StatSeq = if (location != InBlock) StatSeq(None, Some(expr()), Nil) else block()
     AnonymousFunction(exprElementFlatten2(implicitToken, id, colonTypeOpt), arrowToken, body)
   }
 

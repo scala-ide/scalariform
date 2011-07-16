@@ -240,7 +240,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val AnonymousFunction(parameters, arrow, body) = anonymousFunction
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(parameters)
-    val bodyFirstTokenOpt = body flatMap { _.tokens } headOption;
+    val bodyFirstTokenOpt = body.tokens.headOption
     val newlineBeforeBody = bodyFirstTokenOpt exists { hiddenPredecessors(_).containsNewline }
     if (newlineBeforeBody) {
       formatResult = formatResult.before(bodyFirstTokenOpt.get, formatterState.nextIndentLevelInstruction)
@@ -552,7 +552,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             formatterState.currentIndentLevelInstruction
         formatResult.formatNewline(semi, instruction)
       }
-      case Some(_) | None ⇒ {
+      case _ ⇒ {
         val instruction =
           if (indentBody)
             formatterState.currentIndentLevelInstruction
@@ -598,12 +598,14 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         else {
           if (statSeq.firstTokenOption.isDefined) {
             statSeq.firstStatOpt match {
-              case Some(Expr(List(anonFn @ AnonymousFunction(params, arrowToken, body)))) ⇒
+              case Some(Expr(List(anonFn @ AnonymousFunction(params, arrowToken, subStatSeq)))) ⇒
                 formatResult = formatResult.before(statSeq.firstToken, CompactEnsuringGap)
-                for (firstToken ← body.headOption flatMap { _.firstTokenOption })
-                  formatResult = formatResult.before(firstToken, indentedInstruction)
                 formatResult ++= format(params)
-                formatResult ++= format(body)(indentedState)
+                for (firstToken ← subStatSeq.firstTokenOption) {
+                  val firstTokenIndent = statFormatterState(subStatSeq.firstStatOpt)(indentedState).currentIndentLevelInstruction
+                  formatResult = formatResult.before(firstToken, firstTokenIndent)
+                }
+                formatResult ++= format(subStatSeq)(indentedState)
               case _ ⇒
                 val instruction = statSeq.selfReferenceOpt match {
                   case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
@@ -622,9 +624,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult
   }
 
-  private def statFormatterState(statOpt: Option[Stat])(implicit formatterState: FormatterState) = condOpt(statOpt) {
-    case Some(FullDefOrDcl(_, _, FunDefOrDcl(_, _, _, _, _, _, true))) if formattingPreferences(IndentLocalDefs) ⇒ formatterState.indent
-  } getOrElse formatterState
+  private def statFormatterState(statOpt: Option[Stat])(implicit formatterState: FormatterState) = statOpt match {
+    case Some(FullDefOrDcl(_, _, FunDefOrDcl(_, _, _, _, _, _, /* localDef = */ true))) if formattingPreferences(IndentLocalDefs) ⇒
+      formatterState.indent
+    case _ ⇒
+      formatterState
+  }
 
   def format(statSeq: StatSeq)(implicit formatterState: FormatterState): FormatResult = {
     val StatSeq(selfReferenceOpt: Option[(Expr, Token)], firstStatOpt: Option[Stat], otherStats: List[(Token, Option[Stat])]) = statSeq
