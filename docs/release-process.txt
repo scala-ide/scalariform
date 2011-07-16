@@ -9,6 +9,12 @@ sed -i s/$FROM/$TO/g README.rst
 # + date to CHANGELOG
 # create scalariform/notes/$TO.markdown, check at at http://wmd-editor.com/demo
 
+Consider adding new Scala versions to sbt, e.g.:
+
+  set build.scala.versions 2.8.0 2.8.1 2.8.2-SNAPSHOT 2.9.0 2.9.1-SNAPSHOT
+
+Check tests locally; also check Maven plugin compiles
+
 # 2. Branch
 
 git add .
@@ -23,7 +29,7 @@ git grep -n $TO-SNAPSHOT # $FROM etc
 # edit project/build/Project.scala -- switch publishTo line to releases at ScalaTools
 
 git commit -a -m "Update versions for $TO release"
-
+    
 # 3. Publish
 
 sbt
@@ -51,6 +57,7 @@ cd scalariform.maven-plugin
 mvn deploy
 
 # Push branch
+git push
 
 # 4. Update master
 

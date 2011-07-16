@@ -68,12 +68,12 @@ public class ScalariformMojo extends AbstractMojo {
     /**
      *  @parameter default-value=false
      */
-    protected int indentWithTabs;
+    protected boolean indentWithTabs;
 
     /**
      *  @parameter default-value=false
      */
-    protected int multilineScaladocCommentsStartOnFirstLine;
+    protected boolean multilineScaladocCommentsStartOnFirstLine;
 
     /**
      *  @parameter default-value=false
@@ -98,12 +98,12 @@ public class ScalariformMojo extends AbstractMojo {
     /**
      *  @parameter default-value=false
      */
-    protected boolean spacesInsideBrackets;
+    protected boolean spaceInsideBrackets;
 
     /**
      *  @parameter default-value=false
      */
-    protected boolean spacesInsideParentheses;
+    protected boolean spaceInsideParentheses;
     
     /**
      *  @parameter default-value=true
@@ -128,8 +128,8 @@ public class ScalariformMojo extends AbstractMojo {
                              preserveSpaceBeforeArguments,
                              rewriteArrowSymbols,
                              spaceBeforeColon,
-                             spacesInsideBrackets,
-                             spacesInsideParentheses,
+                             spaceInsideBrackets,
+                             spaceInsideParentheses,
                              spacesWithinPatternBinders);
     }
 
