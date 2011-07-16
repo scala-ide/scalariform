@@ -56,8 +56,8 @@ sbt
 cd scalariform.maven-plugin
 mvn deploy
 
-# Push branch
-git push
+# Push branch to Github
+
 
 # 4. Update master
 

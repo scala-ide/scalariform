@@ -20,7 +20,7 @@ Download
 
 Scalariform is available from Scala-tools.org:
 
-  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.8.0/0.1.0/
+  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.9.0/0.1.0/
 
 If you're using sbt, you can declare a dependency as follows::
 
