@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>scalariform</name>
-	<comment>scalariform 0.1</comment>
+	<name>scalariform-maven-plugin</name>
+	<comment>Maven plug-in to run Scalariform</comment>
 	<projects>
 	</projects>
 	<buildSpec>

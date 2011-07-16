@@ -4,6 +4,7 @@ import scalariform.parser._
 import scalariform.utils._
 import scalariform.lexer._
 import scalariform.formatter.preferences._
+
 trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with ScalaFormatter ⇒
 
   def format(xmlExpr: XmlExpr)(implicit formatterState: FormatterState): FormatResult = {
@@ -96,6 +97,9 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     formatResult
   }
 
+  /**
+   * @return format result and whether the contents span multiple lines
+   */
   def format(contents: List[XmlContents])(formatterState: FormatterState, nestedFormatterState: FormatterState): (FormatResult, Boolean) = {
     var formatResult: FormatResult = NoFormatResult
     val multiline = contents exists {
@@ -106,15 +110,16 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     var firstNonWhitespace = true
     for (previousAndThis ← Utils.pairWithPrevious(contents)) {
       previousAndThis match {
-        case (_, xmlContent @ XmlPCDATA(token @ Token(_, text @ Trimmed(prefix, infix, suffix), _, _))) ⇒
-          if (infix.isEmpty)
-            formatResult = formatResult.replaceXml(token, "")
-          else {
-            firstNonWhitespace = false
-            formatResult = formatResult.replaceXml(token, infix)
-            val withNewlines = (prefix contains '\n') || (suffix contains '\n')
+        case (_, XmlPCDATA(token @ Token(_, Trimmed(prefix, infix, suffix), _, _))) ⇒
+          if (infix.isEmpty) {
             if (multiline)
+              formatResult = formatResult.replaceXml(token, "")
+          } else {
+            firstNonWhitespace = false
+            if (multiline) {
+              formatResult = formatResult.replaceXml(token, infix)
               formatResult = formatResult.before(token, nestedFormatterState.currentIndentLevelInstruction)
+            }
           }
         case (_, xmlContent) if multiline && firstNonWhitespace ⇒
           firstNonWhitespace = false

@@ -9,12 +9,17 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "<a b = 'c'/>" ==> "<a b='c'/>"
 
-  "<a>{foo}</a>" ==> "<a>{ foo }</a>"
-
   "<a></a>" ==> "<a></a>"
   "<a></a >" ==> "<a></a>"
 
+  "<a>{foo}</a>" ==> "<a>{ foo }</a>"
   "<a>{foo}{bar}</a>" ==> "<a>{ foo }{ bar }</a>"
+
+  "<a>1</a>" ==> "<a>1</a>"
+  "<a> 1 </a>" ==> "<a> 1 </a>"
+  "<a> b {c} d {e} f </a>" ==> "<a> b { c } d { e } f </a>" 
+  "<b>ABORT: { msg }</b>" ==> "<b>ABORT: { msg }</b>" // See issue #27
+  "<a>   {b} </c>" ==> "<a>   { b } </c>"
   
   """<a>
     |{foo}
@@ -53,9 +58,6 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  e +
     |    "f"
     |}></c>)"""
-
-  "<a>1</a>" ==> "<a>1</a>"
-  "<a> 1 </a>" ==> "<a>1</a>"
 
   """<a>
     |1</a>""" ==>
@@ -115,7 +117,7 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |}""" ==>
   """{
     |
-    |  <p>{ 1 }{ 1 }</p>;
+    |  <p>{ 1 } { 1 }</p>;
     |
     |  <p>{ 1 }{ 1 }</p>
     |
@@ -263,7 +265,6 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |}"""
 
   }
-
 
   override val debug = false
 

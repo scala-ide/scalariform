@@ -1,3 +1,7 @@
+0.1.1 (..)
+
+* Leave PCDATA whitespace untouched inside a single-line XML tag (issue #27)
+
 0.1.0 (16/July/11)
 
 * Add forgiving mode to lexer

@@ -21,8 +21,8 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   class CoreProject(info: ProjectInfo) extends DefaultProject(info) with FormatterOptions with posterous.Publish with ScctProject {
 
     val scalatest = buildScalaVersion match {
-     case "2.9.0" => "org.scalatest" %% "scalatest" % "1.4.1" % "test->default"
-     case _ =>       "org.scalatest" % "scalatest" % "1.2" % "test->default"
+      case "2.9.0" ⇒ "org.scalatest" %% "scalatest" % "1.4.1" % "test->default"
+      case _       ⇒ "org.scalatest" % "scalatest" % "1.2" % "test->default"
     }
 
     override def mainClass = Some("scalariform.commandline.Main")
