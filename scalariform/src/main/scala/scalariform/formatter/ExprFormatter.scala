@@ -608,13 +608,18 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           if (statSeq.firstTokenOption.isDefined) {
             statSeq.firstStatOpt match {
               case Some(Expr(List(anonFn @ AnonymousFunction(params, arrowToken, subStatSeq)))) ⇒
-                formatResult = formatResult.before(statSeq.firstToken, CompactEnsuringGap)
+                val (instruction, subStatState) =
+                  if (hiddenPredecessors(params(0).firstToken).containsNewline)
+                    (indentedInstruction, indentedState.indent)
+                  else
+                    (CompactEnsuringGap, indentedState)
+                formatResult = formatResult.before(statSeq.firstToken, instruction)
                 formatResult ++= format(params)
                 for (firstToken ← subStatSeq.firstTokenOption) {
-                  val firstTokenIndent = statFormatterState(subStatSeq.firstStatOpt)(indentedState).currentIndentLevelInstruction
+                  val firstTokenIndent = statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
                   formatResult = formatResult.before(firstToken, firstTokenIndent)
                 }
-                formatResult ++= format(subStatSeq)(indentedState)
+                formatResult ++= format(subStatSeq)(subStatState)
               case _ ⇒
                 val instruction = statSeq.selfReferenceOpt match {
                   case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒

@@ -744,4 +744,34 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """List.range(1, r) flatMap (
     |  i => List.range(1, i) map (j => (i, j)))"""
 
+  """a map { 
+    |  b =>
+    |    c
+    |    d
+    |}""" ==>  
+  """a map {
+    |  b =>
+    |    c
+    |    d
+    |}"""  
+
+  """object HelloThere {
+    |  val Things = "a" :: "b" :: Nil
+    |  def foo {
+    |    Things.foreach {
+    |      thing =>
+    |        println("_%s".format(thing))
+    |    }
+    |  }
+    |}""" ==>
+  """object HelloThere {
+    |  val Things = "a" :: "b" :: Nil
+    |  def foo {
+    |    Things.foreach {
+    |      thing =>
+    |        println("_%s".format(thing))
+    |    }
+    |  }
+    |}""" // See issue 21
+
 }
