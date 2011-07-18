@@ -63,7 +63,8 @@ object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
-    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs)
+    SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
+    CompactControlReadability)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -182,5 +183,11 @@ case object MultilineScaladocCommentsStartOnFirstLine extends BooleanPreferenceD
 case object IndentWithTabs extends BooleanPreferenceDescriptor {
   val key = "indentWithTabs"
   val description = "Use a tab character for indentation"
+  val defaultValue = false
+}
+
+case object CompactControlReadability extends BooleanPreferenceDescriptor {
+  val key = "compactControlReadability"
+  val description = "Enable Compact Control Readability style"
   val defaultValue = false
 }

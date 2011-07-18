@@ -294,8 +294,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     // TODO: Simplified version of elseClause formatting
     for (CatchClause(catchToken, catchBlockOrExpr) ← catchClauseOption) {
-      if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
+      if (formattingPreferences(CompactControlReadability) && bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
+      else if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
+        formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
+
       catchBlockOrExpr match {
         case Left(catchBlock) ⇒
           formatResult = formatResult.before(catchBlock.firstToken, CompactEnsuringGap)
@@ -315,7 +318,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val previousIsMultilineBracesBlock = catchClauseOption.isEmpty && bodyIsABlock && containsNewline(body) ||
         cond(catchClauseOption) { case Some(CatchClause(_, Left(catchBlock))) ⇒ containsNewline(catchBlock) }
 
-      if (hiddenPredecessors(finallyToken).containsNewline && !previousIsMultilineBracesBlock)
+      if (formattingPreferences(CompactControlReadability) && previousIsMultilineBracesBlock)
+        formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
+      else if (hiddenPredecessors(finallyToken).containsNewline && !previousIsMultilineBracesBlock)
         formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
 
       val indentFinallyBody =
@@ -369,8 +374,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     // TODO: take into account pre-Else semi
     for (ElseClause(elseSemiOpt, elseToken, elseBody) ← elseClauseOption) {
-
-      if (bodyIsABlock && containsNewline(body))
+      if (formattingPreferences(CompactControlReadability) && bodyIsABlock && containsNewline(body))
+        formatResult = formatResult.before(elseToken, formatterState.currentIndentLevelInstruction)
+      else if (bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(elseToken, CompactEnsuringGap)
       else if (hiddenPredecessors(elseToken).containsNewline || containsNewline(body) || (indentBody && (hiddenPredecessors(elseBody.firstToken).containsNewline || isBlockExpr(elseBody) || isIfExpr(elseBody))))
         formatResult = formatResult.before(elseToken, formatterState.currentIndentLevelInstruction)

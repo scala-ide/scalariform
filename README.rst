@@ -141,6 +141,7 @@ Usage::
   Preferences:
     [+|-]alignParameters                                  Enable/disable Align parameters on different lines in the same column
     [+|-]alignSingleLineCaseStatements                    Enable/disable Align the arrows of consecutive single-line case statements
+    [+|-]compactControlReadability                        Enable/disable Format control structures using Compact Control Readability style
     [+|-]compactStringConcatenation                       Enable/disable Omit spaces when formatting a '+' operator on String literals
     [+|-]doubleIndentClassDeclaration                     Enable/disable Double indent either a class's parameters or its inheritance list
     [+|-]formatXml                                        Enable/disable Format XML literals
@@ -251,6 +252,37 @@ e.g.::
   a match {
     case Some(wibble, wobble) if wibble + wibble > wobble * wibble => 1
     case ccc                                                       => 2
+  }
+
+compactControlReadability
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+When ``compactControlReadability`` is ``true``, ``if``/``else`` and
+``try``/``catch``/``finally`` control structures will be formatted
+using `Compact Control Readability`_ style:
+
+.. _Compact Control Readability: http://en.wikipedia.org/wiki/Indent_style#Compact_Control_Readability_style
+
+  if (x == y) {
+    foo()
+  }
+  else if (y == z) {
+    bar()
+  }
+  else {
+    baz()
+  }
+
+  try {
+    foo()
+  } 
+  catch {
+    case _ => bar()
+  }
+  finally {
+    baz()
   }
 
 compactStringConcatenation
