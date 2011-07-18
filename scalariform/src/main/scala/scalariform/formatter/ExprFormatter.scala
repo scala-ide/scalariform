@@ -293,13 +293,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(body)(bodyFormatterState)
 
     // TODO: Simplified version of elseClause formatting
-    val cuddledBraces = formattingPreferences(CompactControlReadability)
     for (CatchClause(catchToken, catchBlockOrExpr) ← catchClauseOption) {
-      if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
+      if (formattingPreferences(CompactControlReadability) && bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
-      else if(cuddledBraces){
+      else if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
         formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
-      }
 
       catchBlockOrExpr match {
         case Left(catchBlock) ⇒
@@ -320,11 +318,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val previousIsMultilineBracesBlock = catchClauseOption.isEmpty && bodyIsABlock && containsNewline(body) ||
         cond(catchClauseOption) { case Some(CatchClause(_, Left(catchBlock))) ⇒ containsNewline(catchBlock) }
 
-      if (hiddenPredecessors(finallyToken).containsNewline && !previousIsMultilineBracesBlock)
+      if (formattingPreferences(CompactControlReadability) && previousIsMultilineBracesBlock)
         formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
-      else if(cuddledBraces){
+      else if (hiddenPredecessors(finallyToken).containsNewline && !previousIsMultilineBracesBlock)
         formatResult = formatResult.before(finallyToken, formatterState.currentIndentLevelInstruction)
-      }
 
       val indentFinallyBody =
         if (isBlockExpr(finallyBody))
@@ -376,11 +373,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(body)(bodyFormatterState)
 
     // TODO: take into account pre-Else semi
-    val cuddledBraces = formattingPreferences(CompactControlReadability)
     for (ElseClause(elseSemiOpt, elseToken, elseBody) ← elseClauseOption) {
-      if(cuddledBraces){
+      if (formattingPreferences(CompactControlReadability) && bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(elseToken, formatterState.currentIndentLevelInstruction)
-      }
       else if (bodyIsABlock && containsNewline(body))
         formatResult = formatResult.before(elseToken, CompactEnsuringGap)
       else if (hiddenPredecessors(elseToken).containsNewline || containsNewline(body) || (indentBody && (hiddenPredecessors(elseBody.firstToken).containsNewline || isBlockExpr(elseBody) || isIfExpr(elseBody))))

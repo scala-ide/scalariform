@@ -259,8 +259,11 @@ compactControlReadability
 
 Default: ``false``
 
-When ``compactControlReadability`` is ``true``, if/else and try/catch/finally control structures will be formatted using
-Compact Control Readability style:
+When ``compactControlReadability`` is ``true``, ``if``/``else`` and
+``try``/``catch``/``finally`` control structures will be formatted
+using `Compact Control Readability`_ style:
+
+.. _Compact Control Readability: http://en.wikipedia.org/wiki/Indent_style#Compact_Control_Readability_style
 
   if (x == y) {
     foo()
@@ -272,6 +275,15 @@ Compact Control Readability style:
     baz()
   }
 
+  try {
+    foo()
+  } 
+  catch {
+    case _ => bar()
+  }
+  finally {
+    baz()
+  }
 
 compactStringConcatenation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -5,16 +5,15 @@ import scalariform.formatter.preferences._
 import scalariform.parser._
 import scalariform.formatter._
 
+// format: OFF
+class CompactControlReadabilityTest extends AbstractExpressionFormatterTest {
 
-class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
-
-  override val debug = false
-
-  string2FormatTest(
-    """if(a){
-      |foo
-      |} else {
-      |bar }""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  implicit val formattingPreferences = FormattingPreferences.setPreference(CompactControlReadability, true)
+  
+  """if(a){
+    |foo
+    |} else {
+    |bar }""" ==>
   """if (a) {
     |  foo
     |}
@@ -22,12 +21,11 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |  bar
     |}"""
 
-  string2FormatTest(
-    """if(a){
-      |foo
-      |}
-      |else {
-      |bar }""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  """if(a){
+    |foo
+    |}
+    |else {
+    |bar }""" ==>
   """if (a) {
     |  foo
     |}
@@ -35,12 +33,11 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |  bar
     |}"""
 
-  string2FormatTest(
-    """if(a){
-      |foo
-      |} else {
-      |
-      |bar }""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  """if(a){
+    |foo
+    |} else {
+    |
+    |bar }""" ==>
   """if (a) {
     |  foo
     |}
@@ -49,12 +46,11 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |  bar
     |}"""
 
-  string2FormatTest(
-    """try{
-      |  foo
-      |} catch {
-      |  bar
-      |}""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  """try{
+    |  foo
+    |} catch {
+    |  bar
+    |}""" ==>
   """try {
     |  foo
     |}
@@ -62,12 +58,11 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |  bar
     |}"""
 
-  string2FormatTest(
-    """try{
-      |  foo
-      |} finally {
-      |  bar
-      |}""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  """try{
+    |  foo
+    |} finally {
+    |  bar
+    |}""" ==>
   """try {
     |  foo
     |}
@@ -75,13 +70,12 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |  bar
     |}"""
 
-  string2FormatTest(
-    """try{
-      |  foo
-      |}
-      |finally {
-      |  bar
-      |}""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  """try{
+    |  foo
+    |}
+    |finally {
+    |  bar
+    |}""" ==>
   """try {
     |  foo
     |}
@@ -89,13 +83,12 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |  bar
     |}"""
 
-  string2FormatTest(
-    """try{
-      |  foo
-      |} finally {
-      |
-      |  bar
-      |}""")(FormattingPreferences().setPreference(CompactControlReadability, true)) ==>
+  """try{
+    |  foo
+    |} finally {
+    |
+    |  bar
+    |}""" ==>
   """try {
     |  foo
     |}
@@ -103,4 +96,11 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest{
     |
     |  bar
     |}"""
+
+  "if (y > 0) positive else if (y < 0) negative else zero" ==> "if (y > 0) positive else if (y < 0) negative else zero"
+      
+  "try x catch y finally z" ==> "try x catch y finally z"    
+      
+
+      
 }

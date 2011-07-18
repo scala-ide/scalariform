@@ -1,14 +1,10 @@
 package scalariform.formatter
 
-import preferences.FormattingPreferences._
 import scalariform.parser._
 import scalariform.formatter._
 
+// format: OFF
 class IfExprFormatterTest extends AbstractExpressionFormatterTest {
-
-  override val debug = false
-
-  // format: OFF
 
   "if(x>y)(x)else(y)" ==> "if (x > y) (x) else (y)"
 
@@ -351,6 +347,8 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |else if (c) {
     |  d
     |} else e"""
+
+  override val debug = false
 
 }
  
