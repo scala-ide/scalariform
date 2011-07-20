@@ -755,23 +755,13 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    d
     |}"""  
 
-  """object HelloThere {
-    |  val Things = "a" :: "b" :: Nil
-    |  def foo {
-    |    Things.foreach {
-    |      thing =>
-    |        println("_%s".format(thing))
-    |    }
-    |  }
+  """Things.foreach {
+    |  thing =>
+    |    println("_%s".format(thing))
     |}""" ==>
-  """object HelloThere {
-    |  val Things = "a" :: "b" :: Nil
-    |  def foo {
-    |    Things.foreach {
-    |      thing =>
-    |        println("_%s".format(thing))
-    |    }
-    |  }
+  """Things.foreach {
+    |  thing =>
+    |    println("_%s".format(thing))
     |}""" // See issue 21
 
 }
