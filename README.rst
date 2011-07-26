@@ -1,14 +1,13 @@
 Scalariform
 ===========
 
-Scalariform is a code formatter for Scala 2.8+. It is a library and a
-stand-alone command line tool, with integrations available for various
-editors (see below).
+Scalariform is a code formatter for Scala. It's available as a
+library, a stand-alone command line tool, or via integrations with
+various editors and build tools (listed below).
 
-Currently, Scalariform supports only a limited set of options. The
-plan is to add further features as and when people ask for them, so
-please do raise a ticket if it doesn't format your code the way you'd
-like it, and I'll see what I can do.
+The plan is to add preferences and features as and when people ask for
+them, so please do raise a Github issue if it doesn't format your code
+the way you'd like it, and I'll see what I can do.
 
 Scalariform is licenced under `The MIT Licence`_.
 
@@ -29,7 +28,7 @@ If you're using sbt, you can declare a dependency as follows::
 Integration with Eclipse
 ------------------------
 
-Scala IDE for Eclipse uses Scalariform for formatting:
+Scala IDE for Eclipse uses Scalariform for formatting
 
   http://download.scala-ide.org/
 
@@ -93,9 +92,12 @@ Usage::
 Integration with sbt
 --------------------
 
-`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions.
+`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions for sbt 0.7.x.
+
+A version for sbt 0.10.x has been written by Peter Vlugter: https://github.com/typesafehub/sbt-scalariform
 
 .. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
+
 
 Integration with TextMate
 -------------------------
