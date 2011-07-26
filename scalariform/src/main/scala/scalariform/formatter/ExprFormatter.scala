@@ -616,8 +616,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                 formatResult = formatResult.before(statSeq.firstToken, instruction)
                 formatResult ++= format(params)
                 for (firstToken ← subStatSeq.firstTokenOption) {
-                  val firstTokenIndent = statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
-                  formatResult = formatResult.before(firstToken, firstTokenIndent)
+                  val instruction =
+                    if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
+                      statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
+                    else
+                      CompactEnsuringGap
+                  formatResult = formatResult.before(firstToken, instruction)
                 }
                 formatResult ++= format(subStatSeq)(subStatState)
               case _ ⇒
@@ -698,15 +702,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val PackageBlock(packageToken: Token, name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) = packageBlock
 
     var formatResult: FormatResult = NoFormatResult
-    newlineOpt match {
-      case Some(newline) ⇒ {
-        formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)
-      }
-      case None ⇒ {
-        formatResult = formatResult.before(lbrace, CompactEnsuringGap)
-      }
+    formatResult = newlineOpt match {
+      case Some(newline) ⇒ formatResult.formatNewline(newline, CompactEnsuringGap)
+      case None          ⇒ formatResult.before(lbrace, CompactEnsuringGap)
     }
-
     val dummyBlock = BlockExpr(lbrace, Right(topStats), rbrace)
     formatResult ++= format(dummyBlock, indent = formattingPreferences(IndentPackageBlocks))
     formatResult

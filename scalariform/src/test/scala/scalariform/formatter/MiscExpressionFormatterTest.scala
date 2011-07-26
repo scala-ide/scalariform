@@ -764,4 +764,11 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    println("_%s".format(thing))
     |}""" // See issue 21
 
+  """a.map { 
+    |  b => c
+    |}""" ==>
+  """a.map {
+    |  b => c
+    |}"""
+
 }
