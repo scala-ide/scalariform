@@ -1,29 +1,26 @@
 package scalariform.gui
 
 import java.awt.event._
-import net.miginfocom.layout._
-import net.miginfocom.swing._
-import javax.swing._
-import javax.swing.text._
-import java.awt.event._
 import java.awt.{ List ⇒ _, _ }
 
 import javax.swing._
-import javax.swing.event._
 import javax.swing.text._
+import javax.swing.event._
 import javax.swing.tree._
 import javax.swing.table._
 import javax.swing.border.TitledBorder
-import javax.swing.{ JMenu, JMenuItem, JMenuBar, SwingConstants }
 
+import net.miginfocom.layout._
+import net.miginfocom.swing._
+
+import scalariform.astselect._
 import scalariform.utils.Utils._
 import scalariform.utils.Range
 import scalariform.parser._
 import scalariform.formatter._
-import scalariform.lexer._
-import scalariform.astselect._
-import scalariform.lexer.Tokens._
 import scalariform.formatter.preferences._
+import scalariform.lexer._
+import scalariform.lexer.Tokens._
 
 class FormatterFrame extends JFrame with SpecificFormatter {
 
@@ -46,65 +43,43 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     doc.setCharacterAttributes(0, doc.getLength + 1, attrs, false)
   }
 
-  private val keywords = Set(ABSTRACT, CASE, CATCH, CLASS, DEF, DO,
-    ELSE, EXTENDS, FINAL, FINALLY, FOR, FORSOME, IF, IMPLICIT, IMPORT,
-    LAZY, MATCH, NEW, OBJECT, OVERRIDE, PACKAGE, PRIVATE, PROTECTED,
-    REQUIRES, RETURN, SEALED, SUPER, THIS, THROW, TRAIT, TRY, TYPE, VAL,
-    VAR, WHILE, WITH, YIELD, USCORE, COLON, EQUALS, ARROW, LARROW,
-    SUBTYPE, VIEWBOUND, SUPERTYPE, HASH, AT, XML_ATTR_EQ,
-    XML_START_OPEN, XML_EMPTY_CLOSE, XML_TAG_CLOSE, XML_END_OPEN)
-
-  private val literals = Set(CHARACTER_LITERAL, INTEGER_LITERAL, FLOATING_POINT_LITERAL, SYMBOL_LITERAL, TRUE, FALSE, NULL)
-
   private val showAstCheckBox = new JCheckBox("Show AST / Tokens")
 
   private val productionComboBox = new JComboBox(ProductionComboBoxModel)
 
   type TextStyle = Int
+
+  def getHighlight(token: Token): (Color, TextStyle) =
+    token.getType match {
+      case STRING_LITERAL | XML_ATTR_VALUE | XML_CDATA ⇒ (new Color(42, 0, 255), Font.PLAIN)
+      case _ if token.isScalaDocComment ⇒ (new Color(63, 95, 191), Font.PLAIN)
+      case LINE_COMMENT | MULTILINE_COMMENT | XML_COMMENT ⇒ (new Color(63, 127, 95), Font.PLAIN)
+      case t if t.isKeyword || t.isXml ⇒ (new Color(127, 0, 85), Font.BOLD)
+      case t if t.isLiteral ⇒ (new Color(0, 0, 192), Font.PLAIN)
+      case _ ⇒ (Color.BLACK, Font.PLAIN)
+    }
+
+  def highlightToken(token: Token, document: StyledDocument) {
+    if (token.getType == Tokens.EOF)
+      return
+    val style = document.addStyle("DUMMY", null)
+    StyleConstants.setFontFamily(style, "monospaced")
+    StyleConstants.setFontSize(style, 14)
+    val (colour, fontStyle) = getHighlight(token)
+    StyleConstants.setForeground(style, colour)
+    StyleConstants.setBold(style, fontStyle == Font.BOLD)
+    val startIndex = token.getStartIndex
+    val endIndex = token.getStopIndex
+    document.setCharacterAttributes(startIndex, endIndex - startIndex + 1, style, true)
+  }
+
   private def syntaxHighlight(textPane: JTextPane) {
-
-    def getHighlight(token: Token): (Color, TextStyle) = {
-      val tokenType = token.getType
-      if (keywords.contains(tokenType))
-        (new Color(127, 0, 85), Font.BOLD)
-      else if (literals.contains(tokenType))
-        (new Color(0, 0, 192), Font.PLAIN)
-      else tokenType match {
-        case STRING_LITERAL | XML_ATTR_VALUE | XML_CDATA ⇒ (new Color(42, 0, 255), Font.PLAIN)
-        case MULTILINE_COMMENT if token.getText startsWith "/**" ⇒ (new Color(63, 95, 191), Font.PLAIN)
-        case LINE_COMMENT | MULTILINE_COMMENT | XML_COMMENT ⇒ (new Color(63, 127, 95), Font.PLAIN)
-        case _ ⇒ (Color.BLACK, Font.PLAIN)
-      }
-    }
-    if (highlightCheckBox.isSelected) {
-      val (hiddenTokenInfo, tokens: List[Token]) = ScalaLexer.tokeniseFull(textPane.getText)
-
-      val document = textPane.getStyledDocument
-      def highlightToken(token: Token) {
-        if (token.getType != Tokens.EOF) {
-          val style = document.addStyle("DUMMY", null)
-          StyleConstants.setFontFamily(style, "monospaced")
-          StyleConstants.setFontSize(style, 14)
-          val (colour, fontStyle) = getHighlight(token)
-          StyleConstants.setForeground(style, colour)
-          if (fontStyle == Font.BOLD)
-            StyleConstants.setBold(style, true)
-          else
-            StyleConstants.setBold(style, false)
-          val startIndex = token.getStartIndex
-          val endIndex = token.getStopIndex
-          document.setCharacterAttributes(startIndex, endIndex - startIndex + 1, style, true)
-        }
-      }
-
-      for (token ← tokens) {
-        highlightToken(token)
-        for (hiddenToken ← hiddenTokenInfo.hiddenPredecessors(token))
-          highlightToken(hiddenToken.token)
-        for (hiddenTokens ← hiddenTokenInfo.inferredNewlines(token); hiddenToken ← hiddenTokens)
-          highlightToken(hiddenToken.token)
-      }
-    }
+    if (!highlightCheckBox.isSelected)
+      return
+    val tokens = ScalaLexer.rawTokenise(textPane.getText, forgiveErrors = true)
+    val document = textPane.getStyledDocument
+    for (token ← tokens)
+      highlightToken(token, document)
   }
 
   setLayout(new BorderLayout)
@@ -153,6 +128,11 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   setFont(inputTextPane, textFont)
   def runFormatter() {
     try {
+      onSwingThread {
+        syntaxHighlight(inputTextPane)
+        syntaxHighlight(outputTextPane)
+      }
+
       val inputText = inputTextPane.getText
 
       val startTime = System.currentTimeMillis
@@ -177,10 +157,6 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       val tokenCount = getTokens(inputText).size
       setTitle("Scalariform " + scalariform.VERSION + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / (duration + 1)) + " tokens/second")
       outputTextPane.setText(outputText)
-      onSwingThread {
-        syntaxHighlight(inputTextPane)
-        syntaxHighlight(outputTextPane)
-      }
 
       if (showAstCheckBox.isSelected) {
         import scalariform.parser._
@@ -263,7 +239,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         }
       }
     }
-    add(PreferencesPanel, new CC().wrap())
+    add(new JScrollPane(PreferencesPanel), new CC().wrap)
 
     val makeTestButton = new JButton("Make test")
     makeTestButton.addActionListener(new ActionListener() {
@@ -450,4 +426,3 @@ class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends A
     (token.getStartIndex, token.getStopIndex)
   }
 }
-
