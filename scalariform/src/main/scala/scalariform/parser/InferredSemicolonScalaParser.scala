@@ -499,7 +499,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case DO ⇒
         nextToken()
         expr()
-        if (isStatSep) nextToken()
+        if (isStatSep) acceptStatSep() // <-- for inferred semi // nextToken()
         accept(WHILE)
         condExpr()
 
@@ -702,7 +702,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     val newStyle = !VAL
     generator(eqOK = false)
     while (isStatSep) {
-      nextToken()
+      acceptStatSep() // <-- for inferred semi //nextToken()
       if (newStyle) {
         if (IF) guard()
         else generator(eqOK = true)
@@ -1129,7 +1129,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(LBRACE)
     selfInvocation()
     if (isStatSep) {
-      nextToken()
+      acceptStatSep() // <-- for inferred semi // nextToken()
       blockStatSeq()
     }
     accept(RBRACE)
@@ -1341,7 +1341,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           localDef()
         acceptStatSepOpt()
       } else if (isStatSep) {
-        nextToken()
+        acceptStatSep() // <-- for inferred semi // nextToken()
       } else
         throw new ScalaParserException("illegal start of statement: " + currentToken)
     }
@@ -1367,7 +1367,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           if (EOF)
             ()
           else if (isStatSep) {
-            nextToken()
+            acceptStatSep() // <-- to record inferred semi // nextToken()
             topstats()
           } else {
             inBraces(topStatSeq())
