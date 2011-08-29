@@ -659,7 +659,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case LBRACE ⇒ blockExpr()
       case LPAREN ⇒
         inParens { if (RPAREN) Nil else args() }
-      case _ ⇒ throw new UnsupportedOperationException // TODO
+      case _ ⇒
     }
   }
 
