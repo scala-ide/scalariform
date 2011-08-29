@@ -26,7 +26,7 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
   case class FormatTest(source: String, formattingPreferences: IFormattingPreferences) {
     require(formattingPreferences != null)
     def ==>(expectedRaw: String) {
-      it should ("format >>>" + prettyPrint(source) + "<<< as >>>" + prettyPrint(expectedRaw) + "<<<") in {
+      it should ("format >>>" + prettyPrint(source) + "<<< as >>>" + prettyPrint(expectedRaw) + "<<< with preferences " + formattingPreferences) in {
         val expected = expectedRaw.stripMargin
         val actual = format(source)(formattingPreferences)
         if (debug) println("Actual = " + actual)

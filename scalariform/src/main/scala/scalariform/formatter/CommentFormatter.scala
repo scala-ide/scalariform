@@ -13,6 +13,7 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
     val (start, rest) = comment.splitAt(prefix.length)
     val (contents, _) = rest.splitAt(rest.length - "*/".length)
     val firstLine :: otherLines = contents.split("""\r?\n([ \t]*\*?)?""", Integer.MAX_VALUE).toList
+    val afterStarSpaces = if (formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)) 2 else 1
     val adjustedLines = dropInitialSpaces(firstLine, 1) :: (otherLines map { dropInitialSpaces(_, afterStarSpaces) })
     (start, adjustedLines)
   }
@@ -28,12 +29,11 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
   private def pruneEmptyInitial(lines: List[String]) = lines match {
     case first :: rest if first.trim == "" ⇒ rest
-    case _                                 ⇒ lines
+    case _ ⇒ lines
   }
 
   private def pruneEmptyFinal(lines: List[String]) = pruneEmptyInitial(lines.reverse).reverse
 
-  private def afterStarSpaces = if (formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)) 2 else 1
 
   def formatComment(comment: HiddenToken, indentLevel: Int): String =
     if (comment.text contains '\n') {
@@ -42,8 +42,10 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
       val lines = pruneEmptyFinal(pruneEmptyInitial(rawLines))
 
+      val alignBeneathSecondAsterisk = formattingPreferences(PlaceScaladocAsterisksBeneathSecondAsterisk)
       val startOnFirstLine = formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)
-
+      val beforeStarSpaces = if (alignBeneathSecondAsterisk) "  " else " "
+      val afterStarSpaces = if (startOnFirstLine && !alignBeneathSecondAsterisk) "  " else " "
       sb.append(start.trim)
       var firstLine = true
       for (line ← lines) {
@@ -52,13 +54,13 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
           if (!trimmedLine.isEmpty)
             sb.append(" ").append(trimmedLine)
         } else {
-          sb.append(newlineSequence).indent(indentLevel).append(" *")
+          sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append ("*")
           if (!trimmedLine.isEmpty)
-            sb.append(" " * afterStarSpaces).append(trimmedLine)
+            sb.append(afterStarSpaces).append(trimmedLine)
         }
         firstLine = false
       }
-      sb.append(newlineSequence).indent(indentLevel).append(" */")
+      sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append ("*/")
       sb.toString
     } else
       comment.text

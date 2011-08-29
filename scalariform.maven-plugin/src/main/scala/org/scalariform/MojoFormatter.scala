@@ -54,6 +54,7 @@ object MojoFormatter {
              indentSpaces: Int,
              indentWithTabs: Boolean,
              multilineScaladocCommentsStartOnFirstLine: Boolean,
+             placeScaladocAsterisksBeneathSecondAsterisk: Boolean,
              preserveDanglingCloseParenthesis: Boolean,
              preserveSpaceBeforeArguments: Boolean,
              rewriteArrowSymbols: Boolean,
@@ -75,6 +76,7 @@ object MojoFormatter {
       .setPreference(IndentSpaces, indentSpaces)
       .setPreference(IndentWithTabs, indentWithTabs)
       .setPreference(MultilineScaladocCommentsStartOnFirstLine, multilineScaladocCommentsStartOnFirstLine)
+      .setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, placeScaladocAsterisksBeneathSecondAsterisk)
       .setPreference(PreserveDanglingCloseParenthesis, preserveDanglingCloseParenthesis)
       .setPreference(PreserveSpaceBeforeArguments, preserveSpaceBeforeArguments)
       .setPreference(RewriteArrowSymbols, rewriteArrowSymbols)

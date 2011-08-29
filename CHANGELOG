@@ -9,6 +9,7 @@
 * Preserve newline before anonymous function argument (issue #21)
 * Allow one-line anonymous function blocks
 * Fix parser crash on argument-less constructor annotations
+* Add PlaceScaladocAsterisksBeneathSecondAsterisk preference to conform to recommended Scaladoc style (issue #30)
 
 0.1.0 (16/July/11)
 

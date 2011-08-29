@@ -83,6 +83,11 @@ public class ScalariformMojo extends AbstractMojo {
     /**
      *  @parameter default-value=false
      */
+    protected boolean placeScaladocAsterisksBeneathSecondAsterisk;
+
+    /**
+     *  @parameter default-value=false
+     */
     protected boolean preserveDanglingCloseParenthesis;
 
     /**
@@ -130,6 +135,7 @@ public class ScalariformMojo extends AbstractMojo {
                              indentSpaces,
                              indentWithTabs,
                              multilineScaladocCommentsStartOnFirstLine,
+                             placeScaladocAsterisksBeneathSecondAsterisk,
                              preserveDanglingCloseParenthesis,
                              preserveSpaceBeforeArguments,
                              rewriteArrowSymbols,

@@ -12,9 +12,9 @@ case object BooleanPreference extends PreferenceType[Boolean] {
 
   def parseValue(s: String) =
     s.toLowerCase match {
-      case "true"  ⇒ Right(true)
+      case "true" ⇒ Right(true)
       case "false" ⇒ Right(false)
-      case _       ⇒ Left("Could not parse as boolean value: " + s)
+      case _ ⇒ Left("Could not parse as boolean value: " + s)
     }
 
 }
@@ -64,7 +64,7 @@ object AllPreferences {
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
-    CompactControlReadability)
+    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -189,5 +189,11 @@ case object IndentWithTabs extends BooleanPreferenceDescriptor {
 case object CompactControlReadability extends BooleanPreferenceDescriptor {
   val key = "compactControlReadability"
   val description = "Enable Compact Control Readability style"
+  val defaultValue = false
+}
+
+case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenceDescriptor {
+  val key = "placeScaladocAsterisksBeneathSecondAsterisk"
+  val description = "Place Scaladoc asterisks beneath the second asterisk in the opening '/**', as opposed to the first"
   val defaultValue = false
 }

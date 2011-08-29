@@ -448,6 +448,25 @@ If ``false``, the parenthesis will be joined to the end of the argument list::
     author = "Author",
     rating = 5)
 
+placeScaladocAsterisksBeneathSecondAsterisk
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+If ``true``, Scaladoc asterisks will be placed beneath the second asterisk::
+
+  /** Wibble
+    * wobble 
+    */
+  class A
+
+Otherwise, if ``false``, beneath the first asterisk::
+
+  /** Wibble
+   *  wobble 
+   */
+  class A
+
 preserveSpaceBeforeArguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -540,19 +559,20 @@ initially compiliant with the Style Guide will not become uncompliant
 after formatting. In a number of cases, running the formatter will
 make uncompliant source more compliant.
 
-============================ ========= =========
-Preference                   Value     Default?
-============================ ========= =========
-alignParameters              ``false`` 
-compactStringConcatenation   ``false`` 
-doubleIndentClassDeclaration ``true``    No
-indentSpaces                 ``2``       
-preserveSpaceBeforeArguments ``false`` 
-rewriteArrowSymbols          ``false`` 
-spaceBeforeColon             ``false`` 
-spaceInsideBrackets          ``false``
-spaceInsideParentheses       ``false``
-============================ ========= =========
+============================                ========= =========
+Preference                                  Value     Default?
+============================                ========= =========
+alignParameters                             ``false`` 
+compactStringConcatenation                  ``false`` 
+doubleIndentClassDeclaration                ``true``    No
+indentSpaces                                ``2``       
+placeScaladocAsterisksBeneathSecondAsterisk ``true``    No
+preserveSpaceBeforeArguments                ``false`` 
+rewriteArrowSymbols                         ``false`` 
+spaceBeforeColon                            ``false`` 
+spaceInsideBrackets                         ``false``
+spaceInsideParentheses                      ``false``
+============================                ========= =========
 
 Source directives
 -----------------
