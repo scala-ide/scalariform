@@ -790,7 +790,7 @@ class ScalaParser(tokens: Array[Token]) {
         } else
           exprElementFlatten2(previousPart)
       case LPAREN | LBRACE if canApply ⇒
-        val argumentExprs_ = argumentExprs()
+        val argumentExprs_ = argumentExprs().get
         val updatedPart = previousPart match {
           case List(callExpr: CallExpr) ⇒ List(callExpr.copy(newLineOptsAndArgumentExprss = callExpr.newLineOptsAndArgumentExprss :+ (newLineOpt, argumentExprs_)))
           case _                        ⇒ exprElementFlatten2(previousPart, newLineOpt, argumentExprs_)
@@ -809,22 +809,24 @@ class ScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def argumentExprs(): ArgumentExprs = {
+  /**
+   * @return Some(..) if next token is LBRACE or LPAREN
+   */
+  private def argumentExprs(): Option[ArgumentExprs] = {
     // println("argumentExprs(): " + currentToken)
     def argument() = Argument(expr())
     def args() = commaSeparated(argument())
-    currentTokenType match {
+    condOpt(currentTokenType) {
       case LBRACE ⇒ BlockArgumentExprs(exprElementFlatten2(blockExpr()))
       case LPAREN ⇒
         val (lparen, body, rparen) = inParens { if (RPAREN) Nil else exprElementFlatten2(args()) }
         ParenArgumentExprs(lparen, body, rparen)
-      case _ ⇒ throw new UnsupportedOperationException // TODO
     }
   }
 
   private def multipleArgumentExprs(): List[ArgumentExprs] =
     if (!LPAREN) Nil
-    else argumentExprs() :: multipleArgumentExprs()
+    else argumentExprs().get :: multipleArgumentExprs()
 
   private def blockExpr(): BlockExpr = {
     val (lbrace, body, rbrace) = inBraces {
@@ -1084,7 +1086,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def constructorAnnotations() =
     readAnnots {
       val annotationType = Type(exprSimpleType())
-      val argumentExprss = List(argumentExprs())
+      val argumentExprss = argumentExprs().toList
       (annotationType, argumentExprss)
     } map {
       case (atToken, (annotationType, argumentExprss)) ⇒
@@ -1363,7 +1365,7 @@ class ScalaParser(tokens: Array[Token]) {
     val newLineOpt2 = newLineOptWhenFollowedBy(LBRACE)
     var argumentExprsAndNewLines: Vector[(ArgumentExprs, Option[Token])] = Vector()
     while (LPAREN || LBRACE) {
-      val argumentExprs_ = argumentExprs()
+      val argumentExprs_ = argumentExprs().get
       val anotherNewLineOpt = newLineOptWhenFollowedBy(LBRACE)
       argumentExprsAndNewLines = argumentExprsAndNewLines :+ ((argumentExprs_, anotherNewLineOpt))
     }

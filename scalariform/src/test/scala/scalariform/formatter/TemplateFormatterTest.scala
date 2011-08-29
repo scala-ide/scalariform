@@ -43,6 +43,10 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "class A@Annotation1()@Annotation2()(val b: C)" ==> "class A @Annotation1() @Annotation2() (val b: C)"
   "class A[B]@Annotation()private(val c: D)" ==> "class A[B] @Annotation() private (val c: D)"
 
+  "class A @Deprecated" ==> "class A @Deprecated" 
+  "class A @Deprecated private" ==> "class A @Deprecated private" 
+  "class A @Deprecated private (n: Int)" ==> "class A @Deprecated private (n: Int)" 
+    
   """@A@B(c = "d")abstract class E [F]@G()private(val h: I) (implicit j: K) extends{} with L(2) with M{}""" ==>
   """@A @B(c = "d") abstract class E[F] @G() private (val h: I)(implicit j: K) extends {} with L(2) with M {}"""
 

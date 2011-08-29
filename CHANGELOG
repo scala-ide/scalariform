@@ -8,6 +8,7 @@
 * Add option to support CompactControlReadability style (issue #22) (thanks to by Owein Reese (https://github.com/wheaties) and Rose Toomey (https://github.com/rktoomey) for the patch
 * Preserve newline before anonymous function argument (issue #21)
 * Allow one-line anonymous function blocks
+* Fix parser crash on argument-less constructor annotations
 
 0.1.0 (16/July/11)
 
