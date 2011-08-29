@@ -151,6 +151,7 @@ Usage::
     [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
     [+|-]indentWithTabs                                   Enable/disable Use a tab character for indentation
     [+|-]multilineScaladocCommentsStartOnFirstLine        Enable/disable Start multiline Scaladoc comment body on same line as the opening '/**' 
+    [+|-]placeScaladocAsterisksBeneathSecondAsterisk      Enable/disable Place Scaladoc asterisks beneath the second asterisk in the opening '/**', as opposed to the first
     [+|-]preserveDanglingCloseParenthesis                 Enable/disable Allow a newline before a ')' in an argument expression.
     [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
     [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
