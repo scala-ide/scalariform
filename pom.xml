@@ -176,19 +176,36 @@
       </repositories>
     </profile>
     <profile>
-      <id>scala-2.9.1-SNAPSHOT</id>
+      <id>scala-2.9.1</id>
       <activation>
         <property>
           <name>scala.version</name>
-          <value>2.9.1-SNAPSHOT</value>
+          <value>2.9.1</value>
         </property>
       </activation>
       <repositories>
         <repository>
-          <id>scala-toolchain-2.9.1-SNAPSHOT</id>
-          <name>Scala Toolchain 2.9.1-SNAPSHOT p2 repository</name>
+          <id>scala-toolchain-2.9.1.final</id>
+          <name>Scala Toolchain 2.9.1.final p2 repository</name>
           <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.1-SNAPSHOT</url>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.1.final</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala-2.9.2-SNAPSHOT</id>
+      <activation>
+        <property>
+          <name>scala.version</name>
+          <value>2.9.2-SNAPSHOT</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-2.9.2-SNAPSHOT</id>
+          <name>Scala Toolchain 2.9.2-SNAPSHOT p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.2-SNAPSHOT</url>
         </repository>
       </repositories>
     </profile>
