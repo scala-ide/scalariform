@@ -160,6 +160,10 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   """def foo(n, m)""" ==>
   """def foo(n, m)"""
 
+  """def test(test: ^^ *)""" ==>
+  """def test(test: ^^ *)"""
+
+    
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl

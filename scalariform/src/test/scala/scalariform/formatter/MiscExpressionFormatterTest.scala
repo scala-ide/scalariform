@@ -27,6 +27,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   "42" ==> "42"
   "-42" ==> "-42"
 
+  "- ~" ==> "- ~"
+  
   """println("hello")""" ==> """println("hello")"""
   "1 * (2 + 3) * 4" ==> "1 * (2 + 3) * 4"
 
