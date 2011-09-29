@@ -225,9 +225,9 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
         for {
           firstToken ← hiddenTokens.firstTokenOption
           lastToken ← hiddenTokens.lastTokenOption
-          val start = firstToken.token.startIndex
-          val end = lastToken.token.stopIndex
-          val length = end - start + 1
+          start = firstToken.token.startIndex
+          end = lastToken.token.stopIndex
+          length = end - start + 1
         } yield TextEdit(start, length, replacement)
     }
   }

@@ -48,7 +48,7 @@ trait SpecificFormatter {
       ToggleOption(onOrOff, optionName) ← FormatterDirectiveParser.getDirectives(hiddenToken.getText)
       rawPreference ← AllPreferences.preferencesByKey.get(optionName)
       if rawPreference.preferenceType == BooleanPreference
-      val preference = BooleanPreference.cast(rawPreference)
+      preference = BooleanPreference.cast(rawPreference)
     } actualFormattingPreferences = actualFormattingPreferences.setPreference(preference, onOrOff)
 
     require(parseResult.tokens == tokens.init, "Parse tokens differ from expected. Actual = " + parseResult.tokens + ", expected = " + tokens.init + ", parseResult = " + parseResult) // dropped EOF
