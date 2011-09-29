@@ -9,7 +9,7 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
 
   def iterator: Iterator[HiddenToken] = tokens.iterator
 
-  val comments: List[Comment] = tokens collect { case comment @ Comment(_) ⇒ comment }
+  val comments: List[Comment] = tokens collect { case comment:  Comment ⇒ comment }
 
   val scalaDocComments: List[ScalaDocComment] = tokens collect { case comment @ ScalaDocComment(_) ⇒ comment }
 
