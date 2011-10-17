@@ -20,13 +20,13 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
 
   def containsNewline = text contains '\n'
 
-  def containsComment = !comments.isEmpty
+  def containsComment = comments.nonEmpty
 
   lazy val text = tokens.map(_.token.getText).mkString
 
   lazy val newlines: Option[Token] =
     if (containsNewline) {
-      require(!tokens.isEmpty)
+      require(tokens.nonEmpty)
       val tokenType = if (text matches HiddenTokens.BLANK_LINE_PATTERN) NEWLINES else NEWLINE
       val first = tokens.head.token
       val last = tokens.last.token

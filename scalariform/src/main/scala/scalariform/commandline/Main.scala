@@ -146,7 +146,7 @@ object Main {
     def log(s: String) = if (verbose) println(s)
 
     val preferencesText = preferences.preferencesMap.mkString(", ")
-    if (preferencesText.isEmpty)
+    if (preferencesText == "")
       log("Formatting with default preferences.")
     else
       log("Formatting with preferences: " + preferencesText)

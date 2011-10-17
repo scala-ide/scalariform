@@ -51,11 +51,11 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
       for (line ← lines) {
         val trimmedLine = removeTrailingWhitespace(line)
         if (firstLine && startOnFirstLine) {
-          if (!trimmedLine.isEmpty)
+          if (trimmedLine.nonEmpty)
             sb.append(" ").append(trimmedLine)
         } else {
           sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append ("*")
-          if (!trimmedLine.isEmpty)
+          if (trimmedLine.nonEmpty)
             sb.append(afterStarSpaces).append(trimmedLine)
         }
         firstLine = false

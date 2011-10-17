@@ -13,7 +13,7 @@ class UnicodeEscapeReader(val s: String, forgiveLexerErrors: Boolean = false) {
 
   def getPos = pos
 
-  private var eof = s.isEmpty
+  private var eof = s == ""
 
   def isEof = eof
 
