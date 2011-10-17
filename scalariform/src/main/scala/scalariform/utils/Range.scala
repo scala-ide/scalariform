@@ -13,4 +13,7 @@ case class Range(offset: Int, length: Int) {
 
   def isLargerThan(other: Range) = length > other.length
 
+  def intersects(other: Range) =
+    !(other.offset >= offset + length || other.offset + other.length - 1 < offset)
+
 }
