@@ -1,15 +1,15 @@
 import sbt._
 import sbt.Keys._
-import ScalariformPlugin.{ format, formatPreferences }
-import scalariform.formatter.preferences._
+//import ScalariformPlugin.{ format, formatPreferences }
+//import scalariform.formatter.preferences._
 
-object MyBuild extends Build {
+object ScalariformBuild extends Build {
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "scalariform",
     version      := "0.1.1-SNAPSHOT",
     scalaVersion := "2.9.0",
-    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2-SNAPSHOT", "2.9.0", "2.9.0-1", "2.9.1-SNAPSHOT"),
+    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.8.3-SNAPSHOT", "2.9.0", "2.9.0-1", "2.9.1", "2.10.0-SNAPSHOT"),
     resolvers += ScalaToolsSnapshots,
     retrieveManaged := true,
     scalacOptions += "-deprecation",
@@ -17,21 +17,31 @@ object MyBuild extends Build {
     pomExtra := pomExtraXml,
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-  ) ++ formatterSettings
+  )  // ++ formatterSettings
 
-  lazy val formatterSettings = ScalariformPlugin.settings ++ Seq(
-    formatPreferences in Compile := formattingPreferences,
-    formatPreferences in Test    := formattingPreferences
-  )
+  //lazy val formatterSettings = ScalariformPlugin.settings ++ Seq(
+  //  formatPreferences in Compile := formattingPreferences,
+   // formatPreferences in Test    := formattingPreferences
+ // )
 
-  def formattingPreferences = PreferencesImporterExporter.loadPreferences("formatterPreferences.properties").asInstanceOf[FormattingPreferences]
+  // def formattingPreferences = PreferencesImporterExporter.loadPreferences("formatterPreferences.properties").asInstanceOf[FormattingPreferences]
 
   lazy val root = Project("root", file("."), settings = buildSettings) aggregate(
     scalariform, gui, perf, corpusScan)
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = buildSettings ++ 
     Seq(
-      libraryDependencies += "org.scalatest" % "scalatest_2.9.0" % "1.6.1"  % "test",
+      libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) =>
+         val scalatestVersion = sv match {
+           case "2.8.0"           => "org.scalatest" %% "scalatest"       % "1.3.1.RC2" % "test"
+           case "2.8.1"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
+           case "2.8.2"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
+           case "2.8.3-SNAPSHOT"  => "org.scalatest" %  "scalatest_2.8.2" % "1.5.1"     % "test"
+           case "2.10.0-SNAPSHOT" => "org.scalatest" %  "scalatest_2.9.1" % "1.6.1"     % "test"
+           case _                 => "org.scalatest" %% "scalatest"       % "1.6.1"     % "test"
+         }
+         deps :+ scalatestVersion
+      },
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
       publishTo <<= version { (v: String) =>
         if (v endsWith "-SNAPSHOT")

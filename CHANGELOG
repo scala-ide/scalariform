@@ -11,6 +11,7 @@
 * Fix parser crash on argument-less constructor annotations
 * Add PlaceScaladocAsterisksBeneathSecondAsterisk preference to conform to recommended Scaladoc style (issue #30)
 * FIX: Removal of space causing token merge in varargs and unary ops (http://scala-ide-portfolio.assembla.com/spaces/scala-ide/tickets/1000601)
+* Switch to sbt 0.11 build
 
 0.1.0 (16/July/11)
 
