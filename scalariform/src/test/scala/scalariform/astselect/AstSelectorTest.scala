@@ -55,7 +55,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$$$$$$$$$ "
 
   " if (a) b else c " ~
-  "             $$$ "
+  "             $$$ " ~
   " $$$$$$$$$$$$$$$ "
 
   " aa(bb + cc, dd * ee) " ~
