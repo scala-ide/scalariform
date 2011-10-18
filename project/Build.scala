@@ -6,7 +6,7 @@ import sbt.Keys._
 object ScalariformBuild extends Build {
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
-    organization := "scalariform",
+    organization := "org.scalariform",
     version      := "0.1.1",
     scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.8.3-SNAPSHOT", "2.9.0", "2.9.0-1", "2.9.1", "2.10.0-SNAPSHOT"),
@@ -43,12 +43,18 @@ object ScalariformBuild extends Build {
          deps :+ scalatestVersion
       },
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
-      publishTo <<= version { (v: String) =>
+      publishArtifact in (Compile, packageDoc) := false,
+      publishTo <<= (version) { version: String =>
+        val nexus = "http://nexus.scala-tools.org/content/repositories/"
+        if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "snapshots/") 
+        else                                   Some("releases"  at nexus + "releases/")
+      }
+      /*publishTo <<= version { (v: String) =>
         if (v endsWith "-SNAPSHOT")
           Some(ScalaToolsSnapshots)
         else
           Some(ScalaToolsReleases)
-      }
+      }*/
     ),
     delegates = root :: Nil)
 
