@@ -1,4 +1,4 @@
-0.1.1 (..)
+0.1.1 (18/October/11)
 
 * FIX: Leave PCDATA whitespace untouched inside a single-line XML tag (issue #27)
 * FIX: indent for indentLocalDefs on first line of function block (issue #24)
