@@ -1938,8 +1938,17 @@ class ScalaParser(tokens: Array[Token]) {
 
 object ScalaParser {
 
+  /**
+   * Parse the given text as a compilation unit or script
+   * @return None if there is a parse error.
+   */
+  def parse(text: String): Option[AstNode] = {
+    val parser = new ScalaParser(ScalaLexer.tokenise(text).toArray)
+    parser.safeParse(parser.compilationUnitOrScript)
+  }
+
   trait ExprElementFlattenable { def elements: List[ExprElement] }
-  case class ExprElements(val elements: List[ExprElement]) extends ExprElementFlattenable
+  case class ExprElements(elements: List[ExprElement]) extends ExprElementFlattenable
   def exprElementFlatten[T <% ExprElementFlattenable]: (T ⇒ List[ExprElement]) = t ⇒ { exprElementFlatten2(t) }
   def exprElementFlatten2[T <% ExprElementFlattenable](t: T): List[ExprElement] = groupGeneralTokens(t.elements)
   def groupGeneralTokens(xs: List[ExprElement]): List[ExprElement] = {

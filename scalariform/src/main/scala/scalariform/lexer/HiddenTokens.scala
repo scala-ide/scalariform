@@ -53,7 +53,7 @@ abstract sealed class HiddenToken(val token: Token) {
 
 case class Whitespace(override val token: Token) extends HiddenToken(token)
 
-abstract class Comment(token: Token) extends HiddenToken(token)
+sealed abstract class Comment(token: Token) extends HiddenToken(token)
 
 object Comment {
   def unapply(comment: Comment) = Some(comment.token)
