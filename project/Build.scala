@@ -7,7 +7,7 @@ object ScalariformBuild extends Build {
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "scalariform",
-    version      := "0.1.1-SNAPSHOT",
+    version      := "0.1.2-SNAPSHOT",
     scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.8.3-SNAPSHOT", "2.9.0", "2.9.0-1", "2.9.1", "2.10.0-SNAPSHOT"),
     resolvers += ScalaToolsSnapshots,

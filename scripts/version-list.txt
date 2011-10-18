@@ -1,5 +1,5 @@
 pom.xml
-project/build.scala
+project/Build.scala
 scalariform/pom.xml
 gui/pom.xml
 corpusscan/pom.xml
