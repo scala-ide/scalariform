@@ -12,9 +12,10 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
     val prefix = List("/** ", "/**", "/* ", "/*").find(comment.startsWith).get
     val (start, rest) = comment.splitAt(prefix.length)
     val (contents, _) = rest.splitAt(rest.length - "*/".length)
-    val firstLine :: otherLines = contents.split("""\r?\n([ \t]*\*?)?""", Integer.MAX_VALUE).toList
+    val firstLine :: otherLines = contents.split("""\r?\n([ \t]*(\*(?!/))?)?""", Integer.MAX_VALUE).toList
     val afterStarSpaces = if (formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)) 2 else 1
     val adjustedLines = dropInitialSpaces(firstLine, 1) :: (otherLines map { dropInitialSpaces(_, afterStarSpaces) })
+//    val adjustedLines map { line ⇒ if (line startsWith "*/") "*" + line else line }
     (start, adjustedLines)
   }
 
@@ -29,11 +30,10 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
   private def pruneEmptyInitial(lines: List[String]) = lines match {
     case first :: rest if first.trim == "" ⇒ rest
-    case _ ⇒ lines
+    case _                                 ⇒ lines
   }
 
   private def pruneEmptyFinal(lines: List[String]) = pruneEmptyInitial(lines.reverse).reverse
-
 
   def formatComment(comment: HiddenToken, indentLevel: Int): String =
     if (comment.text contains '\n') {
@@ -54,13 +54,13 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
           if (trimmedLine.nonEmpty)
             sb.append(" ").append(trimmedLine)
         } else {
-          sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append ("*")
+          sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append("*")
           if (trimmedLine.nonEmpty)
             sb.append(afterStarSpaces).append(trimmedLine)
         }
         firstLine = false
       }
-      sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append ("*/")
+      sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append("*/")
       sb.toString
     } else
       comment.text

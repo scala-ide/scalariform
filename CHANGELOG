@@ -1,3 +1,7 @@
+0.1.2 (..)
+
+* FIX: Scaladoc comment formatting could break nested comments (issue #36)
+
 0.1.1 (18/October/11)
 
 * FIX: Leave PCDATA whitespace untouched inside a single-line XML tag (issue #27)

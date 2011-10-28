@@ -88,7 +88,18 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | * b
     | */
     |"""
-
+      
+  // nested comments
+  """/**
+    |/*
+    |*/
+    |*/""" ==>
+  """/**
+    | * /*
+    | * */
+    | */
+    |"""
+      
   {
   implicit val formattingPreferences = FormattingPreferences.setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
 
