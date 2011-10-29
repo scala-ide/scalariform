@@ -57,8 +57,8 @@ sealed trait AstNode extends CaseClassReflector {
     if (tokens.isEmpty)
       None
     else {
-      val firstIndex = tokens.head.startIndex
-      val lastIndex = tokens.last.stopIndex
+      val firstIndex = tokens.head.offset
+      val lastIndex = tokens.last.lastCharacterOffset
       Some(Range(firstIndex, lastIndex - firstIndex + 1))
     }
 

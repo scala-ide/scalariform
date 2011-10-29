@@ -53,11 +53,13 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
     val children = Nil
     override def toString = name + ": " + token
 
-    override lazy val range = Some(token.getStartIndex, token.getStopIndex)
+    override lazy val range = Some(token.offset, token.lastCharacterOffset)
   }
+  
   case class ListNode(name: String, list: List[_ <: AnyRef]) extends TreeNode(name) {
     lazy val children = list map { makeTreeNode(_) }
   }
+  
   case class OptionNode(name: String, opt: Option[_ <: AnyRef]) extends TreeNode(name) {
     lazy val children = opt map { makeTreeNode(_) } toList
   }

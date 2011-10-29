@@ -56,7 +56,7 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
 
   def nextToken(): Token = {
     val token = nextTokenCore()
-    token.getType match {
+    token.tokenType match {
       case LBRACE ⇒
         multipleStatementRegionMarkerStack ::= RBRACE
       case LPAREN ⇒
@@ -64,7 +64,7 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
       case LBRACKET ⇒
         multipleStatementRegionMarkerStack ::= RBRACKET
       case CASE if !buffer.isEmpty ⇒
-        val followingTokenType = buffer.front._2.getType
+        val followingTokenType = buffer.front._2.tokenType
         if (followingTokenType != CLASS && followingTokenType != OBJECT)
           multipleStatementRegionMarkerStack ::= ARROW
       case tokenType if multipleStatementRegionMarkerStack.headOption == Some(tokenType) ⇒
@@ -106,16 +106,16 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
   }
 
   private def shouldTranslateToNewline(nextToken: Token) = {
-    val nextTokenType = nextToken.getType
-    val nextCanBeginAStatement = !tokensWhichCannotBeginAStatement(nextToken.getType) && (nextTokenType == CASE implies followingTokenIsClassOrObject)
-    val previousCanEndAStatement = previousTokenOption.map(_.getType).map(tokensWhichCanTerminateAStatement).getOrElse(false)
+    val nextTokenType = nextToken.tokenType
+    val nextCanBeginAStatement = !tokensWhichCannotBeginAStatement(nextToken.tokenType) && (nextTokenType == CASE implies followingTokenIsClassOrObject)
+    val previousCanEndAStatement = previousTokenOption.map(_.tokenType).map(tokensWhichCanTerminateAStatement).getOrElse(false)
     previousCanEndAStatement && nextCanBeginAStatement && multipleStatementsAllowed
   }
 
   private def followingTokenIsClassOrObject: Boolean =
     buffer.headOption match {
       case None                      ⇒ false
-      case Some((_, followingToken)) ⇒ followingToken.getType == CLASS || followingToken.getType == OBJECT
+      case Some((_, followingToken)) ⇒ followingToken.tokenType == CLASS || followingToken.tokenType == OBJECT
     }
 
 }

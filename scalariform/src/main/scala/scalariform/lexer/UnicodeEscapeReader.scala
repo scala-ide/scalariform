@@ -1,21 +1,66 @@
 package scalariform.lexer
 
-import CharConstants._
-import ScalaLexer._
+import scala.xml.Utility.SU
+import scalariform.lexer.ScalaLexer._
 
 class UnicodeEscapeReader(val s: String, forgiveLexerErrors: Boolean = false) {
 
   private var pos: Int = 0
-  private var consecutiveBackslashCount = 0
-  var unicodeEscapeOfPreviousRead: Option[String] = None
-
-  private def safeGet(pos: Int) = if (pos >= s.length) SU else s charAt pos
-
-  def getPos = pos
 
   private var eof = s == ""
 
-  def isEof = eof
+  /**
+   * To distinguish cases like "\\u" from unicode escape sequences.
+   */
+  private var consecutiveBackslashCount = 0
+
+  /**
+   * @return the next logical character paired with the unicode escape sequence that encoded it, if any.
+   */
+  @throws(classOf[ScalaLexerException])
+  def read(): (Char, Option[String]) = {
+    val ch = consumeNextCharacter()
+    if (ch == '\\')
+      if (nextChar == 'u' && consecutiveBackslashCount % 2 == 0) {
+        consecutiveBackslashCount = 0
+        readUnicodeChar()
+      } else {
+        consecutiveBackslashCount += 1
+        (ch, None)
+      }
+    else {
+      consecutiveBackslashCount = 0
+      (ch, None)
+    }
+  }
+
+  private def readUnicodeChar(): (Char, Option[String]) = {
+    val unicodeEscapeSequence = consumeUnicodeEscape()
+    val decodedChar = decodeUnicodeChar(unicodeEscapeSequence takeRight 4 toList, unicodeEscapeSequence)
+    (decodedChar, Some(unicodeEscapeSequence))
+  }
+
+  private def consumeUnicodeEscape(): String = {
+    val sb = new StringBuilder
+    sb.append('\\')
+
+    // Repeating u's are allowed in Unicode escapes (bizarrely enough):
+    do sb.append(consumeNextCharacter())
+    while (nextChar == 'u')
+
+    for (n ← 1 to 4)
+      sb.append(consumeNextCharacter())
+
+    sb.toString
+  }
+
+  private def decodeUnicodeChar(digits: List[Char], unicodeEscapeSequence: String): Char = {
+    val List(digit1, digit2, digit3, digit4) = digits.map(digit2int(_, base = 16))
+    if (digit1 < 0 || digit2 < 0 || digit3 < 0 || digit4 < 0)
+      if (forgiveLexerErrors) ' ' else throw new ScalaLexerException("Error in unicode escape: " + unicodeEscapeSequence)
+    else
+      (digit1 << 12 | digit2 << 8 | digit3 << 4 | digit4).toChar
+  }
 
   private def consumeNextCharacter(): Char = {
     val result = safeGet(pos)
@@ -25,59 +70,10 @@ class UnicodeEscapeReader(val s: String, forgiveLexerErrors: Boolean = false) {
     result
   }
 
-  private def lookahead(offset: Int) = safeGet(pos + offset)
+  private def nextChar = safeGet(pos)
 
-  def read(): Char = {
-    val ch = consumeNextCharacter()
-    if (ch == '\\')
-      if (lookahead(0) == 'u' && consecutiveBackslashCount % 2 == 0)
-        getUnicodeChar()
-      else {
-        unicodeEscapeOfPreviousRead = None
-        consecutiveBackslashCount += 1
-        ch
-      }
-    else {
-      unicodeEscapeOfPreviousRead = None
-      consecutiveBackslashCount = 0
-      ch
-    }
-  }
+  private def safeGet(pos: Int): Char = if (pos >= s.length) SU else s(pos)
 
-  private def getUnicodeChar(): Char = {
-    val sb = new StringBuilder
-
-    sb.append('\\')
-
-    while (lookahead(0) == 'u') {
-      pos += 1
-      sb.append('u')
-    }
-
-    val digitCh1 = consumeNextCharacter()
-    sb.append(digitCh1)
-    val digit1 = digit2int(digitCh1, base = 16)
-
-    val digitCh2 = consumeNextCharacter()
-    sb.append(digitCh2)
-    val digit2 = digit2int(digitCh2, base = 16)
-
-    val digitCh3 = consumeNextCharacter()
-    sb.append(digitCh3)
-    val digit3 = digit2int(digitCh3, base = 16)
-
-    val digitCh4 = consumeNextCharacter()
-    sb.append(digitCh4)
-    val digit4 = digit2int(digitCh4, base = 16)
-
-    val decodedChar = if (digit1 < 0 || digit2 < 0 || digit3 < 0 || digit4 < 0)
-      if (forgiveLexerErrors) ' ' else throw new ScalaLexerException("error in unicode escape: " + sb.toString)
-    else
-      (digit1 << 12 | digit2 << 8 | digit3 << 4 | digit4).toChar
-
-    unicodeEscapeOfPreviousRead = Some(sb.toString)
-    consecutiveBackslashCount = 0
-    decodedChar
-  }
+  def isEof = eof
 
 }

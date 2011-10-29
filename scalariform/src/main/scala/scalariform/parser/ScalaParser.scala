@@ -4,7 +4,7 @@ import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.utils.Utils._
 import scala.collection.mutable.ListBuffer
-import PartialFunction._
+import scala.PartialFunction._
 
 class ScalaParser(tokens: Array[Token]) {
 
@@ -651,7 +651,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isOpAssignmentName(name: String) = name match {
     case "!=" | "<=" | ">=" | "" ⇒ false
-    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && ScalaOnlyLexer.isOperatorPart(name(0))
+    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && Chars.isOperatorPart(name(0))
   }
 
   private def precedence(id: String) = id(0) match {
@@ -728,14 +728,14 @@ class ScalaParser(tokens: Array[Token]) {
 
   private object PathEndingWithDotId {
     def unapply(tokens: List[Token]) = condOpt(tokens.reverse) {
-      case (lastId @ Token(tokenType, _, _, _)) :: dot :: rest if (tokenType.isId || tokenType == THIS) && dot.tokenType == DOT ⇒
-        (rest.reverse, dot, lastId)
+      case (lastIdToken) :: dot :: rest if (lastIdToken.tokenType.isId || lastIdToken.tokenType == THIS) && dot.tokenType == DOT ⇒
+        (rest.reverse, dot, lastIdToken)
     }
   }
 
   private object JustIdOrThis {
     def unapply(tokens: List[Token]) = condOpt(tokens) {
-      case List(id @ Token(tokenType, _, _, _)) if (tokenType.isId || tokenType == THIS) ⇒ id
+      case List(idToken) if (idToken.tokenType.isId || idToken.tokenType == THIS) ⇒ idToken
     }
   }
 
@@ -904,7 +904,7 @@ class ScalaParser(tokens: Array[Token]) {
         val uscore = nextToken()
         val wildcardTypeOpt = if (SUBTYPE || SUPERTYPE) Some(wildcardType()) else None
         typeElementFlatten3(uscore, wildcardTypeOpt)
-      case _ if isIdent && isVariableName(currentToken.getText) ⇒
+      case _ if isIdent && isVariableName(currentToken.text) ⇒
         typeElementFlatten3(ident())
       case _ ⇒
         List(typ())
@@ -1886,8 +1886,7 @@ class ScalaParser(tokens: Array[Token]) {
   private case object InBlock extends Location
   private case object InTemplate extends Location
 
-  private def isLeftAssoc(token: Token) =
-    token.getText.size > 0 && token.getText.last != ':'
+  private def isLeftAssoc(token: Token) = token.text.nonEmpty && token.text.last != ':'
 
   private def isVariableName(name: String): Boolean = {
     val first = name(0)
@@ -1896,8 +1895,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isVarPattern(token: Token) = {
     isIdent(token.tokenType) &&
-      isVariableName(token.getText) &&
-      !token.getText.startsWith("`")
+      isVariableName(token.text) &&
+      !token.text.startsWith("`")
   }
 
   private def optional[T](p: ⇒ T): Option[T] =

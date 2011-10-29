@@ -36,8 +36,6 @@ object Utils {
     }
   }
 
-  def enumerate[T](xs: Iterable[T]): List[(Int, T)] = (0 to xs.size) zip xs toList
-
   import scala.reflect.Manifest
   implicit def any2optionable(x: AnyRef) = new {
     def matchInstance[B](implicit m: Manifest[B]): Option[B] =

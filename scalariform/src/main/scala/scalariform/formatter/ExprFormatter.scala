@@ -1,12 +1,12 @@
 package scalariform.formatter
 
+import scalariform.lexer.Chars
 import scalariform.lexer.Token
 import scalariform.lexer.Tokens._
 import scalariform.parser._
 import scalariform.utils.Utils
 import scalariform.formatter.preferences._
-import PartialFunction._
-import scalariform.lexer.ScalaOnlyLexer
+import scala.PartialFunction._
 
 trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter with CaseClauseFormatter ⇒
 
@@ -91,10 +91,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         case Some(previousElement) ⇒
           var nestedFormatterState = currentFormatterState
           val instructionOption = condOpt(previousElement, element) {
-            case (PrefixExprElement(_), _) ⇒ if (ScalaOnlyLexer.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact 
+            case (PrefixExprElement(_), _) ⇒ if (Chars.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact 
             case (Argument(_), _) ⇒ Compact
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr
-            case (_, _) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.getType) } ⇒
+            case (_, _) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.tokenType) } ⇒
               currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
               currentFormatterState.currentIndentLevelInstruction
           }
@@ -130,7 +130,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                   currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
                   formatResult = formatResult.formatNewline(token, currentFormatterState.currentIndentLevelInstruction)
               }
-            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.getType)) { // TODO: Probably not needed now, see above
+            else if (hiddenPredecessors(token).containsNewline && !(Set(COMMA, COLON) contains token.tokenType)) { // TODO: Probably not needed now, see above
               currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
               formatResult = formatResult.before(token, currentFormatterState.currentIndentLevelInstruction)
             }

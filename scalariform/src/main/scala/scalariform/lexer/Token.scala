@@ -1,20 +1,33 @@
 package scalariform.lexer
 
-import scalariform.utils.Range
 import scalariform.lexer.Tokens._
+import scalariform.utils.Range
 
-case class Token(tokenType: TokenType, text: String, startIndex: Int, stopIndex: Int) {
-  require(tokenType == Tokens.EOF || stopIndex - startIndex + 1 == text.length)
-  lazy val getText = text // Delete me?
-  lazy val getType = tokenType // Delete me?
-  lazy val getLine = -1 // TODO
-  lazy val getCharPositionInLine = -1 // TODO
-  lazy val getStartIndex = startIndex // Delete me?
-  lazy val getStopIndex = stopIndex // Delete me?
-  def length = stopIndex - startIndex + 1
-  def isNewline = tokenType.isNewline
-  def range = Range(startIndex, length)
+/**
+ * A token of Scala source.
+ * 
+ * @param text -- the text associated with the token after unicode escaping
+ * @param rawText -- the text associated with the token before unicode escaping
+ */
+case class Token(tokenType: TokenType, text: String, offset: Int, rawText: String) {
+
+  def length = rawText.length
+
+  def range = Range(offset, length)
+
+  def lastCharacterOffset = offset + length - 1
 
   def isScalaDocComment = tokenType == MULTILINE_COMMENT && text.startsWith("/**") && text != "/**/"
+
+  def isNewline = tokenType.isNewline
+
+  @deprecated(message = "Use text instead", since = "0.1.2")
+  def getText = text
+
+  @deprecated(message = "Use offset instead", since = "0.1.2")
+  def startIndex = offset
+
+  @deprecated(message = "Use lastCharacterOffset instead", since = "0.1.2")
+  def stopIndex = lastCharacterOffset
 
 }

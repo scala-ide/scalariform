@@ -36,7 +36,7 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
         val beforeTokens = ScalaLexer.tokenise(source)
         val afterTokens = ScalaLexer.tokenise(actual)
         val newlineTokenTypes = Set(Tokens.NEWLINE, Tokens.NEWLINES)
-        if (beforeTokens.map(_.getType).find(!newlineTokenTypes.contains(_)) != afterTokens.map(_.getType).find(!newlineTokenTypes.contains(_)))
+        if (beforeTokens.map(_.tokenType).find(!newlineTokenTypes.contains(_)) != afterTokens.map(_.tokenType).find(!newlineTokenTypes.contains(_)))
           throw newTestFailedException("Text as expected, but actual and expected tokens differ:\n ---- Before ---- \n" + beforeTokens + "\n ---- After ---- \n" + afterTokens + "\n")
 
         val actual2 = format(actual)(formattingPreferences)
@@ -44,7 +44,7 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
           throw newTestFailedException("Idempotency failure:\n ---- Expected ---- \n" + prettyPrint(actual) + "<<<\n ---- but was----- \n" + prettyPrint(actual2) + "<<<.")
         }
         val afterTokens2 = ScalaLexer.tokenise(actual2)
-        if (afterTokens2.map(_.getType) != afterTokens.map(_.getType)) {
+        if (afterTokens2.map(_.tokenType) != afterTokens.map(_.tokenType)) {
           throw newTestFailedException("Idempotency token inconsistency:\n ---- One ---- \n" + afterTokens2 + "\n ---- Twice ---- \n" + afterTokens2 + "\n")
         }
       }

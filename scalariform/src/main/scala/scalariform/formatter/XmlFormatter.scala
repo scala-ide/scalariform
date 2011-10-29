@@ -104,7 +104,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     var formatResult: FormatResult = NoFormatResult
     val multiline = contents exists {
       /* case x: XmlElement ⇒ true */
-      case XmlPCDATA(Token(_, text, _, _)) if text contains '\n' ⇒ true
+      case XmlPCDATA(token) if token.text contains '\n' ⇒ true
       case _ ⇒ false
     }
     var firstNonWhitespace = true

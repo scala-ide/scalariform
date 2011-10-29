@@ -20,7 +20,7 @@ object CorpusScanner extends SpecificFormatter {
 
   def attemptToParse(file: File): Option[ParseFault] = {
     val source = getText(file)
-    val sourceAgain = ScalaLexer.rawTokenise(source).map(_.getText).mkString
+    val sourceAgain = ScalaLexer.rawTokenise(source).map(_.text).mkString
     if (source != sourceAgain)
       return Some(TokensDoNotCoverSource)
     val (_, tokens) = ScalaLexer.tokeniseFull(file)

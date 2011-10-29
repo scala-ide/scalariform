@@ -1,6 +1,7 @@
 0.1.2 (..)
 
 * FIX: Scaladoc comment formatting could break nested comments (issue #36)
+* Tidy up lexer code
 
 0.1.1 (18/October/11)
 

@@ -11,15 +11,15 @@ class ScalaLexerReader(val tokens: List[Token]) extends Reader[Token] {
 
   def pos: Position = new ScalaLexerPosition(first)
 
-  def atEnd: Boolean = tokens.isEmpty || tokens.head.getType == EOF
+  def atEnd: Boolean = tokens.isEmpty || tokens.head.tokenType == EOF
 
   private class ScalaLexerPosition(token: Token) extends Position {
 
-    def line: Int = token.getLine
+    def line: Int = -1
 
-    def column: Int = token.getCharPositionInLine
+    def column: Int = -1
 
-    protected def lineContents: String = token.getText
+    protected def lineContents: String = token.rawText
 
     override def longString = lineContents
 

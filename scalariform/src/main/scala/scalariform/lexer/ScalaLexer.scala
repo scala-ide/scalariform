@@ -1,13 +1,14 @@
 package scalariform.lexer
-import scala.annotation.{ switch, tailrec }
+
+import scala.annotation._
+import scala.collection.mutable.{ Queue, Stack, ListBuffer }
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 
-import scala.collection.mutable.{ Queue, Stack, ListBuffer }
+class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false)
+    extends Lexer(reader) with ScalaOnlyLexer with XmlLexer {
 
-class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false) extends Lexer(reader) with ScalaOnlyLexer with XmlLexer {
-
-  override val forgiveLexerErrors = forgiveErrors
+  override protected val forgiveLexerErrors = forgiveErrors
 
   modeStack.push(new ScalaMode())
 
@@ -23,13 +24,13 @@ class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false) ex
     token
   }
 
-  protected def switchToScalaModeAndFetchToken() {
-    modeStack.push(new ScalaMode())
+  override protected def switchToScalaModeAndFetchToken() {
+    modeStack.push(new ScalaMode)
     fetchScalaToken()
   }
 
-  protected def switchToXmlModeAndFetchToken(): Unit = {
-    modeStack.push(new XmlMode())
+  override protected def switchToXmlModeAndFetchToken() {
+    modeStack.push(new XmlMode)
     fetchXmlToken()
   }
 
@@ -64,7 +65,7 @@ object ScalaLexer {
     while (continue) {
       val token = lexer.nextToken()
       tokenBuffer += token
-      if (token.getType == Tokens.EOF)
+      if (token.tokenType == Tokens.EOF)
         continue = false
     }
 
@@ -80,7 +81,7 @@ object ScalaLexer {
     while (continue) {
       val token = lexer.nextToken()
       actualTokens ::= token
-      if (token.getType == Tokens.EOF)
+      if (token.tokenType == Tokens.EOF)
         continue = false
     }
     (actualTokens.tail).reverse
@@ -96,7 +97,7 @@ object ScalaLexer {
     while (lexer.hasNext) {
       val (_, token) = lexer.next()
       actualTokens ::= token
-      if (token.getType == Tokens.EOF)
+      if (token.tokenType == Tokens.EOF)
         continue = false
     }
     (actualTokens.tail).reverse

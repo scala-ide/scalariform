@@ -31,8 +31,8 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val sb = new StringBuilder
     for (token ← astNode.tokens) {
       if (token != astNode.tokens.head)
-        sb.append(hiddenPredecessors(token).text)
-      sb.append(token.text)
+        sb.append(hiddenPredecessors(token).rawText)
+      sb.append(token.rawText)
     }
     sb.toString
   }
@@ -53,7 +53,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     else
       None
 
-  private def replaceEdit(token: Token, replacement: String): TextEdit = TextEdit(token.startIndex, token.text.length, replacement)
+  private def replaceEdit(token: Token, replacement: String): TextEdit = TextEdit(token.offset, token.length, replacement)
 
   def writeTokens(s: String, tokens: List[Token], formatResult: FormatResult, offset: Int = 0): List[TextEdit] = {
     val FormatResult(predecessorFormatting, inferredNewlineFormatting, xmlRewrites) = formatResult
@@ -65,23 +65,23 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     def printableFormattingInstruction(previousTokenOpt: Option[Token], token: Token) =
       predecessorFormatting.get(token) orElse
         previousTokenOpt.map(defaultFormattingInstruction(_, token)) getOrElse
-        (if (token.getType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */ else Compact)
+        (if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */ else Compact)
 
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
       val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
       if (isInferredNewline(token)) {
-        alterSuspendFormatting(token.getText) foreach { suspendFormatting = _ }
+        alterSuspendFormatting(token.text) foreach { suspendFormatting = _ }
         if (suspendFormatting)
-          builder.append(token.getText)
+          builder.append(token.rawText)
         else {
           val basicFormattingInstruction = inferredNewlineFormatting.get(token) getOrElse
             defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
           val formattingInstruction =
-            if (nextTokenOption.exists { _.getType == EOF } && basicFormattingInstruction.isInstanceOf[EnsureNewlineAndIndent])
+            if (nextTokenOption.exists { _.tokenType == EOF } && basicFormattingInstruction.isInstanceOf[EnsureNewlineAndIndent])
               EnsureNewlineAndIndent(0) // Adjustment for end of input when using non-zero initial indent
             else
               basicFormattingInstruction
-          val nextTokenUnindents = nextTokenOption exists { _.getType == RBRACE }
+          val nextTokenUnindents = nextTokenOption exists { _.tokenType == RBRACE }
           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
             !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
           }
@@ -91,15 +91,15 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       } else {
         alterSuspendFormatting(hiddenPredecessors(token).text) foreach { suspendFormatting = _ }
         if (suspendFormatting) {
-          builder.append(hiddenPredecessors(token).text)
+          builder.append(hiddenPredecessors(token).rawText)
           tokenIndentMap += (token -> builder.currentColumn)
-          builder.append(token.getText)
+          builder.append(token.rawText)
         } else {
           val formattingInstruction = printableFormattingInstruction(previousTokenOption, token)
-          val nextTokenUnindents = token.getType == RBRACE
+          val nextTokenUnindents = token.tokenType == RBRACE
           val includeBufferBeforeNextToken = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
-          val positionHintOption = if (hiddenTokens.isEmpty) Some(token.startIndex) else None
+          val positionHintOption = if (hiddenTokens.isEmpty) Some(token.offset) else None
           edits :::= writeHiddenTokens(builder, hiddenTokens, formattingInstruction, nextTokenUnindents, includeBufferBeforeNextToken,
             previousTokenIsPrintable, tokenIndentMap, positionHintOption).toList
           tokenIndentMap += (token -> builder.currentColumn)
@@ -188,7 +188,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                   builder.append(" ")
                 builder.write(hiddenToken)
               case Whitespace(token) ⇒
-                val newlineCount = token.getText.count(_ == '\n')
+                val newlineCount = token.text.count(_ == '\n')
                 val newlinesToWrite = previousOpt match {
                   case Some(SingleLineComment(_)) ⇒ math.min(1, newlineCount)
                   case _                          ⇒ math.min(2, newlineCount)
@@ -206,7 +206,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
                 case MultiLineComment(_) ⇒
                   builder.append(" ")
                 case Whitespace(token) ⇒
-                  if (previousOpt.exists(_.isInstanceOf[MultiLineComment]) && !token.getText.contains('\n'))
+                  if (previousOpt.exists(_.isInstanceOf[MultiLineComment]) && !token.text.contains('\n'))
                     builder.append(" ")
                   else {
                     builder.ensureAtBeginningOfLine()
@@ -220,13 +220,14 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     }
     val replacement = builder.substring(startPos)
     positionHintOption match {
-      case Some(positionHint) if hiddenTokens.isEmpty ⇒ Some(TextEdit(positionHint, length = 0, replacement = replacement))
+      case Some(positionHint) if hiddenTokens.isEmpty ⇒
+        Some(TextEdit(positionHint, length = 0, replacement = replacement))
       case _ ⇒
         for {
           firstToken ← hiddenTokens.firstTokenOption
           lastToken ← hiddenTokens.lastTokenOption
-          start = firstToken.token.startIndex
-          end = lastToken.token.stopIndex
+          start = firstToken.token.offset
+          end = lastToken.token.lastCharacterOffset
           length = end - start + 1
         } yield TextEdit(start, length, replacement)
     }
@@ -246,17 +247,17 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
 
     def write(token: Token, replacementOption: Option[String] = None): Option[TextEdit] = {
       val rewriteArrows = formattingPreferences(RewriteArrowSymbols)
-      val actualReplacementOption = replacementOption orElse (condOpt(token.getType) {
+      val actualReplacementOption = replacementOption orElse (condOpt(token.tokenType) {
         case ARROW if rewriteArrows  ⇒ "⇒"
         case LARROW if rewriteArrows ⇒ "←"
         case EOF                     ⇒ ""
       })
-      builder.append(actualReplacementOption getOrElse token.getText)
+      builder.append(actualReplacementOption getOrElse token.rawText)
       actualReplacementOption map { replaceEdit(token, _) }
     }
 
     def write(hiddenToken: HiddenToken) = {
-      builder.append(hiddenToken.token.getText)
+      builder.append(hiddenToken.token.rawText)
       builder
     }
 
@@ -299,8 +300,8 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
   implicit def stringBuilder2stringBuilderExtra(builder: StringBuilder): StringBuilderExtra = new StringBuilderExtra(builder)
 
   private def defaultNewlineFormattingInstruction(previousTokenOption: Option[Token], token: Token, nextTokenOption: Option[Token]): IntertokenFormatInstruction = {
-    val previousTypeOption = previousTokenOption map { _.getType }
-    val nextTypeOption = nextTokenOption map { _.getType }
+    val previousTypeOption = previousTokenOption map { _.tokenType }
+    val nextTypeOption = nextTokenOption map { _.tokenType }
     val result =
       if (previousTypeOption == Some(TYPE))
         CompactEnsuringGap
@@ -321,9 +322,9 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
   }
   private def actualDefaultFormattingInstruction(token1: Token, token2: Token): IntertokenFormatInstruction = {
     import ScalaFormatter._
-    import scalariform.lexer.ScalaOnlyLexer.isOperatorPart
-    val type1 = token1.getType
-    val type2 = token2.getType
+    import scalariform.lexer.Chars.isOperatorPart
+    val type1 = token1.tokenType
+    val type2 = token2.tokenType
     if (type2 == EOF)
       return Compact
     if (type1 == LPAREN && type2 != RPAREN && formattingPreferences(SpaceInsideParentheses))
@@ -373,14 +374,14 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       return CompactEnsuringGap
     if (type1.isId && type2.isId)
       return CompactEnsuringGap
-    val firstCharOfToken2 = token2.getText.head
+    val firstCharOfToken2 = token2.text.head
     if (formattingPreferences(SpacesWithinPatternBinders) && type1.isId && type2 == AT)
       return CompactEnsuringGap
     if (formattingPreferences(SpacesWithinPatternBinders) && type1 == AT)
       return CompactEnsuringGap
     if (Set(HASH, AT).contains(type1) && isOperatorPart(firstCharOfToken2))
       return CompactEnsuringGap
-    val lastCharOfToken1 = token1.getText.last
+    val lastCharOfToken1 = token1.text.last
     val firstIsIdEndingWithOpChar = type1.isId && (lastCharOfToken1 == '_' || isOperatorPart(lastCharOfToken1))
     if (Set(HASH, COLON, AT).contains(type2) && firstIsIdEndingWithOpChar)
       return CompactEnsuringGap
@@ -403,9 +404,9 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
   protected def containsNewline(tokens: List[Token]): Boolean =
     tokens exists { token ⇒
       require(token != null)
-      require(token.getText != null, token)
+      require(token.text != null, token)
       token != tokens.head && hiddenPredecessors(token).containsNewline ||
-        token.getText.contains("\n") ||
+        token.text.contains("\n") ||
         isInferredNewline(token) && inferredNewlines(token).containsNewline // TODO: Why would an inferred newline not contain newline?
     }
 

@@ -50,7 +50,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   type TextStyle = Int
 
   def getHighlight(token: Token): (Color, TextStyle) =
-    token.getType match {
+    token.tokenType match {
       case STRING_LITERAL | XML_ATTR_VALUE | XML_CDATA ⇒ (new Color(42, 0, 255), Font.PLAIN)
       case _ if token.isScalaDocComment ⇒ (new Color(63, 95, 191), Font.PLAIN)
       case LINE_COMMENT | MULTILINE_COMMENT | XML_COMMENT ⇒ (new Color(63, 127, 95), Font.PLAIN)
@@ -60,7 +60,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     }
 
   def highlightToken(token: Token, document: StyledDocument) {
-    if (token.getType == Tokens.EOF)
+    if (token.tokenType == Tokens.EOF)
       return
     val style = document.addStyle("DUMMY", null)
     StyleConstants.setFontFamily(style, "monospaced")
@@ -68,9 +68,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     val (colour, fontStyle) = getHighlight(token)
     StyleConstants.setForeground(style, colour)
     StyleConstants.setBold(style, fontStyle == Font.BOLD)
-    val startIndex = token.getStartIndex
-    val endIndex = token.getStopIndex
-    document.setCharacterAttributes(startIndex, endIndex - startIndex + 1, style, true)
+    document.setCharacterAttributes(token.offset, token.length, style, true)
   }
 
   private def syntaxHighlight(textPane: JTextPane) {
@@ -406,8 +404,8 @@ class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends A
     col match {
       case 0 ⇒ token.tokenType
       case 1 ⇒ token.text
-      case 2 ⇒ token.startIndex.asInstanceOf[java.lang.Integer]
-      case 3 ⇒ token.stopIndex.asInstanceOf[java.lang.Integer]
+      case 2 ⇒ token.offset.asInstanceOf[java.lang.Integer]
+      case 3 ⇒ token.lastCharacterOffset.asInstanceOf[java.lang.Integer]
       case 4 ⇒ {
         formatResult.predecessorFormatting.get(token) orElse formatResult.inferredNewlineFormatting.get(token) getOrElse ""
       }
@@ -423,6 +421,6 @@ class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends A
 
   def getDocumentRange(index: Int): (Int, Int) = {
     val token = tokens(index)
-    (token.getStartIndex, token.getStopIndex)
+    (token.offset, token.lastCharacterOffset)
   }
 }

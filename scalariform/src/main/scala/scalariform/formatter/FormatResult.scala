@@ -10,7 +10,7 @@ case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstru
                         xmlRewrites: Map[Token, String]) {
 
   def replaceXml(token: Token, replacement: String) = {
-    require(token.getType.isXml)
+    require(token.tokenType.isXml)
     copy(xmlRewrites = xmlRewrites + (token -> replacement))
   }
 

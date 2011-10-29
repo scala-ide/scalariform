@@ -36,9 +36,9 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
   private def pruneEmptyFinal(lines: List[String]) = pruneEmptyInitial(lines.reverse).reverse
 
   def formatComment(comment: HiddenToken, indentLevel: Int): String =
-    if (comment.text contains '\n') {
+    if (comment.rawText contains '\n') {
       val sb = new StringBuilder
-      val (start, rawLines) = getLines(comment.text)
+      val (start, rawLines) = getLines(comment.rawText)
 
       val lines = pruneEmptyFinal(pruneEmptyInitial(rawLines))
 
@@ -63,6 +63,6 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
       sb.append(newlineSequence).indent(indentLevel).append(beforeStarSpaces).append("*/")
       sb.toString
     } else
-      comment.text
+      comment.rawText
 
 }
