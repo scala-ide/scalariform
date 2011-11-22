@@ -7,7 +7,7 @@
   <version>0.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-    <tycho.version>0.9.0</tycho.version>
+    <tycho.version>0.12.0</tycho.version>
     <scala.version>2.8.0</scala.version>
     <encoding>UTF-8</encoding>
   </properties>
@@ -26,19 +26,30 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
         <version>${tycho.version}</version>
         <extensions>true</extensions>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho.version}</version>
         <configuration>
           <resolver>p2</resolver>
+          <pomDependencies>consider</pomDependencies>
         </configuration>
       </plugin>
+      <!-- for setting a better qualifier -->
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <format>yyyyMMddHHmm'-${git.hash}'</format>
+          <archiveSite>true</archiveSite>
+        </configuration>
+      </plugin>    
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
@@ -91,57 +102,6 @@
   </pluginRepositories>
   <profiles>
     <profile>
-      <id>scala-2.8.0</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.8.0</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.8.0.final</id>
-          <name>Scala Toolchain 2.8.0.final p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.0.final</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>scala-2.8.1</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.8.1</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.8.1.final</id>
-          <name>Scala Toolchain 2.8.1.final p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.1.final</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>scala-2.8.2-SNAPSHOT</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.8.2-SNAPSHOT</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.8.2-SNAPSHOT</id>
-          <name>Scala Toolchain 2.8.2-SNAPSHOT p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.2-SNAPSHOT</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
       <id>scala-2.8.3-SNAPSHOT</id>
       <activation>
         <property>
@@ -155,57 +115,6 @@
           <name>Scala Toolchain 2.8.3-SNAPSHOT p2 repository</name>
           <layout>p2</layout>
           <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.3-SNAPSHOT</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>scala-2.9.0</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.9.0</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.9.0.final</id>
-          <name>Scala Toolchain 2.9.0.final p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.0.final</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>scala-2.9.0-1</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.9.0-1</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.9.0-1</id>
-          <name>Scala Toolchain 2.9.0-1 p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.0-1</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>scala-2.9.1</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.9.1</value>
-        </property>
-      </activation>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.9.1.final</id>
-          <name>Scala Toolchain 2.9.1.final p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.1.final</url>
         </repository>
       </repositories>
     </profile>
