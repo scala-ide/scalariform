@@ -1,7 +1,9 @@
 package scalariform.lexer
 
+import java.io.File
 import scala.annotation._
 import scala.collection.mutable.{ Queue, Stack, ListBuffer }
+import scala.io.Source
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 
@@ -10,18 +12,14 @@ class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false)
 
   override protected val forgiveLexerErrors = forgiveErrors
 
-  modeStack.push(new ScalaMode())
+  modeStack.push(new ScalaMode)
 
   def nextToken(): Token = {
-    if (eof)
-      super[Lexer].token(EOF)
-    else if (isXmlMode)
+    if (isXmlMode)
       fetchXmlToken()
     else
       fetchScalaToken()
-    val token = builtToken.get
-    builtToken = None
-    token
+    builtToken
   }
 
   override protected def switchToScalaModeAndFetchToken() {
@@ -37,24 +35,12 @@ class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false)
 }
 
 object ScalaLexer {
-  import java.io._
-
-  private[lexer] def digit2int(ch: Int, base: Int): Int = {
-    if ('0' <= ch && ch <= '9' && ch < '0' + base)
-      ch - '0'
-    else if ('A' <= ch && ch < 'A' + base - 10)
-      ch - 'A' + 10
-    else if ('a' <= ch && ch < 'a' + base - 10)
-      ch - 'a' + 10
-    else
-      -1
-  }
 
   def createRawLexer(s: String, forgiveErrors: Boolean = false): ScalaLexer =
     new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
 
   def tokeniseFull(file: File): (HiddenTokenInfo, List[Token]) = {
-    val s = scala.io.Source.fromFile(file).mkString
+    val s = Source.fromFile(file).mkString
     tokeniseFull(s)
   }
 

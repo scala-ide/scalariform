@@ -1,7 +1,8 @@
 package scalariform.lexer
 
-import scala.xml.Utility.SU
-import scalariform.lexer.ScalaLexer._
+import scalariform.lexer.CharConstants.SU
+
+import scalariform.utils.Utils.digit2int
 
 class UnicodeEscapeReader(val s: String, forgiveLexerErrors: Boolean = false) {
 

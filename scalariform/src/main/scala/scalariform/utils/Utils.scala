@@ -3,6 +3,7 @@ package scalariform.utils
 import java.io.FileOutputStream
 import java.io.FileInputStream
 import java.io.IOException
+
 object Utils {
 
   def asInstanceOf[T](o: Any) = if (o.isInstanceOf[T]) Some(o.asInstanceOf[T]) else None
@@ -120,5 +121,15 @@ object Utils {
     result
   }
 
+  def digit2int(ch: Char, base: Int): Int =
+    if ('0' <= ch && ch <= '9' && ch < '0' + base)
+      ch - '0'
+    else if ('A' <= ch && ch < 'A' + base - 10)
+      ch - 'A' + 10
+    else if ('a' <= ch && ch < 'a' + base - 10)
+      ch - 'a' + 10
+    else
+      -1
+  
 }
 

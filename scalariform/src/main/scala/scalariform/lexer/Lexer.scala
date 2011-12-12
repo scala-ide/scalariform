@@ -4,7 +4,7 @@ import scala.annotation._
 import scala.collection.mutable.{ Queue, Stack }
 import scala.math.min
 import scala.xml.parsing.TokenTests
-import scala.xml.Utility.SU
+import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
@@ -20,7 +20,7 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
   private var actualTokenTextLength = 0
 
   protected var eof = false
-  protected var builtToken: Option[Token] = None
+  protected var builtToken: Token = _
 
   // Two queues maintained in parallel. Invariant: chQueue.length == unicodeEscapesQueue.length
   private val chQueue = new Queue[Char]
@@ -71,12 +71,10 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
     val stopIndex = min(startIndex + tokenLength - 1, reader.s.length - 1) // min protects against overeager consumption past EOF in forgiving mode   
     val rawText = reader.s.substring(actualTokenTextOffset, stopIndex + 1)
     val text = tokenTextBuffer.toString
-    val token = Token(tokenType, text, startIndex, rawText)
-    builtToken = Some(token)
+    builtToken = Token(tokenType, text, startIndex, rawText)
     tokenTextBuffer.clear()
     actualTokenTextOffset = stopIndex + 1
     actualTokenTextLength = 0
-    // println("Token: " + token)
   }
 
   protected def lookaheadIs(s: String): Boolean = s.zipWithIndex forall { case (c, index) ⇒ ch(index) == c }

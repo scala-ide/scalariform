@@ -1,30 +1,20 @@
 package scalariform.lexer
 
 import scala.collection.immutable.Queue
+import scala.collection.JavaConversions._
 import scalariform.utils.Utils.boolean2ImpliesWrapper
 import scalariform.lexer.Tokens._
 import scala.annotation.tailrec
-import java.util.{ HashMap, Map ⇒ JMap }
-
-trait HiddenTokenInfo {
-
-  def isInferredNewline(token: Token): Boolean
-
-  def inferredNewlines(token: Token): Option[HiddenTokens]
-
-  def hiddenPredecessors(token: Token): HiddenTokens
-
-  def allHiddenTokens: Iterable[HiddenTokens]
-
-}
+import java.{ util ⇒ ju }
 
 class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) extends HiddenTokenInfo {
+
   import NewlineInferencer._
 
   require(delegate.hasNext)
 
-  private var hiddenPredecessors: JMap[Token, HiddenTokens] = new HashMap()
-  private var inferredNewlines: JMap[Token, HiddenTokens] = new HashMap()
+  private var hiddenPredecessors: ju.Map[Token, HiddenTokens] = new ju.HashMap()
+  private var inferredNewlines: ju.Map[Token, HiddenTokens] = new ju.HashMap()
 
   def isInferredNewline(token: Token): Boolean = inferredNewlines containsKey token
 
@@ -32,10 +22,10 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
 
   def hiddenPredecessors(token: Token): HiddenTokens = hiddenPredecessors get token
 
-  import scala.collection.JavaConversions._
   lazy val allHiddenTokens = hiddenPredecessors.values ++ inferredNewlines.values
 
   private var buffer: Queue[(HiddenTokens, Token)] = Queue()
+
   @tailrec
   private def refillBuffer() {
     if (buffer.size < 2 && delegate.hasNext) {
@@ -52,7 +42,8 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
   private var previousTokenOption: Option[Token] = None
 
   private var multipleStatementRegionMarkerStack: List[TokenType] = Nil
-  private def multipleStatementsAllowed = multipleStatementRegionMarkerStack.isEmpty || multipleStatementRegionMarkerStack.head == RBRACE
+  private def multipleStatementsAllowed = 
+    multipleStatementRegionMarkerStack.isEmpty || multipleStatementRegionMarkerStack.head == RBRACE
 
   def nextToken(): Token = {
     val token = nextTokenCore()
@@ -107,7 +98,8 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
 
   private def shouldTranslateToNewline(nextToken: Token) = {
     val nextTokenType = nextToken.tokenType
-    val nextCanBeginAStatement = !tokensWhichCannotBeginAStatement(nextToken.tokenType) && (nextTokenType == CASE implies followingTokenIsClassOrObject)
+    val nextCanBeginAStatement = !tokensWhichCannotBeginAStatement(nextToken.tokenType) &&
+      (nextTokenType == CASE implies followingTokenIsClassOrObject)
     val previousCanEndAStatement = previousTokenOption.map(_.tokenType).map(tokensWhichCanTerminateAStatement).getOrElse(false)
     previousCanEndAStatement && nextCanBeginAStatement && multipleStatementsAllowed
   }
@@ -123,12 +115,12 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
 object NewlineInferencer {
 
   val tokensWhichCanTerminateAStatement: Set[TokenType] = Set(
-    INTEGER_LITERAL, FLOATING_POINT_LITERAL, CHARACTER_LITERAL, STRING_LITERAL, SYMBOL_LITERAL, VARID, OTHERID, PLUS, MINUS, STAR, PIPE, TILDE, EXCLAMATION,
-    THIS, NULL, TRUE, FALSE, RETURN, TYPE, XML_EMPTY_CLOSE, XML_TAG_CLOSE, XML_COMMENT, XML_CDATA, XML_UNPARSED, XML_PROCESSING_INSTRUCTION,
-    USCORE, RPAREN, RBRACKET, RBRACE)
+    INTEGER_LITERAL, FLOATING_POINT_LITERAL, CHARACTER_LITERAL, STRING_LITERAL, SYMBOL_LITERAL, VARID, OTHERID, PLUS,
+    MINUS, STAR, PIPE, TILDE, EXCLAMATION, THIS, NULL, TRUE, FALSE, RETURN, TYPE, XML_EMPTY_CLOSE, XML_TAG_CLOSE,
+    XML_COMMENT, XML_CDATA, XML_UNPARSED, XML_PROCESSING_INSTRUCTION, USCORE, RPAREN, RBRACKET, RBRACE)
+
   val tokensWhichCannotBeginAStatement: Set[TokenType] = Set(
-    CATCH, ELSE, EXTENDS, FINALLY, FORSOME, MATCH, REQUIRES,
-    WITH, YIELD, COMMA, DOT, SEMI, COLON, /* USCORE, */ EQUALS, ARROW, LARROW, SUBTYPE, VIEWBOUND,
-    SUPERTYPE, HASH, LBRACKET, RPAREN, RBRACKET, RBRACE)
+    CATCH, ELSE, EXTENDS, FINALLY, FORSOME, MATCH, REQUIRES, WITH, YIELD, COMMA, DOT, SEMI, COLON, /* USCORE, */ EQUALS,
+    ARROW, LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, HASH, LBRACKET, RPAREN, RBRACKET, RBRACE)
 
 }

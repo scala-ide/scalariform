@@ -1,11 +1,14 @@
 package scalariform.lexer
 
 import scala.annotation._
-import scala.xml.Utility.SU
+import scalariform.lexer.CharConstants.SU
+import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
-import scalariform.lexer.ScalaLexer._
 
+/**
+ * Lexer implementation for XML literals and patterns
+ */
 trait XmlLexer extends Lexer {
 
   private def xmlMode: XmlMode = modeStack.head.asInstanceOf[XmlMode]
@@ -264,4 +267,3 @@ trait XmlLexer extends Lexer {
   }
 
 }
-

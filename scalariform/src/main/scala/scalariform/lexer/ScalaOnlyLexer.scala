@@ -1,13 +1,16 @@
 package scalariform.lexer
 
 import scala.annotation._
-import scala.xml.Utility.SU
+import scalariform.lexer.CharConstants.SU
+import scalariform.lexer.Chars._
 import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
-import scalariform.lexer.Chars._
 
-trait ScalaOnlyLexer extends Lexer {
+/**
+ * Lexer implementation for "pure Scala", i.e. not XML
+ */
+private[lexer] trait ScalaOnlyLexer extends Lexer {
 
   private var processingSymbol = false
 
@@ -353,9 +356,8 @@ trait ScalaOnlyLexer extends Lexer {
     val base1 = if (base < 10) 10 else base
 
     // read 8,9's even if format is octal, produce a malformed number error afterwards.
-    while (digit2int(ch, base1) >= 0) {
+    while (Utils.digit2int(ch, base1) >= 0)
       nextChar()
-    }
 
     def restOfUncertainToken() = {
       def isEfd = ch match {
@@ -431,3 +433,4 @@ trait ScalaOnlyLexer extends Lexer {
   }
 
 }
+
