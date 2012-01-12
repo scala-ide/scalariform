@@ -6,6 +6,8 @@ import java.io.IOException
 
 object Utils {
 
+  def when[T](b: Boolean)(x: => T): Option[T] = if (b) Some(x) else None
+  
   def asInstanceOf[T](o: Any) = if (o.isInstanceOf[T]) Some(o.asInstanceOf[T]) else None
 
   def checkNotNull[T](item: T): T = { require(item != null); item }
