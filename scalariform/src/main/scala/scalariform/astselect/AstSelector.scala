@@ -3,6 +3,8 @@ package scalariform.astselect
 import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils.Range
+import scalariform.utils.Utils._
+import scala.util.control.Exception._
 
 object AstSelector {
 
@@ -12,17 +14,15 @@ object AstSelector {
    * there is no strictly larger containing AST element.
    */
   def expandSelection(source: String, initialSelection: Range): Option[Range] =
-    try {
+    catching(classOf[ScalaParserException]).toOption {
       new AstSelector(source).expandSelection(initialSelection)
-    } catch {
-      case e: ScalaParserException ⇒ None
     }
 
   import Tokens._
 
-  private val selectableXmls = Set(XML_NAME, XML_ATTR_VALUE, XML_PCDATA, XML_COMMENT, XML_UNPARSED, XML_PCDATA)
+  private val selectableXmlTokens = Set(XML_NAME, XML_ATTR_VALUE, XML_PCDATA, XML_COMMENT, XML_UNPARSED, XML_PCDATA)
 
-  private val nonSelectableAstNodes: Set[Class[_]] =
+  private val nonSelectableAstNodes: Set[Class[_ <: AstNode]] =
     Set(
       classOf[AccessQualifier],
       classOf[CasePattern],
@@ -50,87 +50,103 @@ object AstSelector {
 }
 
 class AstSelector(source: String) {
+
   import AstSelector._
 
   private val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(source)
+
   import hiddenTokenInfo._
 
-  private val parser = new ScalaParser(tokens.toArray)
-  private val compilationUnitOpt = parser.safeParse(parser.compilationUnitOrScript)
-
-  /**
-   * A node's adjusted range includes any Scaladoc immediately before it.
-   */
-  private def adjustedNodeRange(node: AstNode): Option[Range] =
-    if (node.isEmpty)
-      None
-    else {
-      val nodeRange = node.rangeOpt.get
-      val scaladocComments = getPriorHiddenTokens(node.firstToken).scalaDocComments
-      scaladocComments.lastOption map { comment ⇒ nodeRange mergeWith comment.token.range } orElse Some(nodeRange)
+  private val compilationUnitOpt: Option[CompilationUnit] = {
+    val parser = new ScalaParser(tokens.toArray)
+    parser.safeParse(parser.compilationUnitOrScript)
+  }
+  
+  private val allTokens: List[Token] = tokens.flatMap { ordinaryToken ⇒
+    inferredNewlines(ordinaryToken) match {
+      case Some(hiddenTokens) ⇒ hiddenTokens.rawTokens
+      case None               ⇒ hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
     }
+  }
 
   def expandSelection(initialSelection: Range): Option[Range] =
     expandToToken(initialSelection) orElse
+      expandScaladocToAssociatedNode(initialSelection) orElse
       (compilationUnitOpt flatMap { expandToEnclosingAst(_, initialSelection, enclosingNodes = Nil) })
 
-  private def expandToToken(initialSelection: Range): Option[Range] = {
-    val Range(offset, length) = initialSelection
-    for (ordinaryToken ← tokens) {
-      val allTokens = inferredNewlines(ordinaryToken) match {
-        case Some(hiddenTokens) ⇒ hiddenTokens.rawTokens
-        case None               ⇒ hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
-      }
-      for {
-        token ← allTokens
-        if isSelectableToken(token.tokenType)
-        if token.range contains initialSelection
-      } {
-        if (token.isScalaDocComment && token.range == initialSelection)
-          for {
-            compilationUnit ← compilationUnitOpt
-            expandedToAstRange ← appendAstNodeIfPossible(compilationUnit, token)
-          } return Some(expandedToAstRange)
-        if (token.length > length)
-          return Some(token.range)
-      }
-    }
-    None
-  }
+  /**
+   * If a Scaladoc comment is exactly selected, expand to an associated class, method etc.
+   */
+  private def expandScaladocToAssociatedNode(initialSelection: Range): Option[Range] =
+    for {
+      scaladocComment ← allTokens.find { token ⇒ token.isScalaDocComment && token.range == initialSelection }
+      associatedNode ← findAssociatedAstNode(scaladocComment)
+      nodeRange ← associatedNode.rangeOpt // <-- should always be defined here, in fact
+    } yield scaladocComment.range mergeWith nodeRange
 
-  private def appendAstNodeIfPossible(node: AstNode, commentToken: Token): Option[Range] =
-    node.firstTokenOption flatMap { firstToken ⇒
+  /**
+   * If the selection is a strict subrange of some token, expand to the entire token.
+   */
+  private def expandToToken(initialSelection: Range): Option[Range] =
+    allTokens find { token ⇒
+      isSelectableToken(token) && (token.range contains initialSelection) && initialSelection.length < token.length
+    } map { _.range }
+
+  private def findAssociatedAstNode(scaladocCommentToken: Token): Option[AstNode] =
+    compilationUnitOpt.flatMap { cu ⇒ findAssociatedAstNode(cu, scaladocCommentToken) }
+
+  private def findAssociatedAstNode(nodeToSearch: AstNode, scaladocCommentToken: Token): Option[AstNode] =
+    nodeToSearch.firstTokenOption flatMap { firstToken ⇒
       val hiddenTokens = getPriorHiddenTokens(firstToken)
-      if (hiddenTokens.rawTokens contains commentToken)
-        Some(commentToken.range mergeWith node.rangeOpt.get)
+      if (hiddenTokens.rawTokens contains scaladocCommentToken)
+        Some(nodeToSearch)
       else {
         for {
-          childNode ← node.immediateChildren
-          result ← appendAstNodeIfPossible(childNode, commentToken)
+          childNode ← nodeToSearch.immediateChildren
+          result ← findAssociatedAstNode(childNode, scaladocCommentToken)
         } return Some(result)
         None
       }
     }
 
-  private def isSelectableToken(tokenType: TokenType) = {
+  private def isSelectableToken(token: Token) = {
+    val tokenType = token.tokenType
     import tokenType._
-    isLiteral || isKeyword || isComment || isId || (selectableXmls contains tokenType)
+    isLiteral || isKeyword || isComment || isId || (selectableXmlTokens contains tokenType)
   }
 
-  private def expandToEnclosingAst(node: AstNode, initialSelection: Range, enclosingNodes: List[AstNode]): Option[Range] =
-    adjustedNodeRange(node) flatMap { nodeRange ⇒
-      if (nodeRange contains initialSelection) {
-        for {
-          childNode ← node.immediateChildren
-          descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
-        } return Some(descendantRange)
-        if ((nodeRange contains initialSelection) && (nodeRange isLargerThan initialSelection) && isSelectableAst(node, enclosingNodes))
-          Some(nodeRange)
-        else
-          None
-      } else
-        None
+  /**
+   * @return range of the node and any Scaladoc immediately before it
+   */
+  private def adjustedNodeRange(node: AstNode): Option[Range] =
+    node.rangeOpt map { nodeRange ⇒
+      val scaladocComments = getPriorHiddenTokens(node.firstToken).scalaDocComments
+      scaladocComments.lastOption map { comment ⇒ nodeRange mergeWith comment.token.range } getOrElse nodeRange
     }
+
+  /**
+   * Attempt to find a suitable AST node to expand to which contains the given selection.
+   *
+   * @param enclosingNodes -- stack of nodes recording path to root compilation unit (useful for more context-aware
+   *   decisions about whether to expand to a node or not).
+   */
+  private def expandToEnclosingAst(node: AstNode, initialSelection: Range, enclosingNodes: List[AstNode]): Option[Range] = {
+
+    val nodeRange = adjustedNodeRange(node).getOrElse { return None }
+
+    if (!nodeRange.contains(initialSelection)) { return None }
+
+    for {
+      childNode ← node.immediateChildren
+      descendantRange ← expandToEnclosingAst(childNode, initialSelection, enclosingNodes = node :: enclosingNodes)
+    } return Some(descendantRange)
+
+    if (nodeRange.strictlyContains(initialSelection) && isSelectableAst(node :: enclosingNodes))
+      Some(nodeRange)
+    else
+      None
+
+  }
 
   private def getPredecessorNewline(token: Token): Option[HiddenTokens] =
     tokens.indexOf(token) match {
@@ -140,20 +156,12 @@ class AstSelector(source: String) {
 
   private def getPriorHiddenTokens(token: Token) = getPredecessorNewline(token) getOrElse hiddenPredecessors(token)
 
-  private def isSelectableAst(node: AstNode, enclosingNodes: List[AstNode]) = {
-    // println((node:: enclosingNodes) map (_.getClass.getSimpleName) mkString " ")
-    (node :: enclosingNodes) match {
-      case n1 :: n2 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[MatchExpr] ⇒ false
-
-      // case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ForExpr] ⇒ false
-      // case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ForExpr] ⇒ false
-
-      // case n1 :: n2 :: n3 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[Expr] && n3.isInstanceOf[ExprFunBody] ⇒ false
-      // case n1 :: n2 :: _ if n1.isInstanceOf[Expr] && n2.isInstanceOf[ExprFunBody] ⇒ false
-
-      case n1 :: n2 :: _ if n1.isInstanceOf[BlockExpr] && n2.isInstanceOf[ProcFunBody] ⇒ false
-
-      case _ ⇒ !(nonSelectableAstNodes contains node.getClass)
+  private def isSelectableAst(nodeStack: List[AstNode]) =
+    nodeStack match {
+      case List(_: BlockExpr, _: MatchExpr, _*)   ⇒ false
+      case List(_: BlockExpr, _: ProcFunBody, _*) ⇒ false
+      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass)
+      case Nil                                    ⇒ false
     }
-  }
+
 }
