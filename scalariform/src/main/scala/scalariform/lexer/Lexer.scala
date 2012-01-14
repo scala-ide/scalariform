@@ -19,16 +19,23 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
   private var actualTokenTextOffset = 0
   private var actualTokenTextLength = 0
 
-  protected var eof = false
   protected var builtToken: Token = _
 
   // Two queues maintained in parallel. Invariant: chQueue.length == unicodeEscapesQueue.length
   private val chQueue = new Queue[Char]
+
   private val unicodeEscapesQueue = new Queue[Option[String]]
+
+  /**
+   * Number of characters left in queues before end of file. If -1, this as yet unknown
+   */
+  private var untilEof = -1
 
   protected var lastCh: Char = SU
 
   protected val modeStack = new Stack[LexerMode]
+
+  protected def eof = untilEof == 0
 
   protected def isUnicodeEscape = unicodeEscapesQueue.last.isDefined
 
@@ -46,11 +53,10 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
   }
 
   private def slurpOneChar() {
-    val (c, unicodeEscapeOfPreviousRead) = reader.read()
-    chQueue.enqueue(c)
-    if (reader.isEof)
-      eof = true
-    unicodeEscapesQueue.enqueue(unicodeEscapeOfPreviousRead)
+    chQueue.enqueue(reader.read())
+    unicodeEscapesQueue.enqueue(reader.unicodeEscapeOpt)
+    if (untilEof == -1 && reader.isEof)
+      untilEof = chQueue.size
   }
 
   protected def nextChar() {
@@ -61,6 +67,8 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
       case None    ⇒ 1
       case Some(s) ⇒ s.length
     }
+    if (untilEof > 0)
+      untilEof -= 1
     actualTokenTextLength += delta
   }
 
@@ -68,8 +76,8 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
     val startIndex = actualTokenTextOffset
     val tokenLength = actualTokenTextLength
     require(tokenType == EOF || tokenLength > 0)
-    val stopIndex = min(startIndex + tokenLength - 1, reader.s.length - 1) // min protects against overeager consumption past EOF in forgiving mode   
-    val rawText = reader.s.substring(actualTokenTextOffset, stopIndex + 1)
+    val stopIndex = min(startIndex + tokenLength - 1, reader.text.length - 1) // min protects against overeager consumption past EOF in forgiving mode   
+    val rawText = reader.text.substring(actualTokenTextOffset, stopIndex + 1)
     val text = tokenTextBuffer.toString
     builtToken = Token(tokenType, text, startIndex, rawText)
     tokenTextBuffer.clear()
