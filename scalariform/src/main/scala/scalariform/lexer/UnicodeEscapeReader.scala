@@ -16,11 +16,38 @@ object UnicodeEscapeDecoder {
     while (!reader.isEof)
       sb.append(reader.read())
     sb.toString
+    reader.mkString
   }
 
 }
 
-class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) {
+trait IUnicodeEscapeReader extends Iterator[Char] {
+
+  val text: String
+
+  /**
+   * @return true if all the available characters have been read.
+   */
+  def isEof: Boolean
+
+  /**
+   * @return the next character from the post-decoded text
+   */
+  @throws(classOf[ScalaLexerException])
+  def read(): Char
+
+  /**
+   * @return the corresponding unicode escape sequence if the last character read was decoded, otherwise None.
+   */
+  def unicodeEscapeOpt: Option[String]
+
+  def next() = read()
+
+  def hasNext = !isEof
+
+}
+
+class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) extends IUnicodeEscapeReader {
 
   private var pos: Int = 0
 
@@ -31,14 +58,8 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) {
    */
   private var consecutiveBackslashCount = 0
 
-  /**
-   * @return true if all the available characters have been read.
-   */
   def isEof = pos >= text.length
 
-  /**
-   * @return the next character from the post-decoded text
-   */
   @throws(classOf[ScalaLexerException])
   def read(): Char = {
     val ch = consumeNextCharacter()
@@ -57,9 +78,6 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) {
     }
   }
 
-  /**
-   * @return the corresponding unicode escape sequence if the last character read was decoded, otherwise None.
-   */
   def unicodeEscapeOpt: Option[String] = Option(unicodeEscapeSequence)
 
   private def consumeNextCharacter(): Char = {
@@ -117,5 +135,21 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) {
     }
     (line, column)
   }
+
+}
+
+class NoUnicodeEscapeReader(val text: String) extends IUnicodeEscapeReader {
+
+  private var pos = 0
+
+  def isEof: Boolean = pos >= text.length
+
+  def read(): Char = {
+    val result = if (isEof) SU else text(pos)
+    pos += 1
+    result
+  }
+
+  def unicodeEscapeOpt: Option[String] = None
 
 }

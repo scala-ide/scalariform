@@ -33,4 +33,3 @@ class XmlMode extends LexerMode {
   def nestingLevel = tagNestLevel
 
 }
-

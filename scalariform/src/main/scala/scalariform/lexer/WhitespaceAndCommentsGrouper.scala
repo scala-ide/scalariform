@@ -8,7 +8,7 @@ import scala.collection.mutable.ListBuffer
  */
 private[lexer] class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[(HiddenTokens, Token)] {
 
-  private var nextToken = lexer.nextToken()
+  private var nextToken = lexer.next()
 
   private var ended = false
 
@@ -20,7 +20,7 @@ private[lexer] class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Ite
     val resultToken = nextToken
     if (nextToken.tokenType == EOF)
       ended = true
-    nextToken = lexer.nextToken()
+    nextToken = lexer.next()
     (hiddenTokens, resultToken)
   }
 
@@ -28,7 +28,7 @@ private[lexer] class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Ite
     val hiddenTokens = new ListBuffer[HiddenToken]
     while (isCommentOrWhitespace(nextToken)) {
       hiddenTokens += makeHiddenToken(nextToken)
-      nextToken = lexer.nextToken()
+      nextToken = lexer.next()
     }
     new HiddenTokens(hiddenTokens.toList)
   }
