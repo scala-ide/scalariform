@@ -53,20 +53,18 @@ class AstSelector(source: String) {
 
   import AstSelector._
 
-  private val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(source)
-
-  import hiddenTokenInfo._
+  private val tokens = ScalaLexer.tokenise(source)
 
   private val compilationUnitOpt: Option[CompilationUnit] = {
     val parser = new ScalaParser(tokens.toArray)
     parser.safeParse(parser.compilationUnitOrScript)
   }
-  
-  private val allTokens: List[Token] = tokens.flatMap { ordinaryToken ⇒
-    inferredNewlines(ordinaryToken) match {
-      case Some(hiddenTokens) ⇒ hiddenTokens.rawTokens
-      case None               ⇒ hiddenPredecessors(ordinaryToken).rawTokens :+ ordinaryToken
-    }
+
+  private val allTokens: List[Token] = tokens.flatMap { token ⇒
+    if (token.isNewline)
+      token.associatedWhitespaceAndComments.rawTokens
+    else
+      token.associatedWhitespaceAndComments.rawTokens :+ token
   }
 
   def expandSelection(initialSelection: Range): Option[Range] =
@@ -151,10 +149,15 @@ class AstSelector(source: String) {
   private def getPredecessorNewline(token: Token): Option[HiddenTokens] =
     tokens.indexOf(token) match {
       case 0 ⇒ None
-      case n ⇒ inferredNewlines(tokens(n - 1))
+      case n ⇒
+        val previousToken = tokens(n - 1)
+        if (previousToken.isNewline)
+          Some(previousToken.associatedWhitespaceAndComments)
+        else
+          None
     }
 
-  private def getPriorHiddenTokens(token: Token) = getPredecessorNewline(token) getOrElse hiddenPredecessors(token)
+  private def getPriorHiddenTokens(token: Token) = getPredecessorNewline(token) getOrElse token.associatedWhitespaceAndComments
 
   private def isSelectableAst(nodeStack: List[AstNode]) =
     nodeStack match {

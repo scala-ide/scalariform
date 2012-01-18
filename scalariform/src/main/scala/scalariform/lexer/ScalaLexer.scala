@@ -9,16 +9,15 @@ import scala.xml.parsing.TokenTests
 import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
+import scalariform._
 
-class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Boolean = false)
+class ScalaLexer(
+  reader: IUnicodeEscapeReader,
+  protected val forgiveErrors: Boolean = false,
+  protected val scalaVersion: ScalaVersionGroup = SCALA_28_29_210)
     extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
 
   import ScalaLexer._
-
-  //  /**
-  //   * Text of token (after unicode escaping).
-  //   */
-  //  protected val tokenTextBuffer = new StringBuilder
 
   /**
    * Circular buffer of characters yet to be processed (after unicode escaping)
@@ -35,12 +34,6 @@ class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Bool
   private var bufferEnd = 0
 
   private var seenUnicodeEscape = false
-
-  private var tokenText: String = _
-
-  private var rawText: String = _
-
-  private var stopIndex: Int = 0
 
   /**
    * Start position of this token in the (pre Unicode escaped) text
@@ -61,6 +54,12 @@ class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Bool
    * The previous character
    */
   protected var lastCh: Char = SU
+
+  private var tokenText: String = _
+
+  private var rawText: String = _
+
+  private var stopIndex: Int = 0
 
   private var builtToken: Token = _
 
@@ -108,14 +107,14 @@ class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Bool
     lastCh = charBuffer(bufferStart)
     val unicodeEscapeOpt = unicodeEscapesBuffer(bufferStart)
     bufferStart = (bufferStart + 1) & BUFFER_MASK
-    
+
     tokenLength +=
       (unicodeEscapeOpt match {
         case None    ⇒ 1
         case Some(s) ⇒ s.length
       })
     seenUnicodeEscape |= unicodeEscapeOpt.isDefined
-    
+
     if (untilEof > 0)
       untilEof -= 1
   }
@@ -131,6 +130,9 @@ class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Bool
     //    require(tokenType == EOF || tokenLength > 0)
     finaliseTokenData()
     builtToken = Token(tokenType, tokenText, tokenOffset, rawText)
+
+    if (seenUnicodeEscape)
+      builtToken.containsUnicodeEscape = true
     resetTokenData()
   }
 
@@ -153,6 +155,8 @@ class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Bool
           rawText
     }
   }
+
+  private[lexer] def text = reader.text
 
   protected def getTokenText: String = {
     finaliseTokenData()
@@ -182,39 +186,27 @@ class ScalaLexer(reader: IUnicodeEscapeReader, protected val forgiveErrors: Bool
 
 object ScalaLexer {
 
-  private val BUFFER_SIZE = 16
+  private val BUFFER_SIZE = 16 // sufficient lookahead for "</xml:unparsed>" (15 chars)
 
   private val BUFFER_MASK = BUFFER_SIZE - 1
 
-  def createRawLexer(s: String, forgiveErrors: Boolean = false): ScalaLexer =
-    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
+  def createRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210): ScalaLexer =
+    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersion)
 
-  def tokeniseFull(file: File): (HiddenTokenInfo, List[Token]) = {
-    val s = Source.fromFile(file).mkString
-    tokeniseFull(s)
-  }
+  def tokenise(file: File): List[Token] = tokenise(Source.fromFile(file).mkString)
 
-  def tokeniseFull(s: String, forgiveErrors: Boolean = false): (HiddenTokenInfo, List[Token]) = {
+  def tokenise(s: String, forgiveErrors: Boolean = false): List[Token] = {
     val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(createRawLexer(s, forgiveErrors)))
-    val tokenBuffer = new ListBuffer[Token]
-    var continue = true
-    while (continue) {
-      val token = lexer.nextToken()
-      tokenBuffer += token
-      if (token.tokenType == Tokens.EOF)
-        continue = false
-    }
-    (lexer, tokenBuffer.toList)
+    lexer.toList
   }
-
-  def tokenise(s: String): List[Token] = tokeniseFull(s)._2
 
   /**
-   * @return a list of tokens from the source, including whitespace and comment tokens. No NEWLINE /
+   * @param forgiveErrors -- if true, no exceptions will be thrown
+   * @return a list of tokens from the source, including whitespace and comment tokens. No NEWLINE or
    * NEWLINES tokens are inferred. The final token will be of type EOF.
    */
   @throws(classOf[ScalaLexerException])
-  def rawTokenise(s: String, forgiveErrors: Boolean = false): List[Token] =
-    createRawLexer(s, forgiveErrors).toList
+  def rawTokenise(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210): List[Token] =
+    createRawLexer(s, forgiveErrors, scalaVersion).toList
 
 }

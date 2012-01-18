@@ -15,6 +15,7 @@ object ScalariformBuild extends Build {
     scalacOptions += "-deprecation",
     logLevel in test := Level.Warn,
     pomExtra := pomExtraXml,
+    parallelExecution in Test := false,
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
   )  // ++ formatterSettings

@@ -9,15 +9,18 @@ import scalariform.formatter._
 
 object LexerPerformanceTest {
 
+  val ITERATIONS = 1000
+  
+  val WARMUP = 200
+
   def main(args: Array[String]) {
 
     val file = new File("/home/matt/coding/scala/src/compiler/scala/tools/nsc/typechecker/Typers.scala")
+    //    val file = new File("/home/matt/Downloads/scala/scala/src/compiler/scala/tools/nsc/typechecker/Typers.scala")
     val source = Source.fromFile(file).mkString
     println("Source: " + source.length + " chars")
     val tokens = ScalaLexer.rawTokenise(source)
     println("Tokens: " + tokens.size)
-    val ITERATIONS = 3000
-    val WARMUP = 500
     1 to WARMUP foreach { _ ⇒ doIt(source) }
 
     val start = System.currentTimeMillis
@@ -37,12 +40,12 @@ object LexerPerformanceTest {
       (mean, math.sqrt(durations.map(n => square(n - mean)).sum / size))
     }
     val (mean, stdDev) = compute(durations)
-    def isNormal(d: Double) =  math.abs(d - mean) < 2 * stdDev
+    def isNormal(d: Double) = math.abs(d - mean) < 2 * stdDev
     val durations2 = durations.filter(isNormal)
     println("Original trials: " + ITERATIONS)
     println("Outliers removed: " + (ITERATIONS - durations2.size))
     val (mean2, stdDev2) = compute(durations2)
-    println("Minimum: " + durations.min)
+    println("Minimum: " + durations.min + " ms")
     println("Average: " + mean2 + " ms")
     println("Standard deviation: " + stdDev2 + " ms")
     println()
@@ -50,9 +53,10 @@ object LexerPerformanceTest {
   }
 
   private def doIt(s: String) = {
+    //    new WhitespaceAndCommentsGrouper(ScalaLexer.createRawLexer(s)).toList
+    ScalaLexer.tokenise(s)
     //    UnicodeEscapeDecoder.decode(s)
-    ScalaLexer.rawTokenise(s)
+//        ScalaLexer.rawTokenise(s)
   }
-  
-}
 
+}

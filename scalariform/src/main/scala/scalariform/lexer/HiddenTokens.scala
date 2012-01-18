@@ -3,6 +3,8 @@ package scalariform.lexer
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 
+object NoHiddenTokens extends HiddenTokens(Nil)
+
 case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken] {
 
   def removeInitialWhitespace = new HiddenTokens(tokens.dropWhile(_.isInstanceOf[Whitespace]))
@@ -23,12 +25,24 @@ case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken]
 
   def containsComment = comments.nonEmpty
 
-  lazy val text = tokens.map(_.token.text).mkString
-
+  def containsUnicodeEscape: Boolean = {
+    for (token <- tokens if token.token.containsUnicodeEscape) 
+      return true
+    false
+  }
+  
+  lazy val text: String = {
+    val sb = new StringBuilder
+    for (token <- tokens) sb.append(token.text)
+//    tokens.flatMap(_.token.text)(scala.collection.breakOut)
+  sb.toString
+  }
   lazy val rawText = tokens.map(_.token.rawText).mkString
 
   def rawTokens = tokens.map(_.token)
 
   def offset = tokens.head.token.offset
+  
+  def lastCharacterOffset = tokens.last.token.lastCharacterOffset
   
 }

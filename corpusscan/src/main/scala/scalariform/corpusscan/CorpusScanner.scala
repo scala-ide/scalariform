@@ -23,7 +23,7 @@ object CorpusScanner extends SpecificFormatter {
     val sourceAgain = ScalaLexer.rawTokenise(source).map(_.text).mkString
     if (source != sourceAgain)
       return Some(TokensDoNotCoverSource)
-    val (_, tokens) = ScalaLexer.tokeniseFull(file)
+    val tokens = ScalaLexer.tokenise(file)
     try {
       val result = new ScalaParser(tokens.toArray).compilationUnitOrScript()
       if (result.tokens != tokens.init) /* drop EOF */

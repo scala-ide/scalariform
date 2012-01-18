@@ -1,4 +1,5 @@
 package scalariform.gui
+
 import java.awt.event._
 import net.miginfocom.layout._
 import net.miginfocom.swing._
@@ -57,11 +58,11 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
   }
   
   case class ListNode(name: String, list: List[_ <: AnyRef]) extends TreeNode(name) {
-    lazy val children = list map { makeTreeNode(_) }
+    lazy val children = list map { x: AnyRef => makeTreeNode(x) }
   }
   
   case class OptionNode(name: String, opt: Option[_ <: AnyRef]) extends TreeNode(name) {
-    lazy val children = opt map { makeTreeNode(_) } toList
+    lazy val children = opt map { x => makeTreeNode(x) } toList
   }
 
   case class EitherNode(name: String, either: Either[_ <: AnyRef, _ <: AnyRef]) extends TreeNode(name) {

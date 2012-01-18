@@ -1,68 +1,41 @@
 package scalariform.lexer
 
-import scala.annotation.tailrec
-import scala.collection.immutable.Queue
-import scala.collection.JavaConversions._
-import scalariform.utils.Utils._
 import scalariform.lexer.Tokens._
-import java.{ util ⇒ ju }
 
 /**
  * Logic for promoting intertoken whitespace/comments to a NEWLINE or NEWLINES token as required.
  */
-class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) extends HiddenTokenInfo {
+class NewlineInferencer(private val delegate: WhitespaceAndCommentsGrouper) extends Iterator[Token] {
 
   import NewlineInferencer._
 
-  require(delegate.hasNext)
+  //  private var currentToken: Token = _
 
-  private var hiddenPredecessors: ju.Map[Token, HiddenTokens] = new ju.HashMap()
-  
-  private var inferredNewlines: ju.Map[Token, HiddenTokens] = new ju.HashMap()
+  private var nextToken: Token = if (delegate.hasNext) delegate.next() else null
 
-  def isInferredNewline(token: Token): Boolean = inferredNewlines containsKey token
+  private var previousToken: Token = _
 
-  def inferredNewlines(token: Token): Option[HiddenTokens] = Option(inferredNewlines get token)
+  private var tokenToEmitNextTime: Token = _
 
-  def hiddenPredecessors(token: Token): HiddenTokens = hiddenPredecessors get token
-
-  lazy val allHiddenTokens = hiddenPredecessors.values ++ inferredNewlines.values
-
-  private var buffer: Queue[(HiddenTokens, Token)] = Queue()
-
-  @tailrec
-  private def refillBuffer() {
-    if (buffer.size < 2 && delegate.hasNext) {
-      buffer = buffer enqueue delegate.next()
-      refillBuffer()
-    }
-  }
-
-  refillBuffer()
-
-  private def bufferInvariant = buffer.size <= 2 && (delegate.hasNext implies buffer.size == 2)
-
-  require(bufferInvariant)
-
-  private var tokenToEmitNextTime: Option[Token] = None
-
-  private var previousTokenOption: Option[Token] = None
-
-  // Keeps track of the nested regions which allow multiple statements or not. An item in the stack indicates the
-  // expected closing token type for that region.
+  /**
+   *  Keeps track of the nested regions which allow multiple statements or not. An item in the stack indicates the
+   *  expected closing token type for that region.
+   */
   private var regionMarkerStack: List[TokenType] = Nil
 
-  def nextToken(): Token = {
-    val (token, hiddenTokens) = tokenToEmitNextTime match {
-      case Some(token) ⇒
-        tokenToEmitNextTime = None
-        (token, HiddenTokens(Nil))
-      case None ⇒
+  def hasNext = nextToken != null || delegate.hasNext || tokenToEmitNextTime != null
+
+  def next(): Token = {
+    val token =
+      if (tokenToEmitNextTime == null)
         fetchNextToken()
-    }
-    hiddenPredecessors.put(token, hiddenTokens)
-    updateRegionStack(token.tokenType)
-    previousTokenOption = Some(token)
+      else {
+        val result = tokenToEmitNextTime
+        tokenToEmitNextTime = null
+        result
+      }
+    updateRegionStack(token.tokenType, nextToken)
+    previousToken = token
     token
   }
 
@@ -70,7 +43,7 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
    * Multiple statements are allowed immediately inside "{..}" regions, but disallowed immediately inside "[..]", "(..)"
    * and "case ... =>" regions.
    */
-  private def updateRegionStack(tokenType: TokenType) =
+  private def updateRegionStack(tokenType: TokenType, nextToken: Token) =
     tokenType match {
       case LBRACE ⇒
         regionMarkerStack ::= RBRACE
@@ -78,9 +51,8 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
         regionMarkerStack ::= RPAREN
       case LBRACKET ⇒
         regionMarkerStack ::= RBRACKET
-      case CASE if !buffer.isEmpty ⇒
-        val (_, followingToken) = buffer.front
-        val followingTokenType = followingToken.tokenType
+      case CASE if nextToken != null ⇒
+        val followingTokenType = nextToken.tokenType
         // "case class" and "case object" are excluded from the usual "case .. =>" region.
         if (followingTokenType != CLASS && followingTokenType != OBJECT)
           regionMarkerStack ::= ARROW
@@ -89,42 +61,67 @@ class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) e
       case _ ⇒
     }
 
-  private def fetchNextToken(): (Token, HiddenTokens) = {
-    val (hiddenTokens, token) = consumeFromBuffer()
-    if (shouldTranslateToNewline(hiddenTokens, token)) {
-      val tokenType = if (hiddenTokens.text matches BLANK_LINE_PATTERN) NEWLINES else NEWLINE
-      val newlineToken = Token(tokenType, hiddenTokens.text, hiddenTokens.offset, hiddenTokens.rawText)
-      tokenToEmitNextTime = Some(token)
-      inferredNewlines.put(newlineToken, hiddenTokens)
-      (newlineToken, HiddenTokens(Nil))
-    } else
-      (token, hiddenTokens)
+  private def fetchNextToken(): Token = {
+    val token = nextToken
+    if (delegate.hasNext)
+      nextToken = delegate.next()
+    else
+      nextToken = null
+    if (shouldTranslateToNewline(previousToken, token, nextToken))
+      translateToNewline(token)
+    else
+      token
   }
 
-  private def consumeFromBuffer(): (HiddenTokens, Token) = {
-    val ((hiddenTokens, token), newBuffer) = buffer.dequeue
-    buffer = newBuffer
-    refillBuffer()
-    require(bufferInvariant)
-    (hiddenTokens, token)
+  private def translateToNewline(currentToken: Token): Token = {
+    val currentHiddenTokens = currentToken.associatedWhitespaceAndComments
+    val rawText = delegate.text.substring(currentHiddenTokens.offset, currentHiddenTokens.lastCharacterOffset + 1)
+    val text = if (currentHiddenTokens.containsUnicodeEscape) currentHiddenTokens.text else rawText
+    val tokenType = if (containsBlankLine(text)) NEWLINES else NEWLINE
+    val newlineToken = Token(tokenType, text, currentHiddenTokens.offset, rawText)
+    currentToken.associatedWhitespaceAndComments_ = NoHiddenTokens
+    newlineToken.associatedWhitespaceAndComments_ = currentHiddenTokens
+    tokenToEmitNextTime = currentToken
+    newlineToken
   }
 
-  private def shouldTranslateToNewline(hiddenTokens: HiddenTokens, followingToken: Token) = {
-    val nextTokenType = followingToken.tokenType
-    val nextCanBeginAStatement = !TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT(followingToken.tokenType) &&
-      (nextTokenType == CASE implies followingTokenIsClassOrObject)
-    val previousCanEndAStatement = previousTokenOption.map(_.tokenType).map(TOKENS_WHICH_CAN_END_A_STATEMENT).getOrElse(false)
-    hiddenTokens.containsNewline && previousCanEndAStatement && nextCanBeginAStatement && multipleStatementsAllowed
+  private def containsNewline(hiddenTokens: HiddenTokens) =
+    hiddenTokens.exists(_.text contains '\n')
+
+  private def shouldTranslateToNewline(previousToken: Token, currentToken: Token, nextToken: Token): Boolean = {
+    val hiddenTokens = currentToken.associatedWhitespaceAndComments
+    val currentTokenType = currentToken.tokenType
+    if (!containsNewline(hiddenTokens))
+      return false
+    if (TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT contains currentTokenType)
+      return false
+    if (currentTokenType == CASE && !followingTokenIsClassOrObject(nextToken))
+      return false
+    if (regionMarkerStack.nonEmpty && regionMarkerStack.head != RBRACE)
+      return false
+    else
+      return previousToken != null && (TOKENS_WHICH_CAN_END_A_STATEMENT contains previousToken.tokenType)
   }
 
-  private def multipleStatementsAllowed =
-    regionMarkerStack.isEmpty || regionMarkerStack.head == RBRACE
+  private def followingTokenIsClassOrObject(nextToken: Token): Boolean =
+    nextToken != null && (nextToken.tokenType == CLASS || nextToken.tokenType == OBJECT)
 
-  private def followingTokenIsClassOrObject: Boolean =
-    buffer.headOption match {
-      case None                      ⇒ false
-      case Some((_, followingToken)) ⇒ followingToken.tokenType == CLASS || followingToken.tokenType == OBJECT
+  private def containsBlankLine(s: String): Boolean = {
+    var i = 0
+    var inBlankLine = false
+    while (i < s.length) {
+      val c = s(i)
+      if (inBlankLine) {
+        if (c == '\n' || c == '\r')
+          return true
+        else if (c > ' ')
+          inBlankLine = false
+      } else if (c == '\n' || c == '\r')
+        inBlankLine = true
+      i += 1
     }
+    false
+  }
 
 }
 

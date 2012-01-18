@@ -6,6 +6,7 @@ import scalariform.lexer.Chars._
 import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
+import scalariform.SCALA_211
 
 /**
  * Lexer implementation for non-XML Scala
@@ -113,9 +114,11 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       case SU ⇒ token(EOF)
       case _ ⇒
         if (ch == '\u21D2') {
-          nextChar(); token(ARROW)
+          nextChar()
+          token(ARROW)
         } else if (ch == '\u2190') {
-          nextChar(); token(LARROW)
+          nextChar()
+          token(LARROW)
         } else if (Character.isUnicodeIdentifierStart(ch)) {
           nextChar()
           getIdentRest()
@@ -388,8 +391,15 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     }
 
     if (ch == '.') {
+      val c = ch(1)
+      
+      if (scalaVersion == SCALA_211 && !isDigit(c)) {
+        token(INTEGER_LITERAL)
+        return
+      }
+      
       val isDefinitelyNumber =
-        (ch(1): @switch) match {
+        (c: @switch) match {
           /** Another digit is a giveaway. */
           case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ⇒
             true
@@ -440,4 +450,3 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
   }
 
 }
-

@@ -34,6 +34,6 @@ object Chars {
    * @see scala.reflect.internal.Chars.isIdentifierPart
    */
   def isIdentifierPart(c: Char) =
-    (c == '$') || Character.isUnicodeIdentifierPart(c)
+    (c == '$') || Character.isUnicodeIdentifierPart(c) && c != CharConstants.SU
 
 }

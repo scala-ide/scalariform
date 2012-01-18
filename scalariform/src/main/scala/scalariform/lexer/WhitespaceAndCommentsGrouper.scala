@@ -6,22 +6,29 @@ import scala.collection.mutable.ListBuffer
 /**
  * Groups together whitespace and comments and filters them out from other token types.
  */
-private[lexer] class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[(HiddenTokens, Token)] {
+class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[Token] {
 
   private var nextToken = lexer.next()
 
   private var ended = false
 
+  private var hiddenTokens: HiddenTokens = _
+  
+  def getHiddenTokens = hiddenTokens
+  
   def hasNext = !ended
 
+  private[lexer] def text = lexer.text
+  
   def next() = {
     require(hasNext)
-    val hiddenTokens = readHiddenTokens()
+    hiddenTokens = readHiddenTokens()
     val resultToken = nextToken
+    resultToken.associatedWhitespaceAndComments_ = hiddenTokens
     if (nextToken.tokenType == EOF)
       ended = true
     nextToken = lexer.next()
-    (hiddenTokens, resultToken)
+    resultToken
   }
 
   private def readHiddenTokens(): HiddenTokens = {
