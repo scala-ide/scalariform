@@ -3,9 +3,6 @@ package scalariform.lexer
 import scalariform.lexer.Tokens._
 import scala.collection.mutable.ListBuffer
 
-/**
- * Groups together whitespace and comments and filters them out from other token types.
- */
 class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[Token] {
 
   private var nextToken = lexer.next()

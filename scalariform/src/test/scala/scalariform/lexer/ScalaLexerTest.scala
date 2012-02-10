@@ -113,7 +113,7 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
     "5.d" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5." producesTokens (INTEGER_LITERAL, DOT)
   }
-  
+
   "'f'" producesTokens (CHARACTER_LITERAL)
   """'\n'""" producesTokens (CHARACTER_LITERAL)
   """'\025'""" producesTokens (CHARACTER_LITERAL)
@@ -225,13 +225,14 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   }
 
-  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210) {
+  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = SCALA_28_29_210) {
 
     def producesTokens(toks: TokenType*)() {
       check(s.stripMargin, toks.toList)
     }
 
     private def check(s: String, expectedTokens: List[TokenType]) {
+      val scalaVersion = ScalaVersions.representativeVersion(scalaVersionGroup)
       it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors + ", scalaVersion = " + scalaVersion) in {
         val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors, scalaVersion)
         val actualTokenTypes = actualTokens map { _.tokenType } filter { EOF != }

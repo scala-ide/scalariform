@@ -10,7 +10,7 @@ import scalariform.formatter._
 object LexerPerformanceTest {
 
   val ITERATIONS = 1000
-  
+
   val WARMUP = 200
 
   def main(args: Array[String]) {
@@ -54,9 +54,9 @@ object LexerPerformanceTest {
 
   private def doIt(s: String) = {
     //    new WhitespaceAndCommentsGrouper(ScalaLexer.createRawLexer(s)).toList
-    ScalaLexer.tokenise(s)
-    //    UnicodeEscapeDecoder.decode(s)
-//        ScalaLexer.rawTokenise(s)
+    //    ScalaLexer.tokenise(s)
+    //        UnicodeEscapeDecoder.decode(s)
+    ScalaLexer.rawTokenise(s) // 8.13
   }
 
 }

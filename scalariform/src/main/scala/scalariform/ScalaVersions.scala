@@ -8,6 +8,8 @@ case object SCALA_28_29_210 extends ScalaVersionGroup
 case object SCALA_211 extends ScalaVersionGroup
 
 object ScalaVersions {
+  
+  def DEFAULT_VERSION = "2.9.1"
 
   def getVersionGroup(version: String): ScalaVersionGroup =
     version match {
@@ -17,4 +19,9 @@ object ScalaVersions {
       case _                               ⇒ SCALA_211
     }
 
+  def representativeVersion(versionGroup: ScalaVersionGroup) = versionGroup match {
+    case SCALA_28_29_210 => "2.9.1"
+    case SCALA_211 => "2.11"
+  }
+  
 }

@@ -5,16 +5,21 @@ import scalariform.lexer.Tokens._
 /**
  * Logic for promoting intertoken whitespace/comments to a NEWLINE or NEWLINES token as required.
  */
-class NewlineInferencer(private val delegate: WhitespaceAndCommentsGrouper) extends Iterator[Token] {
+class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator[Token] {
 
   import NewlineInferencer._
 
-  //  private var currentToken: Token = _
-
+  /**
+   * Contains the next unprocessed token from the delegate, or null if we've processed them all.
+   */
   private var nextToken: Token = if (delegate.hasNext) delegate.next() else null
 
   private var previousToken: Token = _
 
+  /**
+   * If not null, we emit this token rather than looking at nextToken (used for inserting NEWLINE or NEWLINES
+   * into the stream).
+   */
   private var tokenToEmitNextTime: Token = _
 
   /**
@@ -23,7 +28,7 @@ class NewlineInferencer(private val delegate: WhitespaceAndCommentsGrouper) exte
    */
   private var regionMarkerStack: List[TokenType] = Nil
 
-  def hasNext = nextToken != null || delegate.hasNext || tokenToEmitNextTime != null
+  def hasNext = nextToken != null || tokenToEmitNextTime != null
 
   def next(): Token = {
     val token =
@@ -92,13 +97,13 @@ class NewlineInferencer(private val delegate: WhitespaceAndCommentsGrouper) exte
     val hiddenTokens = currentToken.associatedWhitespaceAndComments
     val currentTokenType = currentToken.tokenType
     if (!containsNewline(hiddenTokens))
-      return false
-    if (TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT contains currentTokenType)
-      return false
-    if (currentTokenType == CASE && !followingTokenIsClassOrObject(nextToken))
-      return false
-    if (regionMarkerStack.nonEmpty && regionMarkerStack.head != RBRACE)
-      return false
+      false
+    else if (TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT contains currentTokenType)
+      false
+    else if (currentTokenType == CASE && !followingTokenIsClassOrObject(nextToken))
+      false
+    else if (regionMarkerStack.nonEmpty && regionMarkerStack.head != RBRACE)
+      false
     else
       return previousToken != null && (TOKENS_WHICH_CAN_END_A_STATEMENT contains previousToken.tokenType)
   }

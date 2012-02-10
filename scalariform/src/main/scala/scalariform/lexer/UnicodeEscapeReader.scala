@@ -10,14 +10,8 @@ object UnicodeEscapeDecoder {
    * If forgiveErrors is true, then no exception will be thrown on malformed escapes.
    */
   @throws(classOf[ScalaLexerException])
-  def decode(text: String, forgiveErrors: Boolean = false): String = {
-    val reader = new UnicodeEscapeReader(text, forgiveErrors)
-    val sb = new StringBuilder(text.length)
-    while (!reader.isEof)
-      sb.append(reader.read())
-    sb.toString
-    reader.mkString
-  }
+  def decode(text: String, forgiveErrors: Boolean = false): String =
+    new UnicodeEscapeReader(text, forgiveErrors).mkString
 
 }
 

@@ -12,7 +12,7 @@ import scalariform.utils.Utils
 import scalariform._
 
 class ScalaLexer(
-  reader: IUnicodeEscapeReader,
+  protected val reader: IUnicodeEscapeReader,
   protected val forgiveErrors: Boolean = false,
   protected val scalaVersion: ScalaVersionGroup = SCALA_28_29_210)
     extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
@@ -61,7 +61,7 @@ class ScalaLexer(
 
   private var stopIndex: Int = 0
 
-  private var builtToken: Token = _
+  protected var builtToken: Token = _
 
   protected def eof = untilEof == 0
 
@@ -186,27 +186,50 @@ class ScalaLexer(
 
 object ScalaLexer {
 
+  /**
+   * Convert the given Scala source code into a list of "raw" tokens.
+   *
+   * This includes whitespace and comment tokens. No NEWLINE or NEWLINES tokens are inferred. The final token
+   * will be of type EOF.
+   *
+   * @param forgiveErrors -- if true, no exceptions will be thrown when malformed tokens are encountered.
+   * @param scalaVersion -- the version of Scala to assume as the source type (e.g. "2.9.1"). This can affect the
+   *   interpretation of certain tokens (for example, floating point literals).
+   */
+  @throws(classOf[ScalaLexerException])
+  def rawTokenise(s: String, forgiveErrors: Boolean = false, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): List[Token] =
+    createRawLexer(s, forgiveErrors, scalaVersion).toList
+
+  /**
+   * Create a lexer for "raw" tokens.
+   *
+   * @see rawTokenise
+   */
+  def createRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): ScalaLexer =
+    makeRawLexer(s, forgiveErrors, ScalaVersions.getVersionGroup(scalaVersion))
+
+  /**
+   * Convert the given Scala source code into a list of tokens.
+   *
+   * NEWLINE or NEWLINES tokens are inferred, and whitespace and comments are absorbed into the token they
+   * precede. The final token will be of type EOF.
+   *
+   * @param forgiveErrors -- if true, no exceptions will be thrown when malformed tokens are encountered.
+   * @param scalaVersion -- the version of Scala to assume as the source type (e.g. "2.9.1"). This can affect the
+   *   interpretation of certain tokens (for example, floating point literals).
+   */
+  @throws(classOf[ScalaLexerException])
+  def tokenise(s: String, forgiveErrors: Boolean = false, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): List[Token] = {
+    val rawLexer = createRawLexer(s, forgiveErrors, scalaVersion)
+    val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(rawLexer))
+    lexer.toList
+  }
+
   private val BUFFER_SIZE = 16 // sufficient lookahead for "</xml:unparsed>" (15 chars)
 
   private val BUFFER_MASK = BUFFER_SIZE - 1
 
-  def createRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210): ScalaLexer =
-    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersion)
-
-  def tokenise(file: File): List[Token] = tokenise(Source.fromFile(file).mkString)
-
-  def tokenise(s: String, forgiveErrors: Boolean = false): List[Token] = {
-    val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(createRawLexer(s, forgiveErrors)))
-    lexer.toList
-  }
-
-  /**
-   * @param forgiveErrors -- if true, no exceptions will be thrown
-   * @return a list of tokens from the source, including whitespace and comment tokens. No NEWLINE or
-   * NEWLINES tokens are inferred. The final token will be of type EOF.
-   */
-  @throws(classOf[ScalaLexerException])
-  def rawTokenise(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210): List[Token] =
-    createRawLexer(s, forgiveErrors, scalaVersion).toList
+  private def makeRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = SCALA_28_29_210): ScalaLexer =
+    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersionGroup)
 
 }

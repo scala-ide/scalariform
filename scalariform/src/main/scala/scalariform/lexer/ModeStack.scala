@@ -9,9 +9,13 @@ trait ModeStack { self: ScalaLexer ⇒
 
   private val modeStack = new Stack[LexerMode]
 
+  private var currentRegionStart: Int = 0
+
   modeStack.push(new ScalaMode)
 
-  protected def popMode() { modeStack.pop() }
+  protected def popMode() {
+    val mode = modeStack.pop()
+  }
 
   protected def isRootMode = modeStack.size == 1
 
@@ -25,9 +29,9 @@ trait ModeStack { self: ScalaLexer ⇒
     fetchXmlToken()
   }
 
-  protected def xmlMode: XmlMode = modeStack.head.asInstanceOf[XmlMode]
-
   protected def isXmlMode = modeStack.head.isInstanceOf[XmlMode]
+
+  protected def xmlMode: XmlMode = modeStack.head.asInstanceOf[XmlMode]
 
   protected def scalaMode: ScalaMode = modeStack.head.asInstanceOf[ScalaMode]
 
