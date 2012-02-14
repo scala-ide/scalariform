@@ -1,8 +1,19 @@
 package scalariform.utils
 
+object TextEdit {
+
+  def delete(range: Range): TextEdit = delete(range.offset, range.length)
+
+  def delete(position: Int, length: Int): TextEdit = TextEdit(position = position, length = length, replacement = "")
+
+}
+
 case class TextEdit(position: Int, length: Int, replacement: String) {
+
   require(position >= 0, "position must be positive: " + position)
+
   require(length >= 0)
+
   override lazy val toString = {
     val replacementDisplay = replacement.replace("\n", """\n""").replace("\r", """\r""")
     getClass.getSimpleName + "(position = " + position + ", length = " + length + ", replacement = '" + replacementDisplay + "')"
