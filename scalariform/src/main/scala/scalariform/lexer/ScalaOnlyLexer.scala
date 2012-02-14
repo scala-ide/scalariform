@@ -111,7 +111,8 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
         nextChar(); token(LBRACKET)
       case ']' ⇒
         nextChar(); token(RBRACKET)
-      case SU ⇒ token(EOF)
+      case SU ⇒ 
+        token(EOF)
       case _ ⇒
         if (ch == '\u21D2') {
           nextChar()

@@ -80,6 +80,18 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       highlightToken(token, document)
   }
 
+  private def highlightRedundantSemis(textPane: JTextPane) {
+    val semis = RedundantSemicolonDetector.findRedundantSemis(textPane.getText)
+    val document = textPane.getStyledDocument
+    for (semi ← semis) {
+      val style = document.addStyle("semi", null)
+      StyleConstants.setFontFamily(style, "monospaced")
+      StyleConstants.setFontSize(style, 14)
+      StyleConstants.setBackground(style, Color.YELLOW)
+      document.setCharacterAttributes(semi.offset, semi.length, style, true)
+    }
+  }
+
   setLayout(new BorderLayout)
 
   setTitle("Scalariform " + scalariform.VERSION)
@@ -128,6 +140,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     try {
       onSwingThread {
         syntaxHighlight(inputTextPane)
+        highlightRedundantSemis(inputTextPane)
         syntaxHighlight(outputTextPane)
       }
 

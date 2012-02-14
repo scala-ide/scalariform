@@ -13,6 +13,8 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
   implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210) =
     new TestString(s, forgiveErrors, scalaVersion)
 
+  "" producesTokens ()
+  
   "println" producesTokens (VARID)
 
   "lazy" producesTokens (LAZY)
@@ -235,9 +237,11 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
       val scalaVersion = ScalaVersions.representativeVersion(scalaVersionGroup)
       it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors + ", scalaVersion = " + scalaVersion) in {
         val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors, scalaVersion)
-        val actualTokenTypes = actualTokens map { _.tokenType } filter { EOF != }
-        val reconstitutedSource = actualTokens map { _.rawText } mkString ""
-        require(actualTokenTypes == expectedTokens, "Tokens do not match. Expected " + expectedTokens + ", but was " + actualTokenTypes)
+        val actualTokenTypes = actualTokens.map(_.tokenType)
+        require(actualTokenTypes.last == EOF, "Last token must be EOF, but was " + actualTokens.last.tokenType)
+        require(actualTokenTypes.count(_ == EOF) == 1, "There must only be one EOF token")
+        val reconstitutedSource = actualTokens.init.map(_.rawText).mkString
+        require(actualTokenTypes.init == expectedTokens, "Tokens do not match. Expected " + expectedTokens + ", but was " + actualTokenTypes.init)
         require(s == reconstitutedSource, "tokens do not partition text correctly: " + s + " vs " + reconstitutedSource)
       }
     }

@@ -19,6 +19,8 @@ class ScalaLexer(
 
   import ScalaLexer._
 
+  // -- Character buffer ----------------------------------------------------------------------------------------
+
   /**
    * Circular buffer of characters yet to be processed (after unicode escaping)
    */
@@ -33,10 +35,22 @@ class ScalaLexer(
 
   private var bufferEnd = 0
 
+  private def charsInBuffer = (BUFFER_SIZE + bufferEnd - bufferStart) & BUFFER_MASK
+
+  /**
+   * Is the current character the result of a unicode escape?
+   */
+  protected def isUnicodeEscape = unicodeEscapesBuffer(bufferStart).isDefined
+
+  // ------------------------------------------------------------------------------------------------------------
+
+  /**
+   * Has a Unicode escape occurred somewhere in the current token?
+   */
   private var seenUnicodeEscape = false
 
   /**
-   * Start position of this token in the (pre Unicode escaped) text
+   * Start position of this token in the (pre-Unicode escaped) text
    */
   private var tokenOffset = 0
 
@@ -44,11 +58,6 @@ class ScalaLexer(
    * Length so far of this token (before unicode escaping)
    */
   private var tokenLength = 0
-
-  /**
-   * Number of characters left in queues before end of file, or -1, if this is unknown
-   */
-  private var untilEof = -1
 
   /**
    * The previous character
@@ -63,14 +72,14 @@ class ScalaLexer(
 
   protected var builtToken: Token = _
 
+  /**
+   * Number of characters left in the character buffer before the end of file, or -1 if this is yet to be discovered.
+   */
+  private var untilEof = if (reader.isEof) 0 else -1
+
   protected def eof = untilEof == 0
 
-  private def charsInBuffer = (BUFFER_SIZE + bufferEnd - bufferStart) & BUFFER_MASK
-
-  /**
-   * Is the current character the result of a unicode escape?
-   */
-  protected def isUnicodeEscape = unicodeEscapesBuffer(bufferStart).isDefined
+  private var eofTokenEmitted = false
 
   /**
    * Get the current character.
@@ -177,10 +186,12 @@ class ScalaLexer(
       fetchXmlToken()
     else
       fetchScalaToken()
+    if (builtToken.tokenType == EOF)
+      eofTokenEmitted = true
     builtToken
   }
 
-  def hasNext = !eof
+  def hasNext = !eofTokenEmitted
 
 }
 

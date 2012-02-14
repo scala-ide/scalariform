@@ -15,7 +15,7 @@ object RedundantSemicolonDetector extends App {
       val sourceWithoutSemi = deleteRange(source, semi.range)
       val tokensWithoutSemi = ScalaLexer.tokenise(sourceWithoutSemi)
       val replacementToken = tokensWithoutSemi(index)
-      replacementToken.isNewline || replacementToken.tokenType == Tokens.EOF
+      replacementToken.isNewline || replacementToken.tokenType == Tokens.EOF || replacementToken.tokenType == Tokens.RBRACE
     }
 
     ScalaLexer.tokenise(source).zipWithIndex.collect {
