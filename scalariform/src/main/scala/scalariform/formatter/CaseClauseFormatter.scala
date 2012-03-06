@@ -57,7 +57,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
 
           val casePatternSource = getSource(casePattern)
           val casePatternFormatResult = formatCasePattern(casePattern)(FormatterState(indentLevel = 0))
-          val offset = casePattern.firstToken.startIndex
+          val offset = casePattern.firstToken.offset
           val edits = writeTokens(casePatternSource, casePattern.tokens, casePatternFormatResult, offset)
           val formattedText = TextEditProcessor.runEdits(casePatternSource, edits)
 

@@ -1,23 +1,16 @@
 package scalariform.lexer
 
-import scala.annotation.{ switch, tailrec }
+import scala.annotation._
+import scalariform.lexer.CharConstants.SU
+import scalariform.lexer.Chars._
+import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
-import ScalaLexer._
 
-import CharConstants._
-
-trait ScalaOnlyLexer extends Lexer {
-
-  import ScalaOnlyLexer._
-
-  class ScalaMode(private var braceNestLevel: Int = 0) extends LexerMode {
-    def nestBrace() { braceNestLevel += 1 }
-    def unnestBrace(): Int = {
-      braceNestLevel -= 1
-      braceNestLevel
-    }
-  }
+/**
+ * Lexer implementation for "pure Scala", i.e. not XML
+ */
+private[lexer] trait ScalaOnlyLexer extends Lexer {
 
   private var processingSymbol = false
 
@@ -363,9 +356,8 @@ trait ScalaOnlyLexer extends Lexer {
     val base1 = if (base < 10) 10 else base
 
     // read 8,9's even if format is octal, produce a malformed number error afterwards.
-    while (digit2int(ch, base1) >= 0) {
+    while (Utils.digit2int(ch, base1) >= 0)
       nextChar()
-    }
 
     def restOfUncertainToken() = {
       def isEfd = ch match {
@@ -428,7 +420,7 @@ trait ScalaOnlyLexer extends Lexer {
       throw new ScalaLexerException("Invalid literal number: " + ch)
   }
 
-  def charLitOr(op: () ⇒ Unit) {
+  private def charLitOr(op: () ⇒ Unit) {
     nextChar()
     if (ch == '\'') {
       nextChar()
@@ -439,43 +431,6 @@ trait ScalaOnlyLexer extends Lexer {
       processingSymbol = false
     }
   }
-
-  // TODO: Grab from lib?
-  def isIdentifierStart(c: Char) =
-    if (c == SU)
-      false
-    else
-      ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'a') || (c == '_') || (c == '$') || Character.isUnicodeIdentifierStart(c)
-
-  def isIdentifierPart(c: Char) =
-    if (c == SU)
-      false
-    else
-      isIdentifierStart(c) || ('0' <= c && c <= '9') || Character.isUnicodeIdentifierPart(c)
-
-}
-
-object ScalaOnlyLexer {
-
-  def isOperatorPart(c: Char): Boolean =
-    if (c == SU)
-      false
-    else
-      (c: @switch) match {
-        case '~' | '!' | '@' | '#' | '%' |
-          '^' | '*' | '+' | '-' | '<' |
-          '>' | '?' | ':' | '=' | '&' |
-          '|' | '/' | '\\' ⇒ true
-        case c ⇒ isSpecial(c)
-      }
-
-  def isSpecial(c: Char) =
-    if (c == SU)
-      false
-    else {
-      val chtp = Character.getType(c)
-      chtp == Character.MATH_SYMBOL.toInt || chtp == Character.OTHER_SYMBOL.toInt
-    }
 
 }
 

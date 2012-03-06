@@ -578,7 +578,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isOpAssignmentName(name: String) = name match {
     case "!=" | "<=" | ">=" | "" ⇒ false
-    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && ScalaOnlyLexer.isOperatorPart(name(0))
+    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && Chars.isOperatorPart(name(0))
   }
 
   private def postfixExpr() {
@@ -732,7 +732,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case USCORE ⇒
           nextToken()
           if (SUBTYPE || SUPERTYPE) wildcardType()
-        case _ if isIdent && isVariableName(currentToken.getText) ⇒
+        case _ if isIdent && isVariableName(currentToken.text) ⇒
           ident()
         case _ ⇒
           typ()
@@ -1528,7 +1528,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private case object InTemplate extends Location
 
   private def isLeftAssoc(token: Token) =
-    token.getText.size > 0 && token.getText.last != ':'
+    token.text.nonEmpty && token.text.last != ':'
 
   private def isVariableName(name: String): Boolean = {
     val first = name(0)
@@ -1537,8 +1537,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isVarPattern(token: Token) = {
     isIdent(token.tokenType) &&
-      isVariableName(token.getText) &&
-      !token.getText.startsWith("`")
+      isVariableName(token.text) &&
+      !token.text.startsWith("`")
   }
 
   private def optional[T](p: ⇒ T): Option[T] =

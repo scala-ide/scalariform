@@ -2,7 +2,7 @@ package scalariform.lexer
 
 import scalariform.lexer.Tokens._
 
-object Keywords extends (String ⇒ Option[TokenType]) {
+object Keywords {
 
   def apply(s: String): Option[TokenType] = keywords get s
 

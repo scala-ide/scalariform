@@ -220,8 +220,8 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
     private def check(s: String, expectedTokens: List[TokenType]) {
       it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors) in {
         val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors)
-        val actualTokenTypes = actualTokens map { _.getType }
-        val reconstitutedSource = actualTokens map { _.getText } mkString ""
+        val actualTokenTypes = actualTokens map { _.tokenType }
+        val reconstitutedSource = actualTokens map { _.rawText } mkString ""
         require(actualTokenTypes == expectedTokens, "tokens do not match expected: " + expectedTokens + " vs " + actualTokenTypes)
         require(s == reconstitutedSource, "tokens do not partition text correctly: " + s + " vs " + reconstitutedSource)
       }

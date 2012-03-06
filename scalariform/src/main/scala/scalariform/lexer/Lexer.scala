@@ -1,29 +1,26 @@
 package scalariform.lexer
 
+import scala.annotation._
+import scala.collection.mutable.{ Queue, Stack }
 import scala.math.min
-import scala.annotation.{ switch, tailrec }
+import scala.xml.parsing.TokenTests
+import scalariform.lexer.CharConstants.SU
+import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
-import scala.xml.parsing.TokenTests
-import scala.collection.mutable.{ Queue, Stack }
-import ScalaLexer._
-
-object CharConstants {
-  final val SU = '\u001A'
-}
 
 abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
-  import CharConstants._
 
   protected val forgiveLexerErrors: Boolean
 
+  // TODO: use this
   protected val tokenTextBuffer = new StringBuilder
 
   private var actualTokenTextOffset = 0
   private var actualTokenTextLength = 0
 
   protected var eof = false
-  protected var builtToken: Option[Token] = None
+  protected var builtToken: Token = _
 
   // Two queues maintained in parallel. Invariant: chQueue.length == unicodeEscapesQueue.length
   private val chQueue = new Queue[Char]
@@ -33,31 +30,27 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
 
   protected val modeStack = new Stack[LexerMode]
 
-  trait LexerMode
+  protected def isUnicodeEscape = unicodeEscapesQueue.last.isDefined
 
-  protected def isUnicodeEscape = reader.unicodeEscapeOfPreviousRead.isDefined
-
-  // TODO: Merge with ch(offset)
   protected def ch: Char = {
-    if (chQueue.isEmpty) {
-      val c = reader.read()
-      if (reader.isEof)
-        eof = true
-      chQueue.enqueue(c)
-      unicodeEscapesQueue.enqueue(reader.unicodeEscapeOfPreviousRead)
-    }
+    if (chQueue.isEmpty)
+      slurpOneChar()
     chQueue.head
   }
 
   protected def ch(offset: Int) = {
     val extra = offset + 1 - chQueue.size
-    for (n ← 1 to extra) {
-      chQueue.enqueue(reader.read())
-      if (reader.isEof)
-        eof = true
-      unicodeEscapesQueue.enqueue(reader.unicodeEscapeOfPreviousRead)
-    }
+    for (n ← 1 to extra)
+      slurpOneChar()
     chQueue(offset)
+  }
+
+  private def slurpOneChar() {
+    val (c, unicodeEscapeOfPreviousRead) = reader.read()
+    chQueue.enqueue(c)
+    if (reader.isEof)
+      eof = true
+    unicodeEscapesQueue.enqueue(unicodeEscapeOfPreviousRead)
   }
 
   protected def nextChar() {
@@ -76,16 +69,15 @@ abstract class Lexer(reader: UnicodeEscapeReader) extends TokenTests {
     val tokenLength = actualTokenTextLength
     require(tokenType == EOF || tokenLength > 0)
     val stopIndex = min(startIndex + tokenLength - 1, reader.s.length - 1) // min protects against overeager consumption past EOF in forgiving mode   
-    val tokenText = reader.s.substring(actualTokenTextOffset, stopIndex + 1)
-    val token = new Token(tokenType, tokenText, startIndex, stopIndex)
-    builtToken = Some(token)
+    val rawText = reader.s.substring(actualTokenTextOffset, stopIndex + 1)
+    val text = tokenTextBuffer.toString
+    builtToken = Token(tokenType, text, startIndex, rawText)
     tokenTextBuffer.clear()
     actualTokenTextOffset = stopIndex + 1
     actualTokenTextLength = 0
-    // println("Token: " + token)
   }
 
-  protected def lookaheadIs(s: String): Boolean = Utils.enumerate(s) forall { case (index, c) ⇒ ch(index) == c }
+  protected def lookaheadIs(s: String): Boolean = s.zipWithIndex forall { case (c, index) ⇒ ch(index) == c }
 
   protected def munch(s: String) {
     require(lookaheadIs(s))

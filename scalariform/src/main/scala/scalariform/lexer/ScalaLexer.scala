@@ -1,59 +1,46 @@
 package scalariform.lexer
-import scala.annotation.{ switch, tailrec }
+
+import java.io.File
+import scala.annotation._
+import scala.collection.mutable.{ Queue, Stack, ListBuffer }
+import scala.io.Source
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 
-import scala.collection.mutable.{ Queue, Stack, ListBuffer }
+class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false)
+    extends Lexer(reader) with ScalaOnlyLexer with XmlLexer {
 
-class ScalaLexer(reader: UnicodeEscapeReader, forgiveErrors: Boolean = false) extends Lexer(reader) with ScalaOnlyLexer with XmlLexer {
+  override protected val forgiveLexerErrors = forgiveErrors
 
-  override val forgiveLexerErrors = forgiveErrors
-
-  modeStack.push(new ScalaMode())
+  modeStack.push(new ScalaMode)
 
   def nextToken(): Token = {
-    if (eof)
-      super[Lexer].token(EOF)
-    else if (isXmlMode)
+    if (isXmlMode)
       fetchXmlToken()
     else
       fetchScalaToken()
-    val token = builtToken.get
-    builtToken = None
-    token
+    builtToken
   }
 
-  protected def switchToScalaModeAndFetchToken() {
-    modeStack.push(new ScalaMode())
+  override protected def switchToScalaModeAndFetchToken() {
+    modeStack.push(new ScalaMode)
     fetchScalaToken()
   }
 
-  protected def switchToXmlModeAndFetchToken(): Unit = {
-    modeStack.push(new XmlMode())
+  override protected def switchToXmlModeAndFetchToken() {
+    modeStack.push(new XmlMode)
     fetchXmlToken()
   }
 
 }
 
 object ScalaLexer {
-  import java.io._
-
-  private[lexer] def digit2int(ch: Int, base: Int): Int = {
-    if ('0' <= ch && ch <= '9' && ch < '0' + base)
-      ch - '0'
-    else if ('A' <= ch && ch < 'A' + base - 10)
-      ch - 'A' + 10
-    else if ('a' <= ch && ch < 'a' + base - 10)
-      ch - 'a' + 10
-    else
-      -1
-  }
 
   def createRawLexer(s: String, forgiveErrors: Boolean = false): ScalaLexer =
     new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors)
 
   def tokeniseFull(file: File): (HiddenTokenInfo, List[Token]) = {
-    val s = scala.io.Source.fromFile(file).mkString
+    val s = Source.fromFile(file).mkString
     tokeniseFull(s)
   }
 
@@ -64,7 +51,7 @@ object ScalaLexer {
     while (continue) {
       val token = lexer.nextToken()
       tokenBuffer += token
-      if (token.getType == Tokens.EOF)
+      if (token.tokenType == Tokens.EOF)
         continue = false
     }
 
@@ -80,7 +67,7 @@ object ScalaLexer {
     while (continue) {
       val token = lexer.nextToken()
       actualTokens ::= token
-      if (token.getType == Tokens.EOF)
+      if (token.tokenType == Tokens.EOF)
         continue = false
     }
     (actualTokens.tail).reverse
@@ -96,7 +83,7 @@ object ScalaLexer {
     while (lexer.hasNext) {
       val (_, token) = lexer.next()
       actualTokens ::= token
-      if (token.getType == Tokens.EOF)
+      if (token.tokenType == Tokens.EOF)
         continue = false
     }
     (actualTokens.tail).reverse

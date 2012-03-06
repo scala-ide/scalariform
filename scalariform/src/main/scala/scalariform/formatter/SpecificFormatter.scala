@@ -45,7 +45,7 @@ trait SpecificFormatter {
     for {
       hiddenTokens ← hiddenTokenInfo.allHiddenTokens
       hiddenToken ← hiddenTokens
-      ToggleOption(onOrOff, optionName) ← FormatterDirectiveParser.getDirectives(hiddenToken.getText)
+      ToggleOption(onOrOff, optionName) ← FormatterDirectiveParser.getDirectives(hiddenToken.text)
       rawPreference ← AllPreferences.preferencesByKey.get(optionName)
       if rawPreference.preferenceType == BooleanPreference
       preference = BooleanPreference.cast(rawPreference)
