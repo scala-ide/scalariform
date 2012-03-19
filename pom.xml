@@ -102,19 +102,13 @@
   </pluginRepositories>
   <profiles>
     <profile>
-      <id>scala-2.8.3-SNAPSHOT</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.8.3-SNAPSHOT</value>
-        </property>
-      </activation>
+      <id>release-ide-29</id>
       <repositories>
         <repository>
-          <id>scala-toolchain-2.8.3-SNAPSHOT</id>
-          <name>Scala Toolchain 2.8.3-SNAPSHOT p2 repository</name>
+          <id>scala-toolchain-scalaide-2.0</id>
+          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
           <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.8.3-SNAPSHOT</url>
+          <url>http://download.scala-ide.org/incoming-release-29/dependencies/osgi-toolchain</url>
         </repository>
       </repositories>
     </profile>
