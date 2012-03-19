@@ -73,31 +73,33 @@
   </build>
   <repositories>
     <repository>
-      <id>galileo</id>
+      <id>helios</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/galileo</url>
+      <url>http://download.eclipse.org/releases/helios</url>
     </repository>
     <repository>
-      <id>scala-tools.org.releases</id>
-      <name>Scala Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
+      <id>sonatype.release</id>
+      <name>Sonatype maven release repository</name>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
     <repository>
-      <id>scala-tools.snapshot</id>
-      <name>Scala Tools maven snapshot repository</name>
-      <url>http://scala-tools.org/repo-snapshots</url>
+      <id>sonatype.snapshot</id>
+      <name>Sonatype maven snapshot repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
-      <id>scala-tools.release</id>
-      <name>Scala Tools maven release repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
+      <id>sonatype.release</id>
+      <name>Sonatype maven release repository</name>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </pluginRepository>
     <pluginRepository>
-      <id>scala-tools.snapshot</id>
-      <name>Scala Tools maven snapshot repository</name>
-      <url>http://scala-tools.org/repo-snapshots</url>
+      <id>sonatype.snapshot</id>
+      <name>Sonatype maven snapshot repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </pluginRepository>
   </pluginRepositories>
   <profiles>
