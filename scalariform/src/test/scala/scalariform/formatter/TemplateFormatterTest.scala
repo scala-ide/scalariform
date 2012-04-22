@@ -586,7 +586,18 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |}"""
 
   "@foo\r\ntrait X" ==> "@foo\r\ntrait X"
-      
+
+  """object A {
+    |  @B
+    |  @C
+    |  @D def e
+    |}""" ==>
+  """object A {
+    |  @B
+    |  @C
+    |  @D def e
+    |}"""
+
   // format: ON
 
   override val debug = false

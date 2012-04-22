@@ -9,6 +9,7 @@ import scala.util.parsing.combinator._
 import java.io.File
 import scala.io.Source
 import scalariform.utils.Utils.writeText
+import org.apache.commons.io.FileUtils
 
 sealed trait ParseFault
 case object TokensDoNotCoverSource extends ParseFault
@@ -20,9 +21,12 @@ object CorpusScanner extends SpecificFormatter {
 
   def attemptToParse(file: File): Option[ParseFault] = {
     val source = getText(file)
-    val sourceAgain = ScalaLexer.rawTokenise(source).map(_.text).mkString
-    if (source != sourceAgain)
+    val sourceAgain = ScalaLexer.rawTokenise(source).map(_.rawText).mkString
+    if (source != sourceAgain) {
+      FileUtils.writeStringToFile(new File("source"), source)
+      FileUtils.writeStringToFile(new File("sourceAgain"), sourceAgain)
       return Some(TokensDoNotCoverSource)
+    }
     val tokens = ScalaLexer.tokenise(source)
     try {
       val result = new ScalaParser(tokens.toArray).compilationUnitOrScript()
@@ -43,7 +47,11 @@ object CorpusScanner extends SpecificFormatter {
     val source = getText(file)
     val formatted = format(source)(prefs)
     val formatted2 = format(formatted)(prefs)
-    require(formatted == formatted2, "Idempotency failure")
+    if (formatted != formatted2) {
+      FileUtils.writeStringToFile(new File("formatted"), formatted)
+      FileUtils.writeStringToFile(new File("formatted2"), formatted2)
+      require(formatted == formatted2, "Idempotency failure")
+    }
     writeText(file, formatted)
     //    for (parseFault <- attemptToParse(file))
     //      throw new RuntimeException(parseFault.toString)
@@ -59,7 +67,8 @@ object CorpusScanner extends SpecificFormatter {
 
 object Runner {
 
-  val corpusDir = "/home/matt/scala-corpus"
+  val corpusDir = "/home/matt/coding/scala-corpus"
+  //  val corpusDir = "/home/matt/scala-corpus"
 
   def checkParser() {
     val files = ScalaFileWalker.findScalaFiles(corpusDir)

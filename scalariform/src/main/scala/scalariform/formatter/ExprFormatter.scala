@@ -723,7 +723,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for ((previousAnnotationOpt, annotation, nextAnnotationOpt) ← Utils.withPreviousAndNext(annotations)) {
       formatResult ++= format(annotation)
       for (previousAnnotation ← previousAnnotationOpt) {
-        val instruction = if (annotation.newlineOption.isDefined)
+        val instruction = if (previousAnnotation.newlineOption.isDefined)
           formatterState.currentIndentLevelInstruction
         else
           CompactEnsuringGap
