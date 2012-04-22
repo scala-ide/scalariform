@@ -181,6 +181,9 @@ class ScalaLexer(
       nextChar()
   }
 
+  @deprecated(message = "Use next() instead" /*, since = "0.1.2"*/ )
+  def nextToken(): Token = next()
+
   def next(): Token = {
     if (isXmlMode)
       fetchXmlToken()
@@ -235,6 +238,9 @@ object ScalaLexer {
     val lexer = new NewlineInferencer(new WhitespaceAndCommentsGrouper(rawLexer))
     lexer.toList
   }
+
+  @deprecated(message = "Use tokenise instead")
+  def tokeniseFull(s: String, forgiveErrors: Boolean = false) = ((), tokenise(s, forgiveErrors))
 
   private val BUFFER_SIZE = 16 // sufficient lookahead for "</xml:unparsed>" (15 chars)
 
