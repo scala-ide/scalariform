@@ -13,7 +13,6 @@ object ScalariformBuild extends Build {
     resolvers += ScalaToolsSnapshots,
     retrieveManaged := true,
     scalacOptions += "-deprecation",
-    logLevel in test := Level.Warn,
     pomExtra := pomExtraXml,
     parallelExecution in Test := false,
     publishMavenStyle := true,

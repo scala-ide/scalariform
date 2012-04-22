@@ -39,6 +39,11 @@ trait IUnicodeEscapeReader extends Iterator[Char] {
 
   def hasNext = !isEof
 
+  /**
+   * Return a clone of this reader initialised to the current state
+   */
+  def copy: IUnicodeEscapeReader
+
 }
 
 class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) extends IUnicodeEscapeReader {
@@ -51,6 +56,14 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) exte
    * To distinguish cases like "\\u" from unicode escape sequences.
    */
   private var consecutiveBackslashCount = 0
+
+  def copy: UnicodeEscapeReader = {
+    val reader = new UnicodeEscapeReader(text, forgiveErrors)
+    reader.pos = pos
+    reader.unicodeEscapeSequence = unicodeEscapeSequence
+    reader.consecutiveBackslashCount = consecutiveBackslashCount
+    reader
+  }
 
   def isEof = pos >= text.length
 
@@ -135,6 +148,12 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) exte
 class NoUnicodeEscapeReader(val text: String) extends IUnicodeEscapeReader {
 
   private var pos = 0
+
+  def copy = {
+    val reader = new NoUnicodeEscapeReader(text)
+    reader.pos = pos
+    reader
+  }
 
   def isEof: Boolean = pos >= text.length
 

@@ -5,11 +5,12 @@ import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
+import scala.PartialFunction.cond
 
 /**
  * Lexer implementation for XML literals and patterns
  */
-trait XmlLexer { self: ScalaLexer =>
+trait XmlLexer { self: ScalaLexer ⇒
 
   private def tagMode = xmlMode.isTagMode
 
@@ -18,10 +19,13 @@ trait XmlLexer { self: ScalaLexer =>
   }
 
   private def moreXmlToCome: Boolean = {
-    var offset = 0
-    while (ch(offset) != SU && isSpace(ch(offset)))
-      offset += 1
-    ch(offset) == '<' && isNameStart(ch(offset + 1))
+    // Amount of scanning ahead required is unlimited, so we can't use the circular buffer:
+    val newReader = reader.copy.buffered
+    while (newReader.head != SU && isSpace(newReader.head))
+      newReader.next()
+    cond(newReader.take(2).toList) {
+      case List(c1, c2) ⇒ c1 == '<' && isNameStart(c2)
+    }
   }
 
   protected def fetchXmlToken() {
