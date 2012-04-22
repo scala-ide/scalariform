@@ -211,7 +211,6 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
     evaluating { ScalaLexer.rawTokenise("\"\"\"") } should produce[ScalaLexerException]
     evaluating { ScalaLexer.rawTokenise("<?") } should produce[ScalaLexerException]
     evaluating { ScalaLexer.rawTokenise("<xml:unparsed>") } should produce[ScalaLexerException]
-
   }
 
   {

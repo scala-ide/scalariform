@@ -117,11 +117,11 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
     while (i < s.length) {
       val c = s(i)
       if (inBlankLine) {
-        if (c == '\n' || c == '\r')
+        if (c == '\n' || c == '\f')
           return true
         else if (c > ' ')
           inBlankLine = false
-      } else if (c == '\n' || c == '\r')
+      } else if (c == '\n' || c == '\f')
         inBlankLine = true
       i += 1
     }

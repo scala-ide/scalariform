@@ -585,6 +585,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  def c
     |}"""
 
+  "@foo\r\ntrait X" ==> "@foo\r\ntrait X"
+      
   // format: ON
 
   override val debug = false

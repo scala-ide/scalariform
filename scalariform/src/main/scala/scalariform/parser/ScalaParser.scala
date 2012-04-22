@@ -1418,7 +1418,7 @@ class ScalaParser(tokens: Array[Token]) {
       case CASE if lookahead(1) == CLASS  ⇒ classDef()
       case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken)
     }
   }
 
