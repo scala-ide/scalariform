@@ -8,8 +8,8 @@ object ScalariformBuild extends Build {
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "scalariform",
     version      := "0.1.2-SNAPSHOT",
-    scalaVersion := "2.9.1",
-    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.8.3-SNAPSHOT", "2.9.0", "2.9.0-1", "2.9.1", "2.10.0-SNAPSHOT"),
+    scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.9.0", "2.9.0-1", "2.9.1", "2.9.2", "2.10.0-SNAPSHOT"),
     resolvers += ScalaToolsSnapshots,
     retrieveManaged := true,
     scalacOptions += "-deprecation",
@@ -34,11 +34,11 @@ object ScalariformBuild extends Build {
       libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) =>
          val scalatestVersion = sv match {
            case "2.8.0"           => "org.scalatest" %% "scalatest"       % "1.3.1.RC2" % "test"
-           case "2.8.1"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
-           case "2.8.2"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
-           case "2.8.3-SNAPSHOT"  => "org.scalatest" %  "scalatest_2.8.2" % "1.5.1"     % "test"
-           case "2.10.0-SNAPSHOT" => "org.scalatest" %  "scalatest_2.9.1" % "1.6.1"     % "test"
-           case _                 => "org.scalatest" %% "scalatest"       % "1.6.1"     % "test"
+          
+//           case "2.8.1"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
+//           case "2.8.2"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
+           case "2.10.0-SNAPSHOT" => "org.scalatest" %  "scalatest_2.9.1" % "1.7.2"     % "test"
+           case _                 => "org.scalatest" %% "scalatest"       % "1.7.2"     % "test"
          }
          deps :+ scalatestVersion
       },
