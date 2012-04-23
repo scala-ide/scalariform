@@ -113,13 +113,6 @@
       </repositories>
     </profile>
     <profile>
-      <id>scala-2.9.2-SNAPSHOT</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.9.2-SNAPSHOT</value>
-        </property>
-      </activation>
       <id>scala-2.9.x</id>
       <repositories>
         <repository>
