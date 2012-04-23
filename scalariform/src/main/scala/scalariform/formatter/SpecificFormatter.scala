@@ -29,7 +29,7 @@ trait SpecificFormatter {
     import scalariform.parser._
 
     val startTime = System.currentTimeMillis
-    val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(source)
+    val tokens = ScalaLexer.tokenise(source)
     if (debug) {
       println
       println(source)
@@ -43,8 +43,8 @@ trait SpecificFormatter {
 
     var actualFormattingPreferences = baseFormattingPreferences
     for {
-      hiddenTokens ← hiddenTokenInfo.allHiddenTokens
-      hiddenToken ← hiddenTokens
+      token <- tokens
+      hiddenToken ← token.associatedWhitespaceAndComments
       ToggleOption(onOrOff, optionName) ← FormatterDirectiveParser.getDirectives(hiddenToken.text)
       rawPreference ← AllPreferences.preferencesByKey.get(optionName)
       if rawPreference.preferenceType == BooleanPreference
@@ -60,12 +60,12 @@ trait SpecificFormatter {
 
     val formatter = new ScalaFormatter() {
 
-      def isInferredNewline(token: Token): Boolean = hiddenTokenInfo.isInferredNewline(token)
+      def isInferredNewline(token: Token): Boolean = token.isNewline
 
       /** requires isInferredNewline(token) == true */
-      def inferredNewlines(token: Token): HiddenTokens = hiddenTokenInfo.inferredNewlines(token).get
+      def inferredNewlines(token: Token): HiddenTokens = token.associatedWhitespaceAndComments
 
-      def hiddenPredecessors(token: Token): HiddenTokens = hiddenTokenInfo.hiddenPredecessors(token)
+      def hiddenPredecessors(token: Token): HiddenTokens = token.associatedWhitespaceAndComments
 
       val formattingPreferences: IFormattingPreferences = actualFormattingPreferences
 

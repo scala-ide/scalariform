@@ -1,126 +1,146 @@
 package scalariform.lexer
 
-import scala.collection.immutable.Queue
-import scala.collection.JavaConversions._
-import scalariform.utils.Utils.boolean2ImpliesWrapper
 import scalariform.lexer.Tokens._
-import scala.annotation.tailrec
-import java.{ util ⇒ ju }
 
-class NewlineInferencer(private val delegate: Iterator[(HiddenTokens, Token)]) extends HiddenTokenInfo {
+/**
+ * Logic for promoting intertoken whitespace/comments to a NEWLINE or NEWLINES token as required.
+ */
+class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator[Token] {
 
   import NewlineInferencer._
 
-  require(delegate.hasNext)
+  /**
+   * Contains the next unprocessed token from the delegate, or null if we've processed them all.
+   */
+  private var nextToken: Token = if (delegate.hasNext) delegate.next() else null
 
-  private var hiddenPredecessors: ju.Map[Token, HiddenTokens] = new ju.HashMap()
-  private var inferredNewlines: ju.Map[Token, HiddenTokens] = new ju.HashMap()
+  private var previousToken: Token = _
 
-  def isInferredNewline(token: Token): Boolean = inferredNewlines containsKey token
+  /**
+   * If not null, we emit this token rather than looking at nextToken (used for inserting NEWLINE or NEWLINES
+   * into the stream).
+   */
+  private var tokenToEmitNextTime: Token = _
 
-  def inferredNewlines(token: Token): Option[HiddenTokens] = Option(inferredNewlines get token)
+  /**
+   *  Keeps track of the nested regions which allow multiple statements or not. An item in the stack indicates the
+   *  expected closing token type for that region.
+   */
+  private var regionMarkerStack: List[TokenType] = Nil
 
-  def hiddenPredecessors(token: Token): HiddenTokens = hiddenPredecessors get token
+  def hasNext = nextToken != null || tokenToEmitNextTime != null
 
-  lazy val allHiddenTokens = hiddenPredecessors.values ++ inferredNewlines.values
-
-  private var buffer: Queue[(HiddenTokens, Token)] = Queue()
-
-  @tailrec
-  private def refillBuffer() {
-    if (buffer.size < 2 && delegate.hasNext) {
-      buffer = buffer enqueue delegate.next()
-      refillBuffer()
-    }
-  }
-  refillBuffer()
-
-  private def bufferInvariant = buffer.size <= 2 && (delegate.hasNext implies buffer.size == 2)
-  require(bufferInvariant)
-
-  private var tokenToEmitNextTime: Option[Token] = None
-  private var previousTokenOption: Option[Token] = None
-
-  private var multipleStatementRegionMarkerStack: List[TokenType] = Nil
-  private def multipleStatementsAllowed = 
-    multipleStatementRegionMarkerStack.isEmpty || multipleStatementRegionMarkerStack.head == RBRACE
-
-  def nextToken(): Token = {
-    val token = nextTokenCore()
-    token.tokenType match {
-      case LBRACE ⇒
-        multipleStatementRegionMarkerStack ::= RBRACE
-      case LPAREN ⇒
-        multipleStatementRegionMarkerStack ::= RPAREN
-      case LBRACKET ⇒
-        multipleStatementRegionMarkerStack ::= RBRACKET
-      case CASE if !buffer.isEmpty ⇒
-        val followingTokenType = buffer.front._2.tokenType
-        if (followingTokenType != CLASS && followingTokenType != OBJECT)
-          multipleStatementRegionMarkerStack ::= ARROW
-      case tokenType if multipleStatementRegionMarkerStack.headOption == Some(tokenType) ⇒
-        multipleStatementRegionMarkerStack = multipleStatementRegionMarkerStack.tail
-      case _ ⇒
-    }
-    previousTokenOption = Some(token)
+  def next(): Token = {
+    val token =
+      if (tokenToEmitNextTime == null)
+        fetchNextToken()
+      else {
+        val result = tokenToEmitNextTime
+        tokenToEmitNextTime = null
+        result
+      }
+    updateRegionStack(token.tokenType, nextToken)
+    previousToken = token
     token
   }
 
-  private def nextTokenCore(): Token = {
-    def updatePredecessorsAndSuccesors(token: Token, hiddenTokens: HiddenTokens) = {
-      hiddenPredecessors.put(token, hiddenTokens)
+  /**
+   * Multiple statements are allowed immediately inside "{..}" regions, but disallowed immediately inside "[..]", "(..)"
+   * and "case ... =>" regions.
+   */
+  private def updateRegionStack(tokenType: TokenType, nextToken: Token) =
+    tokenType match {
+      case LBRACE ⇒
+        regionMarkerStack ::= RBRACE
+      case LPAREN ⇒
+        regionMarkerStack ::= RPAREN
+      case LBRACKET ⇒
+        regionMarkerStack ::= RBRACKET
+      case CASE if nextToken != null ⇒
+        val followingTokenType = nextToken.tokenType
+        // "case class" and "case object" are excluded from the usual "case .. =>" region.
+        if (followingTokenType != CLASS && followingTokenType != OBJECT)
+          regionMarkerStack ::= ARROW
+      case tokenType if regionMarkerStack.headOption == Some(tokenType) ⇒
+        regionMarkerStack = regionMarkerStack.tail
+      case _ ⇒
+    }
+
+  private def fetchNextToken(): Token = {
+    val token = nextToken
+    if (delegate.hasNext)
+      nextToken = delegate.next()
+    else
+      nextToken = null
+    if (shouldTranslateToNewline(previousToken, token, nextToken))
+      translateToNewline(token)
+    else
       token
-    }
-    tokenToEmitNextTime match {
-      case Some(token) ⇒
-        tokenToEmitNextTime = None
-        updatePredecessorsAndSuccesors(token, new HiddenTokens(Nil))
-      case None ⇒
-        val (hiddenTokens, token) = consumeFromBuffer()
-        hiddenTokens.newlines match {
-          case Some(newlineToken) if shouldTranslateToNewline(nextToken = token) ⇒
-            tokenToEmitNextTime = Some(token)
-            inferredNewlines.put(newlineToken, hiddenTokens)
-            updatePredecessorsAndSuccesors(newlineToken, new HiddenTokens(Nil))
-          case _ ⇒
-            updatePredecessorsAndSuccesors(token, hiddenTokens)
-        }
-    }
   }
 
-  private def consumeFromBuffer(): (HiddenTokens, Token) = {
-    val ((hiddenTokens, token), newBuffer) = buffer.dequeue
-    buffer = newBuffer
-    refillBuffer()
-    require(bufferInvariant)
-    (hiddenTokens, token)
+  private def translateToNewline(currentToken: Token): Token = {
+    val currentHiddenTokens = currentToken.associatedWhitespaceAndComments
+    val rawText = delegate.text.substring(currentHiddenTokens.offset, currentHiddenTokens.lastCharacterOffset + 1)
+    val text = if (currentHiddenTokens.containsUnicodeEscape) currentHiddenTokens.text else rawText
+    val tokenType = if (containsBlankLine(text)) NEWLINES else NEWLINE
+    val newlineToken = Token(tokenType, text, currentHiddenTokens.offset, rawText)
+    currentToken.associatedWhitespaceAndComments_ = NoHiddenTokens
+    newlineToken.associatedWhitespaceAndComments_ = currentHiddenTokens
+    tokenToEmitNextTime = currentToken
+    newlineToken
   }
 
-  private def shouldTranslateToNewline(nextToken: Token) = {
-    val nextTokenType = nextToken.tokenType
-    val nextCanBeginAStatement = !tokensWhichCannotBeginAStatement(nextToken.tokenType) &&
-      (nextTokenType == CASE implies followingTokenIsClassOrObject)
-    val previousCanEndAStatement = previousTokenOption.map(_.tokenType).map(tokensWhichCanTerminateAStatement).getOrElse(false)
-    previousCanEndAStatement && nextCanBeginAStatement && multipleStatementsAllowed
+  private def containsNewline(hiddenTokens: HiddenTokens) =
+    hiddenTokens.exists(_.text contains '\n')
+
+  private def shouldTranslateToNewline(previousToken: Token, currentToken: Token, nextToken: Token): Boolean = {
+    val hiddenTokens = currentToken.associatedWhitespaceAndComments
+    val currentTokenType = currentToken.tokenType
+    if (!containsNewline(hiddenTokens))
+      false
+    else if (TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT contains currentTokenType)
+      false
+    else if (currentTokenType == CASE && !followingTokenIsClassOrObject(nextToken))
+      false
+    else if (regionMarkerStack.nonEmpty && regionMarkerStack.head != RBRACE)
+      false
+    else
+      return previousToken != null && (TOKENS_WHICH_CAN_END_A_STATEMENT contains previousToken.tokenType)
   }
 
-  private def followingTokenIsClassOrObject: Boolean =
-    buffer.headOption match {
-      case None                      ⇒ false
-      case Some((_, followingToken)) ⇒ followingToken.tokenType == CLASS || followingToken.tokenType == OBJECT
+  private def followingTokenIsClassOrObject(nextToken: Token): Boolean =
+    nextToken != null && (nextToken.tokenType == CLASS || nextToken.tokenType == OBJECT)
+
+  private def containsBlankLine(s: String): Boolean = {
+    var i = 0
+    var inBlankLine = false
+    while (i < s.length) {
+      val c = s(i)
+      if (inBlankLine) {
+        if (c == '\n' || c == '\f')
+          return true
+        else if (c > ' ')
+          inBlankLine = false
+      } else if (c == '\n' || c == '\f')
+        inBlankLine = true
+      i += 1
     }
+    false
+  }
 
 }
 
 object NewlineInferencer {
 
-  val tokensWhichCanTerminateAStatement: Set[TokenType] = Set(
+  private val TOKENS_WHICH_CAN_END_A_STATEMENT: Set[TokenType] = Set(
     INTEGER_LITERAL, FLOATING_POINT_LITERAL, CHARACTER_LITERAL, STRING_LITERAL, SYMBOL_LITERAL, VARID, OTHERID, PLUS,
     MINUS, STAR, PIPE, TILDE, EXCLAMATION, THIS, NULL, TRUE, FALSE, RETURN, TYPE, XML_EMPTY_CLOSE, XML_TAG_CLOSE,
     XML_COMMENT, XML_CDATA, XML_UNPARSED, XML_PROCESSING_INSTRUCTION, USCORE, RPAREN, RBRACKET, RBRACE)
 
-  val tokensWhichCannotBeginAStatement: Set[TokenType] = Set(
+  private val TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT: Set[TokenType] = Set(
     CATCH, ELSE, EXTENDS, FINALLY, FORSOME, MATCH, REQUIRES, WITH, YIELD, COMMA, DOT, SEMI, COLON, /* USCORE, */ EQUALS,
     ARROW, LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, HASH, LBRACKET, RPAREN, RBRACKET, RBRACE)
+
+  private val BLANK_LINE_PATTERN = """(?s).*\n\s*\n.*"""
 
 }

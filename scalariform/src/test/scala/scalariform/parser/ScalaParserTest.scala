@@ -22,7 +22,7 @@ class C(@annotation(foo = {1 + 2}) n: Int)
   }
 
   private def parseExpression(s: String) = {
-    val (_, tokens) = ScalaLexer.tokeniseFull(s)
+    val tokens = ScalaLexer.tokenise(s)
     val scalaParser = new ScalaParser(tokens.toArray)
     scalaParser.compilationUnit()
   }

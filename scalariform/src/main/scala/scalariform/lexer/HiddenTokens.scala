@@ -3,7 +3,9 @@ package scalariform.lexer
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 
-class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] {
+object NoHiddenTokens extends HiddenTokens(Nil)
+
+case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken] {
 
   def removeInitialWhitespace = new HiddenTokens(tokens.dropWhile(_.isInstanceOf[Whitespace]))
 
@@ -23,27 +25,24 @@ class HiddenTokens(val tokens: List[HiddenToken]) extends Iterable[HiddenToken] 
 
   def containsComment = comments.nonEmpty
 
-  lazy val text = tokens.map(_.token.text).mkString
-
+  def containsUnicodeEscape: Boolean = {
+    for (token <- tokens if token.token.containsUnicodeEscape) 
+      return true
+    false
+  }
+  
+  lazy val text: String = {
+    val sb = new StringBuilder
+    for (token <- tokens) sb.append(token.text)
+//    tokens.flatMap(_.token.text)(scala.collection.breakOut)
+  sb.toString
+  }
   lazy val rawText = tokens.map(_.token.rawText).mkString
-
-  lazy val newlines: Option[Token] =
-    if (containsNewline) {
-      require(tokens.nonEmpty)
-      val tokenType = if (text matches HiddenTokens.BLANK_LINE_PATTERN) NEWLINES else NEWLINE
-      val first = tokens.head.token
-      val last = tokens.last.token
-      val token = Token(tokenType, text, first.offset, rawText)
-      Some(token)
-    } else
-      None
 
   def rawTokens = tokens.map(_.token)
 
-}
-
-object HiddenTokens {
-
-  val BLANK_LINE_PATTERN = """(?s).*\n\s*\n.*"""
-
+  def offset = tokens.head.token.offset
+  
+  def lastCharacterOffset = tokens.last.token.lastCharacterOffset
+  
 }

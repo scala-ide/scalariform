@@ -1,7 +1,9 @@
 0.1.2 (..)
 
 * FIX: Scaladoc comment formatting could break nested comments (issue #36)
-* Tidy up lexer code
+* Tidy up, optimise lexer code
+* FIX: Parse 5.f, 5.d as floating points, unless in Scala 2.11+ mode
+* FIX: Bug with line-per-annotation style
 
 0.1.1 (18/October/11)
 

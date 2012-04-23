@@ -80,6 +80,18 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       highlightToken(token, document)
   }
 
+  private def highlightRedundantSemis(textPane: JTextPane) {
+    val semis = RedundantSemicolonDetector.findRedundantSemis(textPane.getText)
+    val document = textPane.getStyledDocument
+    for (semi ← semis) {
+      val style = document.addStyle("semi", null)
+      StyleConstants.setFontFamily(style, "monospaced")
+      StyleConstants.setFontSize(style, 14)
+      StyleConstants.setBackground(style, Color.YELLOW)
+      document.setCharacterAttributes(semi.offset, semi.length, style, true)
+    }
+  }
+
   setLayout(new BorderLayout)
 
   setTitle("Scalariform " + scalariform.VERSION)
@@ -128,6 +140,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     try {
       onSwingThread {
         syntaxHighlight(inputTextPane)
+        highlightRedundantSemis(inputTextPane)
         syntaxHighlight(outputTextPane)
       }
 
@@ -139,7 +152,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       } catch {
         case e: RuntimeException ⇒
           if (showAstCheckBox.isSelected) {
-            val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(inputText)
+            val tokens = ScalaLexer.tokenise(inputText)
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             try {
@@ -161,15 +174,16 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         import scala.util.parsing.input._
         import scala.util.parsing.combinator._
 
-        val (hiddenTokenInfo, tokens) = ScalaLexer.tokeniseFull(inputText)
-        val parseResult = try {
-          specificFormatter.parse(new ScalaParser(tokens.toArray))
-        } catch {
-          case e: RuntimeException ⇒
-            val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
-            tokensTable.setModel(tableModel)
-            throw e
-        }
+        val tokens = ScalaLexer.tokenise(inputText)
+        val parseResult =
+          try
+            specificFormatter.parse(new ScalaParser(tokens.toArray))
+          catch {
+            case e: RuntimeException ⇒
+              val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
+              tokensTable.setModel(tableModel)
+              throw e
+          }
         val treeModel = new ParseTreeModel(parseResult)
         astTree.setModel(treeModel)
         expandAll(astTree)

@@ -1,18 +1,20 @@
 package scalariform.lexer
 
+import scalariform._
 import scalariform.lexer.Tokens._
-
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.TestFailedException
 import org.scalatest.TestPendingException
-
 import java.io._
 
 class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
-  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false) = new TestString(s)(forgiveErrors)
+  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210) =
+    new TestString(s, forgiveErrors, scalaVersion)
 
+  "" producesTokens ()
+  
   "println" producesTokens (VARID)
 
   "lazy" producesTokens (LAZY)
@@ -99,6 +101,20 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
   "22.`yield`" producesTokens (INTEGER_LITERAL, DOT, VARID)
   "42.toString" producesTokens (INTEGER_LITERAL, DOT, VARID)
+
+  {
+    implicit val scalaVersion = SCALA_28_29_210
+    "5.f" producesTokens (FLOATING_POINT_LITERAL)
+    "5.d" producesTokens (FLOATING_POINT_LITERAL)
+    "5." producesTokens (FLOATING_POINT_LITERAL)
+  }
+
+  {
+    implicit val scalaVersion = SCALA_211
+    "5.f" producesTokens (INTEGER_LITERAL, DOT, VARID)
+    "5.d" producesTokens (INTEGER_LITERAL, DOT, VARID)
+    "5." producesTokens (INTEGER_LITERAL, DOT)
+  }
 
   "'f'" producesTokens (CHARACTER_LITERAL)
   """'\n'""" producesTokens (CHARACTER_LITERAL)
@@ -195,7 +211,6 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
     evaluating { ScalaLexer.rawTokenise("\"\"\"") } should produce[ScalaLexerException]
     evaluating { ScalaLexer.rawTokenise("<?") } should produce[ScalaLexerException]
     evaluating { ScalaLexer.rawTokenise("<xml:unparsed>") } should produce[ScalaLexerException]
-
   }
 
   {
@@ -211,18 +226,21 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   }
 
-  class TestString(s: String)(implicit forgiveErrors: Boolean = false) {
+  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = SCALA_28_29_210) {
 
-    def producesTokens(toks: TokenType*) {
+    def producesTokens(toks: TokenType*)() {
       check(s.stripMargin, toks.toList)
     }
 
     private def check(s: String, expectedTokens: List[TokenType]) {
-      it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors) in {
-        val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors)
-        val actualTokenTypes = actualTokens map { _.tokenType }
-        val reconstitutedSource = actualTokens map { _.rawText } mkString ""
-        require(actualTokenTypes == expectedTokens, "tokens do not match expected: " + expectedTokens + " vs " + actualTokenTypes)
+      val scalaVersion = ScalaVersions.representativeVersion(scalaVersionGroup)
+      it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors + ", scalaVersion = " + scalaVersion) in {
+        val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors, scalaVersion)
+        val actualTokenTypes = actualTokens.map(_.tokenType)
+        require(actualTokenTypes.last == EOF, "Last token must be EOF, but was " + actualTokens.last.tokenType)
+        require(actualTokenTypes.count(_ == EOF) == 1, "There must only be one EOF token")
+        val reconstitutedSource = actualTokens.init.map(_.rawText).mkString
+        require(actualTokenTypes.init == expectedTokens, "Tokens do not match. Expected " + expectedTokens + ", but was " + actualTokenTypes.init)
         require(s == reconstitutedSource, "tokens do not partition text correctly: " + s + " vs " + reconstitutedSource)
       }
     }

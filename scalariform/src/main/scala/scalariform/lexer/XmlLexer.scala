@@ -5,15 +5,12 @@ import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
+import scala.PartialFunction.cond
 
 /**
  * Lexer implementation for XML literals and patterns
  */
-trait XmlLexer extends Lexer {
-
-  private def xmlMode: XmlMode = modeStack.head.asInstanceOf[XmlMode]
-
-  protected def isXmlMode = modeStack.head.isInstanceOf[XmlMode]
+trait XmlLexer { self: ScalaLexer ⇒
 
   private def tagMode = xmlMode.isTagMode
 
@@ -22,10 +19,13 @@ trait XmlLexer extends Lexer {
   }
 
   private def moreXmlToCome: Boolean = {
-    var offset = 0
-    while (ch(offset) != SU && isSpace(ch(offset)))
-      offset += 1
-    ch(offset) == '<' && isNameStart(ch(offset + 1))
+    // Amount of scanning ahead required is unlimited, so we can't use the circular buffer:
+    val newReader = reader.copy.buffered
+    while (newReader.head != SU && isSpace(newReader.head))
+      newReader.next()
+    cond(newReader.take(2).toList) {
+      case List(c1, c2) ⇒ c1 == '<' && isNameStart(c2)
+    }
   }
 
   protected def fetchXmlToken() {
@@ -41,13 +41,13 @@ trait XmlLexer extends Lexer {
           if (ch(2) == '-') {
             getXmlComment()
             if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-              modeStack.pop()
+              popMode()
           } else if (ch(2) == '[') {
             getXmlCDATA()
             if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-              modeStack.pop()
+              popMode()
           } else {
-            if (forgiveLexerErrors) {
+            if (forgiveErrors) {
               munch("<!")
               token(XML_COMMENT)
             } else
@@ -56,11 +56,11 @@ trait XmlLexer extends Lexer {
         } else if (ch(1) == '?') {
           getXmlProcessingInstruction()
           if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-            modeStack.pop()
+            popMode()
         } else if (lookaheadIs("<xml:unparsed")) {
           getXmlUnparsed()
           if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-            modeStack.pop()
+            popMode()
         } else {
           nextChar()
           token(XML_START_OPEN)
@@ -78,7 +78,7 @@ trait XmlLexer extends Lexer {
             xmlMode.isTagMode = false
             xmlMode.tagState = Normal
             if (xmlMode.nestingLevel == 0 && !moreXmlToCome)
-              modeStack.pop()
+              popMode()
           } else
             getXmlCharData()
         } else
@@ -94,7 +94,7 @@ trait XmlLexer extends Lexer {
             case InEndTag ⇒ {
               val nestingLevel = xmlMode.unnestTag()
               if (nestingLevel == 0 && !moreXmlToCome)
-                modeStack.pop()
+                popMode()
             }
             case Normal ⇒ throw new AssertionError("shouldn't reach here")
           }
@@ -148,7 +148,7 @@ trait XmlLexer extends Lexer {
         munch("]]>")
         continue = false
       } else if (ch == SU)
-        if (forgiveLexerErrors)
+        if (forgiveErrors)
           continue = false
         else
           throw new ScalaLexerException("Malformed XML CDATA")
@@ -166,11 +166,11 @@ trait XmlLexer extends Lexer {
         nextChar()
         nextChar()
         if (ch != '>')
-          if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed XML comment")
+          if (forgiveErrors) continue = false else throw new ScalaLexerException("Malformed XML comment")
         nextChar()
         continue = false
       } else if (ch == SU) {
-        if (forgiveLexerErrors) continue = false else throw new ScalaLexerException("Malformed XML comment")
+        if (forgiveErrors) continue = false else throw new ScalaLexerException("Malformed XML comment")
       } else
         nextChar()
     }
@@ -217,7 +217,7 @@ trait XmlLexer extends Lexer {
     nextChar()
     while (ch != quote) {
       if (ch == SU) { // TODO: line seps etc
-        if (forgiveLexerErrors) {
+        if (forgiveErrors) {
           token(XML_ATTR_VALUE)
           return
         } else
@@ -238,7 +238,7 @@ trait XmlLexer extends Lexer {
         munch("</xml:unparsed>")
         continue = false
       } else if (ch == SU) {
-        if (forgiveLexerErrors)
+        if (forgiveErrors)
           continue = false
         else
           throw new ScalaLexerException("Malformed Unparsed XML")
@@ -256,7 +256,7 @@ trait XmlLexer extends Lexer {
         munch("?>")
         continue = false
       } else if (ch == SU) {
-        if (forgiveLexerErrors)
+        if (forgiveErrors)
           continue = false
         else
           throw new ScalaLexerException("Malformed XML processing instruction")

@@ -266,6 +266,8 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   }
 
+  "{<div></div>               }" ==> "{ <div></div> }"
+  
   override val debug = false
 
 }

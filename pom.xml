@@ -120,12 +120,13 @@
           <value>2.9.2-SNAPSHOT</value>
         </property>
       </activation>
+      <id>scala-2.9.x</id>
       <repositories>
         <repository>
-          <id>scala-toolchain-2.9.2-SNAPSHOT</id>
-          <name>Scala Toolchain 2.9.2-SNAPSHOT p2 repository</name>
+          <id>scala-toolchain-2.9.x</id>
+          <name>Scala Toolchain 2.9.x p2 repository</name>
           <layout>p2</layout>
-          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-2.9.2-SNAPSHOT</url>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-29x</url>
         </repository>
       </repositories>
     </profile>

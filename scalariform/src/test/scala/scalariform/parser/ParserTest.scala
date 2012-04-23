@@ -25,7 +25,7 @@ class ParserTest extends FlatSpec with ShouldMatchers {
     parseExpression("{ case List[String]() => 12 }")
   }
 
-  private def parser(s: String) = new ScalaParser(ScalaLexer.tokeniseFull(s)._2.toArray)
+  private def parser(s: String) = new ScalaParser(ScalaLexer.tokenise(s).toArray)
   private def parseExpression(s: String) = parser(s).expr
   private def parseCompilationUnit(s: String) = parser(s).compilationUnit
 

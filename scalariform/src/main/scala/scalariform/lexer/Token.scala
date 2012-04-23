@@ -11,6 +11,12 @@ import scalariform.utils.Range
  */
 case class Token(tokenType: TokenType, text: String, offset: Int, rawText: String) {
 
+  private[lexer] var associatedWhitespaceAndComments_ : HiddenTokens = null
+  
+  private[lexer] var containsUnicodeEscape = false
+  
+  def associatedWhitespaceAndComments: HiddenTokens = associatedWhitespaceAndComments_
+  
   def length = rawText.length
 
   def range = Range(offset, length)

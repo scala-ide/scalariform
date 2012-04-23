@@ -6,6 +6,8 @@ import java.io.IOException
 
 object Utils {
 
+  def when[T](b: Boolean)(x: ⇒ T): Option[T] = if (b) Some(x) else None
+
   def asInstanceOf[T](o: Any) = if (o.isInstanceOf[T]) Some(o.asInstanceOf[T]) else None
 
   def checkNotNull[T](item: T): T = { require(item != null); item }
@@ -130,6 +132,12 @@ object Utils {
       ch - 'a' + 10
     else
       -1
-  
+
+  def deleteRange(text: String, range: Range): String =
+    replaceRange(text, range, replacement = "")
+
+  def replaceRange(text: String, range: Range, replacement: String): String =
+    text.take(range.offset) + replacement + text.drop(range.offset + range.length)
+
 }
 
