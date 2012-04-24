@@ -222,13 +222,13 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       if (multiLine) {
         nextChar()
         if (isTripleQuote()) {
-          token(STRING_PART)
+          token(STRING_LITERAL)
           popMode()
         } else
           getStringPart(multiLine)
       } else {
         nextChar()
-        token(STRING_PART)
+        token(STRING_LITERAL)
         popMode()
       }
     } else if (ch == '$') {
@@ -253,7 +253,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       val isUnclosedLiteral = !isUnicodeEscape && (ch == SU || (!multiLine && (ch == '\r' || ch == '\n')))
       if (isUnclosedLiteral) {
         if (forgiveErrors) {
-          token(STRING_PART)
+          token(STRING_LITERAL)
           popMode()
         } else
           throw new ScalaLexerException(if (!multiLine) "unclosed string literal" else "unclosed multi-line string literal")

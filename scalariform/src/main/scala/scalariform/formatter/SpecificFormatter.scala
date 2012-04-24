@@ -5,6 +5,7 @@ import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils._
 import scalariform.formatter.preferences._
+import scalariform.ScalaVersions
 
 trait SpecificFormatter {
 
@@ -19,17 +20,17 @@ trait SpecificFormatter {
   def getTokens(s: String): List[Token] = ScalaLexer.tokenise(s)
 
   @throws(classOf[ScalaParserException])
-  def format(source: String, lineDelimiter: Option[String] = None)(baseFormattingPreferences: IFormattingPreferences): String = {
-    val (edits, _) = fullFormat(source, lineDelimiter)(baseFormattingPreferences)
+  def format(source: String, lineDelimiter: Option[String] = None, scalaVersion: String = ScalaVersions.DEFAULT_VERSION)(baseFormattingPreferences: IFormattingPreferences): String = {
+    val (edits, _) = fullFormat(source, lineDelimiter, scalaVersion)(baseFormattingPreferences)
     TextEditProcessor.runEdits(source, edits)
   }
 
   @throws(classOf[ScalaParserException])
-  def fullFormat(source: String, lineDelimiter: Option[String] = None)(baseFormattingPreferences: IFormattingPreferences): (List[TextEdit], FormatResult) = {
+  def fullFormat(source: String, lineDelimiter: Option[String] = None, scalaVersion: String = ScalaVersions.DEFAULT_VERSION)(baseFormattingPreferences: IFormattingPreferences): (List[TextEdit], FormatResult) = {
     import scalariform.parser._
 
     val startTime = System.currentTimeMillis
-    val tokens = ScalaLexer.tokenise(source)
+    val tokens = ScalaLexer.tokenise(source, scalaVersion = scalaVersion)
     if (debug) {
       println
       println(source)
@@ -43,7 +44,7 @@ trait SpecificFormatter {
 
     var actualFormattingPreferences = baseFormattingPreferences
     for {
-      token <- tokens
+      token ← tokens
       hiddenToken ← token.associatedWhitespaceAndComments
       ToggleOption(onOrOff, optionName) ← FormatterDirectiveParser.getDirectives(hiddenToken.text)
       rawPreference ← AllPreferences.preferencesByKey.get(optionName)

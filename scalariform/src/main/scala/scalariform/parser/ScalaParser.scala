@@ -118,7 +118,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isLiteralToken(tokenType: TokenType): Boolean = tokenType match {
     case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL |
-      STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒ true
+      STRING_LITERAL | INTERPOLATION_ID | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒ true
     case _ ⇒ false
   }
 
@@ -412,11 +412,33 @@ class ScalaParser(tokens: Array[Token]) {
     (pkg, newLineOpt)
   }
 
-  private def literal(): Token =
-    if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
-      nextToken()
+  private def literal(inPattern: Boolean = false): List[ExprElement] =
+    if (INTERPOLATION_ID) {
+      List(interpolatedString(inPattern))
+    } else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
+      exprElementFlatten2(nextToken())
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
+
+  private def interpolatedString(inPattern: Boolean = false): StringInterpolation = {
+    val interpolationId = nextToken()
+    val stringPartsAndScala = ListBuffer[(Token, Expr)]()
+    while (STRING_PART) {
+      val stringPart = nextToken()
+      val scalaSegment: Expr =
+        if (inPattern)
+          pattern()
+        else if (isIdent)
+          makeExpr(ident())
+        else
+          expr()
+      stringPartsAndScala += ((stringPart, scalaSegment))
+    }
+    if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
+      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken)
+    val terminalString = nextToken()
+    StringInterpolation(interpolationId, stringPartsAndScala.toList, terminalString)
+  }
 
   private def newLineOpt(): Option[Token] = if (NEWLINE) Some(nextToken()) else None
 
@@ -973,7 +995,7 @@ class ScalaParser(tokens: Array[Token]) {
           val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
           val id = stableId()
           val literalOpt = condOpt(currentTokenType) {
-            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal()
+            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal(inPattern = true)
           }
           val typeArgsOpt: Option[List[ExprElement]] =
             if (LBRACKET) Some(List(TypeExprElement(typeArgs())))
@@ -982,8 +1004,9 @@ class ScalaParser(tokens: Array[Token]) {
           exprElementFlatten2((id, literalOpt), typeArgsOpt, argumentPatternsOpt)
         case USCORE ⇒
           exprElementFlatten2(nextToken())
-        case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
-          exprElementFlatten2(literal())
+        case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | INTERPOLATION_ID |
+          SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
+          exprElementFlatten2(literal(inPattern = true))
         case LPAREN ⇒
           val (lparen, patterns_, rparen) = makeParens(noSeq.patterns)
           exprElementFlatten2(lparen, patterns_, rparen)

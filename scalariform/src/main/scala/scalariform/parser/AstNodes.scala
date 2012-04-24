@@ -400,6 +400,10 @@ case class AnonymousFunction(parameters: List[ExprElement], arrow: Token, body: 
   lazy val tokens = flatten(parameters, arrow, body)
 }
 
+case class StringInterpolation(interpolationId: Token, stringPartsAndScala: List[(Token, Expr)], terminalString: Token) extends ExprElement {
+  lazy val tokens = flatten(interpolationId, stringPartsAndScala, terminalString)
+}
+
 sealed trait XmlExprElement extends ExprElement
 
 case class XmlStartTag(startOpen: Token, name: Token, attributes: List[(Option[Token], XmlAttribute)], whitespaceOption: Option[Token], tagClose: Token) extends XmlExprElement {

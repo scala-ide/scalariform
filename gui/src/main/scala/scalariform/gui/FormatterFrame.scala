@@ -51,7 +51,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
   def getHighlight(token: Token): (Color, TextStyle) =
     token.tokenType match {
-      case STRING_LITERAL | XML_ATTR_VALUE | XML_CDATA ⇒ (new Color(42, 0, 255), Font.PLAIN)
+      case STRING_LITERAL | STRING_PART | XML_ATTR_VALUE | XML_CDATA ⇒ (new Color(42, 0, 255), Font.PLAIN)
       case _ if token.isScalaDocComment ⇒ (new Color(63, 95, 191), Font.PLAIN)
       case LINE_COMMENT | MULTILINE_COMMENT | XML_COMMENT ⇒ (new Color(63, 127, 95), Font.PLAIN)
       case t if t.isKeyword || t.isXml ⇒ (new Color(127, 0, 85), Font.BOLD)
@@ -71,10 +71,12 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     document.setCharacterAttributes(token.offset, token.length, style, true)
   }
 
+  private val SCALA_VERSION = "2.10.0"
+
   private def syntaxHighlight(textPane: JTextPane) {
     if (!highlightCheckBox.isSelected)
       return
-    val tokens = ScalaLexer.rawTokenise(textPane.getText, forgiveErrors = true)
+    val tokens = ScalaLexer.rawTokenise(textPane.getText, forgiveErrors = true, scalaVersion = SCALA_VERSION)
     val document = textPane.getStyledDocument
     for (token ← tokens)
       highlightToken(token, document)
@@ -148,11 +150,11 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
       val startTime = System.currentTimeMillis
       val outputText = try {
-        specificFormatter.format(inputText)(OptionsPanel.getFormattingPreferences)
+        specificFormatter.format(inputText, scalaVersion = SCALA_VERSION)(OptionsPanel.getFormattingPreferences)
       } catch {
         case e: RuntimeException ⇒
           if (showAstCheckBox.isSelected) {
-            val tokens = ScalaLexer.tokenise(inputText)
+            val tokens = ScalaLexer.tokenise(inputText, scalaVersion = SCALA_VERSION)
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setModel(tableModel)
             try {
@@ -165,7 +167,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
           throw e
       }
       val duration = System.currentTimeMillis - startTime
-      val tokenCount = getTokens(inputText).size
+      val tokens = ScalaLexer.tokenise(inputText, scalaVersion = SCALA_VERSION)
+      val tokenCount = tokens.size
       setTitle("Scalariform " + scalariform.VERSION + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / (duration + 1)) + " tokens/second")
       outputTextPane.setText(outputText)
 
@@ -173,8 +176,6 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         import scalariform.parser._
         import scala.util.parsing.input._
         import scala.util.parsing.combinator._
-
-        val tokens = ScalaLexer.tokenise(inputText)
         val parseResult =
           try
             specificFormatter.parse(new ScalaParser(tokens.toArray))
@@ -188,7 +189,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         astTree.setModel(treeModel)
         expandAll(astTree)
 
-        val (outputText, formatResult) = specificFormatter.fullFormat(inputText)(OptionsPanel.getFormattingPreferences)
+        val (outputText, formatResult) = specificFormatter.fullFormat(inputText, scalaVersion = SCALA_VERSION)(OptionsPanel.getFormattingPreferences)
 
         val tableModel = new TokenTableModel(tokens, formatResult)
         tokensTable.setModel(tableModel)
@@ -348,7 +349,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
     inputTextPane.setText("")
   }
 
-  def specificFormatter = productionComboBox.getSelectedItem.asInstanceOf[ProductionComboBoxModel.ProductionItem].formatter
+  def specificFormatter: SpecificFormatter =
+    productionComboBox.getSelectedItem.asInstanceOf[ProductionComboBoxModel.ProductionItem].formatter
 
   object ProductionComboBoxModel extends DefaultComboBoxModel {
 

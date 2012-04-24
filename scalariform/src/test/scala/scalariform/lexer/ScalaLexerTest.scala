@@ -123,16 +123,16 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
   {
     implicit val scalaVersion = SCALA_210
-    """ X s"" """ producesTokens (WS, VARID, WS, INTERPOLATION_ID, STRING_PART, WS)
-    """ X s "" """ producesTokens (WS, VARID, WS, VARID, WS, STRING_LITERAL, WS)
-    """ s"$foo" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, VARID, STRING_PART, WS)
-    """ s"$$" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, WS)
-    """ s"${foo}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_PART, WS)
-    """ s"${s"${x}"}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_PART, RBRACE, STRING_PART, WS)
+    """ X s"" """ producesTokens (WS, VARID, WS, INTERPOLATION_ID, STRING_LITERAL, WS)
+    """ X s "$foo" """ producesTokens (WS, VARID, WS, VARID, WS, STRING_LITERAL, WS)
+    """ s"$foo" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL, WS)
+    """ s"$$" """ producesTokens (WS, INTERPOLATION_ID, STRING_LITERAL, WS)
+    """ s"${foo}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_LITERAL, WS)
+    """ s"${s"${x}"}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_LITERAL, RBRACE, STRING_LITERAL, WS)
 
-    <t>s""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_PART)
-    <t>s"""""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_PART)
-    <t>s""" $foo """</t>.text producesTokens (INTERPOLATION_ID, STRING_PART, VARID, STRING_PART)
+    <t>s""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
+    <t>s"""""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
+    <t>s""" $foo """</t>.text producesTokens (INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL)
     
   }
 
