@@ -14,7 +14,7 @@ import scalariform._
 class ScalaLexer(
   protected val reader: IUnicodeEscapeReader,
   protected val forgiveErrors: Boolean = false,
-  protected val scalaVersion: ScalaVersionGroup = SCALA_28_29_210)
+  protected val scalaVersion: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP)
     extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
 
   import ScalaLexer._
@@ -187,14 +187,37 @@ class ScalaLexer(
   def next(): Token = {
     if (isXmlMode)
       fetchXmlToken()
-    else
+    else if (isScalaMode)
       fetchScalaToken()
+    else if (isStringInterpolationMode) {
+      fetchStringInterpolationToken()
+    }
+
     if (builtToken.tokenType == EOF)
       eofTokenEmitted = true
     builtToken
   }
 
   def hasNext = !eofTokenEmitted
+
+  private def fetchStringInterpolationToken() {
+    if (stringInterpolationMode.interpolationVariable) {
+      stringInterpolationMode.interpolationVariable = false
+      do {
+        nextChar()
+      } while (ch != SU && Character.isUnicodeIdentifierPart(ch))
+      token(VARID)
+    } else {
+      if (stringInterpolationMode.initialSegment) {
+        stringInterpolationMode.initialSegment = false
+        if (stringInterpolationMode.multiLine)
+          munch("\"\"\"")
+        else
+          munch("\"")
+      }
+      getStringPart(stringInterpolationMode.multiLine)
+    }
+  }
 
 }
 
@@ -246,7 +269,7 @@ object ScalaLexer {
 
   private val BUFFER_MASK = BUFFER_SIZE - 1
 
-  private def makeRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = SCALA_28_29_210): ScalaLexer =
+  private def makeRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP): ScalaLexer =
     new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersionGroup)
 
 }

@@ -10,11 +10,11 @@ import java.io._
 
 class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
-  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210) =
+  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP) =
     new TestString(s, forgiveErrors, scalaVersion)
 
   "" producesTokens ()
-  
+
   "println" producesTokens (VARID)
 
   "lazy" producesTokens (LAZY)
@@ -103,7 +103,7 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
   "42.toString" producesTokens (INTEGER_LITERAL, DOT, VARID)
 
   {
-    implicit val scalaVersion = SCALA_28_29_210
+    implicit val scalaVersion = SCALA_28_29
     "5.f" producesTokens (FLOATING_POINT_LITERAL)
     "5.d" producesTokens (FLOATING_POINT_LITERAL)
     "5." producesTokens (FLOATING_POINT_LITERAL)
@@ -114,6 +114,26 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
     "5.f" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5.d" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5." producesTokens (INTEGER_LITERAL, DOT)
+  }
+
+  {
+    implicit val scalaVersion = SCALA_28_29
+    """ X s"" """ producesTokens (WS, VARID, WS, VARID, STRING_LITERAL, WS)
+  }
+
+  {
+    implicit val scalaVersion = SCALA_210
+    """ X s"" """ producesTokens (WS, VARID, WS, INTERPOLATION_ID, STRING_PART, WS)
+    """ X s "" """ producesTokens (WS, VARID, WS, VARID, WS, STRING_LITERAL, WS)
+    """ s"$foo" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, VARID, STRING_PART, WS)
+    """ s"$$" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, WS)
+    """ s"${foo}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_PART, WS)
+    """ s"${s"${x}"}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_PART, RBRACE, STRING_PART, WS)
+
+    <t>s""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_PART)
+    <t>s"""""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_PART)
+    <t>s""" $foo """</t>.text producesTokens (INTERPOLATION_ID, STRING_PART, VARID, STRING_PART)
+    
   }
 
   "'f'" producesTokens (CHARACTER_LITERAL)
@@ -226,7 +246,7 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   }
 
-  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = SCALA_28_29_210) {
+  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP) {
 
     def producesTokens(toks: TokenType*)() {
       check(s.stripMargin, toks.toList)

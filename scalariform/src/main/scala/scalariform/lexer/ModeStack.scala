@@ -20,7 +20,7 @@ trait ModeStack { self: ScalaLexer ⇒
   protected def isRootMode = modeStack.size == 1
 
   protected def switchToScalaModeAndFetchToken() {
-    modeStack.push(new ScalaMode)
+    switchToScalaMode()
     fetchScalaToken()
   }
 
@@ -29,10 +29,24 @@ trait ModeStack { self: ScalaLexer ⇒
     fetchXmlToken()
   }
 
+  protected def switchToStringInterpolationMode(multiLine: Boolean) {
+    modeStack.push(new StringInterpolationMode(multiLine))
+  }
+
+  protected def switchToScalaMode() {
+    modeStack.push(new ScalaMode)
+  }
+
+  protected def isStringInterpolationMode = modeStack.head.isInstanceOf[StringInterpolationMode]
+
   protected def isXmlMode = modeStack.head.isInstanceOf[XmlMode]
+
+  protected def isScalaMode = modeStack.head.isInstanceOf[ScalaMode]
 
   protected def xmlMode: XmlMode = modeStack.head.asInstanceOf[XmlMode]
 
   protected def scalaMode: ScalaMode = modeStack.head.asInstanceOf[ScalaMode]
 
+  protected def stringInterpolationMode: StringInterpolationMode = modeStack.head.asInstanceOf[StringInterpolationMode]
+  
 }
