@@ -7,8 +7,6 @@ import scalariform.formatter.preferences._
 // format: OFF
 class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
-  override val debug = false
-
   "→" ==> "→"
   "this" ==> "this"
   "super [ B ] . t" ==> "super[B].t"
@@ -772,5 +770,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """a.map {
     |  b => c
     |}"""
-
+  
+  override val debug = false
+  
 }

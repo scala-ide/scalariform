@@ -51,7 +51,14 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for ((stringPart, scala) ← stringPartsAndScala) {
       formatResult = formatResult.before(stringPart, Compact)
       formatResult = formatResult.before(scala.firstToken, Compact)
-      formatResult ++= format(scala)(formatterState) 
+      formatResult ++= format(scala)(formatterState)
+      scala match {
+        case Expr(List(BlockExpr(lbrace, caseClausesOrStatSeq, rbrace))) if !containsNewline(scala) ⇒
+          formatResult = formatResult.before(rbrace, Compact)
+          // First token of caseClausesOrStatSeq (or rbrace):
+          formatResult = formatResult.before(scala.tokens.drop(1).head, Compact)
+        case _ ⇒
+      }
     }
     formatResult
   }
