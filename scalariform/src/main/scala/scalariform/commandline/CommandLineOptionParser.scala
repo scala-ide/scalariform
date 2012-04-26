@@ -6,7 +6,7 @@ import scala.util.parsing.combinator._
 class CommandLineOptionParser extends RegexParsers {
 
   lazy val option: Parser[CommandLineArgument] =
-    phrase(help) | phrase(version) | phrase(test) | phrase(forceOutput) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
+    phrase(help) | phrase(version) | phrase(scalaVersion) | phrase(test) | phrase(forceOutput) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
       phrase(encoding) | phrase(toggle) | phrase(preferenceFile) | phrase(preferenceOption) | phrase(badOption)
 
   lazy val test = ("--test" | "-t") ^^^ Test
@@ -20,6 +20,8 @@ class CommandLineOptionParser extends RegexParsers {
   lazy val help = ("--help" | "-help" | "-h") ^^^ Help
 
   lazy val version = ("--version" | "-version") ^^^ Version
+
+  lazy val scalaVersion = ("--scalaVersion=" | "-s=") ~> """(\d|\.)+""".r ^^ ScalaVersion 
 
   lazy val fileList = ("--fileList=" | "-l=") ~ ".+".r ^^ { case (_ ~ name) ⇒ FileList(name) }
 
@@ -53,4 +55,5 @@ case object InPlace extends CommandLineArgument
 case object Verbose extends CommandLineArgument
 case object Help extends CommandLineArgument
 case object Version extends CommandLineArgument
+case class ScalaVersion(scalaVersion: String) extends CommandLineArgument
 case class BadOption(name: String) extends CommandLineArgument

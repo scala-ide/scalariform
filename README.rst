@@ -132,11 +132,12 @@ Usage::
   Options:
     --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.
     --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)
+    --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)
     --help, -h                           Show help
     --inPlace, -i                        Replace the input file(s) in place with a formatted version.
     --preferenceFile=<path>, -p=<path>   Read preferences from a properties file
+    --scalaVersion=<v>, -s=<v>           Assume the source is written against the given version of Scala (e.g. 2.9.2). Default is runtime version.
     --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
-    --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)
     --verbose, -v                        Verbose output
     --version                            Show Scalariform version
   

@@ -9,6 +9,7 @@ import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
 import java.nio.charset._
 import scalariform.utils.Utils._
+import scalariform.ScalaVersions
 
 object Main {
 
@@ -145,6 +146,13 @@ object Main {
 
     def log(s: String) = if (verbose) println(s)
 
+    
+    val scalaVersion = arguments.collect {
+      case ScalaVersion(scalaVersion) => scalaVersion
+    }.headOption.getOrElse(ScalaVersions.DEFAULT_VERSION)
+    
+    log("Assuming source is Scala " + scalaVersion)
+    
     val preferencesText = preferences.preferencesMap.mkString(", ")
     if (preferencesText == "")
       log("Formatting with default preferences.")
@@ -161,7 +169,7 @@ object Main {
       def checkSource(source: Source): FormatResult = {
         val original = source.mkString
         try {
-          val formatted = ScalaFormatter.format(original, preferences)
+          val formatted = ScalaFormatter.format(original, preferences, scalaVersion = scalaVersion)
           // TODO: Sometimes get edits which cancel each other out
           // val edits = ScalaFormatter.formatAsEdits(source.mkString, preferences)
           // edits.isEmpty
@@ -190,7 +198,7 @@ object Main {
       if (files.isEmpty) {
         val original = Source.fromInputStream(System.in, encoding).mkString
         try {
-          val formatted = ScalaFormatter.format(original, preferences)
+          val formatted = ScalaFormatter.format(original, preferences, scalaVersion = scalaVersion)
           print(formatted)
         } catch {
           case e: ScalaParserException ⇒
@@ -204,7 +212,7 @@ object Main {
         for (file ← files) {
           val original = Source.fromFile(file, encoding).mkString
           val formattedOption = try {
-            Some(ScalaFormatter.format(original, preferences))
+            Some(ScalaFormatter.format(original, preferences, scalaVersion = scalaVersion))
           } catch {
             case e: ScalaParserException ⇒
               log("[Parse error]   " + file.getPath)
@@ -236,11 +244,12 @@ object Main {
     println("Options:")
     println("  --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.")
     println("  --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)")
+    println("  --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)")
     println("  --help, -h                           Show help")
     println("  --inPlace, -i                        Replace the input file(s) in place with a formatted version.")
     println("  --preferenceFile=<path>, -p=<path>   Read preferences from a properties file")
+    println("  --scalaVersion=<v>, -s=<v>           Assume the source is written against the given version of Scala (e.g. 2.9.2). Default is runtime version.")
     println("  --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
-    println("  --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)")
     println("  --verbose, -v                        Verbose output")
     println("  --version                            Show Scalariform version")
     println()
