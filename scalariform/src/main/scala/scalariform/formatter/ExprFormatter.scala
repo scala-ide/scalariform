@@ -809,7 +809,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       formatResult ++= format(type_)
     for (funBody ← funBodyOpt) {
       funBody match {
-        case ExprFunBody(equals: Token, body: Expr) ⇒ {
+        case ExprFunBody(equals: Token, macroOpt: Option[Token], body: Expr) ⇒ {
           // TODO: see format(PatDefOrDcl)
           val bodyToken = body.firstToken
           val (formatInstruction, exprFormatterState) =

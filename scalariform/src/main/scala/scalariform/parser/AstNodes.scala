@@ -275,11 +275,13 @@ case class PatDefOrDcl(valOrVarToken: Token,
 }
 
 sealed trait FunBody extends AstNode
+
 case class ProcFunBody(newlineOpt: Option[Token], bodyBlock: BlockExpr) extends FunBody {
   lazy val tokens = flatten(newlineOpt, bodyBlock)
 }
-case class ExprFunBody(equals: Token, body: Expr) extends FunBody {
-  lazy val tokens = flatten(equals, body)
+
+case class ExprFunBody(equals: Token, macroOpt: Option[Token], body: Expr) extends FunBody {
+  lazy val tokens = flatten(equals, macroOpt, body)
 }
 
 case class ParamClauses(newlineOpt: Option[Token], paramClausesAndNewlines: List[(ParamClause, Option[Token])]) extends AstNode {

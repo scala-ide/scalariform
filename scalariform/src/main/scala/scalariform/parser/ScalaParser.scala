@@ -1353,26 +1353,40 @@ class ScalaParser(tokens: Array[Token]) {
         case _ ⇒
           val equalsToken = accept(EQUALS)
           val constrExpr_ = constrExpr()
-          ExprFunBody(equalsToken, constrExpr_)
+          ExprFunBody(equalsToken, None, constrExpr_)
       }
       FunDefOrDcl(defToken, thisToken, None, paramClauses_, None, Some(funBody), localDef)
     } else {
       val nameToken = ident()
-      val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = false)
-      val paramClauses_ = paramClauses()
-      val newLineOpt_ = newLineOptWhenFollowedBy(LBRACE)
-      val returnTypeOpt = typedOpt()
-      val funBodyOpt = if (isStatSep || RBRACE || EOF /* for our tests */ )
-        None
-      else if (LBRACE) { // TODO: check cond
-        val blockExpr_ = blockExpr()
-        Some(ProcFunBody(newLineOpt_, blockExpr_))
-      } else {
-        val (equalsToken, expr_) = equalsExpr()
-        Some(ExprFunBody(equalsToken, expr_))
-      }
-      FunDefOrDcl(defToken, nameToken, typeParamClauseOpt_, paramClauses_, returnTypeOpt, funBodyOpt, localDef)
+      funDefRest(localDef, defToken, nameToken)
     }
+  }
+
+  private def funDefRest(localDef: Boolean, defToken: Token, nameToken: Token): FunDefOrDcl = {
+    val typeParamClauseOpt_ = typeParamClauseOpt(allowVariance = false)
+    val paramClauses_ = paramClauses()
+    val newLineOpt_ = newLineOptWhenFollowedBy(LBRACE)
+    val returnTypeOpt = typedOpt()
+    val funBodyOpt = if (isStatSep || RBRACE || EOF /* for our tests */ )
+      None
+    else if (LBRACE) { // TODO: check cond
+      val blockExpr_ = blockExpr()
+      Some(ProcFunBody(newLineOpt_, blockExpr_))
+    } else {
+      if (!EQUALS) {
+        accept(EQUALS)
+        throw new AssertionError("Will not reach here")
+      }
+      val equalsToken = nextToken()
+      val macroTokenOpt =
+        if (VARID && currentToken.text == "macro")
+          Some(nextToken())
+        else
+          None
+      val expr_ = expr() 
+      Some(ExprFunBody(equalsToken, macroTokenOpt, expr_))
+    }
+    FunDefOrDcl(defToken, nameToken, typeParamClauseOpt_, paramClauses_, returnTypeOpt, funBodyOpt, localDef)
   }
 
   private def constrExpr(): Expr = {
