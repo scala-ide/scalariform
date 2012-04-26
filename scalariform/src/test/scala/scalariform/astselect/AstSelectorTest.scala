@@ -2,8 +2,8 @@ package scalariform.astselect
 
 import org.scalatest._
 import org.scalatest.matchers._
-
 import scalariform.utils.Range
+import scalariform.ScalaVersions
 
 // format: OFF
 class AstSelectorTest extends FlatSpec with ShouldMatchers {
@@ -266,9 +266,26 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "         $$$$$$$$$$$ " ~
   " $$$$$$$$$$$$$$$$$$$ "  
 
-  if (false) { 
-  }
+  {
+    implicit val scalaVersion = "2.10.0"
+      
+    """ s"my name is ${person.name}." """ ~
+    """                $$$$$$       " """ ~
+    """                $$$$$$$$$$$  " """ ~
+    """               $$$$$$$$$$$$$ " """ ~
+    """ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ """
 
+    """ xyz"" """ ~
+    """  $    """ ~
+    """ $$$   """ ~
+    """ $$$$$ """
+
+    """ s"my name is $bob" """ ~
+    """    $               """ ~
+    """  $$$$$$$$$$$$$     """
+    
+  }
+  
   private def findSelectionRange(s: String): Range = { 
     val barLocation = s indexOf '|'
     if (barLocation >= 0)
@@ -281,20 +298,20 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
     }
   }
 
-  implicit def stringToTestString(source: String): TestString = new TestString(source)
-  class TestString(source: String) { 
-    def ~(initialSelectionDiagram: String) = IntermediateTest(source, initialSelectionDiagram)
+  implicit def stringToTestString(source: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION): TestString = new TestString(source, scalaVersion)
+  class TestString(source: String, scalaVersion: String) { 
+    def ~(initialSelectionDiagram: String) = IntermediateTest(source, initialSelectionDiagram, scalaVersion)
   }
 
-  case class IntermediateTest(source: String, initialSelectionDiagram: String) { 
+  case class IntermediateTest(source: String, initialSelectionDiagram: String, scalaVersion: String) { 
     def ~(finalSelectionDiagram: String): IntermediateTest = { 
        val initialSelection = findSelectionRange(initialSelectionDiagram)      
-       val actualFinalSelection = AstSelector.expandSelection(source, initialSelection) getOrElse initialSelection
+       val actualFinalSelection = AstSelector.expandSelection(source, initialSelection, scalaVersion) getOrElse initialSelection
        val expectedFinalSelection = findSelectionRange(finalSelectionDiagram)
        ("source\n>>>" + source + "<<<\n") should "expand\n>>>" + (initialSelectionDiagram + "<<<\n to \n>>>" + finalSelectionDiagram + "<<<\n") in {
          actualFinalSelection should equal (expectedFinalSelection)
        }
-       IntermediateTest(source, initialSelectionDiagram = finalSelectionDiagram)
+       IntermediateTest(source, initialSelectionDiagram = finalSelectionDiagram, scalaVersion)
     }
   }
 }

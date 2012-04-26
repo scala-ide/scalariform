@@ -1,5 +1,7 @@
 package scalariform
 
+import scala.util.Properties
+
 /**
  * A group of Scala versions that Scalariform wants to distinguish because they have incompatible syntax
  */
@@ -22,7 +24,7 @@ object ScalaVersions {
 
   def DEFAULT_GROUP = getVersionGroup(DEFAULT_VERSION)
 
-  def DEFAULT_VERSION = "2.9.1"
+  def DEFAULT_VERSION = Properties.scalaPropOrElse("version.number", "2.9.2")
 
   def getVersionGroup(version: String): ScalaVersionGroup =
     version match {

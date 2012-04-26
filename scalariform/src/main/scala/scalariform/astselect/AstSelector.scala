@@ -5,6 +5,7 @@ import scalariform.parser._
 import scalariform.utils.Range
 import scalariform.utils.Utils._
 import scala.util.control.Exception._
+import scalariform.ScalaVersions
 
 object AstSelector {
 
@@ -13,9 +14,9 @@ object AstSelector {
    * enclosing AST element. Returns None if the source does not parse correctly, or if
    * there is no strictly larger containing AST element.
    */
-  def expandSelection(source: String, initialSelection: Range): Option[Range] =
+  def expandSelection(source: String, initialSelection: Range, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): Option[Range] =
     catching(classOf[ScalaParserException]).toOption {
-      new AstSelector(source).expandSelection(initialSelection)
+      new AstSelector(source, scalaVersion).expandSelection(initialSelection)
     }
 
   import Tokens._
@@ -49,11 +50,11 @@ object AstSelector {
 
 }
 
-class AstSelector(source: String) {
+class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_VERSION) {
 
   import AstSelector._
 
-  private val tokens = ScalaLexer.tokenise(source)
+  private val tokens = ScalaLexer.tokenise(source, scalaVersion = scalaVersion)
 
   private val compilationUnitOpt: Option[CompilationUnit] = {
     val parser = new ScalaParser(tokens.toArray)
@@ -110,7 +111,8 @@ class AstSelector(source: String) {
   private def isSelectableToken(token: Token) = {
     val tokenType = token.tokenType
     import tokenType._
-    isLiteral || isKeyword || isComment || isId || (selectableXmlTokens contains tokenType)
+    isLiteral || isKeyword || isComment || isId || tokenType == Tokens.INTERPOLATION_ID ||
+      (selectableXmlTokens contains tokenType)
   }
 
   /**
