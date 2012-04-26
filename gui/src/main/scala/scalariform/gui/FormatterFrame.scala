@@ -83,7 +83,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   }
 
   private def highlightRedundantSemis(textPane: JTextPane) {
-    val semis = RedundantSemicolonDetector.findRedundantSemis(textPane.getText)
+    val semis = RedundantSemicolonDetector.findRedundantSemis(textPane.getText, scalaVersion = SCALA_VERSION)
     val document = textPane.getStyledDocument
     for (semi ← semis) {
       val style = document.addStyle("semi", null)

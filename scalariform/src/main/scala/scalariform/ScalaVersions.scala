@@ -22,9 +22,9 @@ case object SCALA_211 extends ScalaVersionGroup
 
 object ScalaVersions {
 
-  def DEFAULT_GROUP = getVersionGroup(DEFAULT_VERSION)
+  lazy val DEFAULT_GROUP = getVersionGroup(DEFAULT_VERSION)
 
-  def DEFAULT_VERSION = Properties.scalaPropOrElse("version.number", "2.9.2")
+  lazy val DEFAULT_VERSION = Properties.scalaPropOrElse("version.number", "2.9.2")
 
   def getVersionGroup(version: String): ScalaVersionGroup =
     version match {

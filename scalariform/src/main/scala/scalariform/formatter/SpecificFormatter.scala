@@ -17,8 +17,6 @@ trait SpecificFormatter {
 
   def format(formatter: ScalaFormatter, result: Result): FormatResult
 
-  def getTokens(s: String): List[Token] = ScalaLexer.tokenise(s)
-
   @throws(classOf[ScalaParserException])
   def format(source: String, lineDelimiter: Option[String] = None, scalaVersion: String = ScalaVersions.DEFAULT_VERSION)(baseFormattingPreferences: IFormattingPreferences): String = {
     val (edits, _) = fullFormat(source, lineDelimiter, scalaVersion)(baseFormattingPreferences)

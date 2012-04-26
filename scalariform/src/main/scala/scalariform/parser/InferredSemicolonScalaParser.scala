@@ -127,7 +127,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isLiteralToken(tokenType: TokenType): Boolean = tokenType match {
     case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL |
-      STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒ true
+      STRING_LITERAL | STRING_PART | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒ true
     case _ ⇒ false
   }
 
@@ -380,11 +380,29 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     newLineOptWhenFollowedBy(LBRACE)
   }
 
-  private def literal(): Token =
-    if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
+  private def literal(inPattern: Boolean = false) =
+    if (INTERPOLATION_ID)
+      interpolatedString(inPattern)
+    else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
       nextToken()
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
+
+  private def interpolatedString(inPattern: Boolean = false) {
+    nextToken()
+    while (STRING_PART) {
+      nextToken()
+      if (inPattern)
+        pattern()
+      else if (isIdent)
+        ident()
+      else
+        expr()
+    }
+    if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
+      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken)
+    val terminalString = nextToken()
+  }
 
   private def newLineOpt() { if (NEWLINE) nextToken() }
 
@@ -786,7 +804,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
           stableId()
           condOpt(currentTokenType) {
-            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal()
+            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal(inPattern = true)
           }
           if (LBRACKET) typeArgs()
           else None
@@ -794,7 +812,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case USCORE ⇒
           nextToken()
         case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
-          literal()
+          literal(inPattern = true)
         case LPAREN ⇒
           makeParens(noSeq.patterns)
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
@@ -1164,7 +1182,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case CASE if lookahead(1) == CLASS  ⇒ classDef()
       case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken)
     }
   }
 

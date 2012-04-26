@@ -3,6 +3,7 @@ package scalariform.parser
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.utils.Utils._
+import scalariform.ScalaVersions
 import scala.collection.mutable.ListBuffer
 import scala.PartialFunction._
 
@@ -1964,8 +1965,8 @@ object ScalaParser {
    * Parse the given text as a compilation unit or script
    * @return None if there is a parse error.
    */
-  def parse(text: String): Option[AstNode] = {
-    val parser = new ScalaParser(ScalaLexer.tokenise(text).toArray)
+  def parse(text: String, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): Option[AstNode] = {
+    val parser = new ScalaParser(ScalaLexer.tokenise(text, scalaVersion = scalaVersion).toArray)
     parser.safeParse(parser.compilationUnitOrScript)
   }
 
