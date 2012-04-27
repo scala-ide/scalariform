@@ -5,20 +5,13 @@ import scala.util.Properties
 /**
  * A group of Scala versions that Scalariform wants to distinguish because they have incompatible syntax
  */
-sealed trait ScalaVersionGroup extends Ordered[ScalaVersionGroup] {
-
-  def compare(that: ScalaVersionGroup) =
-    this match {
-      case `that`      ⇒ 0
-      case SCALA_28_29 ⇒ -1
-      case SCALA_211   ⇒ 1
-    }
-
+sealed class ScalaVersionGroup(protected[scalariform] val internalVersion: Int) extends Ordered[ScalaVersionGroup] {
+  def compare(that: ScalaVersionGroup) = internalVersion compare that.internalVersion
 }
 
-case object SCALA_28_29 extends ScalaVersionGroup
-case object SCALA_210 extends ScalaVersionGroup
-case object SCALA_211 extends ScalaVersionGroup
+case object SCALA_28_29 extends ScalaVersionGroup(0)
+case object SCALA_210 extends ScalaVersionGroup(1)
+case object SCALA_211 extends ScalaVersionGroup(2)
 
 object ScalaVersions {
 
