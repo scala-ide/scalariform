@@ -38,6 +38,12 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(RBRACE)
   }
 
+  def dropAnyBraces[T](body: ⇒ Any) =
+    if (LBRACE)
+      inBraces(body)
+    else
+      body
+
   def inBrackets[T](body: ⇒ T) {
     accept(LBRACKET)
     body
@@ -61,8 +67,12 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   def scriptBody() {
-    templateStatSeq()
+    templateStats()
     accept(EOF)
+  }
+
+  private def templateStats() = {
+    templateStatSeq()
   }
 
   private def accept(tokenType: TokenType): Token =
@@ -393,7 +403,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     while (STRING_PART) {
       nextToken()
       if (inPattern)
-        pattern()
+        dropAnyBraces(pattern())
       else if (isIdent)
         ident()
       else
@@ -1111,17 +1121,30 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     } else {
       ident()
-      typeParamClauseOpt(allowVariance = false)
-      paramClauses()
-      newLineOptWhenFollowedBy(LBRACE)
-      typedOpt()
-      if (isStatSep || RBRACE || EOF /* for our tests */ )
-        None
-      else if (LBRACE) { // TODO: check cond
-        blockExpr()
-      } else {
-        equalsExpr()
+      funDefRest()
+    }
+  }
+
+  private def funDefRest() {
+    typeParamClauseOpt(allowVariance = false)
+    paramClauses()
+    newLineOptWhenFollowedBy(LBRACE)
+    typedOpt()
+    if (isStatSep || RBRACE || EOF /* for our tests */ )
+      None
+    else if (LBRACE) { // TODO: check cond
+      blockExpr()
+    } else {
+      if (!EQUALS) {
+        accept(EQUALS)
+        throw new AssertionError("Will not reach here")
       }
+      nextToken()
+      if (VARID && currentToken.text == "macro")
+        Some(nextToken())
+      else
+        None
+      expr()
     }
   }
 

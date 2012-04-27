@@ -6,6 +6,7 @@
 * FIX: Bug with line-per-annotation style
 * Add support for String interpolation (2.10) 
 * Add support for macros
+* Add --scalaVersion=<version> flag to command-line tool
 
 0.1.1 (18/October/11)
 

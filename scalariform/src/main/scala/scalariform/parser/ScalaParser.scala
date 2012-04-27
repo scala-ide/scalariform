@@ -33,6 +33,13 @@ class ScalaParser(tokens: Array[Token]) {
     (openToken, contents, closeToken)
   }
 
+  def dropAnyBraces[T](body: ⇒ Expr): Expr =
+    if (LBRACE) {
+      val (lbrace, contents, rbrace) = inBraces(body)
+      makeExpr(lbrace, contents, rbrace)
+    } else
+      body
+
   def inBrackets[T](body: ⇒ T): (Token, T, Token) = {
     val openToken = accept(LBRACKET)
     val contents = body
@@ -57,9 +64,13 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   def scriptBody(): CompilationUnit = {
-    val stmts = templateStatSeq()
+    val stmts = templateStats()
     accept(EOF)
     CompilationUnit(stmts)
+  }
+
+  private def templateStats() = {
+    templateStatSeq()
   }
 
   private def accept(tokenType: TokenType): Token =
@@ -428,7 +439,7 @@ class ScalaParser(tokens: Array[Token]) {
       val stringPart = nextToken()
       val scalaSegment: Expr =
         if (inPattern)
-          pattern()
+          dropAnyBraces(pattern())
         else if (isIdent)
           makeExpr(ident())
         else
@@ -1383,7 +1394,7 @@ class ScalaParser(tokens: Array[Token]) {
           Some(nextToken())
         else
           None
-      val expr_ = expr() 
+      val expr_ = expr()
       Some(ExprFunBody(equalsToken, macroTokenOpt, expr_))
     }
     FunDefOrDcl(defToken, nameToken, typeParamClauseOpt_, paramClauses_, returnTypeOpt, funBodyOpt, localDef)
