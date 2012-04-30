@@ -7,6 +7,7 @@
 * Add support for String interpolation (2.10) 
 * Add support for macros
 * Add --scalaVersion=<version> flag to command-line tool
+* Support expr[T1, T2][T3, T4] and g()[String] syntaxes
 
 0.1.1 (18/October/11)
 

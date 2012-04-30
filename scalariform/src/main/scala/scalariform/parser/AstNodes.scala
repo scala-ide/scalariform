@@ -129,9 +129,14 @@ case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Opt
   lazy val tokens = flatten(left, infixId, newlineOption, right)
 }
 
-case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement] = None,
-                    newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)] = Nil, uscoreOpt: Option[Token] = None) extends ExprElement {
-  lazy val tokens = flatten(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, uscoreOpt)
+case class CallExpr(
+    exprDotOpt: Option[(List[ExprElement], Token)],
+    id: Token,
+    typeArgsOpt: Option[TypeExprElement] = None,
+    newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)] = Nil,
+    typeArgsOpt2: Option[TypeExprElement] = None,
+    uscoreOpt: Option[Token] = None) extends ExprElement {
+  lazy val tokens = flatten(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, typeArgsOpt2, uscoreOpt)
 }
 
 case class TypeExprElement(contents: List[TypeElement]) extends AstNode with ExprElement {
@@ -206,11 +211,11 @@ case class Enumerators(initialGenerator: Generator, rest: List[(Token, Enumerato
 }
 
 case class Generator(
-  valOption: Option[Token],
-  pattern: Expr,
-  equalsOrArrowToken: Token,
-  expr: Expr,
-  guards: List[Guard]) extends AstNode with Enumerator {
+    valOption: Option[Token],
+    pattern: Expr,
+    equalsOrArrowToken: Token,
+    expr: Expr,
+    guards: List[Guard]) extends AstNode with Enumerator {
 
   lazy val tokens = flatten(valOption, pattern, equalsOrArrowToken, expr, guards)
 

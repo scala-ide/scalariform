@@ -770,7 +770,9 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """a.map {
     |  b => c
     |}"""
-  
+
+  "f()[Foo]" ==> "f()[Foo]"
+      
   override val debug = false
   
 }

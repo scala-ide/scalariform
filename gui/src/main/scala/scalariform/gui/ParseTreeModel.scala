@@ -56,16 +56,16 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
 
     override lazy val range = Some(token.offset, token.lastCharacterOffset)
   }
-  
-  case class ListNode(name: String, list: List[_ <: AnyRef]) extends TreeNode(name) {
-    lazy val children = list map { x: AnyRef => makeTreeNode(x) }
-  }
-  
-  case class OptionNode(name: String, opt: Option[_ <: AnyRef]) extends TreeNode(name) {
-    lazy val children = opt map { x => makeTreeNode(x) } toList
+
+  case class ListNode(name: String, list: List[Any]) extends TreeNode(name) {
+    lazy val children = list map {x => makeTreeNode(x) }
   }
 
-  case class EitherNode(name: String, either: Either[_ <: AnyRef, _ <: AnyRef]) extends TreeNode(name) {
+  case class OptionNode(name: String, opt: Option[Any]) extends TreeNode(name) {
+    lazy val children = opt map { x ⇒ makeTreeNode(x) } toList
+  }
+
+  case class EitherNode(name: String, either: Either[Any, Any]) extends TreeNode(name) {
     lazy val children = either match {
       case Left(obj)  ⇒ List(makeTreeNode(obj))
       case Right(obj) ⇒ List(makeTreeNode(obj))
@@ -73,29 +73,30 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
 
   }
 
-  case class PairNode(name: String, pair: (_ <: AnyRef, _ <: AnyRef)) extends TreeNode(name) {
+  case class PairNode(name: String, pair: (Any, Any)) extends TreeNode(name) {
     lazy val children = List(makeTreeNode(pair._1), makeTreeNode(pair._2))
   }
 
-  case class TodoNode(name: String, obj: AnyRef) extends TreeNode(name) {
+  case class TodoNode(name: String, obj: Any) extends TreeNode(name) {
     val children = Nil
     override def toString = name + ": " + obj
   }
 
-  def makeTreeNode(obj: AnyRef, name: String = ""): TreeNode = {
-    for (astNode ← obj.matchInstance[AstNode])
-      return AstNodeNode(name, astNode)
-    for (token ← obj.matchInstance[Token])
-      return TokenNode(name, token)
-    for (list ← obj.matchInstance[List[_ <: AnyRef]])
-      return ListNode(name, list)
-    for (option ← obj.matchInstance[Option[_ <: AnyRef]])
-      return OptionNode(name, option)
-    for (either ← obj.matchInstance[Either[_ <: AnyRef, _ <: AnyRef]])
-      return EitherNode(name, either)
-    for (pair ← obj.matchInstance[(_ <: AnyRef, _ <: AnyRef)])
-      return PairNode(name, pair)
-    return TodoNode(name, obj)
+  def makeTreeNode(obj: Any, name: String = ""): TreeNode = obj match {
+    case astNode: AstNode ⇒
+      AstNodeNode(name, astNode)
+    case token: Token ⇒
+      TokenNode(name, token)
+    case list: List[_] ⇒
+      ListNode(name, list)
+    case option: Option[_] ⇒
+      OptionNode(name, option)
+    case either: Either[_, _] ⇒
+      EitherNode(name, either)
+    case pair: (_, _) ⇒
+      PairNode(name, pair)
+    case _ ⇒
+      TodoNode(name, obj)
   }
 
   lazy val getRoot = AstNodeNode("root", rootAstNode)

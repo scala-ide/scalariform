@@ -163,7 +163,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(callExpr: CallExpr)(implicit initialFormatterState: FormatterState): (FormatResult, FormatterState) = {
-    val CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt) = callExpr
+    val CallExpr(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, typeArgsOpt2, uscoreOpt) = callExpr
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = initialFormatterState
 

@@ -817,8 +817,14 @@ class ScalaParser(tokens: Array[Token]) {
         if (identifierCond) {
           val typeArgs_ = TypeExprElement(exprTypeArgs())
           val updatedPart = previousPart match {
-            case List(callExpr: CallExpr) ⇒ List(callExpr.copy(typeArgsOpt = Some(typeArgs_)))
-            case _                        ⇒ exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
+            case List(callExpr: CallExpr) ⇒
+              if (callExpr.typeArgsOpt.isDefined || callExpr.typeArgsOpt2.isDefined)
+                exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
+              else if (callExpr.newLineOptsAndArgumentExprss == Nil)
+                List(callExpr.copy(typeArgsOpt = Some(typeArgs_)))
+              else
+                List(callExpr.copy(typeArgsOpt2 = Some(typeArgs_)))
+            case _ ⇒ exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
           }
           simpleExprRest(updatedPart, canApply = true)
         } else
