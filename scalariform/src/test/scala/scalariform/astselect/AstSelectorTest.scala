@@ -266,6 +266,17 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "         $$$$$$$$$$$ " ~
   " $$$$$$$$$$$$$$$$$$$ "  
 
+  " foo[bar][baz] " ~
+  " $$$           " ~
+  " $$$$$$$$      " ~
+  " $$$$$$$$$$$$$ "
+
+  /* TODO: Need AST representation for [] calls 
+  " foo[bar][baz][boz] " ~
+  " $$$$$$$$           " ~
+  " $$$$$$$$$$$$$      "
+  */
+  
   {
     implicit val scalaVersion = "2.10.0"
       

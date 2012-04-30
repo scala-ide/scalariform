@@ -818,12 +818,10 @@ class ScalaParser(tokens: Array[Token]) {
           val typeArgs_ = TypeExprElement(exprTypeArgs())
           val updatedPart = previousPart match {
             case List(callExpr: CallExpr) ⇒
-              if (callExpr.typeArgsOpt.isDefined || callExpr.typeArgsOpt2.isDefined)
-                exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
-              else if (callExpr.newLineOptsAndArgumentExprss == Nil)
-                List(callExpr.copy(typeArgsOpt = Some(typeArgs_)))
+              if (callExpr.typeArgsOpt.isDefined || callExpr.newLineOptsAndArgumentExprss.nonEmpty)
+                exprElementFlatten2(previousPart, newLineOpt, typeArgs_) // TODO: put these into some new type of AST node
               else
-                List(callExpr.copy(typeArgsOpt2 = Some(typeArgs_)))
+                List(callExpr.copy(typeArgsOpt = Some(typeArgs_)))
             case _ ⇒ exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
           }
           simpleExprRest(updatedPart, canApply = true)
