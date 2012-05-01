@@ -751,7 +751,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   trait SeqContextSensitive extends PatternContextSensitive {
 
-    def interceptStarPattern()
+    def isSequenceOK: Boolean
+
+    def isXML: Boolean = false
 
     def functionArgType() = argType()
 
@@ -800,8 +802,24 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
 
     def pattern3() {
+      val firstToken = currentToken
+      val secondToken = InferredSemicolonScalaParser.this(pos + 1)
       simplePattern()
-      interceptStarPattern()
+
+      if (isSequenceOK) {
+        if (STAR && secondToken == currentToken && firstToken.tokenType == USCORE) {
+          lookahead(1) match {
+            case RBRACE if isXML ⇒
+              nextToken()
+              return
+            case RPAREN if !isXML ⇒
+              nextToken()
+              return
+            case _ ⇒
+          }
+        }
+      }
+
       while (isIdent && !PIPE) {
         ident()
         simplePattern()
@@ -840,11 +858,17 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   object seqOK extends SeqContextSensitive {
-    def interceptStarPattern() { if (STAR) nextToken() }
+    val isSequenceOK = true
   }
 
   object noSeq extends SeqContextSensitive {
-    def interceptStarPattern() {}
+    val isSequenceOK = false
+  }
+
+  object xmlSeqOK extends SeqContextSensitive {
+    val isSequenceOK = false
+
+    override val isXML = true
   }
 
   def typ() = outPattern.typ()
@@ -856,6 +880,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   def pattern() = noSeq.pattern()
   def patterns() = noSeq.patterns()
   def seqPatterns() = seqOK.patterns()
+  def xmlSeqPatterns() = xmlSeqOK.patterns()
 
   private def argumentPatterns() = {
     inParens { if (RPAREN) Nil else seqPatterns() }
@@ -1472,7 +1497,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private def xmlEmbeddedScala(isPattern: Boolean) {
     if (isPattern) {
       accept(LBRACE)
-      seqPatterns()
+      xmlSeqPatterns()
       accept(RBRACE)
     } else
       blockExpr()

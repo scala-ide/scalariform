@@ -933,7 +933,9 @@ class ScalaParser(tokens: Array[Token]) {
 
   trait SeqContextSensitive extends PatternContextSensitive {
 
-    def interceptStarPattern(): Option[Token]
+    def isSequenceOK: Boolean
+
+    def isXML: Boolean = false
 
     def functionArgType() = argType()
 
@@ -991,7 +993,23 @@ class ScalaParser(tokens: Array[Token]) {
 
     def pattern3(): List[ExprElement] = {
       val simplePattern1 = simplePattern()
-      interceptStarPattern() foreach { x ⇒ return exprElementFlatten2(simplePattern1, x) }
+
+      if (isSequenceOK) {
+        simplePattern1.flatMap(_.tokens).map(_.tokenType) match {
+          case List(USCORE) if STAR ⇒
+            lookahead(1) match {
+              case RBRACE if isXML ⇒
+                val starToken = nextToken()
+                return exprElementFlatten2(simplePattern1, starToken)
+              case RPAREN if !isXML ⇒
+                val starToken = nextToken()
+                return exprElementFlatten2(simplePattern1, starToken)
+              case _ ⇒
+            }
+          case _ ⇒
+        }
+      }
+
       var soFar: List[ExprElement] = simplePattern1
       while (isIdent && !PIPE) {
         val id = ident()
@@ -1041,11 +1059,17 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   object seqOK extends SeqContextSensitive {
-    def interceptStarPattern() = if (STAR) Some(nextToken()) else None
+    val isSequenceOK = true
   }
 
   object noSeq extends SeqContextSensitive {
-    def interceptStarPattern() = None
+    val isSequenceOK = false
+  }
+
+  object xmlSeqOK extends SeqContextSensitive {
+    val isSequenceOK = false
+
+    override val isXML = true
   }
 
   def typ() = outPattern.typ()
@@ -1057,6 +1081,7 @@ class ScalaParser(tokens: Array[Token]) {
   def pattern() = noSeq.pattern()
   def patterns() = noSeq.patterns()
   def seqPatterns() = seqOK.patterns()
+  def xmlSeqPatterns() = xmlSeqOK.patterns()
 
   private def argumentPatterns(): List[ExprElement] = {
     val (lparen, patterns_, rparen) = inParens { if (RPAREN) Nil else seqPatterns() }
@@ -1836,7 +1861,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def xmlEmbeddedScala(isPattern: Boolean): Expr = {
     if (isPattern) {
       val lbrace = accept(LBRACE)
-      val pats = seqPatterns()
+      val pats = xmlSeqPatterns()
       val rbrace = accept(RBRACE)
       makeExpr(lbrace, pats, rbrace)
     } else

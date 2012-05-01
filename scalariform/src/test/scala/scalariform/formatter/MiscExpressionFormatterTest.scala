@@ -773,6 +773,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "f()[Foo]" ==> "f()[Foo]"
   "a [ b . C ] [ d . E ] [ f . G ] " ==> "a[b.C][d.E][f.G]" 
+
+  "{ val P(a, b*c) = p }" ==> "{ val P(a, b * c) = p }"
     
   override val debug = false
   
