@@ -1,5 +1,6 @@
 import sbt._
 import sbt.Keys._
+import com.github.retronym.SbtOneJar
 //import ScalariformPlugin.{ format, formatPreferences }
 //import scalariform.formatter.preferences._
 
@@ -26,8 +27,7 @@ object ScalariformBuild extends Build {
 
   // def formattingPreferences = PreferencesImporterExporter.loadPreferences("formatterPreferences.properties").asInstanceOf[FormattingPreferences]
 
-  lazy val root = Project("root", file("."), settings = buildSettings) aggregate(
-    scalariform, gui, perf, corpusScan)
+  lazy val root = Project("root", file("."), settings = buildSettings) aggregate(scalariform, gui, perf, corpusScan, scalariformCli)
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = buildSettings ++ 
     Seq(
@@ -42,7 +42,7 @@ object ScalariformBuild extends Build {
          }
          deps :+ scalatestVersion
       },
-      mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
+      exportJars := true, // Needed for scalariformCli oneJar
       publishTo <<= version { (v: String) =>
         if (v endsWith "-SNAPSHOT")
           Some(ScalaToolsSnapshots)
@@ -52,8 +52,14 @@ object ScalariformBuild extends Build {
     ),
     delegates = root :: Nil)
 
-  lazy val perf: Project = Project("perf", file("perf"), settings = buildSettings ++
-    Seq()) dependsOn(scalariform)
+  lazy val scalariformCli = Project("scalariform-cli", file("scalariform-cli"), settings = buildSettings ++ SbtOneJar.oneJarSettings ++
+    Seq(
+      libraryDependencies += "commons-io" % "commons-io" % "1.4",
+      mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
+      artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) => artifact.name + "." + artifact.extension }
+    )) dependsOn(scalariform)
+
+  lazy val perf: Project = Project("perf", file("perf"), settings = buildSettings) dependsOn(scalariform)
 
   lazy val corpusScan: Project = Project("corpusscan", file("corpusscan"), settings = buildSettings ++
     Seq(
@@ -65,7 +71,6 @@ object ScalariformBuild extends Build {
       libraryDependencies += "com.miglayout" % "miglayout" % "3.7.4",
       mainClass in (Compile, run) := Some("scalariform.gui.Main")
     )) dependsOn(scalariform)
-
 
    def pomExtraXml =
       <inceptionYear>2010</inceptionYear>
