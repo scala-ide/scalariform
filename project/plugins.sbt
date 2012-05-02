@@ -7,6 +7,7 @@ resolvers += Resolver.url(
 
 addSbtPlugin("com.github.retronym" % "sbt-onejar" % "0.7")
 
-// addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
+resolvers += Classpaths.typesafeSnapshots
 
-// libraryDependencies += "com.typesafe" %% "sbt-scalariform" % "0.1"
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.1.0-SNAPSHOT")
+

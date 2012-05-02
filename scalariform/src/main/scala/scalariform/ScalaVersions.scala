@@ -5,13 +5,17 @@ import scala.util.Properties
 /**
  * A group of Scala versions that Scalariform wants to distinguish because they have incompatible syntax
  */
-sealed class ScalaVersionGroup(protected[scalariform] val internalVersion: Int) extends Ordered[ScalaVersionGroup] {
+sealed trait ScalaVersionGroup extends Ordered[ScalaVersionGroup] {
+ 
   def compare(that: ScalaVersionGroup) = internalVersion compare that.internalVersion
+
+  protected val internalVersion: Int
+
 }
 
-case object SCALA_28_29 extends ScalaVersionGroup(0)
-case object SCALA_210 extends ScalaVersionGroup(1)
-case object SCALA_211 extends ScalaVersionGroup(2)
+case object SCALA_28_29 extends ScalaVersionGroup { protected val internalVersion = 0}
+case object SCALA_210 extends ScalaVersionGroup  { protected val internalVersion = 1}
+case object SCALA_211 extends ScalaVersionGroup { protected val internalVersion = 2}
 
 object ScalaVersions {
 
