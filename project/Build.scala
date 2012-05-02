@@ -1,6 +1,9 @@
 import sbt._
 import sbt.Keys._
 import com.github.retronym.SbtOneJar
+//import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys._
+//import com.typesafe.sbteclipse.core.EclipsePlugin._
+
 //import ScalariformPlugin.{ format, formatPreferences }
 //import scalariform.formatter.preferences._
 
@@ -18,6 +21,8 @@ object ScalariformBuild extends Build {
     parallelExecution in Test := false,
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+    //EclipseKeys.withSource := true,
+    //EclipseKeys.eclipseOutput = Some("bin")
   )  // ++ formatterSettings
 
   //lazy val formatterSettings = ScalariformPlugin.settings ++ Seq(

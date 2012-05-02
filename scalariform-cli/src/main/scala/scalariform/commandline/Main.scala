@@ -28,7 +28,7 @@ object Main {
     }
 
     if (arguments contains Version) {
-      println("Scalariform " + scalariform.VERSION)
+      println("Scalariform " + scalariform.VERSION + " for Scala " + ScalaVersions.DEFAULT_VERSION)
       return 0
     }
 
@@ -125,8 +125,8 @@ object Main {
     if (forceOutput && test)
       errors ::= "Incompatible arguments --forceOutput and --inPlace"
 
-    if (forceOutput && files.nonEmpty)
-      errors ::= "Cannot use --forceOutput with files"
+    if (forceOutput && files.size > 1)
+      errors ::= "Cannot use --forceOutput with multiple files"
 
     if (inPlace && files.isEmpty)
       errors ::= "Need to provide at least one file to modify in place"
@@ -146,97 +146,132 @@ object Main {
 
     def log(s: String) = if (verbose) println(s)
 
-    
     val scalaVersion = arguments.collect {
-      case ScalaVersion(scalaVersion) => scalaVersion
+      case ScalaVersion(scalaVersion) ⇒ scalaVersion
     }.headOption.getOrElse(ScalaVersions.DEFAULT_VERSION)
-    
+
     log("Assuming source is Scala " + scalaVersion)
-    
+
     val preferencesText = preferences.preferencesMap.mkString(", ")
     if (preferencesText == "")
       log("Formatting with default preferences.")
     else
       log("Formatting with preferences: " + preferencesText)
 
-    if (test) {
-      trait FormatResult
-      case object FormattedCorrectly extends FormatResult
-      case object NotFormattedCorrectly extends FormatResult
-      case object DidNotParse extends FormatResult
-
-      var allFormattedCorrectly = true
-      def checkSource(source: Source): FormatResult = {
-        val original = source.mkString
-        try {
-          val formatted = ScalaFormatter.format(original, preferences, scalaVersion = scalaVersion)
-          // TODO: Sometimes get edits which cancel each other out
-          // val edits = ScalaFormatter.formatAsEdits(source.mkString, preferences)
-          // edits.isEmpty
-          if (formatted == original) FormattedCorrectly else NotFormattedCorrectly
-        } catch {
-          case e: ScalaParserException ⇒ DidNotParse
-        }
+    val doFormat: String ⇒ Option[String] = s ⇒
+      try
+        Some(ScalaFormatter.format(s, preferences, scalaVersion = scalaVersion))
+      catch {
+        case e: ScalaParserException ⇒ None
       }
-      if (files.isEmpty) {
-        val formatResult = checkSource(Source.fromInputStream(System.in, encoding))
-        allFormattedCorrectly &= (formatResult == FormattedCorrectly)
-      } else
-        for (file ← files) {
-          val formatResult = checkSource(Source.fromFile(file, encoding))
-          val resultString = formatResult match {
-            case FormattedCorrectly    ⇒ "OK"
-            case NotFormattedCorrectly ⇒ "FAILED"
-            case DidNotParse           ⇒ "ERROR"
-          }
-          val padding = " " * (6 - resultString.length)
-          log("[" + resultString + "]" + padding + " " + file)
-          allFormattedCorrectly &= (formatResult == FormattedCorrectly)
+
+    if (test)
+      if (files.isEmpty)
+        checkSysIn(encoding, doFormat)
+      else
+        checkFiles(files, encoding, doFormat, log)
+    else {
+      if (files.isEmpty)
+        transformSysInToSysOut(encoding, forceOutput, doFormat)
+      else
+        files match {
+          case List(file) if !inPlace ⇒
+            transformFileToSysOut(file, encoding, forceOutput, doFormat)
+          case _ ⇒
+            transformFilesInPlace(files, encoding, doFormat, log)
         }
-      return (if (allFormattedCorrectly) 0 else 1)
-    } else {
-      if (files.isEmpty) {
-        val original = Source.fromInputStream(System.in, encoding).mkString
-        try {
-          val formatted = ScalaFormatter.format(original, preferences, scalaVersion = scalaVersion)
-          print(formatted)
-        } catch {
-          case e: ScalaParserException ⇒
-            if (forceOutput) print(original) else {
-              System.err.println("Could not parse text as Scala.")
-              return 1
-            }
+    }
+  }
+
+  private def checkSource(source: Source, doFormat: String ⇒ Option[String]): FormatResult = {
+    val original = source.mkString
+    doFormat(original) match {
+      case Some(`original`) ⇒ FormattedCorrectly
+      case Some(_)          ⇒ NotFormattedCorrectly
+      case None             ⇒ DidNotParse
+    }
+  }
+
+  private def checkSysIn(encoding: String, doFormat: String ⇒ Option[String]): Int = {
+    val source = Source.fromInputStream(System.in, encoding)
+    if (checkSource(source, doFormat) == FormattedCorrectly) 0 else 1
+  }
+
+  private def transformSysInToSysOut(encoding: String, forceOutput: Boolean, doFormat: String ⇒ Option[String]): Int = {
+    val original = Source.fromInputStream(System.in, encoding).mkString
+    doFormat(original) match {
+      case Some(formatted) ⇒
+        print(formatted)
+        0
+      case None ⇒
+        if (forceOutput) {
+          print(original)
+          0
+        } else {
+          System.err.println("Could not parse text as Scala.")
+          1
         }
-      } else {
-        var problems = false
-        for (file ← files) {
-          val original = Source.fromFile(file, encoding).mkString
-          val formattedOption = try {
-            Some(ScalaFormatter.format(original, preferences, scalaVersion = scalaVersion))
-          } catch {
-            case e: ScalaParserException ⇒
-              log("[Parse error]   " + file.getPath)
-              problems = true
-              None
-          }
-          for (formatted ← formattedOption) {
-            if (inPlace)
-              if (formatted == original)
-                log(".              " + file)
-              else {
-                log("[Reformatted]  " + file)
-                writeText(file, formatted, Some(encoding))
-              }
-            else
-              print(formatted)
-          }
+    }
+  }
+
+  private def transformFileToSysOut(file: File, encoding: String, forceOutput: Boolean, doFormat: String ⇒ Option[String]): Int = {
+    val original = Source.fromFile(file, encoding).mkString
+    doFormat(original) match {
+      case Some(formatted) ⇒
+        print(formatted)
+        0
+      case None ⇒
+        if (forceOutput) {
+          print(original)
+          0
+        } else {
+          System.err.println("Could not parse " + file.getPath + " as Scala")
+          1
         }
-        if (problems)
-          return 1
+
+    }
+  }
+
+  private def transformFilesInPlace(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Int = {
+    var problems = false
+    for (file ← files) {
+      val original = Source.fromFile(file, encoding).mkString
+      doFormat(original) match {
+        case Some(formatted) ⇒
+          if (formatted == original)
+            log(".              " + file)
+          else {
+            log("[Reformatted]  " + file)
+            writeText(file, formatted, Some(encoding))
+          }
+        case None ⇒
+          log("[Parse error]   " + file.getPath)
+          problems = true
       }
     }
-    return 0
+    if (problems) 1 else 0
   }
+
+  private def checkFiles(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Int = {
+    val allCorrect = files.forall { file ⇒
+      val source = Source.fromFile(file, encoding)
+      val formatResult = checkSource(source, doFormat)
+      val resultString = formatResult match {
+        case FormattedCorrectly    ⇒ "OK"
+        case NotFormattedCorrectly ⇒ "FAILED"
+        case DidNotParse           ⇒ "ERROR"
+      }
+      val padding = " " * (6 - resultString.length)
+      log("[" + resultString + "]" + padding + " " + file)
+      formatResult == FormattedCorrectly
+    }
+    if (allCorrect) 0 else 1
+  }
+
+  private sealed trait FormatResult
+  private case object FormattedCorrectly extends FormatResult
+  private case object NotFormattedCorrectly extends FormatResult
+  private case object DidNotParse extends FormatResult
 
   private def printUsage() {
     println("Usage: scalariform [options] [files...]")
@@ -244,7 +279,7 @@ object Main {
     println("Options:")
     println("  --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.")
     println("  --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)")
-    println("  --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)")
+    println("  --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin or single files)")
     println("  --help, -h                           Show help")
     println("  --inPlace, -i                        Replace the input file(s) in place with a formatted version.")
     println("  --preferenceFile=<path>, -p=<path>   Read preferences from a properties file")
