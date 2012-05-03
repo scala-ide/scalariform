@@ -37,7 +37,7 @@ class XmlMode extends LexerMode {
 class StringInterpolationMode(val multiLine: Boolean) extends LexerMode {
 
   var initialSegment = true
-  
+
   var interpolationVariable = false
-  
+
 }

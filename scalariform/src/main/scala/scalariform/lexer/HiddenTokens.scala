@@ -18,7 +18,7 @@ case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken]
   val whitespaces: List[Whitespace] = tokens collect { case whitespace @ Whitespace(_) ⇒ whitespace }
 
   def firstTokenOption = tokens.headOption
-  
+
   def lastTokenOption = tokens.lastOption
 
   def containsNewline = text contains '\n'
@@ -26,23 +26,23 @@ case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken]
   def containsComment = comments.nonEmpty
 
   def containsUnicodeEscape: Boolean = {
-    for (token <- tokens if token.token.containsUnicodeEscape) 
+    for (token ← tokens if token.token.containsUnicodeEscape)
       return true
     false
   }
-  
+
   lazy val text: String = {
     val sb = new StringBuilder
-    for (token <- tokens) sb.append(token.text)
-//    tokens.flatMap(_.token.text)(scala.collection.breakOut)
-  sb.toString
+    for (token ← tokens) sb.append(token.text)
+    //    tokens.flatMap(_.token.text)(scala.collection.breakOut)
+    sb.toString
   }
   lazy val rawText = tokens.map(_.token.rawText).mkString
 
   def rawTokens = tokens.map(_.token)
 
   def offset = tokens.head.token.offset
-  
+
   def lastCharacterOffset = tokens.last.token.lastCharacterOffset
-  
+
 }

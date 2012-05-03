@@ -12,9 +12,9 @@ case object BooleanPreference extends PreferenceType[Boolean] {
 
   def parseValue(s: String) =
     s.toLowerCase match {
-      case "true" ⇒ Right(true)
+      case "true"  ⇒ Right(true)
       case "false" ⇒ Right(false)
-      case _ ⇒ Left("Could not parse as boolean value: " + s)
+      case _       ⇒ Left("Could not parse as boolean value: " + s)
     }
 
 }

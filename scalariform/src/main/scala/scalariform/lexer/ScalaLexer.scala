@@ -15,7 +15,7 @@ class ScalaLexer(
   protected val reader: IUnicodeEscapeReader,
   protected val forgiveErrors: Boolean = false,
   protected val scalaVersion: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP)
-    extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
+  extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
 
   import ScalaLexer._
 

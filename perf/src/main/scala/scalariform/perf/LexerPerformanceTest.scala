@@ -24,7 +24,7 @@ object LexerPerformanceTest {
     1 to WARMUP foreach { _ ⇒ doIt(source) }
 
     val start = System.currentTimeMillis
-    val durations = 1 to ITERATIONS map { _ =>
+    val durations = 1 to ITERATIONS map { _ ⇒
       val start1 = System.nanoTime
       doIt(source)
       val duration = System.nanoTime - start1
@@ -37,7 +37,7 @@ object LexerPerformanceTest {
       def square(x: Double) = x * x
       val size = iterable.size
       val mean = durations.sum / size
-      (mean, math.sqrt(durations.map(n => square(n - mean)).sum / size))
+      (mean, math.sqrt(durations.map(n ⇒ square(n - mean)).sum / size))
     }
     val (mean, stdDev) = compute(durations)
     def isNormal(d: Double) = math.abs(d - mean) < 2 * stdDev

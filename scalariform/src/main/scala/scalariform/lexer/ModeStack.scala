@@ -48,5 +48,5 @@ trait ModeStack { self: ScalaLexer ⇒
   protected def scalaMode: ScalaMode = modeStack.head.asInstanceOf[ScalaMode]
 
   protected def stringInterpolationMode: StringInterpolationMode = modeStack.head.asInstanceOf[StringInterpolationMode]
-  
+
 }

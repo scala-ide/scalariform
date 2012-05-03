@@ -64,5 +64,5 @@ object Keywords {
     "|" -> PIPE,
     "~" -> TILDE,
     "!" -> EXCLAMATION)
-    
+
 }

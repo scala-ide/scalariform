@@ -4,12 +4,13 @@ import com.github.retronym.SbtOneJar
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys._
 import com.typesafe.sbteclipse.core.EclipsePlugin._
 
-//import ScalariformPlugin.{ format, formatPreferences }
-//import scalariform.formatter.preferences._
+import com.typesafe.sbtscalariform.ScalariformPlugin
+import com.typesafe.sbtscalariform.ScalariformPlugin.ScalariformKeys
+import scalariform.formatter.preferences._
 
 object ScalariformBuild extends Build {
 
-  lazy val buildSettings = Defaults.defaultSettings ++ Seq(
+  lazy val buildSettings = Defaults.defaultSettings ++ ScalariformPlugin.defaultScalariformSettings ++ Seq(
     organization := "scalariform",
     version      := "0.1.2-SNAPSHOT",
     scalaVersion := "2.9.2",
@@ -22,19 +23,15 @@ object ScalariformBuild extends Build {
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
     EclipseKeys.withSource := true,
-    EclipseKeys.eclipseOutput := Some("bin")
-  )  // ++ formatterSettings
+    EclipseKeys.eclipseOutput := Some("bin"))
 
-  //lazy val formatterSettings = ScalariformPlugin.settings ++ Seq(
-  //  formatPreferences in Compile := formattingPreferences,
-   // formatPreferences in Test    := formattingPreferences
- // )
+  lazy val subprojectSettings = buildSettings ++ Seq(
+     ScalariformKeys.preferences <<= baseDirectory.apply(dir => PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath))	
+  )
 
-  // def formattingPreferences = PreferencesImporterExporter.loadPreferences("formatterPreferences.properties").asInstanceOf[FormattingPreferences]
+  lazy val root: Project = Project("root", file("."), settings = buildSettings) aggregate(scalariform, gui, perf, corpusScan, scalariformCli)
 
-  lazy val root = Project("root", file("."), settings = buildSettings) aggregate(scalariform, gui, perf, corpusScan, scalariformCli)
-
-  lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = buildSettings ++ 
+  lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = subprojectSettings ++ 
     Seq(
       libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) =>
          val scalatestVersion = sv match {
@@ -42,7 +39,7 @@ object ScalariformBuild extends Build {
           
 //           case "2.8.1"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
 //           case "2.8.2"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
-           case "2.10.0-SNAPSHOT" => "org.scalatest" %  "scalatest_2.9.1" % "1.7.2"     % "test"
+           case "2.10.0-SNAPSHOT" => "org.scalatest" %  "scalatest_2.10.0-M2" % "1.8-SNAPSHOT"     % "test"
            case _                 => "org.scalatest" %% "scalatest"       % "1.7.2"     % "test"
          }
          deps :+ scalatestVersion
@@ -57,21 +54,21 @@ object ScalariformBuild extends Build {
     ),
     delegates = root :: Nil)
 
-  lazy val scalariformCli = Project("scalariform-cli", file("scalariform-cli"), settings = buildSettings ++ SbtOneJar.oneJarSettings ++
+  lazy val scalariformCli = Project("scalariform-cli", file("scalariform-cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
       artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) => artifact.name + "." + artifact.extension }
     )) dependsOn(scalariform)
 
-  lazy val perf: Project = Project("perf", file("perf"), settings = buildSettings) dependsOn(scalariform)
+  lazy val perf: Project = Project("perf", file("perf"), settings = subprojectSettings) dependsOn(scalariform)
 
-  lazy val corpusScan: Project = Project("corpusscan", file("corpusscan"), settings = buildSettings ++
+  lazy val corpusScan: Project = Project("corpusscan", file("corpusscan"), settings = subprojectSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4"
     )) dependsOn(scalariform)
 
-  lazy val gui: Project = Project("gui", file("gui"), settings = buildSettings ++
+  lazy val gui: Project = Project("gui", file("gui"), settings = subprojectSettings ++
     Seq(
       libraryDependencies += "com.miglayout" % "miglayout" % "3.7.4",
       mainClass in (Compile, run) := Some("scalariform.gui.Main")

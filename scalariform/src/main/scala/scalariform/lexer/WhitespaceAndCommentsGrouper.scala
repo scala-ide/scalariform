@@ -10,13 +10,13 @@ class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[Token] {
   private var ended = false
 
   private var hiddenTokens: HiddenTokens = _
-  
+
   def getHiddenTokens = hiddenTokens
-  
+
   def hasNext = !ended
 
   private[lexer] def text = lexer.text
-  
+
   def next() = {
     require(hasNext)
     hiddenTokens = readHiddenTokens()

@@ -21,7 +21,7 @@ class CommandLineOptionParser extends RegexParsers {
 
   lazy val version = ("--version" | "-version") ^^^ Version
 
-  lazy val scalaVersion = ("--scalaVersion=" | "-s=") ~> """(\d|\.)+""".r ^^ ScalaVersion 
+  lazy val scalaVersion = ("--scalaVersion=" | "-s=") ~> """(\d|\.)+""".r ^^ ScalaVersion
 
   lazy val fileList = ("--fileList=" | "-l=") ~ ".+".r ^^ { case (_ ~ name) ⇒ FileList(name) }
 
