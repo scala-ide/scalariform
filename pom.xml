@@ -42,7 +42,7 @@
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
-        <version>2.14</version>
+        <version>2.15.3-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
@@ -115,6 +115,23 @@
           <name>Scala Toolchain trunk p2 repository</name>
           <layout>p2</layout>
           <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-trunk</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala-virtualized-trunk</id>
+      <activation>
+        <property>
+          <name>scala.version</name>
+          <value>2.10.0-virtualized-SNAPSHOT</value>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-trunk</id>
+          <name>Scala Toolchain trunk p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/scala-eclipse-toolchain-osgi-virtualized</url>
         </repository>
       </repositories>
     </profile>
