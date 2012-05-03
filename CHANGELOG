@@ -9,6 +9,7 @@
 * Add support for macros
 * Add --scalaVersion=<version> flag to command-line tool
 * Support expr[T1, T2][T3, T4] and g()[String] syntaxes
+* Fix AST selection for prefix expressions
 
 0.1.1 (18/October/11)
 

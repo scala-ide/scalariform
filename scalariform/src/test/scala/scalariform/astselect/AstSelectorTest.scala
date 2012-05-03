@@ -271,6 +271,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$      " ~
   " $$$$$$$$$$$$$ "
 
+  " (!foo) " ~
+  "   $$$  " ~
+  "  $$$$  " ~
+  " $$$$$$ "
+  
   /* TODO: Need AST representation for [] calls 
   " foo[bar][baz][boz] " ~
   " $$$$$$$$           " ~

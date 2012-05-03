@@ -755,7 +755,7 @@ class ScalaParser(tokens: Array[Token]) {
         val literal_ = literal()
         simpleExprRest(exprElementFlatten2(unaryId, literal_), true)
       } else
-        exprElementFlatten2(unaryId, simpleExpr())
+        List(Expr(exprElementFlatten2(unaryId, simpleExpr())))
     } else
       simpleExpr()
   }
