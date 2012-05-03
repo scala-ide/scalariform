@@ -28,7 +28,7 @@ object ScalariformBuild extends Build {
   lazy val subprojectSettings = buildSettings ++ Seq(
     ScalariformKeys.preferences <<= baseDirectory.apply(dir ⇒ PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)))
 
-  lazy val root: Project = Project("root", file("."), settings = buildSettings) aggregate (scalariform, gui, perf, corpusScan, scalariformCli)
+  lazy val root: Project = Project("root", file("."), settings = buildSettings) aggregate (scalariform, gui, perf, corpusScan, cli)
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = subprojectSettings ++
     Seq(
@@ -52,7 +52,7 @@ object ScalariformBuild extends Build {
       }),
     delegates = root :: Nil)
 
-  lazy val scalariformCli = Project("scalariform-cli", file("scalariform-cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
+  lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),

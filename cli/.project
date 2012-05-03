@@ -1,5 +1,5 @@
 <projectDescription>
-  <name>scalariform-cli</name>
+  <name>cli</name>
   <buildSpec>
     <buildCommand>
       <name>org.scala-ide.sdt.core.scalabuilder</name>
