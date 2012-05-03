@@ -28,7 +28,7 @@ object ScalariformBuild extends Build {
   lazy val subprojectSettings = buildSettings ++ Seq(
     ScalariformKeys.preferences <<= baseDirectory.apply(dir ⇒ PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)))
 
-  lazy val root: Project = Project("root", file("."), settings = buildSettings) aggregate (scalariform, gui, perf, corpusScan, cli)
+  lazy val root: Project = Project("root", file("."), settings = buildSettings) aggregate (scalariform, cli, misc)
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = subprojectSettings ++
     Seq(
@@ -43,7 +43,7 @@ object ScalariformBuild extends Build {
         }
         deps :+ scalatestVersion
       },
-      exportJars := true, // Needed for scalariformCli oneJar
+      exportJars := true, // Needed for cli oneJar
       publishTo <<= version { (v: String) ⇒
         if (v endsWith "-SNAPSHOT")
           Some(ScalaToolsSnapshots)
@@ -58,14 +58,9 @@ object ScalariformBuild extends Build {
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
       artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" })) dependsOn (scalariform)
 
-  lazy val perf: Project = Project("perf", file("perf"), settings = subprojectSettings) dependsOn (scalariform)
-
-  lazy val corpusScan: Project = Project("corpusscan", file("corpusscan"), settings = subprojectSettings ++
+  lazy val misc: Project = Project("misc", file("misc"), settings = subprojectSettings ++
     Seq(
-      libraryDependencies += "commons-io" % "commons-io" % "1.4")) dependsOn (scalariform)
-
-  lazy val gui: Project = Project("gui", file("gui"), settings = subprojectSettings ++
-    Seq(
+      libraryDependencies += "commons-io" % "commons-io" % "1.4",
       libraryDependencies += "com.miglayout" % "miglayout" % "3.7.4",
       mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform)
 

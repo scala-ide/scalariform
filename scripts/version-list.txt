@@ -1,13 +1,10 @@
 pom.xml
 project/Build.scala
 scalariform/pom.xml
-gui/pom.xml
-corpusscan/pom.xml
 scalariform.feature/pom.xml
 scalariform.feature/feature.xml
 scalariform.update/pom.xml
 scalariform.update/site.xml
-perf/pom.xml
 scalariform.maven-plugin/pom.xml
 docs/source/conf.py
 scalariform/META-INF/MANIFEST.MF
