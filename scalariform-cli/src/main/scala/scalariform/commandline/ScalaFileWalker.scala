@@ -10,9 +10,11 @@ import org.apache.commons.io.filefilter._
 
 object ScalaFileWalker extends DirectoryWalker(TrueFileFilter.INSTANCE, FileFilterUtils.suffixFileFilter(".scala"), -1) {
 
-  def findScalaFiles(path: String): List[File] = {
+  def findScalaFiles(path: String): List[File] = findScalaFiles(new File(path))
+
+  def findScalaFiles(path: File): List[File] = {
     val results = new ArrayList[File]
-    walk(new File(path), results)
+    walk(path, results)
     results.toList
   }
 

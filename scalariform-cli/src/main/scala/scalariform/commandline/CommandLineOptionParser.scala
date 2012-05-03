@@ -6,20 +6,21 @@ import scala.util.parsing.combinator._
 class CommandLineOptionParser extends RegexParsers {
 
   lazy val option: Parser[CommandLineArgument] =
-    phrase(help) | phrase(version) | phrase(scalaVersion) | phrase(stdin) | phrase(stdout) | phrase(test) | phrase(forceOutput) | phrase(inPlace) | phrase(verbose) | phrase(fileList) |
-      phrase(encoding) | phrase(toggle) | phrase(preferenceFile) | phrase(preferenceOption) | phrase(badOption)
+    phrase(help) | phrase(version) | phrase(scalaVersion) | phrase(stdin) | phrase(stdout) | phrase(recurse) |
+      phrase(test) | phrase(forceOutput) | phrase(verbose) | phrase(fileList) | phrase(encoding) | phrase(toggle) |
+      phrase(preferenceFile) | phrase(preferenceOption) | phrase(badOption)
 
   lazy val test = ("--test" | "-t") ^^^ Test
 
   lazy val forceOutput = ("--forceOutput" | "-f") ^^^ ForceOutput
-
-  lazy val inPlace = ("--inPlace" | "-i") ^^^ InPlace
 
   lazy val stdout = "--stdout" ^^^ Stdout
 
   lazy val stdin = "--stdin" ^^^ Stdin
 
   lazy val verbose = ("--verbose" | "-v") ^^^ Verbose
+
+  lazy val recurse = ("--recurse" | "-r") ^^^ Recurse
 
   lazy val help = ("--help" | "-help" | "-h") ^^^ Help
 
@@ -59,9 +60,9 @@ case object Test extends CommandLineArgument
 case object Stdout extends CommandLineArgument
 case object Stdin extends CommandLineArgument
 case object ForceOutput extends CommandLineArgument
-case object InPlace extends CommandLineArgument
 case object Verbose extends CommandLineArgument
 case object Help extends CommandLineArgument
 case object Version extends CommandLineArgument
+case object Recurse extends CommandLineArgument
 case class ScalaVersion(scalaVersion: String) extends CommandLineArgument
 case class BadOption(name: String) extends CommandLineArgument

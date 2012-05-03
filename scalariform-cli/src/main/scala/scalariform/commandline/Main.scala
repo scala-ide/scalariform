@@ -1,13 +1,14 @@
 package scalariform.commandline
 
-import java.io.IOException
-import java.util.Properties
-import scalariform.formatter.preferences._
 import java.io.File
+import java.io.IOException
+import java.nio.charset._
+
 import scala.io.Source
+
+import scalariform.formatter.preferences._
 import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
-import java.nio.charset._
 import scalariform.utils.Utils._
 import scalariform.ScalaVersions
 
@@ -89,6 +90,8 @@ object Main {
       }
     }
 
+    val recurse = arguments contains Recurse
+
     def getFiles(): List[File] = {
       var files: List[File] = Nil
       def addFile(fileName: String) {
@@ -96,8 +99,12 @@ object Main {
         if (!file.exists)
           errors ::= "No such file " + file
         if (file.isDirectory)
-          errors ::= "Cannot format a directory (" + file + ")"
-        files ::= file
+          if (recurse)
+            files :::= ScalaFileWalker.findScalaFiles(file)
+          else
+            errors ::= "Cannot format a directory (" + file + ")"
+        else
+          files ::= file
       }
       for (FileList(listName) ← arguments) {
         val listFile = new File(listName)
@@ -116,40 +123,27 @@ object Main {
 
     val test = arguments contains Test
     val forceOutput = arguments contains ForceOutput
-    val inPlace = arguments contains InPlace
     val verbose = arguments contains Verbose
     val stdout = arguments contains Stdout
     val stdin = arguments contains Stdin
 
     if (files.nonEmpty && stdin)
       errors ::= "Cannot specify files when using --stdin"
-    
+
     if (files.isEmpty && !stdin)
       errors ::= "Must specify a file or use --stdin"
-        
-    if (inPlace && stdout)
-      errors ::= "Cannot specify both --inPlace and --stdout"
-        
-    if (inPlace && test)
-      errors ::= "Incompatible arguments --test and --inPlace"
 
-    if (forceOutput && test)
-      errors ::= "Incompatible arguments --forceOutput and --inPlace"
+    if (forceOutput && !stdout && !stdin)
+      errors ::= "--forceOutput can only be used with --stdout or --stdin"
 
     if (forceOutput && files.size > 1)
       errors ::= "Cannot use --forceOutput with multiple files"
 
-    if (inPlace && files.isEmpty)
-      errors ::= "Need to provide at least one file to modify in place"
-
-    if (!inPlace && !test && files.size > 1)
-      errors ::= "Cannot have more than one input file unless using --test or --inPlace"
-
-    if (verbose && stdout)
-      errors ::= "Cannot be use --verbose with --stdout"
+    if (verbose && (stdin || stdout))
+      errors ::= "Cannot use --verbose with --stdin or --stdout"
 
     if (!errors.isEmpty) {
-      for (error <- errors.reverse)
+      for (error ← errors.reverse)
         System.err.println("Error: " + error)
       if (showUsage)
         printUsage()
@@ -265,19 +259,20 @@ object Main {
   }
 
   private def checkFiles(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Int = {
-    val allCorrect = files.forall { file ⇒
-      val source = Source.fromFile(file, encoding)
-      val formatResult = checkSource(source, doFormat)
-      val resultString = formatResult match {
-        case FormattedCorrectly    ⇒ "OK"
-        case NotFormattedCorrectly ⇒ "FAILED"
-        case DidNotParse           ⇒ "ERROR"
+    val passesFails: Seq[Boolean] =
+      for (file ← files) yield {
+        val source = Source.fromFile(file, encoding)
+        val formatResult = checkSource(source, doFormat)
+        val resultString = formatResult match {
+          case FormattedCorrectly    ⇒ "OK"
+          case NotFormattedCorrectly ⇒ "FAILED"
+          case DidNotParse           ⇒ "ERROR"
+        }
+        val padding = " " * (6 - resultString.length)
+        log("[" + resultString + "]" + padding + " " + file)
+        formatResult == FormattedCorrectly
       }
-      val padding = " " * (6 - resultString.length)
-      log("[" + resultString + "]" + padding + " " + file)
-      formatResult == FormattedCorrectly
-    }
-    if (allCorrect) 0 else 1
+    if (passesFails.forall(identity)) 0 else 1
   }
 
   private sealed trait FormatResult
@@ -289,13 +284,13 @@ object Main {
     println("Usage: scalariform [options] [files...]")
     println()
     println("Options:")
-    println("  --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.")
+    println("  --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding (currently " + System.getProperty("file.encoding") + ").")
     println("  --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)")
-    println("  --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin or single files)")
+    println("  --forceOutput, -f                    If using --stdout, print the source unchanged if it cannot be parsed correctly.")
     println("  --help, -h                           Show help")
-    println("  --inPlace, -i                        Replace the input file(s) in place with a formatted version.")
     println("  --preferenceFile=<path>, -p=<path>   Read preferences from a properties file")
-    println("  --scalaVersion=<v>, -s=<v>           Assume the source is written against the given version of Scala (e.g. 2.9.2). Default is runtime version.")
+    println("  --recurse, -r                        If any given file is a directory, recurse beneath it and collect all .scala files for processing")
+    println("  --scalaVersion=<v>, -s=<v>           Assume the source is written against the given version of Scala (e.g. 2.9.2). Default is runtime version (currently " + ScalaVersions.DEFAULT_VERSION + ").")
     println("  --stdin                              Read Scala source from standard input")
     println("  --stdout                             Write the formatted output to standard output")
     println("  --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
@@ -328,9 +323,9 @@ object Main {
 
     println()
     println("Examples:")
-    println(" scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala")
+    println(" scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 foo.scala")
     println(" find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test")
-    println(" echo 'class A ( n  :Int )' | scalariform")
+    println(" echo 'class A ( n  :Int )' | scalariform --stdin --stdout")
   }
 
 }
