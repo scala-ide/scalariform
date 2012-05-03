@@ -58,7 +58,7 @@ object ScalariformBuild extends Build {
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
-      artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) => artifact.name + "." + artifact.extension }
+      artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) => "scalariform.jar" }
     )) dependsOn(scalariform)
 
   lazy val perf: Project = Project("perf", file("perf"), settings = subprojectSettings) dependsOn(scalariform)

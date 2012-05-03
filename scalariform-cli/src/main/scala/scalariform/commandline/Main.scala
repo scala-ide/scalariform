@@ -28,7 +28,7 @@ object Main {
     }
 
     if (arguments contains Version) {
-      println("Scalariform " + scalariform.VERSION + " for Scala " + ScalaVersions.DEFAULT_VERSION)
+      println("Scalariform " + scalariform.VERSION + " (runtime Scala " + ScalaVersions.DEFAULT_VERSION + ")")
       return 0
     }
 
@@ -44,9 +44,9 @@ object Main {
       case Encoding(encoding) ⇒ encoding
     }.headOption.getOrElse(System getProperty "file.encoding")
 
-    try {
+    try
       Charset.forName(encoding)
-    } catch {
+    catch {
       case e: UnsupportedCharsetException ⇒
         errors ::= "Unsupported encoding " + encoding
       case e: IllegalCharsetNameException ⇒
@@ -118,7 +118,18 @@ object Main {
     val forceOutput = arguments contains ForceOutput
     val inPlace = arguments contains InPlace
     val verbose = arguments contains Verbose
+    val stdout = arguments contains Stdout
+    val stdin = arguments contains Stdin
 
+    if (files.nonEmpty && stdin)
+      errors ::= "Cannot specify files when using --stdin"
+    
+    if (files.isEmpty && !stdin)
+      errors ::= "Must specify a file or use --stdin"
+        
+    if (inPlace && stdout)
+      errors ::= "Cannot specify both --inPlace and --stdout"
+        
     if (inPlace && test)
       errors ::= "Incompatible arguments --test and --inPlace"
 
@@ -134,11 +145,12 @@ object Main {
     if (!inPlace && !test && files.size > 1)
       errors ::= "Cannot have more than one input file unless using --test or --inPlace"
 
-    if (verbose && !inPlace && !test)
-      errors ::= "Will not be verbose unless using --test or --inPlace"
+    if (verbose && stdout)
+      errors ::= "Cannot be use --verbose with --stdout"
 
     if (!errors.isEmpty) {
-      errors.reverse foreach System.err.println
+      for (error <- errors.reverse)
+        System.err.println("Error: " + error)
       if (showUsage)
         printUsage()
       return 1
@@ -166,16 +178,16 @@ object Main {
       }
 
     if (test)
-      if (files.isEmpty)
+      if (stdin)
         checkSysIn(encoding, doFormat)
       else
         checkFiles(files, encoding, doFormat, log)
     else {
-      if (files.isEmpty)
+      if (stdin)
         transformSysInToSysOut(encoding, forceOutput, doFormat)
       else
         files match {
-          case List(file) if !inPlace ⇒
+          case List(file) if stdout ⇒
             transformFileToSysOut(file, encoding, forceOutput, doFormat)
           case _ ⇒
             transformFilesInPlace(files, encoding, doFormat, log)
@@ -284,6 +296,8 @@ object Main {
     println("  --inPlace, -i                        Replace the input file(s) in place with a formatted version.")
     println("  --preferenceFile=<path>, -p=<path>   Read preferences from a properties file")
     println("  --scalaVersion=<v>, -s=<v>           Assume the source is written against the given version of Scala (e.g. 2.9.2). Default is runtime version.")
+    println("  --stdin                              Read Scala source from standard input")
+    println("  --stdout                             Write the formatted output to standard output")
     println("  --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
     println("  --verbose, -v                        Verbose output")
     println("  --version                            Show Scalariform version")
