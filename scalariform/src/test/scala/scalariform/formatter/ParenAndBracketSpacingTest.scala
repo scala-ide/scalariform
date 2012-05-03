@@ -20,7 +20,7 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
     "{ class A[B] { private[this] val bob } }" ==> "{ class A[ B ] { private[ this ] val bob } }"
     "super[X].y" ==> "super[ X ].y"
     "foo[Bar](baz)[Biz]" ==> "foo[ Bar ](baz)[ Biz ]"
-    "foo[Bar][Baz][Buz]" ==> "foo[ Bar ][ Baz ][ Buz ]" 
+    "foo[Bar][Baz][Buz]" ==> "foo[ Bar ][ Baz ][ Buz ]"
   }
 
 }

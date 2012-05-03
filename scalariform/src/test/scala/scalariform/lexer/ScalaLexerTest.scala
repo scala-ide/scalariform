@@ -133,7 +133,7 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
     <t>s""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
     <t>s"""""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
     <t>s""" $foo """</t>.text producesTokens (INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL)
-    
+
   }
 
   "'f'" producesTokens (CHARACTER_LITERAL)

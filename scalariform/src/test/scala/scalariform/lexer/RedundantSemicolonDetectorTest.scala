@@ -10,22 +10,22 @@ import scalariform.utils.Utils._
 
 class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
 
-  implicit def stringToCheckable(s: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION) = 
+  implicit def stringToCheckable(s: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION) =
     new { def check = checkSemis(s, scalaVersion) } // Expected redundant semicolons are indicated with <;>
-;  
+
   """
     class A { 
       def foo = 42<;>
       def bar = 123; def baz = 1234 
     }<;>
   """.check
-;
+
   """
     { 
       println("Foo")<;>
     }
   """.check
-;
+
   """
     class A { 
       for (
@@ -34,14 +34,14 @@ class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
       ) yield x + y<;>
     }
   """.check
-;
+
   {
     implicit val scalaVersion = "2.10.0"
     """
       s"my name is ${person.name<;>}"
     """.check
   }
-;
+
   private def checkSemis(encodedSource: String, scalaVersion: String) {
     val ordinarySource = encodedSource.replaceAllLiterally("<;>", ";")
     val semis = RedundantSemicolonDetector.findRedundantSemis(ordinarySource, scalaVersion)

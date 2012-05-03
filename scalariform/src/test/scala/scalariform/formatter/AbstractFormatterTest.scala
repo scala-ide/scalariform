@@ -25,7 +25,7 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
   case class FormatTest(source: String, formattingPreferences: IFormattingPreferences, scalaVersion: String) {
 
     require(formattingPreferences != null)
-    
+
     def ==>(expectedRaw: String) {
       it should ("format >>>" + prettyPrint(source) + "<<< as >>>" + prettyPrint(expectedRaw) + "<<< with preferences " + formattingPreferences + " in version " + scalaVersion) in {
         val expected = expectedRaw.stripMargin
@@ -49,12 +49,12 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
         }
       }
     }
-    
+
     def =/=>(expected: String): Because = {
       //println("Warning -- skipped test:\n" + source)
       new Because(expected)
     }
-    
+
     class Because(expected: String) {
       def because(reason: String) = {
         //println("because " + reason)
