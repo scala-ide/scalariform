@@ -49,8 +49,7 @@ object ScalariformBuild extends Build {
           Some(ScalaToolsSnapshots)
         else
           Some(ScalaToolsReleases)
-      }),
-    delegates = root :: Nil)
+      }))
 
   lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
     Seq(
@@ -62,7 +61,7 @@ object ScalariformBuild extends Build {
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       libraryDependencies += "com.miglayout" % "miglayout" % "3.7.4",
-      mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform)
+      mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform, cli)
 
   def pomExtraXml =
     <inceptionYear>2010</inceptionYear>

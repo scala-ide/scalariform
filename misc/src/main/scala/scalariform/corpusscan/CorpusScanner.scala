@@ -10,6 +10,7 @@ import java.io.File
 import scala.io.Source
 import scalariform.utils.Utils.writeText
 import org.apache.commons.io.FileUtils
+import scalariform.commandline.ScalaFileWalker
 
 sealed trait ParseFault
 case object TokensDoNotCoverSource extends ParseFault
