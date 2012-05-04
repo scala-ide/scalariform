@@ -51,9 +51,9 @@ class ScalaParser(tokens: Array[Token]) {
 
   def compilationUnitOrScript(): CompilationUnit = {
     val originalPos = pos
-    try {
+    try
       compilationUnit()
-    } catch {
+    catch {
       case e: ScalaParserException ⇒
         pos = originalPos
         if (logging) println("Rewinding to try alternative: " + currentToken)
@@ -1783,6 +1783,8 @@ class ScalaParser(tokens: Array[Token]) {
             val (lbrace, packageBlockStats, rbrace) = inBraces(topStatSeq())
             val otherStatSeq = topStatSeq()
             val packageBlock = PackageBlock(packageToken, packageName, newLineOpt_, lbrace, packageBlockStats, rbrace)
+            if (otherStatSeq.selfReferenceOpt.isDefined || otherStatSeq.firstStatOpt.isDefined)
+              throw new ScalaParserException("Illegal package blocks") // To avoid blowing up on -ve cases
             StatSeq(None, Some(packageBlock), otherStatSeq.otherStats)
           }
         }
