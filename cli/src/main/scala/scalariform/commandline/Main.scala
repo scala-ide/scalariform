@@ -123,7 +123,7 @@ object Main {
 
     val test = arguments contains Test
     val forceOutput = arguments contains ForceOutput
-    val verbose = arguments contains Verbose
+    val quiet = arguments contains Quiet
     val stdout = arguments contains Stdout
     val stdin = arguments contains Stdin
 
@@ -131,16 +131,13 @@ object Main {
       errors ::= "Cannot specify files when using --stdin"
 
     if (files.isEmpty && !stdin)
-      errors ::= "Must specify a file or use --stdin"
+      errors ::= "Must specify a file or use --stdin (run with --help for full options)"
 
     if (forceOutput && !stdout && !stdin)
       errors ::= "--forceOutput can only be used with --stdout or --stdin"
 
     if (forceOutput && files.size > 1)
       errors ::= "Cannot use --forceOutput with multiple files"
-
-    if (verbose && (stdin || stdout))
-      errors ::= "Cannot use --verbose with --stdin or --stdout"
 
     if (!errors.isEmpty) {
       for (error ← errors.reverse)
@@ -150,7 +147,7 @@ object Main {
       return 1
     }
 
-    def log(s: String) = if (verbose) println(s)
+    def log(s: String) = if (!quiet && !stdout && !stdin) println(s)
 
     val scalaVersion = arguments.collect {
       case ScalaVersion(scalaVersion) ⇒ scalaVersion
@@ -214,7 +211,7 @@ object Main {
           print(original)
           0
         } else {
-          System.err.println("Could not parse text as Scala.")
+          System.err.println("Error: Could not parse text as Scala.")
           1
         }
     }
@@ -231,7 +228,7 @@ object Main {
           print(original)
           0
         } else {
-          System.err.println("Could not parse " + file.getPath + " as Scala")
+          System.err.println("Error: Could not parse " + file.getPath + " as Scala")
           1
         }
 
@@ -289,12 +286,12 @@ object Main {
     println("  --forceOutput, -f                    If using --stdout, print the source unchanged if it cannot be parsed correctly.")
     println("  --help, -h                           Show help")
     println("  --preferenceFile=<path>, -p=<path>   Read preferences from a properties file")
+    println("  --quiet, -q                          Work quietly")
     println("  --recurse, -r                        If any given file is a directory, recurse beneath it and collect all .scala files for processing")
     println("  --scalaVersion=<v>, -s=<v>           Assume the source is written against the given version of Scala (e.g. 2.9.2). Default is runtime version (currently " + ScalaVersions.DEFAULT_VERSION + ").")
     println("  --stdin                              Read Scala source from standard input")
     println("  --stdout                             Write the formatted output to standard output")
     println("  --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.")
-    println("  --verbose, -v                        Verbose output")
     println("  --version                            Show Scalariform version")
     println()
     println("Preferences:")
@@ -324,8 +321,8 @@ object Main {
     println()
     println("Examples:")
     println(" scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 foo.scala")
-    println(" find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test")
-    println(" echo 'class A ( n  :Int )' | scalariform --stdin --stdout")
+    println(" scalariform +rewriteArrowSymbols --test --recurse .")
+    println(" echo 'class A ( n  :Int )' | scalariform --stdin")
   }
 
 }

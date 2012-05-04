@@ -7,7 +7,7 @@ class CommandLineOptionParser extends RegexParsers {
 
   lazy val option: Parser[CommandLineArgument] =
     phrase(help) | phrase(version) | phrase(scalaVersion) | phrase(stdin) | phrase(stdout) | phrase(recurse) |
-      phrase(test) | phrase(forceOutput) | phrase(verbose) | phrase(fileList) | phrase(encoding) | phrase(toggle) |
+      phrase(test) | phrase(forceOutput) | phrase(quiet) | phrase(fileList) | phrase(encoding) | phrase(toggle) |
       phrase(preferenceFile) | phrase(preferenceOption) | phrase(badOption)
 
   lazy val test = ("--test" | "-t") ^^^ Test
@@ -18,7 +18,7 @@ class CommandLineOptionParser extends RegexParsers {
 
   lazy val stdin = "--stdin" ^^^ Stdin
 
-  lazy val verbose = ("--verbose" | "-v") ^^^ Verbose
+  lazy val quiet = ("--quiet" | "-q") ^^^ Quiet
 
   lazy val recurse = ("--recurse" | "-r") ^^^ Recurse
 
@@ -60,7 +60,7 @@ case object Test extends CommandLineArgument
 case object Stdout extends CommandLineArgument
 case object Stdin extends CommandLineArgument
 case object ForceOutput extends CommandLineArgument
-case object Verbose extends CommandLineArgument
+case object Quiet extends CommandLineArgument
 case object Help extends CommandLineArgument
 case object Version extends CommandLineArgument
 case object Recurse extends CommandLineArgument
