@@ -866,7 +866,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   object xmlSeqOK extends SeqContextSensitive {
-    val isSequenceOK = false
+    val isSequenceOK = true
 
     override val isXML = true
   }
