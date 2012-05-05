@@ -86,11 +86,10 @@ object Utils {
     import java.io.{ OutputStreamWriter, FileOutputStream }
     val encoding = encodingOpt getOrElse (System getProperty "file.encoding")
     val writer = new OutputStreamWriter(new FileOutputStream(file), encoding)
-    try {
+    try
       writer.write(text)
-    } finally {
+    finally
       writer.close()
-    }
   }
 
   @throws(classOf[IOException])

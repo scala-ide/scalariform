@@ -3,9 +3,7 @@ package scalariform.commandline
 import java.io.File
 import java.io.IOException
 import java.nio.charset._
-
 import scala.io.Source
-
 import scalariform.formatter.preferences._
 import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
@@ -15,22 +13,22 @@ import scalariform.ScalaVersions
 object Main {
 
   def main(args: Array[String]) {
-    exit(process(args))
+    exit(if (process(args)) 1 else 0)
   }
 
-  def process(args: Array[String]): Int = {
+  def process(args: Array[String]): Boolean = {
 
     val parser = new CommandLineOptionParser
     val arguments = args.toList map parser.getArgument
 
     if (arguments contains Help) {
       printUsage()
-      return 0
+      return false
     }
 
     if (arguments contains Version) {
       println("Scalariform " + scalariform.VERSION + " (runtime Scala " + ScalaVersions.DEFAULT_VERSION + ")")
-      return 0
+      return false
     }
 
     var errors: List[String] = Nil
@@ -144,7 +142,7 @@ object Main {
         System.err.println("Error: " + error)
       if (showUsage)
         printUsage()
-      return 1
+      return true
     }
 
     def log(s: String) = if (!quiet && !stdout && !stdin) println(s)
@@ -170,9 +168,9 @@ object Main {
 
     if (test)
       if (stdin)
-        checkSysIn(encoding, doFormat)
+        !checkSysIn(encoding, doFormat)
       else
-        checkFiles(files, encoding, doFormat, log)
+        !checkFiles(files, encoding, doFormat, log)
     else {
       if (stdin)
         transformSysInToSysOut(encoding, forceOutput, doFormat)
@@ -195,81 +193,111 @@ object Main {
     }
   }
 
-  private def checkSysIn(encoding: String, doFormat: String ⇒ Option[String]): Int = {
+  /**
+   * @return true iff the source from stdin is formatted correctly
+   */
+  private def checkSysIn(encoding: String, doFormat: String ⇒ Option[String]): Boolean = {
     val source = Source.fromInputStream(System.in, encoding)
-    if (checkSource(source, doFormat) == FormattedCorrectly) 0 else 1
+    checkSource(source, doFormat) == FormattedCorrectly
   }
 
-  private def transformSysInToSysOut(encoding: String, forceOutput: Boolean, doFormat: String ⇒ Option[String]): Int = {
+  private def transformSysInToSysOut(encoding: String, forceOutput: Boolean, doFormat: String ⇒ Option[String]): Boolean = {
     val original = Source.fromInputStream(System.in, encoding).mkString
     doFormat(original) match {
       case Some(formatted) ⇒
         print(formatted)
-        0
+        false
       case None ⇒
         if (forceOutput) {
           print(original)
-          0
+          false
         } else {
           System.err.println("Error: Could not parse text as Scala.")
-          1
+          true
         }
     }
   }
 
-  private def transformFileToSysOut(file: File, encoding: String, forceOutput: Boolean, doFormat: String ⇒ Option[String]): Int = {
+  private def transformFileToSysOut(file: File, encoding: String, forceOutput: Boolean, doFormat: String ⇒ Option[String]): Boolean = {
     val original = Source.fromFile(file, encoding).mkString
     doFormat(original) match {
       case Some(formatted) ⇒
         print(formatted)
-        0
+        false
       case None ⇒
         if (forceOutput) {
           print(original)
-          0
+          false
         } else {
           System.err.println("Error: Could not parse " + file.getPath + " as Scala")
-          1
+          true
         }
-
     }
   }
 
-  private def transformFilesInPlace(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Int = {
+  private def transformFileInPlace(file: File, encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Boolean = {
+    val original = Source.fromFile(file, encoding).mkString
+    doFormat(original) match {
+      case Some(formatted) ⇒
+        if (formatted == original)
+          log(".              " + file)
+        else {
+          log("[Reformatted]  " + file)
+          writeText(file, formatted, Some(encoding))
+        }
+        false
+      case None ⇒
+        log("[Parse error]   " + file.getPath)
+        true
+    }
+  }
+
+  private def transformFilesInPlace(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Boolean = {
     var problems = false
-    for (file ← files) {
-      val original = Source.fromFile(file, encoding).mkString
-      doFormat(original) match {
-        case Some(formatted) ⇒
-          if (formatted == original)
-            log(".              " + file)
-          else {
-            log("[Reformatted]  " + file)
-            writeText(file, formatted, Some(encoding))
-          }
-        case None ⇒
-          log("[Parse error]   " + file.getPath)
-          problems = true
-      }
-    }
-    if (problems) 1 else 0
+    //    val futures =
+    //      for (file ← files) yield asyncExec {
+    //        problems &= transformFileInPlace(file, encoding, doFormat, log)
+    //      }
+    //    futures.map(_.get())
+    for (file ← files)
+      problems &= transformFileInPlace(file, encoding, doFormat, log)
+    problems
   }
 
-  private def checkFiles(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Int = {
-    val passesFails: Seq[Boolean] =
-      for (file ← files) yield {
-        val source = Source.fromFile(file, encoding)
-        val formatResult = checkSource(source, doFormat)
-        val resultString = formatResult match {
-          case FormattedCorrectly    ⇒ "OK"
-          case NotFormattedCorrectly ⇒ "FAILED"
-          case DidNotParse           ⇒ "ERROR"
-        }
-        val padding = " " * (6 - resultString.length)
-        log("[" + resultString + "]" + padding + " " + file)
-        formatResult == FormattedCorrectly
-      }
-    if (passesFails.forall(identity)) 0 else 1
+  //  private val lock = new ReentrantLock
+  //  private lazy val executorService = Executors.newCachedThreadPool()
+  //  private def asyncExec(x: ⇒ Unit): Future[_] = executorService.submit(new Runnable { def run() = x })
+  //  private def withLock[T](x: ⇒ T): T = {
+  //    lock.lock()
+  //    try
+  //      x
+  //    finally
+  //      lock.unlock()
+  //  }
+  /**
+   * @return true iff file is already formatted correctly
+   */
+  private def checkFile(file: File, encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Boolean = {
+    val source = Source.fromFile(file, encoding)
+    val formatResult = checkSource(source, doFormat)
+    val resultString = formatResult match {
+      case FormattedCorrectly    ⇒ "OK"
+      case NotFormattedCorrectly ⇒ "FAILED"
+      case DidNotParse           ⇒ "ERROR"
+    }
+    val padding = " " * (6 - resultString.length)
+    log("[" + resultString + "]" + padding + " " + file)
+    formatResult != FormattedCorrectly
+  }
+
+  /**
+   * @return true iff all files are already formatted correctly
+   */
+  private def checkFiles(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Boolean = {
+    var allPassed = true
+    for (file ← files)
+      allPassed &= checkFile(file, encoding, doFormat, log)
+    allPassed
   }
 
   private sealed trait FormatResult
