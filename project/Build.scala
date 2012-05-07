@@ -10,45 +10,44 @@ import scalariform.formatter.preferences._
 
 object ScalariformBuild extends Build {
 
-  lazy val buildSettings = Defaults.defaultSettings ++ ScalariformPlugin.defaultScalariformSettings ++ Seq(
+  lazy val commonSettings = Defaults.defaultSettings ++ ScalariformPlugin.defaultScalariformSettings ++ Seq(
     organization := "scalariform",
     version := "0.1.2-SNAPSHOT",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.9.0", "2.9.0-1", "2.9.1", "2.9.2", "2.10.0-SNAPSHOT"),
+    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.9.0", "2.9.1", "2.9.2"),
     resolvers += ScalaToolsSnapshots,
     retrieveManaged := true,
     scalacOptions += "-deprecation",
     pomExtra := pomExtraXml,
     parallelExecution in Test := false,
     publishMavenStyle := true,
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+    publishArtifact in Test := false,
+    pomIncludeRepository := { _ => false },
     EclipseKeys.withSource := true,
     EclipseKeys.eclipseOutput := Some("bin"))
 
-  lazy val subprojectSettings = buildSettings ++ Seq(
+  lazy val subprojectSettings = commonSettings ++ Seq(
     ScalariformKeys.preferences <<= baseDirectory.apply(dir ⇒ PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)))
 
-  lazy val root: Project = Project("root", file("."), settings = buildSettings) aggregate (scalariform, cli, misc)
+  lazy val root: Project = Project("root", file("."), settings = commonSettings) aggregate (scalariform, cli, misc)
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = subprojectSettings ++
     Seq(
       libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
         val scalatestVersion = sv match {
           case "2.8.0"           ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
-
-          //           case "2.8.1"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
-          //           case "2.8.2"           => "org.scalatest" %% "scalatest"       % "1.5.1"     % "test"
-          case "2.10.0-SNAPSHOT" ⇒ "org.scalatest" % "scalatest_2.10.0-M2" % "1.8-SNAPSHOT" % "test"
+          case "2.10.0-M3"       ⇒ "org.scalatest" % "scalatest_2.10.0-M3" % "1.8-SNAPSHOT" % "test"
           case _                 ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
         }
         deps :+ scalatestVersion
       },
       exportJars := true, // Needed for cli oneJar
       publishTo <<= version { (v: String) ⇒
-        if (v endsWith "-SNAPSHOT")
-          Some(ScalaToolsSnapshots)
+        val nexus = "https://oss.sonatype.org/"
+        if (v.trim.endsWith("SNAPSHOT")) 
+          Some("snapshots" at nexus + "content/repositories/snapshots") 
         else
-          Some(ScalaToolsReleases)
+          Some("releases"  at nexus + "service/local/staging/deploy/maven2")
       }))
 
   lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
@@ -73,5 +72,16 @@ object ScalariformBuild extends Build {
         <distribution>repo</distribution>
       </license>
     </licenses>
+    <scm>
+      <url>git@github.com:mdr/scalariform.git</url>
+      <connection>scm:git:git@github.com:mdr/scalariform</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>mdr</id>
+        <name>Matt Russell</name>
+        <url>https://github.com/mdr/</url>
+      </developer>
+    </developers>
 
 }

@@ -6,7 +6,7 @@ import scalariform.utils.TextEdit
 import scalariform.utils.TextEditProcessor
 import scalariform.ScalaVersions
 
-object RedundantSemicolonDetector extends App {
+object RedundantSemicolonDetector {
 
   /**
    * @return all semicolons in the source that could safely be removed without changing the meaning
@@ -33,21 +33,4 @@ object RedundantSemicolonDetector extends App {
   def getEditsToRemoveRedundantSemis(s: String): List[TextEdit] =
     findRedundantSemis(s).map(_.range).map(TextEdit.delete)
 
-}
-
-object Demo extends App {
-
-  val source = """
-    class A {
-      def foo = 42;
-      def bar = 123; def baz = 1234
-    };"""
-  val redundantSemis = RedundantSemicolonDetector.findRedundantSemis(source)
-  val annotated = redundantSemis.reverse.foldLeft(source) { (s, semi) ⇒ replaceRange(s, semi.range, "<;>") }
-  val purged = RedundantSemicolonDetector.removeRedundantSemis(source)
-  println(source)
-  println("-------------------------------------------------")
-  println(annotated)
-  println("-------------------------------------------------")
-  println(purged)
 }
