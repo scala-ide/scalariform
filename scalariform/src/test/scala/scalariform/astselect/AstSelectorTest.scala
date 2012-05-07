@@ -288,7 +288,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
     """ s"my name is ${person.name}." """ ~
     """                $$$$$$       " """ ~
     """                $$$$$$$$$$$  " """ ~
-    """               $$$$$$$$$$$$$ " """ ~
+    """              $$$$$$$$$$$$$$ " """ ~
     """ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ """
 
     """ xyz"" """ ~
@@ -299,6 +299,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
     """ s"my name is $bob" """ ~
     """    $               """ ~
     """  $$$$$$$$$$$$$     """
+
+    """ s"my name is $bob." """ ~
+    """                $    """ ~
+    """              $$$$   """
+
     
   }
   

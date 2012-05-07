@@ -68,6 +68,12 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
       token.associatedWhitespaceAndComments.rawTokens :+ token
   }
 
+  private def previousToken(token: Token): Option[Token] =
+    tokens.indexOf(token) match {
+      case 0 | -1 ⇒ None
+      case n      ⇒ Some(tokens(n - 1))
+    }
+
   def expandSelection(initialSelection: Range): Option[Range] =
     expandToToken(initialSelection) orElse
       expandScaladocToAssociatedNode(initialSelection) orElse
@@ -83,13 +89,22 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
       nodeRange ← associatedNode.rangeOpt // <-- should always be defined here, in fact
     } yield scaladocComment.range mergeWith nodeRange
 
+  private def isPreviousTokenStringPart(token: Token) =
+    previousToken(token).exists(token ⇒ token.tokenType == Tokens.STRING_PART)
+
+  private def expandToStringInterpolationDollarIfPossible(token: Token): Range =
+    if (isPreviousTokenStringPart(token))
+      token.range.expandLeft(1)
+    else
+      token.range
+
   /**
    * If the selection is a strict subrange of some token, expand to the entire token.
    */
   private def expandToToken(initialSelection: Range): Option[Range] =
-    allTokens find { token ⇒
+    allTokens.find { token ⇒
       isSelectableToken(token) && (token.range contains initialSelection) && initialSelection.length < token.length
-    } map { _.range }
+    }.map(expandToStringInterpolationDollarIfPossible)
 
   private def findAssociatedAstNode(scaladocCommentToken: Token): Option[AstNode] =
     compilationUnitOpt.flatMap { cu ⇒ findAssociatedAstNode(cu, scaladocCommentToken) }
@@ -142,7 +157,10 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
     } return Some(descendantRange)
 
     if (nodeRange.strictlyContains(initialSelection) && isSelectableAst(node :: enclosingNodes))
-      Some(nodeRange)
+      if (isPreviousTokenStringPart(node.firstToken)) // Grab $ from string interpolation
+        Some(nodeRange.expandLeft(1))
+      else
+        Some(nodeRange)
     else
       None
 
