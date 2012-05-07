@@ -11,7 +11,7 @@ import scalariform.formatter.preferences._
 object ScalariformBuild extends Build {
 
   lazy val commonSettings = Defaults.defaultSettings ++ ScalariformPlugin.defaultScalariformSettings ++ Seq(
-    organization := "scalariform",
+    organization := "org.scalariform",
     version := "0.1.2",
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.9.0", "2.9.1", "2.9.2"),
