@@ -22,6 +22,8 @@ object ScalariformBuild extends Build {
     parallelExecution in Test := false,
     publishMavenStyle := true,
     publishArtifact in Test := false,
+    // Workaround for package object Scaladoc error: https://github.com/harrah/xsbt/issues/85
+    unmanagedClasspath in Compile += Attributed.blank(file("doesnotexist")),
     pomIncludeRepository := { _ => false },
     EclipseKeys.withSource := true,
     EclipseKeys.eclipseOutput := Some("bin"))
