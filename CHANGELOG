@@ -1,4 +1,4 @@
-0.1.2 (..)
+0.1.2 (7/May/12)
 
 * Revamp command-line tool with more intuitive behaviour
 * Add --quiet, --recurse, --stdin, --stdout options to command-line tool
