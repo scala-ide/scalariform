@@ -5,7 +5,6 @@ scalariform.feature/pom.xml
 scalariform.feature/feature.xml
 scalariform.update/pom.xml
 scalariform.update/site.xml
-scalariform.maven-plugin/pom.xml
 docs/source/conf.py
 scalariform/META-INF/MANIFEST.MF
 scalariform/src/main/scala/scalariform/package.scala
