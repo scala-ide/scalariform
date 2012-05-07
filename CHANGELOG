@@ -6,7 +6,7 @@
 * Tidy up, optimise lexer code
 * FIX: Parse 5.f, 5.d as floating points, unless in Scala 2.11+ mode
 * FIX: Bug with line-per-annotation style
-* Add support for String interpolation (2.10) 
+* Add support for String interpolation
 * Add support for macros
 * Add --scalaVersion=<version> flag to command-line tool
 * Support expr[T1, T2][T3, T4] and g()[String] syntaxes
