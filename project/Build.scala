@@ -31,7 +31,10 @@ object ScalariformBuild extends Build {
   lazy val subprojectSettings = commonSettings ++ Seq(
     ScalariformKeys.preferences <<= baseDirectory.apply(dir ⇒ PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)))
 
-  lazy val root: Project = Project("root", file("."), settings = commonSettings) aggregate (scalariform, cli, misc)
+  lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
+    publish := (),
+    publishLocal := ()
+  )) aggregate (scalariform, cli, misc)
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = subprojectSettings ++
     Seq(
@@ -56,12 +59,16 @@ object ScalariformBuild extends Build {
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
+      publish := (),
+      publishLocal := (),
       artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" })) dependsOn (scalariform)
 
   lazy val misc: Project = Project("misc", file("misc"), settings = subprojectSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       libraryDependencies += "com.miglayout" % "miglayout" % "3.7.4",
+      publish := (),
+      publishLocal := (),
       mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform, cli)
 
   def pomExtraXml =
