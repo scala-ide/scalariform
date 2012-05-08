@@ -394,8 +394,8 @@ case class AccessQualifier(lbracket: Token, thisOrId: Token, rbracket: Token) ex
   lazy val tokens = flatten(lbracket, thisOrId, rbracket)
 }
 
-case class CompilationUnit(topStats: StatSeq) extends AstNode {
-  lazy val tokens = flatten(topStats)
+case class CompilationUnit(topStats: StatSeq, eofToken: Token) extends AstNode {
+  lazy val tokens = flatten(topStats, eofToken)
 }
 
 case class AnonymousFunctionStart(parameters: List[ExprElement], arrow: Token) extends ExprElement {

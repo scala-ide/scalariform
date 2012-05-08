@@ -65,8 +65,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   def scriptBody(): CompilationUnit = {
     val stmts = templateStats()
-    accept(EOF)
-    CompilationUnit(stmts)
+    val eofToken = accept(EOF)
+    CompilationUnit(stmts, eofToken)
   }
 
   private def templateStats() = {
@@ -1798,8 +1798,8 @@ class ScalaParser(tokens: Array[Token]) {
       }
     }
     val topStats_ = topstats()
-    accept(EOF)
-    CompilationUnit(topStats_)
+    val eofToken = accept(EOF)
+    CompilationUnit(topStats_, eofToken)
   }
 
   private def xmlStartTag(isPattern: Boolean): XmlStartTag = {
