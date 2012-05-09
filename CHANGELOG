@@ -1,4 +1,5 @@
 0.1.3 (..)
+* Add EOF to ComplilationUnit, ensuring entire source is represented in the tree
 
 0.1.2 (7/May/12)
 

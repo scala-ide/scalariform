@@ -22,7 +22,7 @@ object ScalariformBuild extends Build {
     parallelExecution in Test := false,
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    // Workaround for package object Scaladoc error: https://github.com/harrah/xsbt/issues/85
+    // Workaround for package object Scaladoc error (https://github.com/harrah/xsbt/issues/85):
     unmanagedClasspath in Compile += Attributed.blank(file("doesnotexist")),
     pomIncludeRepository := { _ => false },
     EclipseKeys.withSource := true,
@@ -47,13 +47,10 @@ object ScalariformBuild extends Build {
         deps :+ scalatestVersion
       },
       exportJars := true, // Needed for cli oneJar
-      publishTo <<= version { (v: String) ⇒
-        val nexus = "https://oss.sonatype.org/"
-        if (v.trim.endsWith("SNAPSHOT")) 
-          Some("snapshots" at nexus + "content/repositories/snapshots") 
-        else
-          Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-      }))
+      publishTo <<= isSnapshot(
+        if (_) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots") 
+        else Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"))
+      ))
 
   lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
     Seq(
