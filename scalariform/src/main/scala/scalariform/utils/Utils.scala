@@ -18,6 +18,12 @@ object Utils {
     def implies(b2: ⇒ Boolean) = if (!b) true else b2
   }
 
+  implicit def string2PimpedString(s: String) = new PimpedString(s)
+
+  class PimpedString(s: String) {
+    def toIntOpt: Option[Int] = try Some(s.toInt) catch { case _: NumberFormatException => None }
+  }
+
   def stagger[T](iterable: Iterable[T]) = iterable zip iterable.tail
 
   def pairWithPrevious[T](iterable: Iterable[T]): List[(Option[T], T)] = {

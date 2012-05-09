@@ -14,7 +14,7 @@ import scalariform._
 class ScalaLexer(
   protected val reader: IUnicodeEscapeReader,
   protected val forgiveErrors: Boolean = false,
-  protected val scalaVersion: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP)
+  protected val scalaVersion: ScalaVersion = ScalaVersions.DEFAULT)
   extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
 
   import ScalaLexer._
@@ -243,7 +243,7 @@ object ScalaLexer {
    * @see rawTokenise
    */
   def createRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): ScalaLexer =
-    makeRawLexer(s, forgiveErrors, ScalaVersions.getVersionGroup(scalaVersion))
+    makeRawLexer(s, forgiveErrors, ScalaVersion.parseOrDefault(scalaVersion))
 
   /**
    * Convert the given Scala source code into a list of tokens.
@@ -269,7 +269,7 @@ object ScalaLexer {
 
   private val BUFFER_MASK = BUFFER_SIZE - 1
 
-  private def makeRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = ScalaVersions.DEFAULT_GROUP): ScalaLexer =
-    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersionGroup)
+  private def makeRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT): ScalaLexer =
+    new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersion)
 
 }

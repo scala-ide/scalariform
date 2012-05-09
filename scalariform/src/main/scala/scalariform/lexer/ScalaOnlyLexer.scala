@@ -341,7 +341,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     val tokenType =
       if (processingSymbol)
         SYMBOL_LITERAL
-      else if (possibleInterpolationId && ch == '\"' && scalaVersion >= SCALA_210) {
+      else if (possibleInterpolationId && ch == '\"' && scalaVersion >= ScalaVersions.Scala_2_10) {
         switchToStringInterpolationMode(lookaheadIs("\"\"\""))
         INTERPOLATION_ID
       } else
@@ -465,7 +465,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     if (ch == '.') {
       val c = ch(1)
 
-      if (scalaVersion >= SCALA_211 && !isDigit(c)) {
+      if (scalaVersion >= ScalaVersions.Scala_2_11 && !isDigit(c)) {
         token(INTEGER_LITERAL)
         return
       }

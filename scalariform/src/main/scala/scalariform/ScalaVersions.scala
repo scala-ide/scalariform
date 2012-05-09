@@ -1,40 +1,47 @@
 package scalariform
 
 import scala.util.Properties
+import scalariform.utils.Utils._
+import scala.math.Ordering
 
-/**
- * A group of Scala versions that Scalariform wants to distinguish because they have incompatible syntax
- */
-sealed trait ScalaVersionGroup extends Ordered[ScalaVersionGroup] {
+object ScalaVersion {
 
-  def compare(that: ScalaVersionGroup) = internalVersion compare that.internalVersion
+  private val VersionPattern = """(\d+)\.(\d+)\.(.*)""".r
 
-  protected val internalVersion: Int
+  def parseOrDefault(s: String): ScalaVersion = parse(s).getOrElse(ScalaVersions.DEFAULT)
+
+  def parse(s: String): Option[ScalaVersion] =
+    s match {
+      case VersionPattern(majorStr, minorStr, extra) =>
+        for {
+          major <- majorStr.toIntOpt
+          minor <- minorStr.toIntOpt
+        } yield ScalaVersion(major, minor, extra)
+      case _ =>
+        None
+    }
 
 }
 
-case object SCALA_28_29 extends ScalaVersionGroup { protected val internalVersion = 0 }
-case object SCALA_210 extends ScalaVersionGroup { protected val internalVersion = 1 }
-case object SCALA_211 extends ScalaVersionGroup { protected val internalVersion = 2 }
+case class ScalaVersion(major: Int, minor: Int, extra: String = "") extends Ordered[ScalaVersion] {
+
+  private def majorMinor = (major, minor)
+
+  def compare(that: ScalaVersion) = Ordering[(Int, Int)].compare(this.majorMinor, that.majorMinor)
+
+  override def toString = major + "." + minor + "." + extra
+
+}
 
 object ScalaVersions {
 
-  lazy val DEFAULT_GROUP = getVersionGroup(DEFAULT_VERSION)
+  val Scala_2_11 = ScalaVersion.parse("2.11.0").get
+  val Scala_2_10 = ScalaVersion.parse("2.10.0").get
+  val Scala_2_9 = ScalaVersion.parse("2.9.2").get
+  val Scala_2_8 = ScalaVersion.parse("2.8.1").get
 
   lazy val DEFAULT_VERSION = Properties.scalaPropOrElse("version.number", "2.9.2")
 
-  def getVersionGroup(version: String): ScalaVersionGroup =
-    version match {
-      case _ if version startsWith "2.8."  ⇒ SCALA_28_29
-      case _ if version startsWith "2.9."  ⇒ SCALA_28_29
-      case _ if version startsWith "2.10." ⇒ SCALA_210
-      case _                               ⇒ SCALA_211
-    }
-
-  def representativeVersion(versionGroup: ScalaVersionGroup) = versionGroup match {
-    case SCALA_28_29 ⇒ "2.9.1"
-    case SCALA_210   ⇒ "2.10.0"
-    case SCALA_211   ⇒ "2.11.0"
-  }
+  lazy val DEFAULT = ScalaVersion.parse(DEFAULT_VERSION).get
 
 }

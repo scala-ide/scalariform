@@ -112,7 +112,7 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
   private def findAssociatedAstNode(nodeToSearch: AstNode, scaladocCommentToken: Token): Option[AstNode] =
     nodeToSearch.firstTokenOption flatMap { firstToken ⇒
       val hiddenTokens = getPriorHiddenTokens(firstToken)
-      if (hiddenTokens.rawTokens contains scaladocCommentToken)
+      if (hiddenTokens.rawTokens.contains(scaladocCommentToken) && !nodeToSearch.isInstanceOf[CompilationUnit])
         Some(nodeToSearch)
       else {
         for {
