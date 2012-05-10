@@ -96,7 +96,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
   setLayout(new BorderLayout)
 
-  setTitle("Scalariform " + scalariform.VERSION)
+  setTitle("Scalariform " + scalariform.BuildInfo.version)
 
   val textFont = new Font("monospaced", Font.PLAIN, 14)
 
@@ -169,7 +169,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       val duration = System.currentTimeMillis - startTime
       val tokens = ScalaLexer.tokenise(inputText, scalaVersion = SCALA_VERSION)
       val tokenCount = tokens.size
-      setTitle("Scalariform " + scalariform.VERSION + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / (duration + 1)) + " tokens/second")
+      setTitle("Scalariform " + scalariform.BuildInfo.version + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / (duration + 1)) + " tokens/second")
       outputTextPane.setText(outputText)
 
       if (showAstCheckBox.isSelected) {

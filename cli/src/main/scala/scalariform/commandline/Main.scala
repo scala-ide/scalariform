@@ -27,7 +27,7 @@ object Main {
     }
 
     if (arguments contains Version) {
-      println("Scalariform " + scalariform.VERSION + " (runtime Scala " + ScalaVersions.DEFAULT_VERSION + ")")
+      println("Scalariform " + scalariform.BuildInfo.version + " (runtime Scala " + ScalaVersions.DEFAULT_VERSION + ")")
       return false
     }
 

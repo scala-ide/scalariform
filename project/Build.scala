@@ -3,7 +3,6 @@ import sbt.Keys._
 import com.github.retronym.SbtOneJar
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys._
 import com.typesafe.sbteclipse.core.EclipsePlugin._
-
 import com.typesafe.sbtscalariform.ScalariformPlugin
 import com.typesafe.sbtscalariform.ScalariformPlugin.ScalariformKeys
 import scalariform.formatter.preferences._
@@ -15,55 +14,59 @@ object ScalariformBuild extends Build {
     version := "0.1.3-SNAPSHOT",
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.9.0", "2.9.1", "2.9.2"),
-    resolvers += ScalaToolsSnapshots,
+    exportJars := true, // Needed for cli oneJar
     retrieveManaged := true,
     scalacOptions += "-deprecation",
-    pomExtra := pomExtraXml,
-    parallelExecution in Test := false,
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    // Workaround for package object Scaladoc error (https://github.com/harrah/xsbt/issues/85):
-    unmanagedClasspath in Compile += Attributed.blank(file("doesnotexist")),
-    pomIncludeRepository := { _ => false },
     EclipseKeys.withSource := true,
     EclipseKeys.eclipseOutput := Some("bin"))
 
   lazy val subprojectSettings = commonSettings ++ Seq(
-    ScalariformKeys.preferences <<= baseDirectory.apply(dir ⇒ PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)))
+    ScalariformKeys.preferences <<= baseDirectory.apply(getScalariformPreferences))
+
+  def getScalariformPreferences(dir: File) =
+    PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)
 
   lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
     publish := (),
-    publishLocal := ()
-  )) aggregate (scalariform, cli, misc)
+    publishLocal := ())) aggregate (scalariform, cli, misc)
 
-  lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings = subprojectSettings ++
-    Seq(
-      libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
-        val scalatestVersion = sv match {
-          case "2.8.0"           ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
-          case "2.10.0-M3"       ⇒ "org.scalatest" % "scalatest_2.10.0-M3" % "1.8-SNAPSHOT" % "test"
-          case _                 ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
-        }
-        deps :+ scalatestVersion
-      },
-      exportJars := true, // Needed for cli oneJar
-      publishTo <<= isSnapshot(
-        if (_) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots") 
-        else Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"))
-      ))
+  def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
+    case "2.8.0"     ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
+    case "2.10.0-M3" ⇒ "org.scalatest" % "scalatest_2.10.0-M3" % "1.8-SNAPSHOT" % "test"
+    case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+  }
+
+  lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings =
+    subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ eclipseSettings ++
+      Seq(
+        libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒ deps :+ getScalaTestDependency(sv) },
+        pomExtra := pomExtraXml,
+        publishMavenStyle := true,
+        publishArtifact in Test := false,
+        pomIncludeRepository := { _ ⇒ false },
+        sbtbuildinfo.Plugin.buildInfoKeys := Seq[Scoped](version),
+        sbtbuildinfo.Plugin.buildInfoPackage := "scalariform",
+        sourceGenerators in Compile <+= sbtbuildinfo.Plugin.buildInfo,
+        EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed,
+        publishTo <<= isSnapshot(getPublishToRepo)))
+
+  def getPublishToRepo(isSnapshot: Boolean) =
+    if (isSnapshot) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
+    else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 
   lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
+      artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" },
       publish := (),
-      publishLocal := (),
-      artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" })) dependsOn (scalariform)
+      publishLocal := ())) dependsOn (scalariform)
 
   lazy val misc: Project = Project("misc", file("misc"), settings = subprojectSettings ++
     Seq(
-      libraryDependencies += "commons-io" % "commons-io" % "1.4",
-      libraryDependencies += "com.miglayout" % "miglayout" % "3.7.4",
+      libraryDependencies ++= Seq(
+        "commons-io" % "commons-io" % "1.4",
+        "com.miglayout" % "miglayout" % "3.7.4"),
       publish := (),
       publishLocal := (),
       mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform, cli)
