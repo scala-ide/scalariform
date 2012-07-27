@@ -25,6 +25,10 @@ class ParserTest extends FlatSpec with ShouldMatchers {
     parseExpression("{ case List[String]() => 12 }")
   }
 
+  "Parser" should "throw a parse exception in bad package blocks" in {
+    evaluating { parseCompilationUnit("package a {} package b {}") } should produce[ScalaParserException]
+  }
+
   private def parser(s: String) = new ScalaParser(ScalaLexer.tokenise(s).toArray)
   private def parseExpression(s: String) = parser(s).expr
   private def parseCompilationUnit(s: String) = parser(s).compilationUnit

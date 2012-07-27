@@ -18,6 +18,12 @@ object Utils {
     def implies(b2: ⇒ Boolean) = if (!b) true else b2
   }
 
+  implicit def string2PimpedString(s: String) = new PimpedString(s)
+
+  class PimpedString(s: String) {
+    def toIntOpt: Option[Int] = try Some(s.toInt) catch { case _: NumberFormatException => None }
+  }
+
   def stagger[T](iterable: Iterable[T]) = iterable zip iterable.tail
 
   def pairWithPrevious[T](iterable: Iterable[T]): List[(Option[T], T)] = {
@@ -86,11 +92,10 @@ object Utils {
     import java.io.{ OutputStreamWriter, FileOutputStream }
     val encoding = encodingOpt getOrElse (System getProperty "file.encoding")
     val writer = new OutputStreamWriter(new FileOutputStream(file), encoding)
-    try {
+    try
       writer.write(text)
-    } finally {
+    finally
       writer.close()
-    }
   }
 
   @throws(classOf[IOException])

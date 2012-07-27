@@ -38,6 +38,12 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(RBRACE)
   }
 
+  def dropAnyBraces[T](body: ⇒ Any) =
+    if (LBRACE)
+      inBraces(body)
+    else
+      body
+
   def inBrackets[T](body: ⇒ T) {
     accept(LBRACKET)
     body
@@ -61,8 +67,12 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   def scriptBody() {
-    templateStatSeq()
+    templateStats()
     accept(EOF)
+  }
+
+  private def templateStats() = {
+    templateStatSeq()
   }
 
   private def accept(tokenType: TokenType): Token =
@@ -127,7 +137,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isLiteralToken(tokenType: TokenType): Boolean = tokenType match {
     case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL |
-      STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒ true
+      STRING_LITERAL | STRING_PART | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒ true
     case _ ⇒ false
   }
 
@@ -380,11 +390,29 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     newLineOptWhenFollowedBy(LBRACE)
   }
 
-  private def literal(): Token =
-    if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
+  private def literal(inPattern: Boolean = false) =
+    if (INTERPOLATION_ID)
+      interpolatedString(inPattern)
+    else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
       nextToken()
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
+
+  private def interpolatedString(inPattern: Boolean = false) {
+    nextToken()
+    while (STRING_PART) {
+      nextToken()
+      if (inPattern)
+        dropAnyBraces(pattern())
+      else if (isIdent)
+        ident()
+      else
+        expr()
+    }
+    if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
+      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken)
+    val terminalString = nextToken()
+  }
 
   private def newLineOpt() { if (NEWLINE) nextToken() }
 
@@ -723,7 +751,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   trait SeqContextSensitive extends PatternContextSensitive {
 
-    def interceptStarPattern()
+    def isSequenceOK: Boolean
+
+    def isXML: Boolean = false
 
     def functionArgType() = argType()
 
@@ -772,8 +802,24 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
 
     def pattern3() {
+      val firstToken = currentToken
+      val secondToken = InferredSemicolonScalaParser.this(pos + 1)
       simplePattern()
-      interceptStarPattern()
+
+      if (isSequenceOK) {
+        if (STAR && secondToken == currentToken && firstToken.tokenType == USCORE) {
+          lookahead(1) match {
+            case RBRACE if isXML ⇒
+              nextToken()
+              return
+            case RPAREN if !isXML ⇒
+              nextToken()
+              return
+            case _ ⇒
+          }
+        }
+      }
+
       while (isIdent && !PIPE) {
         ident()
         simplePattern()
@@ -786,7 +832,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
           stableId()
           condOpt(currentTokenType) {
-            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal()
+            case INTEGER_LITERAL | FLOATING_POINT_LITERAL if nameIsMinus ⇒ literal(inPattern = true)
           }
           if (LBRACKET) typeArgs()
           else None
@@ -794,7 +840,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case USCORE ⇒
           nextToken()
         case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
-          literal()
+          literal(inPattern = true)
         case LPAREN ⇒
           makeParens(noSeq.patterns)
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
@@ -812,11 +858,17 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   object seqOK extends SeqContextSensitive {
-    def interceptStarPattern() { if (STAR) nextToken() }
+    val isSequenceOK = true
   }
 
   object noSeq extends SeqContextSensitive {
-    def interceptStarPattern() {}
+    val isSequenceOK = false
+  }
+
+  object xmlSeqOK extends SeqContextSensitive {
+    val isSequenceOK = true
+
+    override val isXML = true
   }
 
   def typ() = outPattern.typ()
@@ -828,6 +880,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   def pattern() = noSeq.pattern()
   def patterns() = noSeq.patterns()
   def seqPatterns() = seqOK.patterns()
+  def xmlSeqPatterns() = xmlSeqOK.patterns()
 
   private def argumentPatterns() = {
     inParens { if (RPAREN) Nil else seqPatterns() }
@@ -1093,17 +1146,30 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     } else {
       ident()
-      typeParamClauseOpt(allowVariance = false)
-      paramClauses()
-      newLineOptWhenFollowedBy(LBRACE)
-      typedOpt()
-      if (isStatSep || RBRACE || EOF /* for our tests */ )
-        None
-      else if (LBRACE) { // TODO: check cond
-        blockExpr()
-      } else {
-        equalsExpr()
+      funDefRest()
+    }
+  }
+
+  private def funDefRest() {
+    typeParamClauseOpt(allowVariance = false)
+    paramClauses()
+    newLineOptWhenFollowedBy(LBRACE)
+    typedOpt()
+    if (isStatSep || RBRACE || EOF /* for our tests */ )
+      None
+    else if (LBRACE) { // TODO: check cond
+      blockExpr()
+    } else {
+      if (!EQUALS) {
+        accept(EQUALS)
+        throw new AssertionError("Will not reach here")
       }
+      nextToken()
+      if (VARID && currentToken.text == "macro")
+        Some(nextToken())
+      else
+        None
+      expr()
     }
   }
 
@@ -1164,7 +1230,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case CASE if lookahead(1) == CLASS  ⇒ classDef()
       case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentTokenType)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken)
     }
   }
 
@@ -1431,7 +1497,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private def xmlEmbeddedScala(isPattern: Boolean) {
     if (isPattern) {
       accept(LBRACE)
-      seqPatterns()
+      xmlSeqPatterns()
       accept(RBRACE)
     } else
       blockExpr()

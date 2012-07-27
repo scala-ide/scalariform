@@ -1,0 +1,11 @@
+* Revamp command-line tool with more intuitive behaviour
+* Add `--quiet`, `--recurse`, `--stdin`, `--stdout` options to command-line tool
+* FIX: Scaladoc comment formatting could break nested comments (issue #36)
+* Tidy up, optimise lexer code
+* FIX: Parse `5.f`, `5.d` as floating points, unless in Scala 2.11+ mode
+* FIX: Bug with line-per-annotation style
+* Add support for String interpolation
+* Add support for macros
+* Add `--scalaVersion=<version>` flag to command-line tool
+* Support `expr[T1, T2][T3, T4]` and `g()[String]` syntaxes
+* Fix AST selection for prefix expression

@@ -19,4 +19,6 @@ case class Range(offset: Int, length: Int) {
   def intersects(other: Range) =
     !(other.offset >= offset + length || other.offset + other.length - 1 < offset)
 
+  def expandLeft(n: Int): Range = Range(offset - n, length + n)
+
 }

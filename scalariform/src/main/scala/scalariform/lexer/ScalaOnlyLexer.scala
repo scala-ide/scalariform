@@ -6,7 +6,7 @@ import scalariform.lexer.Chars._
 import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
-import scalariform.SCALA_211
+import scalariform._
 
 /**
  * Lexer implementation for non-XML Scala
@@ -14,6 +14,8 @@ import scalariform.SCALA_211
 private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
 
   private var processingSymbol = false
+
+  private var possibleInterpolationId = false
 
   protected def fetchScalaToken() {
     (ch: @switch) match {
@@ -33,7 +35,11 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
         'u' | 'v' | 'w' | 'x' | 'y' |
         'z' ⇒
         nextChar()
-        getIdentRest()
+        try {
+          possibleInterpolationId = true
+          getIdentRest()
+        } finally
+          possibleInterpolationId = false
       case '<' ⇒
         lastCh match {
           case SU | ' ' | '\t' | '\n' | '{' | '(' | '>' if ch(1) != SU && (isNameStart(ch(1)) || ch(1) == '!' || ch(1) == '?') ⇒
@@ -106,12 +112,12 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
         nextChar(); token(RBRACE)
         val nestingLevel = scalaMode.unnestBrace()
         if (nestingLevel == 0 && !isRootMode)
-          popMode() // Go back to XML
+          popMode() // Go back to XML or string interpolation
       case '[' ⇒
         nextChar(); token(LBRACKET)
       case ']' ⇒
         nextChar(); token(RBRACKET)
-      case SU ⇒ 
+      case SU ⇒
         token(EOF)
       case _ ⇒
         if (ch == '\u21D2') {
@@ -210,6 +216,67 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     scanForClosingTripleQuotes()
   }
 
+  @tailrec
+  final protected def getStringPart(multiLine: Boolean) {
+    if (ch == '"') {
+      if (multiLine) {
+        nextChar()
+        if (isTripleQuote()) {
+          token(STRING_LITERAL)
+          popMode()
+        } else
+          getStringPart(multiLine)
+      } else {
+        nextChar()
+        token(STRING_LITERAL)
+        popMode()
+      }
+    } else if (ch == '$') {
+      nextChar()
+      if (ch == '$') {
+        nextChar()
+        getStringPart(multiLine)
+      } else if (ch == '{') {
+        token(STRING_PART)
+        switchToScalaMode()
+      } else if (Character.isUnicodeIdentifierStart(ch)) {
+        token(STRING_PART)
+        stringInterpolationMode.interpolationVariable = true
+      } else {
+        if (forgiveErrors) {
+          nextChar()
+          getStringPart(multiLine)
+        } else
+          throw new ScalaLexerException("invalid string interpolation")
+      }
+    } else {
+      val isUnclosedLiteral = !isUnicodeEscape && (ch == SU || (!multiLine && (ch == '\r' || ch == '\n')))
+      if (isUnclosedLiteral) {
+        if (forgiveErrors) {
+          token(STRING_LITERAL)
+          popMode()
+        } else
+          throw new ScalaLexerException(if (!multiLine) "unclosed string literal" else "unclosed multi-line string literal")
+      } else {
+        nextChar()
+        getStringPart(multiLine)
+      }
+    }
+  }
+
+  private def isTripleQuote(): Boolean =
+    if (ch == '"') {
+      nextChar()
+      if (ch == '"') {
+        nextChar()
+        while (ch == '"')
+          nextChar()
+        true
+      } else
+        false
+    } else
+      false
+
   private def getIdentRest(): Unit = (ch: @switch) match {
     case 'A' | 'B' | 'C' | 'D' | 'E' |
       'F' | 'G' | 'H' | 'I' | 'J' |
@@ -274,8 +341,12 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     val tokenType =
       if (processingSymbol)
         SYMBOL_LITERAL
-      else
+      else if (possibleInterpolationId && ch == '\"' && scalaVersion >= ScalaVersions.Scala_2_10) {
+        switchToStringInterpolationMode(lookaheadIs("\"\"\""))
+        INTERPOLATION_ID
+      } else
         Keywords(getTokenText).getOrElse(VARID)
+
     token(tokenType)
   }
 
@@ -393,12 +464,12 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
 
     if (ch == '.') {
       val c = ch(1)
-      
-      if (scalaVersion == SCALA_211 && !isDigit(c)) {
+
+      if (scalaVersion >= ScalaVersions.Scala_2_11 && !isDigit(c)) {
         token(INTEGER_LITERAL)
         return
       }
-      
+
       val isDefinitelyNumber =
         (c: @switch) match {
           /** Another digit is a giveaway. */

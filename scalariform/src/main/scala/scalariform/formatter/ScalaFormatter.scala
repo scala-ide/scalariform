@@ -6,9 +6,9 @@ import scalariform.parser._
 import scalariform.utils.Utils._
 import scalariform.utils._
 import scalariform.utils.BooleanLang._
-
 import scalariform.formatter.preferences._
 import PartialFunction._
+import scalariform.ScalaVersions
 
 trait HasHiddenTokenInfo {
 
@@ -444,14 +444,14 @@ object ScalaFormatter {
 
   @throws(classOf[ScalaParserException])
   def format(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences(), lineDelimiter: Option[String] = None,
-             initialIndentLevel: Int = 0): String = {
-    val edits = formatAsEdits(source, formattingPreferences, lineDelimiter, initialIndentLevel)
+             initialIndentLevel: Int = 0, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): String = {
+    val edits = formatAsEdits(source, formattingPreferences, lineDelimiter, initialIndentLevel, scalaVersion)
     TextEditProcessor.runEdits(source, edits)
   }
 
   @throws(classOf[ScalaParserException])
   def formatAsEdits(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences(), lineDelimiter: Option[String] = None,
-                    initialIndentLevel: Int = 0): List[TextEdit] = {
+                    initialIndentLevel: Int = 0, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): List[TextEdit] = {
     val specificFormatter = new SpecificFormatter {
 
       type Result = CompilationUnit
@@ -461,7 +461,7 @@ object ScalaFormatter {
       def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = initialIndentLevel))
 
     }
-    val (edits, _) = specificFormatter.fullFormat(source)(formattingPreferences)
+    val (edits, _) = specificFormatter.fullFormat(source, scalaVersion = scalaVersion)(formattingPreferences)
     edits
   }
 

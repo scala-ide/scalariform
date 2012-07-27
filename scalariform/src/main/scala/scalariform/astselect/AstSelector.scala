@@ -5,6 +5,7 @@ import scalariform.parser._
 import scalariform.utils.Range
 import scalariform.utils.Utils._
 import scala.util.control.Exception._
+import scalariform.ScalaVersions
 
 object AstSelector {
 
@@ -13,9 +14,9 @@ object AstSelector {
    * enclosing AST element. Returns None if the source does not parse correctly, or if
    * there is no strictly larger containing AST element.
    */
-  def expandSelection(source: String, initialSelection: Range): Option[Range] =
+  def expandSelection(source: String, initialSelection: Range, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): Option[Range] =
     catching(classOf[ScalaParserException]).toOption {
-      new AstSelector(source).expandSelection(initialSelection)
+      new AstSelector(source, scalaVersion).expandSelection(initialSelection)
     }
 
   import Tokens._
@@ -49,11 +50,11 @@ object AstSelector {
 
 }
 
-class AstSelector(source: String) {
+class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_VERSION) {
 
   import AstSelector._
 
-  private val tokens = ScalaLexer.tokenise(source)
+  private val tokens = ScalaLexer.tokenise(source, scalaVersion = scalaVersion)
 
   private val compilationUnitOpt: Option[CompilationUnit] = {
     val parser = new ScalaParser(tokens.toArray)
@@ -66,6 +67,12 @@ class AstSelector(source: String) {
     else
       token.associatedWhitespaceAndComments.rawTokens :+ token
   }
+
+  private def previousToken(token: Token): Option[Token] =
+    tokens.indexOf(token) match {
+      case 0 | -1 ⇒ None
+      case n      ⇒ Some(tokens(n - 1))
+    }
 
   def expandSelection(initialSelection: Range): Option[Range] =
     expandToToken(initialSelection) orElse
@@ -82,13 +89,22 @@ class AstSelector(source: String) {
       nodeRange ← associatedNode.rangeOpt // <-- should always be defined here, in fact
     } yield scaladocComment.range mergeWith nodeRange
 
+  private def isPreviousTokenStringPart(token: Token) =
+    previousToken(token).exists(token ⇒ token.tokenType == Tokens.STRING_PART)
+
+  private def expandToStringInterpolationDollarIfPossible(token: Token): Range =
+    if (isPreviousTokenStringPart(token))
+      token.range.expandLeft(1)
+    else
+      token.range
+
   /**
    * If the selection is a strict subrange of some token, expand to the entire token.
    */
   private def expandToToken(initialSelection: Range): Option[Range] =
-    allTokens find { token ⇒
+    allTokens.find { token ⇒
       isSelectableToken(token) && (token.range contains initialSelection) && initialSelection.length < token.length
-    } map { _.range }
+    }.map(expandToStringInterpolationDollarIfPossible)
 
   private def findAssociatedAstNode(scaladocCommentToken: Token): Option[AstNode] =
     compilationUnitOpt.flatMap { cu ⇒ findAssociatedAstNode(cu, scaladocCommentToken) }
@@ -96,7 +112,7 @@ class AstSelector(source: String) {
   private def findAssociatedAstNode(nodeToSearch: AstNode, scaladocCommentToken: Token): Option[AstNode] =
     nodeToSearch.firstTokenOption flatMap { firstToken ⇒
       val hiddenTokens = getPriorHiddenTokens(firstToken)
-      if (hiddenTokens.rawTokens contains scaladocCommentToken)
+      if (hiddenTokens.rawTokens.contains(scaladocCommentToken) && !nodeToSearch.isInstanceOf[CompilationUnit])
         Some(nodeToSearch)
       else {
         for {
@@ -110,7 +126,8 @@ class AstSelector(source: String) {
   private def isSelectableToken(token: Token) = {
     val tokenType = token.tokenType
     import tokenType._
-    isLiteral || isKeyword || isComment || isId || (selectableXmlTokens contains tokenType)
+    isLiteral || isKeyword || isComment || isId || tokenType == Tokens.INTERPOLATION_ID ||
+      (selectableXmlTokens contains tokenType)
   }
 
   /**
@@ -140,7 +157,10 @@ class AstSelector(source: String) {
     } return Some(descendantRange)
 
     if (nodeRange.strictlyContains(initialSelection) && isSelectableAst(node :: enclosingNodes))
-      Some(nodeRange)
+      if (isPreviousTokenStringPart(node.firstToken)) // Grab $ from string interpolation
+        Some(nodeRange.expandLeft(1))
+      else
+        Some(nodeRange)
     else
       None
 
@@ -163,7 +183,7 @@ class AstSelector(source: String) {
     nodeStack match {
       case List(_: BlockExpr, _: MatchExpr, _*)   ⇒ false
       case List(_: BlockExpr, _: ProcFunBody, _*) ⇒ false
-      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass)
+      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass.asInstanceOf[Class[_ <: AstNode]])
       case Nil                                    ⇒ false
     }
 

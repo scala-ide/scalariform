@@ -10,11 +10,11 @@ import java.io._
 
 class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
-  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersionGroup = SCALA_28_29_210) =
+  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) =
     new TestString(s, forgiveErrors, scalaVersion)
 
   "" producesTokens ()
-  
+
   "println" producesTokens (VARID)
 
   "lazy" producesTokens (LAZY)
@@ -103,17 +103,37 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
   "42.toString" producesTokens (INTEGER_LITERAL, DOT, VARID)
 
   {
-    implicit val scalaVersion = SCALA_28_29_210
+    implicit val scalaVersion = ScalaVersions.Scala_2_9
     "5.f" producesTokens (FLOATING_POINT_LITERAL)
     "5.d" producesTokens (FLOATING_POINT_LITERAL)
     "5." producesTokens (FLOATING_POINT_LITERAL)
   }
 
   {
-    implicit val scalaVersion = SCALA_211
+    implicit val scalaVersion = ScalaVersions.Scala_2_11
     "5.f" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5.d" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5." producesTokens (INTEGER_LITERAL, DOT)
+  }
+
+  {
+    implicit val scalaVersion = ScalaVersions.Scala_2_9
+    """ X s"" """ producesTokens (WS, VARID, WS, VARID, STRING_LITERAL, WS)
+  }
+
+  {
+    implicit val scalaVersion = ScalaVersions.Scala_2_10
+    """ X s"" """ producesTokens (WS, VARID, WS, INTERPOLATION_ID, STRING_LITERAL, WS)
+    """ X s "$foo" """ producesTokens (WS, VARID, WS, VARID, WS, STRING_LITERAL, WS)
+    """ s"$foo" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL, WS)
+    """ s"$$" """ producesTokens (WS, INTERPOLATION_ID, STRING_LITERAL, WS)
+    """ s"${foo}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_LITERAL, WS)
+    """ s"${s"${x}"}" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, LBRACE, INTERPOLATION_ID, STRING_PART, LBRACE, VARID, RBRACE, STRING_LITERAL, RBRACE, STRING_LITERAL, WS)
+
+    <t>s""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
+    <t>s"""""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
+    <t>s""" $foo """</t>.text producesTokens (INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL)
+
   }
 
   "'f'" producesTokens (CHARACTER_LITERAL)
@@ -226,16 +246,15 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   }
 
-  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersionGroup: ScalaVersionGroup = SCALA_28_29_210) {
+  class TestString(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) {
 
     def producesTokens(toks: TokenType*)() {
       check(s.stripMargin, toks.toList)
     }
 
     private def check(s: String, expectedTokens: List[TokenType]) {
-      val scalaVersion = ScalaVersions.representativeVersion(scalaVersionGroup)
       it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors + ", scalaVersion = " + scalaVersion) in {
-        val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors, scalaVersion)
+        val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors, scalaVersion.toString)
         val actualTokenTypes = actualTokens.map(_.tokenType)
         require(actualTokenTypes.last == EOF, "Last token must be EOF, but was " + actualTokens.last.tokenType)
         require(actualTokenTypes.count(_ == EOF) == 1, "There must only be one EOF token")

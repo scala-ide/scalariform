@@ -15,7 +15,7 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
     val firstLine :: otherLines = contents.split("""\r?\n([ \t]*(\*(?!/))?)?""", Integer.MAX_VALUE).toList
     val afterStarSpaces = if (formattingPreferences(MultilineScaladocCommentsStartOnFirstLine)) 2 else 1
     val adjustedLines = dropInitialSpaces(firstLine, 1) :: (otherLines map { dropInitialSpaces(_, afterStarSpaces) })
-//    val adjustedLines map { line ⇒ if (line startsWith "*/") "*" + line else line }
+    //    val adjustedLines map { line ⇒ if (line startsWith "*/") "*" + line else line }
     (start, adjustedLines)
   }
 

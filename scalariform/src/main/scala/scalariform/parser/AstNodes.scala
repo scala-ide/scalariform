@@ -129,8 +129,12 @@ case class InfixExpr(left: List[ExprElement], infixId: Token, newlineOption: Opt
   lazy val tokens = flatten(left, infixId, newlineOption, right)
 }
 
-case class CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id: Token, typeArgsOpt: Option[TypeExprElement] = None,
-                    newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)] = Nil, uscoreOpt: Option[Token] = None) extends ExprElement {
+case class CallExpr(
+  exprDotOpt: Option[(List[ExprElement], Token)],
+  id: Token,
+  typeArgsOpt: Option[TypeExprElement] = None,
+  newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)] = Nil,
+  uscoreOpt: Option[Token] = None) extends ExprElement {
   lazy val tokens = flatten(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, uscoreOpt)
 }
 
@@ -275,11 +279,13 @@ case class PatDefOrDcl(valOrVarToken: Token,
 }
 
 sealed trait FunBody extends AstNode
+
 case class ProcFunBody(newlineOpt: Option[Token], bodyBlock: BlockExpr) extends FunBody {
   lazy val tokens = flatten(newlineOpt, bodyBlock)
 }
-case class ExprFunBody(equals: Token, body: Expr) extends FunBody {
-  lazy val tokens = flatten(equals, body)
+
+case class ExprFunBody(equals: Token, macroOpt: Option[Token], body: Expr) extends FunBody {
+  lazy val tokens = flatten(equals, macroOpt, body)
 }
 
 case class ParamClauses(newlineOpt: Option[Token], paramClausesAndNewlines: List[(ParamClause, Option[Token])]) extends AstNode {
@@ -388,8 +394,8 @@ case class AccessQualifier(lbracket: Token, thisOrId: Token, rbracket: Token) ex
   lazy val tokens = flatten(lbracket, thisOrId, rbracket)
 }
 
-case class CompilationUnit(topStats: StatSeq) extends AstNode {
-  lazy val tokens = flatten(topStats)
+case class CompilationUnit(topStats: StatSeq, eofToken: Token) extends AstNode {
+  lazy val tokens = flatten(topStats, eofToken)
 }
 
 case class AnonymousFunctionStart(parameters: List[ExprElement], arrow: Token) extends ExprElement {
@@ -398,6 +404,10 @@ case class AnonymousFunctionStart(parameters: List[ExprElement], arrow: Token) e
 
 case class AnonymousFunction(parameters: List[ExprElement], arrow: Token, body: StatSeq) extends ExprElement {
   lazy val tokens = flatten(parameters, arrow, body)
+}
+
+case class StringInterpolation(interpolationId: Token, stringPartsAndScala: List[(Token, Expr)], terminalString: Token) extends ExprElement {
+  lazy val tokens = flatten(interpolationId, stringPartsAndScala, terminalString)
 }
 
 sealed trait XmlExprElement extends ExprElement

@@ -33,3 +33,11 @@ class XmlMode extends LexerMode {
   def nestingLevel = tagNestLevel
 
 }
+
+class StringInterpolationMode(val multiLine: Boolean) extends LexerMode {
+
+  var initialSegment = true
+
+  var interpolationVariable = false
+
+}

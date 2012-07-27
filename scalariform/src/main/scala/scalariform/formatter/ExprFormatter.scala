@@ -15,32 +15,52 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def format(exprElements: List[ExprElement])(implicit formatterState: FormatterState): FormatResult = formatExprElements(exprElements)._1
 
   private def format(exprElement: ExprElement)(implicit formatterState: FormatterState): FormatResult = exprElement match {
-    case ifExpr: IfExpr                       ⇒ format(ifExpr)
-    case whileExpr: WhileExpr                 ⇒ format(whileExpr)
-    case matchExpr: MatchExpr                 ⇒ format(matchExpr)
-    case doExpr: DoExpr                       ⇒ format(doExpr)
-    case blockExpr: BlockExpr                 ⇒ format(blockExpr, indent = true)
-    case forExpr: ForExpr                     ⇒ format(forExpr)
-    case tryExpr: TryExpr                     ⇒ format(tryExpr)
-    case template: Template                   ⇒ format(template)
-    case statSeq: StatSeq                     ⇒ format(statSeq) // TODO: revisit
-    case argumentExprs: ArgumentExprs         ⇒ format(argumentExprs)._1
-    case anonymousFunction: AnonymousFunction ⇒ format(anonymousFunction)
-    case GeneralTokens(_)                     ⇒ NoFormatResult
-    case PrefixExprElement(_)                 ⇒ NoFormatResult
-    case infixExpr: InfixExpr                 ⇒ format(infixExpr)._1
-    case postfixExpr: PostfixExpr             ⇒ format(postfixExpr)
-    case annotation: Annotation               ⇒ format(annotation)
-    case typeExprElement: TypeExprElement     ⇒ format(typeExprElement.contents)
-    case expr: Expr                           ⇒ format(expr.contents)
-    case argument: Argument                   ⇒ format(argument.expr)
-    case xmlExpr: XmlExpr                     ⇒ format(xmlExpr)
-    case parenExpr: ParenExpr                 ⇒ format(parenExpr)._1
-    case new_ : New                           ⇒ format(new_.template)
-    case callExpr: CallExpr                   ⇒ format(callExpr)._1
-    case equalsExpr: EqualsExpr               ⇒ format(equalsExpr)
-    case ascriptionExpr: AscriptionExpr       ⇒ format(ascriptionExpr)
-    case _                                    ⇒ NoFormatResult
+    case ifExpr: IfExpr                           ⇒ format(ifExpr)
+    case whileExpr: WhileExpr                     ⇒ format(whileExpr)
+    case matchExpr: MatchExpr                     ⇒ format(matchExpr)
+    case doExpr: DoExpr                           ⇒ format(doExpr)
+    case blockExpr: BlockExpr                     ⇒ format(blockExpr, indent = true)
+    case forExpr: ForExpr                         ⇒ format(forExpr)
+    case tryExpr: TryExpr                         ⇒ format(tryExpr)
+    case template: Template                       ⇒ format(template)
+    case statSeq: StatSeq                         ⇒ format(statSeq) // TODO: revisit
+    case argumentExprs: ArgumentExprs             ⇒ format(argumentExprs)._1
+    case anonymousFunction: AnonymousFunction     ⇒ format(anonymousFunction)
+    case GeneralTokens(_)                         ⇒ NoFormatResult
+    case PrefixExprElement(_)                     ⇒ NoFormatResult
+    case infixExpr: InfixExpr                     ⇒ format(infixExpr)._1
+    case postfixExpr: PostfixExpr                 ⇒ format(postfixExpr)
+    case annotation: Annotation                   ⇒ format(annotation)
+    case typeExprElement: TypeExprElement         ⇒ format(typeExprElement.contents)
+    case expr: Expr                               ⇒ format(expr.contents)
+    case argument: Argument                       ⇒ format(argument.expr)
+    case xmlExpr: XmlExpr                         ⇒ format(xmlExpr)
+    case parenExpr: ParenExpr                     ⇒ format(parenExpr)._1
+    case new_ : New                               ⇒ format(new_.template)
+    case callExpr: CallExpr                       ⇒ format(callExpr)._1
+    case equalsExpr: EqualsExpr                   ⇒ format(equalsExpr)
+    case ascriptionExpr: AscriptionExpr           ⇒ format(ascriptionExpr)
+    case stringInterpolation: StringInterpolation ⇒ formatStringInterpolation(stringInterpolation)
+    case _                                        ⇒ NoFormatResult
+  }
+
+  private def formatStringInterpolation(stringInterpolation: StringInterpolation)(implicit formatterState: FormatterState): FormatResult = {
+    val StringInterpolation(interpolationId, stringPartsAndScala, terminalString) = stringInterpolation
+    var formatResult: FormatResult = NoFormatResult
+    formatResult = formatResult.before(terminalString, Compact)
+    for ((stringPart, scala) ← stringPartsAndScala) {
+      formatResult = formatResult.before(stringPart, Compact)
+      formatResult = formatResult.before(scala.firstToken, Compact)
+      formatResult ++= format(scala)(formatterState)
+      scala match {
+        case Expr(List(BlockExpr(lbrace, caseClausesOrStatSeq, rbrace))) if !containsNewline(scala) ⇒
+          formatResult = formatResult.before(rbrace, Compact)
+          // First token of caseClausesOrStatSeq (or rbrace):
+          formatResult = formatResult.before(scala.tokens.drop(1).head, Compact)
+        case _ ⇒
+      }
+    }
+    formatResult
   }
 
   private def format(ascriptionExpr: AscriptionExpr)(implicit formatterState: FormatterState): FormatResult = {
@@ -91,7 +111,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         case Some(previousElement) ⇒
           var nestedFormatterState = currentFormatterState
           val instructionOption = condOpt(previousElement, element) {
-            case (PrefixExprElement(_), _) ⇒ if (Chars.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact 
+            case (PrefixExprElement(_), _) ⇒ if (Chars.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact
             case (Argument(_), _) ⇒ Compact
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr
             case (_, _) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.tokenType) } ⇒
@@ -143,7 +163,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(callExpr: CallExpr)(implicit initialFormatterState: FormatterState): (FormatResult, FormatterState) = {
-    val CallExpr(exprDotOpt: Option[(List[ExprElement], Token)], id, typeArgsOpt: Option[TypeExprElement], newLineOptsAndArgumentExprss: List[(Option[Token], ArgumentExprs)], uscoreOpt) = callExpr
+    val CallExpr(exprDotOpt, id, typeArgsOpt, newLineOptsAndArgumentExprss, uscoreOpt) = callExpr
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = initialFormatterState
 
@@ -789,7 +809,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       formatResult ++= format(type_)
     for (funBody ← funBodyOpt) {
       funBody match {
-        case ExprFunBody(equals: Token, body: Expr) ⇒ {
+        case ExprFunBody(equals: Token, macroOpt: Option[Token], body: Expr) ⇒ {
           // TODO: see format(PatDefOrDcl)
           val bodyToken = body.firstToken
           val (formatInstruction, exprFormatterState) =

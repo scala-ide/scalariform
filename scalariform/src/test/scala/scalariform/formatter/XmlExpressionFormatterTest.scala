@@ -268,6 +268,8 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "{<div></div>               }" ==> "{ <div></div> }"
   
+  "a match { case <foo>{_*}</foo> => }" ==> "a match { case <foo>{ _* }</foo> => }"
+    
   override val debug = false
 
 }

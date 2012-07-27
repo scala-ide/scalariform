@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/scala"/>
-	<classpathentry kind="src" path="src/test/scala"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
+	<classpathentry kind="src" output="bin" path="src/main/scala"/>
+	<classpathentry kind="src" output="bin" path="src/main/java"/>
+	<classpathentry kind="src" output="bin" path="target/scala-2.9.2/src_managed/main"/>
+	<classpathentry kind="src" output="bin" path="src/test/scala"/>
+	<classpathentry kind="src" output="bin" path="src/test/java"/>
+	<classpathentry kind="src" output="bin" path="target/scala-2.9.2/src_managed/test"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib_managed/scala_2.10.0-SNAPSHOT/scalatest_2.9.1-1.6.1.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="lib" path="../lib_managed/jars/org.scalatest/scalatest_2.9.2/scalatest_2.9.2-1.7.2.jar" sourcepath="/lib_managed/srcs/org.scalatest/scalatest_2.9.2/scalatest_2.9.2-1.7.2-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

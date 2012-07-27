@@ -14,35 +14,19 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
-Download
---------
-
-Scalariform is available from Scala-tools.org:
-
-  http://scala-tools.org/repo-releases/org/scalariform/scalariform_2.9.0/0.1.1/
-
-If you're using sbt, you can declare a dependency as follows::
-
-  val scalariform = "org.scalariform" %% "scalariform" % "0.1.1"
-
 Integration with Eclipse
 ------------------------
 
-Scala IDE for Eclipse uses Scalariform for formatting
-
-  http://download.scala-ide.org/
-
-(See http://www.assembla.com/wiki/show/scala-ide/Requirements_and_Installation 
-for more detailed instructions.)
-
-Formatting works the same in the Scala editor; that is, either
+Scala IDE for Eclipse uses Scalariform for code formatting:
 
 - Right click in the editor -> Source -> Format
 - Press Ctrl-Shift-F
 
-To configure preferences, go to Window -> Preferences -> Scala -> Formatter
+If you select some lines, only those will be formatted. 
 
-It can also perform formatting as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
+You can also configure formatting to be run as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
+
+To set preferences, go to Window -> Preferences -> Scala -> Formatter
 
 Integration with Emacs/ENSIME
 -----------------------------
@@ -75,7 +59,7 @@ Usage::
   <plugin>
     <groupId>org.scalariform</groupId>
     <artifactId>scalariform-maven-plugin</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <executions>
       <execution>
         <phase>process-sources</phase>
@@ -115,81 +99,17 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gq`` command by adding
 the following to ``.vimrc`` ::
 
-  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.1.1.jar\ scalariform.commandline.Main\ --forceOutput
+  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.1.2.jar\ scalariform.commandline.Main\ --forceOutput
 
 Command line tool
 -----------------
 
-Scalariform includes a stand-alone command line utility. Sample script::
-
-  #!/bin/bash
-  scala -cp /path/to/scalariform-0.1.1.jar scalariform.commandline.Main "$@"
-
-Usage::
-
-  Usage: scalariform [options] [files...]
-  
-  Options:
-    --encoding=<encoding>                Set the encoding, e.g. UTF-8. If not set, defaults to the platform default encoding.
-    --fileList=<path>, -l=<path>         Read the list of input file(s) from a text file (one per line)
-    --help, -h                           Show help
-    --inPlace, -i                        Replace the input file(s) in place with a formatted version.
-    --preferenceFile=<path>, -p=<path>   Read preferences from a properties file
-    --test, -t                           Check the input(s) to see if they are correctly formatted, return a non-zero error code if not.
-    --forceOutput, -f                    Return the input unchanged if the file cannot be parsed correctly. (Only works for input on stdin)
-    --verbose, -v                        Verbose output
-    --version                            Show Scalariform version
-  
-  Preferences:
-    [+|-]alignParameters                                  Enable/disable Align parameters on different lines in the same column
-    [+|-]alignSingleLineCaseStatements                    Enable/disable Align the arrows of consecutive single-line case statements
-    [+|-]compactControlReadability                        Enable/disable Format control structures using Compact Control Readability style
-    [+|-]compactStringConcatenation                       Enable/disable Omit spaces when formatting a '+' operator on String literals
-    [+|-]doubleIndentClassDeclaration                     Enable/disable Double indent either a class's parameters or its inheritance list
-    [+|-]formatXml                                        Enable/disable Format XML literals
-    [+|-]indentLocalDefs                                  Enable/disable Indent local defs an extra level
-    [+|-]indentPackageBlocks                              Enable/disable Indent package blocks
-    [+|-]indentWithTabs                                   Enable/disable Use a tab character for indentation
-    [+|-]multilineScaladocCommentsStartOnFirstLine        Enable/disable Start multiline Scaladoc comment body on same line as the opening '/**' 
-    [+|-]placeScaladocAsterisksBeneathSecondAsterisk      Enable/disable Place Scaladoc asterisks beneath the second asterisk in the opening '/**', as opposed to the first
-    [+|-]preserveDanglingCloseParenthesis                 Enable/disable Allow a newline before a ')' in an argument expression.
-    [+|-]preserveSpaceBeforeArguments                     Enable/disable Preserve a space before a parenthesis argument
-    [+|-]rewriteArrowSymbols                              Enable/disable Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←
-    [+|-]spaceBeforeColon                                 Enable/disable Add a space before colons
-    [+|-]spaceInsideBrackets                              Enable/disable Require a space after '[' and before ']'
-    [+|-]spaceInsideParentheses                           Enable/disable Require a space after '(' and before ')'
-    [+|-]spacesWithinPatternBinders                       Enable/disable Add a space around the @ token in pattern binders
-    -alignSingleLineCaseStatements.maxArrowIndent=[1-100] Set Maximum number of spaces inserted before an arrow to align case statements
-    -indentSpaces=[1-10]                                  Set Number of spaces to use for indentation
-  
-  Examples:
-   scalariform +spaceBeforeColon -alignParameters -indentSpaces=2 --inPlace foo.scala
-   find . -name '*.scala' | xargs scalariform +rewriteArrowSymbols --verbose --test
-   echo 'class A ( n  :Int )' | scalariform
+  https://github.com/mdr/scalariform/wiki/Command-line-tool
 
 Library
 -------
 
-Example usage::
-
-  import scalariform.formatter.preferences._
-  import scalariform.formatter.ScalaFormatter
-  import scalariform.parser.ScalaParserException
-  
-  object Test extends Application {
-  
-    val unformattedScala = """
-      class A  {
-      println (42)}"""
-    val preferences = FormattingPreferences().setPreference(IndentSpaces, 3)
-    try {
-      val formattedScala = ScalaFormatter.format(unformattedScala, preferences)
-      println(formattedScala)
-    } catch {
-       case e: ScalaParserException => println("Syntax error in Scala source")
-    }
-  
-  }
+  https://github.com/mdr/scalariform/wiki/Library
 
 Preferences
 -----------
