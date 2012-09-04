@@ -206,7 +206,8 @@ class ScalaLexer(
       do {
         nextChar()
       } while (ch != SU && Character.isUnicodeIdentifierPart(ch))
-      token(VARID)
+      val tokenType = Keywords(getTokenText).getOrElse(VARID)
+      token(tokenType)
     } else {
       if (stringInterpolationMode.initialSegment) {
         stringInterpolationMode.initialSegment = false

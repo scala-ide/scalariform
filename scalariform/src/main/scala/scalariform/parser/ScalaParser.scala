@@ -442,8 +442,12 @@ class ScalaParser(tokens: Array[Token]) {
           dropAnyBraces(pattern())
         else if (isIdent)
           makeExpr(ident())
+        else if (LBRACE)
+          makeExpr(expr())
+        else if (THIS)
+          makeExpr(nextToken())
         else
-          expr()
+          throw new ScalaParserException("Error in string interpolation: expected block, identifier or `this'")
       stringPartsAndScala += ((stringPart, scalaSegment))
     }
     if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
