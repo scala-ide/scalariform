@@ -178,9 +178,13 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           for ((previousOpt, hiddenToken, nextOpt) ← Utils.withPreviousAndNext(hiddenTokens)) {
             hiddenToken match {
               case ScalaDocComment(token) ⇒
-                builder.ensureAtBeginningOfLine()
-                builder.indent(commentIndentLevel, baseIndentOption)
-                builder.append(formatComment(hiddenToken, commentIndentLevel))
+                if (token.rawText.startsWith("/***")){
+                  builder.append(token.rawText)
+                } else {
+                  builder.ensureAtBeginningOfLine()
+                  builder.indent(commentIndentLevel, baseIndentOption)
+                  builder.append(formatComment(hiddenToken, commentIndentLevel))
+                }
               case SingleLineComment(_) | MultiLineComment(_) ⇒
                 if (builder.atBeginningOfLine)
                   builder.indent(commentIndentLevel, baseIndentOption)
