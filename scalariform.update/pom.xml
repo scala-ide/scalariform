@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>scalariform.update</artifactId>
 	<packaging>eclipse-update-site</packaging>
-	<version>0.1.3-SNAPSHOT</version>
+	<version>0.1.4-SNAPSHOT</version>
 	<parent>
 		<artifactId>scalariform.parent</artifactId>
 		<groupId>org.scalariform</groupId>
-		<version>0.1.3-SNAPSHOT</version>
+		<version>0.1.4-SNAPSHOT</version>
 	</parent>
 </project>
 
