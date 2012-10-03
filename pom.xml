@@ -7,7 +7,7 @@
   <version>0.1.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-    <tycho.version>0.9.0</tycho.version>
+    <tycho.version>0.12.0</tycho.version>
     <scala.version>2.8.0</scala.version>
     <repo.scala-ide>http://download.scala-ide.org</repo.scala-ide>
     <encoding>UTF-8</encoding>
@@ -27,19 +27,30 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
         <version>${tycho.version}</version>
         <extensions>true</extensions>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.tycho</groupId>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho.version}</version>
         <configuration>
           <resolver>p2</resolver>
+          <pomDependencies>consider</pomDependencies>
         </configuration>
       </plugin>
+      <!-- for setting a better qualifier -->
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <format>yyyyMMddHHmm'-${git.hash}'</format>
+          <archiveSite>true</archiveSite>
+        </configuration>
+      </plugin>    
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
@@ -85,6 +96,39 @@
   </repositories>
   <profiles>
     <profile>
+      <id>release-ide-29</id>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-scalaide-2.0</id>
+          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/incoming-release-29/dependencies/osgi-toolchain</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>release-ide-210</id>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-scalaide-2.1</id>
+          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/incoming-release-210/dependencies/osgi-toolchain</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>release-ide-211</id>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-scalaide-2.1</id>
+          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
+          <layout>p2</layout>
+          <url>http://download.scala-ide.org/incoming-release-211/dependencies/osgi-toolchain</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
       <id>scala-2.9.x</id>
       <repositories>
         <repository>
@@ -96,19 +140,24 @@
       </repositories>
     </profile>
     <profile>
-      <id>scala-trunk</id>
-      <activation>
-        <property>
-          <name>scala.version</name>
-          <value>2.10.0-SNAPSHOT</value>
-        </property>
-      </activation>
+      <id>scala-2.10.x</id>
       <repositories>
         <repository>
-          <id>scala-toolchain-trunk</id>
+          <id>scala-toolchain-2.10.x</id>
           <name>Scala Toolchain trunk p2 repository</name>
           <layout>p2</layout>
-          <url>${repo.scala-ide}/scala-eclipse-toolchain-osgi-trunk</url>
+          <url>${repo.scala-ide}/scala-eclipse-toolchain-osgi-210x</url>
+        </repository>
+      </repositories>
+    </profile>
+    <profile>
+      <id>scala-2.11.x</id>
+      <repositories>
+        <repository>
+          <id>scala-toolchain-2.11.x</id>
+          <name>Scala Toolchain trunk p2 repository</name>
+          <layout>p2</layout>
+          <url>${repo.scala-ide}/scala-eclipse-toolchain-osgi-211x</url>
         </repository>
       </repositories>
     </profile>
