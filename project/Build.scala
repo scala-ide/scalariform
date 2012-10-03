@@ -9,11 +9,16 @@ import scalariform.formatter.preferences._
 
 object ScalariformBuild extends Build {
 
+
   lazy val commonSettings = Defaults.defaultSettings ++ ScalariformPlugin.defaultScalariformSettings ++ Seq(
     organization := "org.scalariform",
     version := "0.1.3-SNAPSHOT",
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.8.0", "2.8.1", "2.8.2", "2.9.0", "2.9.1", "2.9.2"),
+    crossScalaVersions := Seq(
+      "2.10.0-M7",
+      "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0",
+      "2.8.2", "2.8.1", "2.8.0"
+    ),
     exportJars := true, // Needed for cli oneJar
     retrieveManaged := true,
     scalacOptions += "-deprecation",
@@ -32,7 +37,7 @@ object ScalariformBuild extends Build {
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
     case "2.8.0"     ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
-    case "2.10.0-M3" ⇒ "org.scalatest" % "scalatest_2.10.0-M3" % "1.8-SNAPSHOT" % "test"
+    case "2.10.0-M7" ⇒ "org.scalatest" %  "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test"
     case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
@@ -44,7 +49,7 @@ object ScalariformBuild extends Build {
         publishMavenStyle := true,
         publishArtifact in Test := false,
         pomIncludeRepository := { _ ⇒ false },
-        sbtbuildinfo.Plugin.buildInfoKeys := Seq[Scoped](version),
+        sbtbuildinfo.Plugin.buildInfoKeys := Seq[sbtbuildinfo.Plugin.BuildInfoKey](version),
         sbtbuildinfo.Plugin.buildInfoPackage := "scalariform",
         sourceGenerators in Compile <+= sbtbuildinfo.Plugin.buildInfo,
         EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed,
@@ -58,7 +63,7 @@ object ScalariformBuild extends Build {
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
-      artifactName in SbtOneJar.oneJar := { (config: String, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" },
+      artifactName in SbtOneJar.oneJar := { (version: ScalaVersion, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" },
       publish := (),
       publishLocal := ())) dependsOn (scalariform)
 

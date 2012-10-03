@@ -20,7 +20,7 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
   implicit def string2FormatTest(s: String)(implicit formattingPreferences: IFormattingPreferences = FormattingPreferences(), scalaVersion: String = ScalaVersions.DEFAULT_VERSION): FormatTest =
     FormatTest(s.stripMargin, formattingPreferences, scalaVersion)
 
-  override def newTestFailedException(message: String) = new TestFailedException(message = Some(message), cause = None, failedCodeStackDepth = 2)
+  def testFailedException(message: String) = new TestFailedException(message = Some(message), cause = None, failedCodeStackDepth = 2)
 
   case class FormatTest(source: String, formattingPreferences: IFormattingPreferences, scalaVersion: String) {
 
@@ -32,20 +32,20 @@ abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with S
         val actual = format(source, scalaVersion = scalaVersion)(formattingPreferences)
         if (debug) println("Actual = " + actual)
         if (expected != actual)
-          throw newTestFailedException("Format failure:\n ---- Expected ---- \n" + prettyPrint(expected) + "<<<\n ---- but was----- \n" + prettyPrint(actual) + "<<<\n ---- Original: ----- \n" + prettyPrint(source) + "<<<.")
+          throw testFailedException("Format failure:\n ---- Expected ---- \n" + prettyPrint(expected) + "<<<\n ---- but was----- \n" + prettyPrint(actual) + "<<<\n ---- Original: ----- \n" + prettyPrint(source) + "<<<.")
         val beforeTokens = ScalaLexer.tokenise(source, scalaVersion = scalaVersion)
         val afterTokens = ScalaLexer.tokenise(actual, scalaVersion = scalaVersion)
         val newlineTokenTypes = Set(Tokens.NEWLINE, Tokens.NEWLINES)
         if (beforeTokens.map(_.tokenType).find(!newlineTokenTypes.contains(_)) != afterTokens.map(_.tokenType).find(!newlineTokenTypes.contains(_)))
-          throw newTestFailedException("Text as expected, but actual and expected tokens differ:\n ---- Before ---- \n" + beforeTokens + "\n ---- After ---- \n" + afterTokens + "\n")
+          throw testFailedException("Text as expected, but actual and expected tokens differ:\n ---- Before ---- \n" + beforeTokens + "\n ---- After ---- \n" + afterTokens + "\n")
 
         val actual2 = format(actual, scalaVersion = scalaVersion)(formattingPreferences)
         if (actual2 != actual) {
-          throw newTestFailedException("Idempotency failure:\n ---- Expected ---- \n" + prettyPrint(actual) + "<<<\n ---- but was----- \n" + prettyPrint(actual2) + "<<<.")
+          throw testFailedException("Idempotency failure:\n ---- Expected ---- \n" + prettyPrint(actual) + "<<<\n ---- but was----- \n" + prettyPrint(actual2) + "<<<.")
         }
         val afterTokens2 = ScalaLexer.tokenise(actual2, scalaVersion = scalaVersion)
         if (afterTokens2.map(_.tokenType) != afterTokens.map(_.tokenType)) {
-          throw newTestFailedException("Idempotency token inconsistency:\n ---- One ---- \n" + afterTokens2 + "\n ---- Twice ---- \n" + afterTokens2 + "\n")
+          throw testFailedException("Idempotency token inconsistency:\n ---- One ---- \n" + afterTokens2 + "\n ---- Twice ---- \n" + afterTokens2 + "\n")
         }
       }
     }

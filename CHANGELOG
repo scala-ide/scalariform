@@ -1,6 +1,7 @@
 0.1.3 (..)
 * Add EOF to ComplilationUnit, ensuring entire source is represented in the tree
 * Support $this references in String interpolation
+* Update build to sbt 0.12.0
 
 0.1.2 (7/May/12)
 
