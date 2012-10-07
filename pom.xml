@@ -6,6 +6,13 @@
   <artifactId>scalariform.parent</artifactId>
   <version>0.1.4-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <!-- scm configuration is require to extract the github hash-->
+  <scm>
+    <connection>scm:git://github.com/mdr/scalariform.git</connection>
+    <url>https://github.com/mdr/scalariform</url>
+  </scm>
+
   <properties>
     <tycho.version>0.12.0</tycho.version>
     <scala.version>2.8.0</scala.version>
@@ -41,13 +48,37 @@
           <pomDependencies>consider</pomDependencies>
         </configuration>
       </plugin>
+      <!-- git hash extractor -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.1</version>
+      </plugin>
+      <plugin>
+        <!-- plugin used to extract the git hash and store it in ${buildNumber} -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doCheck>false</doCheck>
+          <doUpdate>false</doUpdate>
+          <shortRevisionLength>7</shortRevisionLength>
+        </configuration>
+      </plugin>
       <!-- for setting a better qualifier -->
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-packaging-plugin</artifactId>
         <version>${tycho.version}</version>
         <configuration>
-          <format>yyyyMMddHHmm'-${git.hash}'</format>
+          <format>yyyyMMddHHmm'-${buildNumber}'</format>
           <archiveSite>true</archiveSite>
         </configuration>
       </plugin>    
