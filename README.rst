@@ -99,7 +99,11 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gq`` command by adding
 the following to ``.vimrc`` ::
 
-  au BufEnter *.scala setl formatprg=scala\ -cp\ /path/to/scalariform_2.8.0-0.1.3.jar\ scalariform.commandline.Main\ --forceOutput
+  au BufEnter *.scala setl formatprg=/path/to/scalariform.jar\ --stdin\ --stdout
+
+The executable scalariform.jar can be downloaded from:
+
+  https://github.com/downloads/mdr/scalariform/scalariform.jar
 
 Command line tool
 -----------------
