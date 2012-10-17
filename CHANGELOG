@@ -2,6 +2,7 @@
 * Add EOF to ComplilationUnit, ensuring entire source is represented in the tree
 * Support $this references in String interpolation
 * Update build to sbt 0.12.0
+* FIX: Allow declarations as last statement in case block (issue #60).
 
 0.1.2 (7/May/12)
 

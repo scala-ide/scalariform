@@ -25,6 +25,18 @@ class ParserTest extends FlatSpec with ShouldMatchers {
     parseExpression("{ case List[String]() => 12 }")
   }
 
+   // See issue #60
+  "Parser" should "not throw an exception on case block ending with decl" in {
+    parseExpression("""
+                args(0) match {
+                        case "blah" =>
+                                val x = args(0)
+                        case _ =>
+                                println("not blah")
+                }
+    """)
+  }
+  
   "Parser" should "throw a parse exception in bad package blocks" in {
     evaluating { parseCompilationUnit("package a {} package b {}") } should produce[ScalaParserException]
   }
