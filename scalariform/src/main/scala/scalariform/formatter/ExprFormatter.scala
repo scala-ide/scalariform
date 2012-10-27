@@ -871,6 +871,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
       formatResult ++= format(param)(paramFormatterState)
     }
+
+    val hasContent = implicitOption.isDefined || firstParamOption.isDefined || !otherParams.isEmpty
+    if (formattingPreferences(PreserveDanglingCloseParenthesis) && hiddenPredecessors(rparen).containsNewline && hasContent)
+      formatResult = formatResult.before(rparen, formatterState.currentIndentLevelInstruction)
+
     (formatResult, paramFormatterState)
   }
 
