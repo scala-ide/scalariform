@@ -86,7 +86,8 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
           val clauseBodyIsMultiline = containsNewline(pruneTrailingNewline(statSeq)) ||
             statSeq.firstTokenOption.exists(hiddenPredecessors(_).containsNewline)
 
-          if (formattedCasePattern.contains('\n') || (first && !clausesAreMultiline) || (!first && !newlineBeforeClause) || clauseBodyIsMultiline)
+          if (!formattingPreferences(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements) &&
+            (formattedCasePattern.contains('\n') || (first && !clausesAreMultiline) || (!first && !newlineBeforeClause) || clauseBodyIsMultiline))
             Right(caseClause) :: otherClausesGrouped
           else {
             val arrowAdjust = (if (formattingPreferences(RewriteArrowSymbols)) 1 else casePattern.arrow.length) + 1

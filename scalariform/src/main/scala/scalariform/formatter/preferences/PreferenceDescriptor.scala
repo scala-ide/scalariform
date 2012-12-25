@@ -62,7 +62,7 @@ trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
-    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
+    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, IndentLocalDefs, PreserveDanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
     CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, NoSpacesAroundMultiImports)
 
@@ -140,6 +140,12 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
     val description = "Maximum number of spaces inserted before an arrow to align case statements"
     val preferenceType = IntegerPreference(1, 100)
     val defaultValue = 40
+  }
+
+  case object AlignMultiLineCaseStatements extends BooleanPreferenceDescriptor {
+    val key = "alignSingleLineCaseStatements.alignMultiLineCaseStatements"
+    val description = "Align the arrows of consecutive multi-line case statements"
+    val defaultValue = false
   }
 
 }
