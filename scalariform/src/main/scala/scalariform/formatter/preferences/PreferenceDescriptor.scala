@@ -148,6 +148,12 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
     val defaultValue = false
   }
 
+  case object GroupByNewLine extends BooleanPreferenceDescriptor {
+    val key = "alignSingleLineCaseStatements.groupByNewLine"
+    val description = "Treat blocks that are separated by newlines independently"
+    val defaultValue = false
+  }
+
 }
 
 case object IndentLocalDefs extends BooleanPreferenceDescriptor {
