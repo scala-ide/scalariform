@@ -1,6 +1,6 @@
 package scalariform.formatter
 
-import scalariform.lexer.Token
+import scalariform.lexer.{TokenType, Token}
 import scalariform.lexer.Tokens._
 import scalariform.parser._
 import scalariform.utils.Utils
@@ -81,7 +81,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
           val newlineBeforeClause = hiddenPredecessors(caseClause.firstToken).containsNewline ||
             previousCaseClauseEndsWithNewline(caseClause, caseClausesAstNode)
 
-          // To evaluate whether a clause body is multiline, we ignore a trailing newline: 
+          // To evaluate whether a clause body is multiline, we ignore a trailing newline:
           val prunedStatSeq = pruneTrailingNewline(statSeq)
           val clauseBodyIsMultiline = containsNewline(pruneTrailingNewline(statSeq)) ||
             statSeq.firstTokenOption.exists(hiddenPredecessors(_).containsNewline)
@@ -100,7 +100,26 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
             }
           }
       }
-    groupClauses(caseClausesAstNode.caseClauses, first = true)
+
+    val caseClauses: List[CaseClause] = caseClausesAstNode.caseClauses
+
+    val ranges: List[(Int, Int)] = if (formattingPreferences(AlignSingleLineCaseStatements.GroupByNewLine)) {
+      val newLinesAt = (caseClauses.zipWithIndex.collect {
+        case (c, i) if c.tokens.exists(_.isNewlines) => i + 1
+      })
+
+      val newLinesWithBeginAndEnd = (if (newLinesAt.contains(0)) List() else List(0)) ++ newLinesAt ++ List(caseClauses.length)
+
+      newLinesWithBeginAndEnd.zip(newLinesWithBeginAndEnd.tail)
+    } else {
+      List(0 -> caseClauses.length)
+    }
+
+    ranges.foldLeft(List[Either[ConsecutiveSingleLineCaseClauses, CaseClause]]()) {
+      case (acc, (begin, end)) =>
+        val slice = caseClauses.slice(begin, end)
+        acc ++ groupClauses(slice, first = true)
+    }
   }
 
   private case class ConsecutiveSingleLineCaseClauses(clauses: List[CaseClause], largestCasePatternLength: Int, smallestCasePatternLength: Int) {

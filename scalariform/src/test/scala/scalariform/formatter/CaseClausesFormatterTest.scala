@@ -306,4 +306,113 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case elem @ Multi(values @ _*) =>
     |}"""
 
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+
+    """a match {
+      |case "once" =>
+      |println("einmal")
+      |println("nochmal")
+      |case "many times" =>
+      |println("again")
+      |println("multiline")
+      |case _ =>
+      |println("again")
+      |println("multiline")
+      |}""" ==>
+      """a match {
+        |  case "once"       =>
+        |    println("einmal")
+        |    println("nochmal")
+        |  case "many times" =>
+        |    println("again")
+        |    println("multiline")
+        |  case _            =>
+        |    println("again")
+        |    println("multiline")
+        |}"""
+  }
+
+  {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, false)
+
+      """a match {
+        |case "once" =>
+        |println("einmal")
+        |println("nochmal")
+        |case "many times" =>
+        |println("again")
+        |println("multiline")
+        |case _ =>
+        |println("again")
+        |println("multiline")
+        |
+        |case "after a newline" =>
+        |println("IntelliJ")
+        |println("formats")
+        |case "next lines" =>
+        |println("separately")
+        |}""" ==>
+        """a match {
+          |  case "once"            =>
+          |    println("einmal")
+          |    println("nochmal")
+          |  case "many times"      =>
+          |    println("again")
+          |    println("multiline")
+          |  case _                 =>
+          |    println("again")
+          |    println("multiline")
+          |
+          |  case "after a newline" =>
+          |    println("IntelliJ")
+          |    println("formats")
+          |  case "next lines"      =>
+          |    println("separately")
+          |}"""
+    }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+
+      """a match {
+        |case "once" =>
+        |println("einmal")
+        |println("nochmal")
+        |case "many times" =>
+        |println("again")
+        |println("multiline")
+        |case _ =>
+        |println("again")
+        |println("multiline")
+        |
+        |case "after a newline" =>
+        |println("IntelliJ")
+        |println("formats")
+        |case "next lines" =>
+        |println("separately")
+        |}""" ==>
+        """a match {
+          |  case "once"       =>
+          |    println("einmal")
+          |    println("nochmal")
+          |  case "many times" =>
+          |    println("again")
+          |    println("multiline")
+          |  case _            =>
+          |    println("again")
+          |    println("multiline")
+          |
+          |  case "after a newline" =>
+          |    println("IntelliJ")
+          |    println("formats")
+          |  case "next lines"      =>
+          |    println("separately")
+          |}"""
+    }
 }

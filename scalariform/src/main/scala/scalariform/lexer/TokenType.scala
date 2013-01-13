@@ -2,7 +2,9 @@ package scalariform.lexer
 
 case class TokenType(name: String, isXml: Boolean = false) {
 
-  def isNewline = this == Tokens.NEWLINE || this == Tokens.NEWLINES
+  def isNewline = this == Tokens.NEWLINE || isNewlines
+
+  def isNewlines = this == Tokens.NEWLINES
 
   def isKeyword = Tokens.KEYWORDS contains this
 
