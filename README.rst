@@ -28,6 +28,15 @@ You can also configure formatting to be run as a save action (Window -> Preferen
 
 To set preferences, go to Window -> Preferences -> Scala -> Formatter
 
+Integration with IntelliJ
+-------------------------
+
+IntelliJ already has a built-in Scala code formatter (C-L).
+I use the original settings plus `Wraping and Braces` -> `Align columns in case branches`.
+In order to achieve exactly the same formatting use the following options::
+  +alignSingleLineCaseStatements +alignSingleLineCaseStatements.AlignMultiLineCaseStatements +alignSingleLineCaseStatements.GroupByNewLine
+
+
 Integration with Emacs/ENSIME
 -----------------------------
 
