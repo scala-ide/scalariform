@@ -195,6 +195,7 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "class A(private val b: C)" ==> "class A(private val b: C)"
   "class A(protected val b: C)" ==> "class A(protected val b: C)"
   "class A(override val b: C)" ==> "class A(override val b: C)"
+  "class A(final val b: C)" ==> "class A(final val b: C)"
 
   """class C[T <: A {val n: Int
     |val m :Int}]""" ==>
