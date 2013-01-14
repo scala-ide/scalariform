@@ -34,7 +34,23 @@ Integration with IntelliJ
 IntelliJ already has a built-in Scala code formatter (C-L).
 I use the original settings plus `Wraping and Braces` -> `Align columns in case branches`.
 In order to achieve exactly the same formatting use the following options::
-  +alignSingleLineCaseStatements +alignSingleLineCaseStatements.AlignMultiLineCaseStatements +alignSingleLineCaseStatements.GroupByNewLine
+
+
+  def formattingPreferences = {
+    import scalariform.formatter.preferences._
+    FormattingPreferences()
+        .setPreference(AlignParameters, true)
+        .setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 120)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true) // IntelliJ compatible
+        .setPreference(CompactControlReadability, false)
+        .setPreference(NoSpacesAroundMultiImports, true)
+        .setPreference(FormatXml, false)
+        .setPreference(PreserveSpaceBeforeArguments, true)
+        .setPreference(IndentWithTabs, false)
+        .setPreference(SpacesWithinPatternBinders, false) // IntelliJ compatible
+  }
 
 
 Integration with Emacs/ENSIME
