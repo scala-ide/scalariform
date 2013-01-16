@@ -415,4 +415,25 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
           |    println("separately")
           |}"""
     }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 200)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+
+      """x match {
+        |case 1 | 2 |
+        |3 | 4 |
+        |5 | 6 => 1
+        |case 7 | 8 => 1
+        |}""" ==>
+        """x match {
+          |  case 1 | 2 |
+          |       3 | 4 |
+          |       5 | 6 => 1
+          |  case 7 | 8 => 1
+          |}"""
+    }
+
 }

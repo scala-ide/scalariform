@@ -91,7 +91,10 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
             Right(caseClause) :: otherClausesGrouped
           else {
             val arrowAdjust = (if (formattingPreferences(RewriteArrowSymbols)) 1 else casePattern.arrow.length) + 1
-            val casePatternLength = formattedCasePattern.length - arrowAdjust
+            val casePatternLengthConsideringNewLines = {
+              formattedCasePattern.split('\n').map(_.length).max
+            }
+            val casePatternLength = casePatternLengthConsideringNewLines - arrowAdjust
             otherClausesGrouped match {
               case Left(consecutiveSingleLineCaseClauses) :: otherGroups ⇒
                 Left(consecutiveSingleLineCaseClauses.prepend(caseClause, casePatternLength)) :: otherGroups
@@ -134,6 +137,21 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     val CasePattern(caseToken: Token, pattern: Expr, guardOption: Option[Guard], arrow: Token) = casePattern
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(pattern)
+
+    val beginTokensAfterPipe = List(casePattern.pattern.tokens.head) ++ casePattern.pattern.tokens.zip(casePattern.pattern.tokens.tail).collect {
+      case (Token(PIPE, _, _, _), b) if b.associatedWhitespaceAndComments.containsNewline => b
+    }
+
+    val alignBeginTokens: Map[Token, IntertokenFormatInstruction] = beginTokensAfterPipe.zip(beginTokensAfterPipe.tail).flatMap {
+      case (a, b) => if (b.associatedWhitespaceAndComments.containsNewline) {
+        Map(b -> EnsureNewlineAndIndent(0, Some(a)))
+      } else {
+        Map.empty[Token, IntertokenFormatInstruction]
+      }
+    }.toMap
+
+    formatResult ++= FormatResult(alignBeginTokens, Map(), Map())
+
     for (guard ← guardOption)
       formatResult ++= format(guard)
     arrowInstructionOpt foreach { instruction ⇒ formatResult = formatResult.before(arrow, instruction) }
