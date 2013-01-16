@@ -436,4 +436,11 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
           |}"""
     }
 
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+
+      """x match { case _: X => Y }""" ==>
+        """x match { case _: X => Y }"""
+    }
 }
