@@ -443,4 +443,26 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
       """x match { case _: X => Y }""" ==>
         """x match { case _: X => Y }"""
     }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 200)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+
+      """|x match {
+         |    case 1 => A
+         |    case 1234 |
+         |         5678 => A
+         |    case 5 => A
+         |    case 12345678 => A
+         |}""" ==>
+      """|x match {
+         |  case 1        => A
+         |  case 1234 |
+         |       5678     => A
+         |  case 5        => A
+         |  case 12345678 => A
+         |}"""
+  }
 }
