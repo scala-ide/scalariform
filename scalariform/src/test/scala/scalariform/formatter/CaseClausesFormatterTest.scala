@@ -465,4 +465,33 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
          |  case 12345678 => A
          |}"""
   }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 200)
+
+    """|x match {
+       |case AA => a
+       |case B => b
+       |}""" ==>
+    """|x match {
+       |  case AA => a
+       |  case B  => b
+       |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+
+    """|x match {
+       |case AA => (s: Int) => 1
+       |case B => (s: Int) => 2
+       |}""" ==>
+    """|x match {
+       |  case AA => (s: Int) => 1
+       |  case B  => (s: Int) => 2
+       |}"""
+  }
 }
