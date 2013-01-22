@@ -187,10 +187,14 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
       if separator.isNewline
     } yield separator
 
-  private def previousCaseClauseTrailingNewlineOpt(caseClause: CaseClause, caseClauses: CaseClauses): Option[Token] =
-    Utils.pairWithPrevious(caseClauses.caseClauses).collect {
+  private def previousCaseClauseTrailingNewlineOpt(caseClause: CaseClause, caseClauses: CaseClauses): Option[Token] = {
+    val previousCaseClauseOpt = Utils.pairWithPrevious(caseClauses.caseClauses).collect {
       case (Some(previousClause), `caseClause`) ⇒ previousClause
-    }.headOption.flatMap(getTrailingNewline)
+    }.headOption
+    val hasNewLine = previousCaseClauseOpt.flatMap(getTrailingNewline)
+    val hasNewLineAtEnd = previousCaseClauseOpt.flatMap(_.statSeq.tokens.lastOption.filter(_.isNewline))
+    hasNewLine.orElse(hasNewLineAtEnd)
+  }
 
   private def previousCaseClauseEndsWithNewline(caseClause: CaseClause, caseClauses: CaseClauses): Boolean =
     previousCaseClauseTrailingNewlineOpt(caseClause, caseClauses).isDefined
