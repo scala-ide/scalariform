@@ -636,15 +636,22 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                     (CompactEnsuringGap, indentedState)
                 formatResult = formatResult.before(statSeq.firstToken, instruction)
                 formatResult ++= format(params)
+
+                val hasNewScopeAfterArrow = {
+                  val arrowIndex = statSeq.tokens.indexWhere(_.tokenType == ARROW)
+                  val tokenAfterArrow = statSeq.tokens.lift(arrowIndex + 1)
+                  tokenAfterArrow.map(_.tokenType == lbrace.tokenType).getOrElse(false)
+                }
                 for (firstToken ← subStatSeq.firstTokenOption) {
                   val instruction =
-                    if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
+                    if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq) && !hasNewScopeAfterArrow)
                       statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
                     else
                       CompactEnsuringGap
                   formatResult = formatResult.before(firstToken, instruction)
                 }
-                formatResult ++= format(subStatSeq)(subStatState)
+                val subStatStateAfterArrow = if(hasNewScopeAfterArrow) newFormatterState.indent else subStatState
+                formatResult ++= format(subStatSeq)(subStatStateAfterArrow)
               case _ ⇒
                 val instruction = statSeq.selfReferenceOpt match {
                   case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
