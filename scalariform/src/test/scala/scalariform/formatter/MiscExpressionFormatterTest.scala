@@ -771,6 +771,17 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  b => c
     |}"""
 
+  """|a map {
+     |q => {
+     |2 * q
+     |}
+     |}""" ==>
+  """|a map {
+     |  q => {
+     |    2 * q
+     |  }
+     |}"""
+
   "f()[Foo]" ==> "f()[Foo]"
   "a [ b . C ] [ d . E ] [ f . G ] " ==> "a[b.C][d.E][f.G]" 
 
