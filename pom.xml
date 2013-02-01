@@ -16,9 +16,11 @@
   <properties>
     <tycho.version>0.18.1</tycho.version>
     <scala.version>2.10.2</scala.version>
-    <repo.scala-ide>http://download.scala-ide.org</repo.scala-ide>
     <encoding>UTF-8</encoding>
     <maven.version>3.0.4</maven.version>
+    <scala.binary.version>2.11.0-M5</scala.binary.version>
+    <scala.xml.version>1.0.0-RC5</scala.xml.version>
+    <version.suffix>2_10</version.suffix>
   </properties>
 
   <prerequisites>
@@ -81,7 +83,7 @@
         <artifactId>tycho-packaging-plugin</artifactId>
         <version>${tycho.version}</version>
         <configuration>
-          <format>yyyyMMddHHmm'-${buildNumber}'</format>
+          <format>'${version.suffix}-'yyyyMMddHHmm'-${buildNumber}'</format>
           <archiveSite>true</archiveSite>
         </configuration>
       </plugin>    
@@ -130,37 +132,24 @@
   </repositories>
   <profiles>
     <profile>
-      <id>scala-2.9.x</id>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.9.x</id>
-          <name>Scala Toolchain 2.9.x p2 repository</name>
-          <layout>p2</layout>
-          <url>${repo.scala-ide}/scala-eclipse-toolchain-osgi-29x</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
       <id>scala-2.10.x</id>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.10.x</id>
-          <name>Scala Toolchain trunk p2 repository</name>
-          <layout>p2</layout>
-          <url>${repo.scala-ide}/scala-eclipse-toolchain-osgi-210x</url>
-        </repository>
-      </repositories>
+      <properties>
+        <version.suffix>2_10</version.suffix>
+      </properties>
     </profile>
     <profile>
       <id>scala-2.11.x</id>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-2.11.x</id>
-          <name>Scala Toolchain trunk p2 repository</name>
-          <layout>p2</layout>
-          <url>${repo.scala-ide}/scala-eclipse-toolchain-osgi-211x</url>
-        </repository>
-      </repositories>
+      <properties>
+        <scala.version>2.11.0-SNAPSHOT</scala.version>
+        <version.suffix>2_11</version.suffix>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-xml_${scala.binary.version}</artifactId>
+          <version>${scala.xml.version}</version>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>
