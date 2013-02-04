@@ -644,7 +644,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                 }
                 for (firstToken ← subStatSeq.firstTokenOption) {
                   val instruction =
-                    if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq) && !hasNewScopeAfterArrow)
+                    if (!hasNewScopeAfterArrow && (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq)))
                       statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
                     else
                       CompactEnsuringGap
