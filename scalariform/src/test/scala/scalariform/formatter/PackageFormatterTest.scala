@@ -63,6 +63,10 @@ class PackageFormatterTest extends AbstractFormatterTest {
 
   }
 
+  {
+
+  implicit val formattingPreferences = FormattingPreferences.setPreference(ChainedPackageClauses, true)
+
   """package a.b.c.d.e.f
     |""" ==>
   """package a.b.c.d
@@ -86,5 +90,5 @@ class PackageFormatterTest extends AbstractFormatterTest {
     |package g
     |package h
     |"""
-
+  }
 }
