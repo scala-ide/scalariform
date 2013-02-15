@@ -64,7 +64,7 @@ object AllPreferences {
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, IndentLocalDefs, PreserveDanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
-    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, NoSpacesAroundMultiImports)
+    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, NoSpacesAroundMultiImports, ChainedPackageClauses, ChainedPackageClauses.PackageDepth)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -214,4 +214,17 @@ case object NoSpacesAroundMultiImports extends BooleanPreferenceDescriptor {
   val key = "noSpacesAroundMultiImports"
   val description = "Don't place spaces around multi imports (Java-style)"
   val defaultValue = false
+}
+
+case object ChainedPackageClauses extends BooleanPreferenceDescriptor {
+  val key = "chainedPackageClauses"
+  val description = "Break up chained package clauses"
+  val defaultValue = false
+
+  case object PackageDepth extends IntegerPreferenceDescriptor {
+    val key = "chainedPackageClauses.packageDepth"
+    val description = "Depth of package nesting"
+    val preferenceType = IntegerPreference(1, 100)
+    val defaultValue = 4
+  }
 }

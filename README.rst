@@ -499,6 +499,22 @@ If ``false``,::
 
   case elem@Multi(values@_*) =>
 
+chainedPackageClauses
+~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Example::
+```
+  package com.company.analytics.math.curves.interpolators
+```
+
+Will be reformatted to::
+```
+  package com.company.analytics.math
+  package curves
+  package interpolators
+```
 
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~
