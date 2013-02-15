@@ -221,7 +221,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val replacement = builder.substring(startPos)
     positionHintOption match {
       case Some(positionHint) if hiddenTokens.isEmpty ⇒
-        Some(TextEdit(positionHint, length = 0, replacement = replacement))
+        instruction match {
+          case EnsureNewlineAndIndent(indentLevel, Some(Token(PACKAGE, _, _, _))) =>
+            Some(TextEdit(positionHint, length = 1, replacement = replacement + "package "))
+          case _                                                                  =>
+            Some(TextEdit(positionHint, length = 0, replacement = replacement))
+        }
       case _ ⇒
         for {
           firstToken ← hiddenTokens.firstTokenOption

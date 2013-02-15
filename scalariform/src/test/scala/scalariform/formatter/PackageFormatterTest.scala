@@ -63,5 +63,28 @@ class PackageFormatterTest extends AbstractFormatterTest {
 
   }
 
+  """package a.b.c.d.e.f
+    |""" ==>
+  """package a.b.c.d
+    |package e
+    |package f
+    |"""
+
+  """package com.company.analytics.math.curves.interpolators
+    |""" ==>
+  """package com.company.analytics.math
+    |package curves
+    |package interpolators
+    |"""
+
+  """package a.b.c.d.e.f
+    |package g.h
+    |""" ==>
+  """package a.b.c.d
+    |package e
+    |package f
+    |package g
+    |package h
+    |"""
 
 }
