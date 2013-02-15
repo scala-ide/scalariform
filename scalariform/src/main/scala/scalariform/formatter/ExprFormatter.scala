@@ -728,28 +728,31 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     }
 
   def format(packageStat: PackageStat, firstPackage: Boolean)(implicit formatterState: FormatterState): FormatResult = {
-    val PackageStat(packageToken: Token, name: CallExpr) = packageStat
-
-    val packageDepth = if(firstPackage) formattingPreferences(ChainedPackageClauses.PackageDepth) else 1
-
-    def dotsForPackageNames(name: CallExpr): List[Token] = {
-      name.exprDotOpt match {
-        case Some((List(c@CallExpr(_, id, _, _, _)), dot)) =>
-          dot :: dotsForPackageNames(c)
-        case _                                             =>
-          Nil
-      }
-    }
-
-    val dotsBetweenPackageNames = dotsForPackageNames(name)
-
-    val lineBreaksAfter = dotsBetweenPackageNames.reverse.drop(packageDepth-1)
-
     var formatResult: FormatResult = NoFormatResult
-    for {
-      token <- lineBreaksAfter
-    } {
-      formatResult ++= FormatResult(Map(token -> EnsureNewlineAndIndent(0, Some(packageToken))), Map(), Map())
+
+    if (formattingPreferences(ChainedPackageClauses)) {
+      val PackageStat(packageToken: Token, name: CallExpr) = packageStat
+
+      val packageDepth = if(firstPackage) formattingPreferences(ChainedPackageClauses.PackageDepth) else 1
+
+      def dotsForPackageNames(name: CallExpr): List[Token] = {
+        name.exprDotOpt match {
+          case Some((List(c@CallExpr(_, id, _, _, _)), dot)) =>
+            dot :: dotsForPackageNames(c)
+          case _                                             =>
+            Nil
+        }
+      }
+
+      val dotsBetweenPackageNames = dotsForPackageNames(name)
+
+      val lineBreaksAfter = dotsBetweenPackageNames.reverse.drop(packageDepth-1)
+
+      for {
+        token <- lineBreaksAfter
+      } {
+        formatResult ++= FormatResult(Map(token -> EnsureNewlineAndIndent(0, Some(packageToken))), Map(), Map())
+      }
     }
 
     formatResult
