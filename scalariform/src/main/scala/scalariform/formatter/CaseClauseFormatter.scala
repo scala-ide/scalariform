@@ -91,9 +91,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
             Right(caseClause) :: otherClausesGrouped
           else {
             val arrowAdjust = (if (formattingPreferences(RewriteArrowSymbols)) 1 else casePattern.arrow.length) + 1
-            val casePatternLengthConsideringNewLines = {
-              formattedCasePattern.split('\n').map(_.length).max
-            }
+            val casePatternLengthConsideringNewLines = formattedCasePattern.split('\n').last.length
             val casePatternLength = casePatternLengthConsideringNewLines - arrowAdjust
             otherClausesGrouped match {
               case Left(consecutiveSingleLineCaseClauses) :: otherGroups ⇒
