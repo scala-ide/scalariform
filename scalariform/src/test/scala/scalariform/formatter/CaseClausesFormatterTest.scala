@@ -494,4 +494,30 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
        |  case B  => (s: Int) => 2
        |}"""
   }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 160)
+      .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+      .setPreference(SpacesWithinPatternBinders, false)
+
+    """|pairs.flatMap {
+       |  case (p1@(t1, MandatoryGridPoint(true) | ExtremalGridPoint),
+       |    (t2, MandatoryGridPoint(true) | ExtremalGridPoint)) =>
+       |    val fillPointTime = (t1 + t2) / 2
+       |    val fillPoint = (fillPointTime, FillingGridPoint)
+       |    Seq(p1, fillPoint)
+       |  case (p1, p2)                                          => Seq(p1)
+       |}""" ==>
+    """|pairs.flatMap {
+       |  case (p1@(t1, MandatoryGridPoint(true) | ExtremalGridPoint),
+       |    (t2, MandatoryGridPoint(true) | ExtremalGridPoint)) =>
+       |    val fillPointTime = (t1 + t2) / 2
+       |    val fillPoint = (fillPointTime, FillingGridPoint)
+       |    Seq(p1, fillPoint)
+       |  case (p1, p2)                                         => Seq(p1)
+       |}"""
+    }
+
 }
