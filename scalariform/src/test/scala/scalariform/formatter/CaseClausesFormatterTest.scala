@@ -306,4 +306,218 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case elem @ Multi(values @ _*) =>
     |}"""
 
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+
+    """a match {
+      |case "once" =>
+      |println("einmal")
+      |println("nochmal")
+      |case "many times" =>
+      |println("again")
+      |println("multiline")
+      |case _ =>
+      |println("again")
+      |println("multiline")
+      |}""" ==>
+      """a match {
+        |  case "once"       =>
+        |    println("einmal")
+        |    println("nochmal")
+        |  case "many times" =>
+        |    println("again")
+        |    println("multiline")
+        |  case _            =>
+        |    println("again")
+        |    println("multiline")
+        |}"""
+  }
+
+  {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, false)
+
+      """a match {
+        |case "once" =>
+        |println("einmal")
+        |println("nochmal")
+        |case "many times" =>
+        |println("again")
+        |println("multiline")
+        |case _ =>
+        |println("again")
+        |println("multiline")
+        |
+        |case "after a newline" =>
+        |println("IntelliJ")
+        |println("formats")
+        |case "next lines" =>
+        |println("separately")
+        |}""" ==>
+        """a match {
+          |  case "once"            =>
+          |    println("einmal")
+          |    println("nochmal")
+          |  case "many times"      =>
+          |    println("again")
+          |    println("multiline")
+          |  case _                 =>
+          |    println("again")
+          |    println("multiline")
+          |
+          |  case "after a newline" =>
+          |    println("IntelliJ")
+          |    println("formats")
+          |  case "next lines"      =>
+          |    println("separately")
+          |}"""
+    }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+
+      """a match {
+        |case "once" =>
+        |println("einmal")
+        |println("nochmal")
+        |case "many times" =>
+        |println("again")
+        |println("multiline")
+        |case _ =>
+        |println("again")
+        |println("multiline")
+        |
+        |case "after a newline" =>
+        |println("IntelliJ")
+        |println("formats")
+        |case "next lines" =>
+        |println("separately")
+        |}""" ==>
+        """a match {
+          |  case "once"       =>
+          |    println("einmal")
+          |    println("nochmal")
+          |  case "many times" =>
+          |    println("again")
+          |    println("multiline")
+          |  case _            =>
+          |    println("again")
+          |    println("multiline")
+          |
+          |  case "after a newline" =>
+          |    println("IntelliJ")
+          |    println("formats")
+          |  case "next lines"      =>
+          |    println("separately")
+          |}"""
+    }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 200)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+
+      """x match {
+        |case 1 | 2 |
+        |3 | 4 |
+        |5 | 6 => 1
+        |case 7 | 8 => 1
+        |}""" ==>
+        """x match {
+          |  case 1 | 2 |
+          |       3 | 4 |
+          |       5 | 6 => 1
+          |  case 7 | 8 => 1
+          |}"""
+    }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+
+      """x match { case _: X => Y }""" ==>
+        """x match { case _: X => Y }"""
+    }
+
+    {
+      implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+        .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 200)
+        .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+
+      """|x match {
+         |    case 1 => A
+         |    case 1234 |
+         |         5678 => A
+         |    case 5 => A
+         |    case 12345678 => A
+         |}""" ==>
+      """|x match {
+         |  case 1        => A
+         |  case 1234 |
+         |       5678     => A
+         |  case 5        => A
+         |  case 12345678 => A
+         |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 200)
+
+    """|x match {
+       |case AA => a
+       |case B => b
+       |}""" ==>
+    """|x match {
+       |  case AA => a
+       |  case B  => b
+       |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+
+    """|x match {
+       |case AA => (s: Int) => 1
+       |case B => (s: Int) => 2
+       |}""" ==>
+    """|x match {
+       |  case AA => (s: Int) => 1
+       |  case B  => (s: Int) => 2
+       |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.AlignMultiLineCaseStatements, true)
+      .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 160)
+      .setPreference(AlignSingleLineCaseStatements.GroupByNewLine, true)
+      .setPreference(SpacesWithinPatternBinders, false)
+
+    """|pairs.flatMap {
+       |  case (p1@(t1, MandatoryGridPoint(true) | ExtremalGridPoint),
+       |    (t2, MandatoryGridPoint(true) | ExtremalGridPoint)) =>
+       |    val fillPointTime = (t1 + t2) / 2
+       |    val fillPoint = (fillPointTime, FillingGridPoint)
+       |    Seq(p1, fillPoint)
+       |  case (p1, p2)                                          => Seq(p1)
+       |}""" ==>
+    """|pairs.flatMap {
+       |  case (p1@(t1, MandatoryGridPoint(true) | ExtremalGridPoint),
+       |    (t2, MandatoryGridPoint(true) | ExtremalGridPoint)) =>
+       |    val fillPointTime = (t1 + t2) / 2
+       |    val fillPoint = (fillPointTime, FillingGridPoint)
+       |    Seq(p1, fillPoint)
+       |  case (p1, p2)                                         => Seq(p1)
+       |}"""
+    }
+
 }

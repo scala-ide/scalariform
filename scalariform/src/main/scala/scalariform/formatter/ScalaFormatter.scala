@@ -221,7 +221,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     val replacement = builder.substring(startPos)
     positionHintOption match {
       case Some(positionHint) if hiddenTokens.isEmpty ⇒
-        Some(TextEdit(positionHint, length = 0, replacement = replacement))
+        instruction match {
+          case EnsureNewlineAndIndent(indentLevel, Some(Token(PACKAGE, _, _, _))) =>
+            Some(TextEdit(positionHint, length = 1, replacement = replacement + "package "))
+          case _                                                                  =>
+            Some(TextEdit(positionHint, length = 0, replacement = replacement))
+        }
       case _ ⇒
         for {
           firstToken ← hiddenTokens.firstTokenOption
@@ -348,7 +353,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       return CompactEnsuringGap
     if (type1 == MINUS && (type2 == INTEGER_LITERAL || type2 == FLOATING_POINT_LITERAL))
       return Compact
-    if (Set(IMPLICIT, VAL, VAR, PRIVATE, PROTECTED, OVERRIDE).contains(type2) && type1 == LPAREN)
+    if (Set(IMPLICIT, VAL, VAR, PRIVATE, PROTECTED, OVERRIDE, FINAL).contains(type2) && type1 == LPAREN)
       return Compact
     if ((type1 == PROTECTED || type1 == PRIVATE) && type2 == LBRACKET)
       return Compact
