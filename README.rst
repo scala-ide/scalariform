@@ -128,7 +128,7 @@ the following to ``.vimrc`` ::
 
 The executable scalariform.jar can be downloaded from:
 
-  https://github.com/downloads/mdr/scalariform/scalariform.jar
+  https://s3.amazonaws.com/scalariform/scalariform.jar
 
 Command line tool
 -----------------
