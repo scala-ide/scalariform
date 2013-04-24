@@ -1,0 +1,3 @@
+* FIX: Allow declarations as last statement in case block (issue #60)
+* Update to build 2.10 final
+
