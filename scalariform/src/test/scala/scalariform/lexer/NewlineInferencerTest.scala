@@ -14,7 +14,7 @@ import java.io._
 class NewlineInferencerTest extends FlatSpec with ShouldMatchers {
 
   implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) =
-    new TestString(s, forgiveErrors, scalaVersion)
+    new TestString(s, forgiveErrors, scalaVersion);
 
   // See issue #60
   """
