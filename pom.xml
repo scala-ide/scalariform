@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.scalariform</groupId>
   <artifactId>scalariform.parent</artifactId>
-  <version>0.1.4-SNAPSHOT</version>
+  <version>0.1.4</version>
   <packaging>pom</packaging>
 
   <!-- scm configuration is require to extract the github hash-->
