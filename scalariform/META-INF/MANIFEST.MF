@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scalariform
 Bundle-SymbolicName: scalariform
-Bundle-Version: 0.1.4.qualifier
+Bundle-Version: 0.1.5.qualifier
 Require-Bundle: org.scala-ide.scala.library
 Bundle-ClassPath: .
 Export-Package: scalariform,
