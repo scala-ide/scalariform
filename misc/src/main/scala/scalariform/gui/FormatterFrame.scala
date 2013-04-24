@@ -195,8 +195,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         tokensTable.setModel(tableModel)
       }
     } catch {
-      case e ⇒
-        outputTextPane.setText(e.toString + "\n" + e.getStackTrace.mkString("\n"))
+      case t: Throwable ⇒
+        outputTextPane.setText(t.toString + "\n" + t.getStackTrace.mkString("\n"))
         outputTextPane.setCaretPosition(0)
     }
 
@@ -350,13 +350,14 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   }
 
   def specificFormatter: SpecificFormatter =
-    productionComboBox.getSelectedItem.asInstanceOf[ProductionComboBoxModel.ProductionItem].formatter
+    productionComboBox.getSelectedItem.asInstanceOf[ProductionItem].formatter
 
-  object ProductionComboBoxModel extends DefaultComboBoxModel {
+  class ProductionItem(name: String, val formatter: SpecificFormatter) {
+    override def toString = name
+  }
+    
+  object ProductionComboBoxModel extends DefaultComboBoxModel[ProductionItem] {
 
-    class ProductionItem(name: String, val formatter: SpecificFormatter) {
-      override def toString = name
-    }
 
     val compilationUnitFormatter = new SpecificFormatter {
 
