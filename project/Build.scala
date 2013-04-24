@@ -3,19 +3,19 @@ import sbt.Keys._
 import com.github.retronym.SbtOneJar
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys._
 import com.typesafe.sbteclipse.core.EclipsePlugin._
-import com.typesafe.sbtscalariform.ScalariformPlugin
-import com.typesafe.sbtscalariform.ScalariformPlugin.ScalariformKeys
+import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
 object ScalariformBuild extends Build {
 
 
-  lazy val commonSettings = Defaults.defaultSettings ++ ScalariformPlugin.defaultScalariformSettings ++ Seq(
+  lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ Seq(
     organization := "org.scalariform",
     version := "0.1.4-SNAPSHOT",
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.0",
     crossScalaVersions := Seq(
-      "2.10.0-M7",
+      "2.10.0",
       "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0",
       "2.8.2", "2.8.1", "2.8.0"
     ),
@@ -37,7 +37,7 @@ object ScalariformBuild extends Build {
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
     case "2.8.0"     ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
-    case "2.10.0-M7" ⇒ "org.scalatest" %  "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test"
+    case "2.10.0"    =>"org.scalatest" %  "scalatest_2.10" % "1.9.1" % "test"
     case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
