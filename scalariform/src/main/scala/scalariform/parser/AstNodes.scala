@@ -26,6 +26,7 @@ sealed trait AstNode extends CaseClassReflector {
   protected implicit def listToFlattenable[T <% Flattenable](list: List[T]): Flattenable = new Flattenable { val tokens = list flatMap { _.tokens } }
   protected implicit def optionToFlattenable[T <% Flattenable](option: Option[T]): Flattenable = new Flattenable { val tokens = option.toList flatMap { _.tokens } }
   protected implicit def pairToFlattenable[T1 <% Flattenable, T2 <% Flattenable](pair: (T1, T2)): Flattenable = new Flattenable { val tokens = pair._1.tokens ::: pair._2.tokens }
+  protected implicit def tripleToFlattenable[T1 <% Flattenable, T2 <% Flattenable, T3 <% Flattenable](triple: (T1, T2, T3)): Flattenable = new Flattenable { val tokens = triple._1.tokens ++ triple._2.tokens ++ triple._3.tokens }
   protected implicit def eitherToFlattenable[T1 <% Flattenable, T2 <% Flattenable](either: T1 Either T2): Flattenable = new Flattenable {
     val tokens = either match {
       case Left(f)  ⇒ f.tokens
@@ -355,8 +356,8 @@ case class StatSeq(selfReferenceOpt: Option[(Expr, Token)],
 
 }
 
-case class TemplateParents(type1: Type, argumentExprss: List[ArgumentExprs], withTypes: List[(Token, Type)]) extends AstNode {
-  lazy val tokens = flatten(type1, argumentExprss, withTypes)
+case class TemplateParents(typeAndArgs: (Type, List[ArgumentExprs]), withTypesAndArgs: List[(Token, Type, List[ArgumentExprs])]) extends AstNode {
+  lazy val tokens = flatten(typeAndArgs, withTypesAndArgs)
 }
 
 case class ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) extends AstNode with Stat {

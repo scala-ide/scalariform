@@ -798,7 +798,7 @@ class ScalaParser(tokens: Array[Token]) {
         case NEW ⇒
           canApply = false
           val newToken = nextToken()
-          val template_ = template(isTrait = false)
+          val template_ = template()
           List(New(newToken, template_))
         case _ ⇒
           throw new ScalaParserException("illegal start of simple expression: " + currentToken)
@@ -1543,33 +1543,37 @@ class ScalaParser(tokens: Array[Token]) {
       templateBodyOption = templateOpt_.templateBodyOpt)
   }
 
-  private def templateParents(isTrait: Boolean): TemplateParents = {
-    val type1 = Type(startAnnotType())
-    val argumentExprs_ =
-      if (LPAREN && !isTrait) multipleArgumentExprs()
-      else Nil
-    val withTypes = ListBuffer[(Token, Type)]()
+  private def templateParents(): TemplateParents = {
+    def readAppliedParent(): (Type, List[ArgumentExprs]) = {
+      val parent = Type(startAnnotType())
+      val argss =
+        if (LPAREN) multipleArgumentExprs()
+        else Nil
+      (parent, argss)
+    }
+    val withTypes = ListBuffer[(Token, Type, List[ArgumentExprs])]()
+    val (type1, argumentExprs) = readAppliedParent()
     while (WITH) {
       val withToken = nextToken()
-      val withType = Type(startAnnotType())
-      withTypes += ((withToken, withType))
+      val (type2, argumentExprs2) = readAppliedParent()
+      withTypes += ((withToken, type2, argumentExprs2))
     }
-    TemplateParents(type1, argumentExprs_, withTypes.toList)
+    TemplateParents((type1, argumentExprs), withTypes.toList)
   }
 
-  private def template(isTrait: Boolean): Template = {
+  private def template(): Template = {
     val newLineOpt = newLineOptWhenFollowedBy(LBRACE)
     if (LBRACE) {
       val templateBody_ = templateBody().copy(newlineOpt = newLineOpt)
       if (WITH) { // TODO check cond
         val withToken = nextToken()
-        val templateParents_ = templateParents(isTrait)
+        val templateParents_ = templateParents()
         val templateBodyOpt_ = templateBodyOpt()
         Template(Some(EarlyDefs(templateBody_, Some(withToken))), Some(templateParents_), templateBodyOpt_)
       } else
         Template(Some(EarlyDefs(templateBody_, withOpt = None)), templateParentsOpt = None, templateBodyOpt = None)
     } else {
-      val templateParents_ = templateParents(isTrait)
+      val templateParents_ = templateParents()
       val templateBodyOpt_ = templateBodyOpt()
       Template(earlyDefsOpt = None, Some(templateParents_), templateBodyOpt_)
     }
@@ -1578,7 +1582,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def templateOpt(isTrait: Boolean): TemplateOpt = {
     if (EXTENDS || SUBTYPE && isTrait) {
       val extendsOrSubtypeToken = nextToken()
-      template(isTrait) match {
+      template() match {
         case Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) ⇒
           TemplateOpt(Some(TemplateInheritanceSection(extendsOrSubtypeToken, earlyDefsOpt, templateParentsOpt)), templateBodyOpt)
       }
