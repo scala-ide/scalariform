@@ -598,6 +598,15 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  @D def e
     |}"""
 
+  """class A extends B(42 , 43) with C(44 , 45) {
+    |  foo()
+    |  bar()
+    |}""" ==>
+  """class A extends B(42, 43) with C(44, 45) {
+    |  foo()
+    |  bar()
+    |}"""
+      
   // format: ON
 
   override val debug = false

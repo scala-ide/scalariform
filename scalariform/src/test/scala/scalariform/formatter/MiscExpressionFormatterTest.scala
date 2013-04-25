@@ -776,6 +776,16 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "{ val P(a, b*c) = p }" ==> "{ val P(a, b * c) = p }"
     
+
+  """new {} with A(new {
+    |val x = 42}) with  B(new {
+    |val x = 42})""" ==>
+  """new {} with A(new {
+    |  val x = 42
+    |}) with B(new {
+    |  val x = 42
+    |})"""
+    
   override val debug = false
   
 }

@@ -50,16 +50,20 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
         formatResult ++= format(earlyBody)(currentFormatterState)
 
       for (templateParents ← templateParentsOpt) {
-        val TemplateParents(type1: Type, argumentExprss: List[ArgumentExprs], withTypes: List[(Token, Type)]) = templateParents
+        val TemplateParents((type1: Type, argumentExprss: List[ArgumentExprs]), withTypes: List[(Token, Type, List[ArgumentExprs])]) = templateParents
+
         formatResult ++= format(type1)(currentFormatterState)
         for (argumentExprs ← argumentExprss)
           formatResult ++= format(argumentExprs)(currentFormatterState)._1
-        for ((withToken, type_) ← withTypes) {
+
+        for ((withToken, type_, argumentExprss2) ← withTypes) {
           if (hiddenPredecessors(withToken).containsNewline) {
             currentFormatterState = formatterState.indent(inheritanceIndent)
             formatResult = formatResult.before(withToken, currentFormatterState.currentIndentLevelInstruction)
           }
           formatResult ++= format(type_)(currentFormatterState)
+          for (argumentExprs2 ← argumentExprss2)
+            formatResult ++= format(argumentExprs2)(currentFormatterState)._1
         }
       }
     }
@@ -113,8 +117,20 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
 
   private def format(templateParents: TemplateParents)(implicit formatterState: FormatterState): FormatResult = {
     var formatResult: FormatResult = NoFormatResult
-    for (argumentExprs ← templateParents.argumentExprss)
+    val TemplateParents((type1: Type, argumentExprss: List[ArgumentExprs]), withTypes: List[(Token, Type, List[ArgumentExprs])]) = templateParents
+    formatResult ++= format(type1)
+    for (argumentExprs ← argumentExprss)
       formatResult ++= format(argumentExprs)._1
+
+    // TODO: Unify with TmplDef code
+      
+    val currentFormatterState = formatterState
+    for ((withToken, type_, argumentExprss2) ← withTypes) {
+      formatResult ++= format(type_)(currentFormatterState)
+      for (argumentExprs2 ← argumentExprss2)
+        formatResult ++= format(argumentExprs2)(currentFormatterState)._1
+    }
+
     formatResult
   }
 
