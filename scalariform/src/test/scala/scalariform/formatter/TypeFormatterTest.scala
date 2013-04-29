@@ -63,6 +63,10 @@ class TypeFormatterTest extends AbstractFormatterTest {
   
   "b[c# ::[d]]" ==> "b[c# ::[d]]"
 
+  """C :: 
+    |  D""" ==>
+  """C :: D""" // To check that this doesn't blow up -- we should maintain the newline
+    
   override val debug = false
   
   type Result = Type

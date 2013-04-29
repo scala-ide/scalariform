@@ -1,3 +1,8 @@
+0.1.5 (..)
+* FIX: Type formatter crash on multiline types
+* Track scalac parser -- allow trait-position parents to have parameter blocks
+* Sync changes to InferredSemicolonParser
+
 0.1.4 (24/April/13)
 * FIX: Allow declarations as last statement in case block (issue #60)
 * Update to build 2.10 final
