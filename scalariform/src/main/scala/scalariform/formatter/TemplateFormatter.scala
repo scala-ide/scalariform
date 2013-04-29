@@ -123,7 +123,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
       formatResult ++= format(argumentExprs)._1
 
     // TODO: Unify with TmplDef code
-      
+
     val currentFormatterState = formatterState
     for ((withToken, type_, argumentExprss2) ← withTypes) {
       formatResult ++= format(type_)(currentFormatterState)

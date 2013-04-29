@@ -9,17 +9,15 @@ import scalariform.formatter.preferences._
 
 object ScalariformBuild extends Build {
 
-
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ Seq(
     organization := "org.scalariform",
     version := "0.1.5-SNAPSHOT",
     scalaVersion := "2.10.0",
     crossScalaVersions := Seq(
-//      "2.11.0-M2",
+      //      "2.11.0-M2",
       "2.10.0", "2.10.1",
       "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0",
-      "2.8.2", "2.8.1", "2.8.0"
-    ),
+      "2.8.2", "2.8.1", "2.8.0"),
     exportJars := true, // Needed for cli oneJar
     retrieveManaged := true,
     scalacOptions += "-deprecation",
@@ -37,11 +35,11 @@ object ScalariformBuild extends Build {
     publishLocal := ())) aggregate (scalariform, cli, misc)
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case "2.8.0"     ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
-    case "2.10.0"    =>"org.scalatest" %%  "scalatest" % "1.9.1" % "test"
-    case "2.10.1"    =>"org.scalatest" %%  "scalatest" % "1.9.1" % "test"
-    case "2.9.3"     =>"org.scalatest" %%  "scalatest" % "1.9.1" % "test"
-    case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+    case "2.8.0"  ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
+    case "2.10.0" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    case "2.10.1" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    case "2.9.3"  ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    case _        ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings =
