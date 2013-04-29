@@ -12,12 +12,12 @@ object ScalaVersion {
 
   def parse(s: String): Option[ScalaVersion] =
     s match {
-      case VersionPattern(majorStr, minorStr, extra) =>
+      case VersionPattern(majorStr, minorStr, extra) ⇒
         for {
-          major <- majorStr.toIntOpt
-          minor <- minorStr.toIntOpt
+          major ← majorStr.toIntOpt
+          minor ← minorStr.toIntOpt
         } yield ScalaVersion(major, minor, extra)
-      case _ =>
+      case _ ⇒
         None
     }
 

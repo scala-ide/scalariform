@@ -606,7 +606,7 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  foo()
     |  bar()
     |}"""
-      
+
   // format: ON
 
   override val debug = false

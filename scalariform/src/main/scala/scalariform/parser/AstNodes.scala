@@ -416,12 +416,15 @@ sealed trait XmlExprElement extends ExprElement
 case class XmlStartTag(startOpen: Token, name: Token, attributes: List[(Option[Token], XmlAttribute)], whitespaceOption: Option[Token], tagClose: Token) extends XmlExprElement {
   lazy val tokens = flatten(startOpen, name, attributes, whitespaceOption, tagClose)
 }
+
 case class XmlAttribute(name: Token, whitespaceOption: Option[Token], equals: Token, whitespaceOption2: Option[Token], valueOrEmbeddedScala: Either[Token, Expr]) extends XmlExprElement {
   lazy val tokens = flatten(name, whitespaceOption, equals, whitespaceOption2, valueOrEmbeddedScala)
 }
+
 case class XmlEmptyElement(startOpen: Token, name: Token, attributes: List[(Option[Token], XmlAttribute)], whitespaceOption: Option[Token], emptyClose: Token) extends XmlElement {
   lazy val tokens = flatten(startOpen, name, attributes, whitespaceOption, emptyClose)
 }
+
 case class XmlEndTag(endOpen: Token, name: Token, whitespaceOption: Option[Token], tagClose: Token) extends XmlExprElement {
   lazy val tokens = flatten(endOpen, name, whitespaceOption, tagClose)
 }

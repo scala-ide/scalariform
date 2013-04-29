@@ -355,9 +355,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   class ProductionItem(name: String, val formatter: SpecificFormatter) {
     override def toString = name
   }
-    
-  object ProductionComboBoxModel extends DefaultComboBoxModel[ProductionItem] {
 
+  object ProductionComboBoxModel extends DefaultComboBoxModel[ProductionItem] {
 
     val compilationUnitFormatter = new SpecificFormatter {
 

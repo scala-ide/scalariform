@@ -51,10 +51,10 @@ trait SpecificFormatter {
     } actualFormattingPreferences = actualFormattingPreferences.setPreference(preference, onOrOff)
 
     val parsedTokens = parseResult.tokens.filter(_.tokenType != EOF)
-    require(parsedTokens == tokens.init /* <-- drop EOF */, "Parse tokens differ from expected.\n  Actual = \n" +
+    require(parsedTokens == tokens.init /* <-- drop EOF */ , "Parse tokens differ from expected.\n  Actual = \n" +
       parsedTokens.mkString("\n") + "\n  expected = \n" + tokens.init.mkString("\n") + "\n  parseResult = \n" +
       parseResult)
-      
+
     if (debug) { println("Parse result: " + parseResult) }
     val elapsedTime = System.currentTimeMillis - startTime
     //     if (debug) 

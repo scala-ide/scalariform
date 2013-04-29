@@ -100,8 +100,8 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
       false
     else if (TOKENS_WHICH_CANNOT_BEGIN_A_STATEMENT contains currentTokenType)
       false
-//    else if (currentTokenType == CASE && !followingTokenIsClassOrObject(nextToken))
-//      false
+    //    else if (currentTokenType == CASE && !followingTokenIsClassOrObject(nextToken))
+    //      false
     else if (regionMarkerStack.nonEmpty && regionMarkerStack.head != RBRACE)
       false
     else
