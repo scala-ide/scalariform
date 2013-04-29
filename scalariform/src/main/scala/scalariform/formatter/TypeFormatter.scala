@@ -20,7 +20,7 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         previousElement.isInstanceOf[InfixTypeConstructor] ||
         element.isInstanceOf[Refinement] ||
         element.isInstanceOf[InfixTypeConstructor])
-        formatResult = formatResult.before(element.firstToken, CompactEnsuringGap)
+        formatResult = formatResult.formatNewlineOrOrdinary(element.firstToken, CompactEnsuringGap)
       else if (element.isInstanceOf[Annotation]) {
         val instruction =
           previousElement match {
