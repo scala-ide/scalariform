@@ -406,6 +406,10 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         dropAnyBraces(pattern())
       else if (isIdent)
         ident()
+      else if (LBRACE)
+        expr()
+      else if (THIS)
+        nextToken()
       else
         expr()
     }
@@ -651,7 +655,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case NEW ⇒
         canApply = false
         nextToken()
-        template(isTrait = false)
+        template()
       case _ ⇒
         throw new ScalaParserException("illegal start of simple expression: " + currentToken)
     }
@@ -1259,27 +1263,30 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     templateOpt(isTrait = false)
   }
 
-  private def templateParents(isTrait: Boolean) = {
-    startAnnotType()
-    if (LPAREN && !isTrait) multipleArgumentExprs()
-    else Nil
+  private def templateParents() {
+    def readAppliedParent() {
+      startAnnotType()
+      if (LPAREN)
+        multipleArgumentExprs()
+    }
+    readAppliedParent()
     while (WITH) {
       nextToken()
-      startAnnotType()
+      readAppliedParent()
     }
   }
 
-  private def template(isTrait: Boolean) {
+  private def template() {
     newLineOptWhenFollowedBy(LBRACE)
     if (LBRACE) {
       templateBody()
       if (WITH) { // TODO check cond
         nextToken()
-        templateParents(isTrait)
+        templateParents()
         templateBodyOpt()
       }
     } else {
-      templateParents(isTrait)
+      templateParents()
       templateBodyOpt()
     }
   }
@@ -1287,7 +1294,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private def templateOpt(isTrait: Boolean) {
     if (EXTENDS || SUBTYPE && isTrait) {
       nextToken()
-      template(isTrait)
+      template()
     } else {
       // val newLineOpt = newLineOptWhenFollowedBy(LBRACE) // Will be picked up by templateBodyOpt ... TODO: double check this
       templateBodyOpt()
