@@ -254,26 +254,11 @@ object Main {
 
   private def transformFilesInPlace(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Boolean = {
     var problems = false
-    //    val futures =
-    //      for (file ← files) yield asyncExec {
-    //        problems &= transformFileInPlace(file, encoding, doFormat, log)
-    //      }
-    //    futures.map(_.get())
     for (file ← files)
       problems &= transformFileInPlace(file, encoding, doFormat, log)
     problems
   }
 
-  //  private val lock = new ReentrantLock
-  //  private lazy val executorService = Executors.newCachedThreadPool()
-  //  private def asyncExec(x: ⇒ Unit): Future[_] = executorService.submit(new Runnable { def run() = x })
-  //  private def withLock[T](x: ⇒ T): T = {
-  //    lock.lock()
-  //    try
-  //      x
-  //    finally
-  //      lock.unlock()
-  //  }
   /**
    * @return true iff file is already formatted correctly
    */
