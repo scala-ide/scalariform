@@ -21,6 +21,10 @@ import scalariform.formatter._
 import scalariform.formatter.preferences._
 import scalariform.lexer._
 import scalariform.lexer.Tokens._
+import scalariform.gui.SwingUtils._
+import scalariform.parser._
+import scala.util.parsing.input._
+import scala.util.parsing.combinator._
 
 class FormatterFrame extends JFrame with SpecificFormatter {
 
@@ -101,10 +105,9 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   val textFont = new Font("monospaced", Font.PLAIN, 14)
 
   val astTree = new JTree
-  val tokensTable = new JTable
-  tokensTable.setCellSelectionEnabled(false)
-  tokensTable.setRowSelectionAllowed(true)
-  tokensTable.setColumnSelectionAllowed(false)
+
+  val tokensTable = new TokenTable
+  val rawTokensTable = new TokenTable
 
   val outputTextPane = new JTextPane
   setFont(outputTextPane, textFont)
@@ -155,8 +158,10 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         case e: RuntimeException ⇒
           if (showAstCheckBox.isSelected) {
             val tokens = ScalaLexer.tokenise(inputText, scalaVersion = SCALA_VERSION)
+            val rawTokens = ScalaLexer.rawTokenise(inputText, scalaVersion = SCALA_VERSION)
             val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
-            tokensTable.setModel(tableModel)
+            tokensTable.setTokens(tokens)
+            rawTokensTable.setTokens(rawTokens)
             try {
               val parseResult = specificFormatter.parse(new ScalaParser(tokens.toArray))
               val treeModel = new ParseTreeModel(parseResult)
@@ -168,21 +173,19 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       }
       val duration = System.currentTimeMillis - startTime
       val tokens = ScalaLexer.tokenise(inputText, scalaVersion = SCALA_VERSION)
+      val rawTokens = ScalaLexer.rawTokenise(inputText, scalaVersion = SCALA_VERSION)
       val tokenCount = tokens.size
       setTitle("Scalariform " + scalariform.BuildInfo.version + " -- " + duration + "ms, " + tokenCount + " tokens, speed = " + (1000 * tokenCount / (duration + 1)) + " tokens/second")
       outputTextPane.setText(outputText)
 
       if (showAstCheckBox.isSelected) {
-        import scalariform.parser._
-        import scala.util.parsing.input._
-        import scala.util.parsing.combinator._
         val parseResult =
           try
             specificFormatter.parse(new ScalaParser(tokens.toArray))
           catch {
             case e: RuntimeException ⇒
-              val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
-              tokensTable.setModel(tableModel)
+              tokensTable.setTokens(tokens)
+              rawTokensTable.setTokens(rawTokens)
               throw e
           }
         val treeModel = new ParseTreeModel(parseResult)
@@ -191,8 +194,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
         val (outputText, formatResult) = specificFormatter.fullFormat(inputText, scalaVersion = SCALA_VERSION)(OptionsPanel.getFormattingPreferences)
 
-        val tableModel = new TokenTableModel(tokens, formatResult)
-        tokensTable.setModel(tableModel)
+        tokensTable.setTokens(tokens, formatResult)
+        rawTokensTable.setTokens(rawTokens)
       }
     } catch {
       case t: Throwable ⇒
@@ -211,6 +214,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   resultTabbedPane.addTab("Output", new JScrollPane(outputTextPane))
   resultTabbedPane.addTab("AST", new JScrollPane(astTree))
   resultTabbedPane.addTab("Tokens", new JScrollPane(tokensTable))
+  resultTabbedPane.addTab("Raw Tokens", new JScrollPane(rawTokensTable))
 
   val splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT)
   splitPane.setTopComponent(new JScrollPane(inputTextPane))
@@ -304,26 +308,36 @@ class FormatterFrame extends JFrame with SpecificFormatter {
       val parseTreeModel = astTree.getModel.asInstanceOf[ParseTreeModel]
       for {
         lastComponent ← Option(astTree.getLastSelectedPathComponent)
-        (from, to) ← parseTreeModel.getDocumentRange(lastComponent)
+        range ← parseTreeModel.getDocumentRange(lastComponent)
       } {
-        inputTextPane.setSelectionStart(from)
-        inputTextPane.setSelectionEnd(to + 1)
+        inputTextPane.setSelectionStart(range.offset)
+        inputTextPane.setSelectionEnd(range.offset + range.length)
+        inputTextPane.requestFocusInWindow()
+        astTree.requestFocusInWindow()
       }
 
     }
   })
-  tokensTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
-    def valueChanged(e: ListSelectionEvent) {
-      val tableModel = tokensTable.getModel.asInstanceOf[TokenTableModel]
-      val selectionIndex = e.getFirstIndex
-      if (selectionIndex >= 0) {
-        val (from, to) = tableModel.getDocumentRange(selectionIndex)
-        inputTextPane.setSelectionStart(from)
-        inputTextPane.setSelectionEnd(to + 1)
-      }
 
+  tokensTable.getSelectionModel.addListSelectionListener { e: ListSelectionEvent ⇒
+    for (token ← tokensTable.getSelectedToken) {
+      val range = token.range
+      inputTextPane.setSelectionStart(range.offset)
+      inputTextPane.setSelectionEnd(range.offset + range.length)
+      inputTextPane.requestFocusInWindow()
+      tokensTable.requestFocusInWindow()
     }
-  })
+  }
+
+  rawTokensTable.getSelectionModel.addListSelectionListener { e: ListSelectionEvent ⇒
+    for (token ← rawTokensTable.getSelectedToken) {
+      val range = token.range
+      inputTextPane.setSelectionStart(range.offset)
+      inputTextPane.setSelectionEnd(range.offset + range.length)
+      inputTextPane.requestFocusInWindow()
+      rawTokensTable.requestFocusInWindow()
+    }
+  }
 
   {
     val menuBar = new JMenuBar
@@ -412,31 +426,4 @@ object Samples {
     |}""".stripMargin
 } // format: ON
 
-class TokenTableModel(tokens: List[Token], formatResult: FormatResult) extends AbstractTableModel {
-  def getColumnCount = 5
-  def getRowCount = tokens.size
-  def getValueAt(row: Int, col: Int): AnyRef = {
-    val token = tokens(row)
-    col match {
-      case 0 ⇒ token.tokenType
-      case 1 ⇒ token.text
-      case 2 ⇒ token.offset.asInstanceOf[java.lang.Integer]
-      case 3 ⇒ token.lastCharacterOffset.asInstanceOf[java.lang.Integer]
-      case 4 ⇒ {
-        formatResult.predecessorFormatting.get(token) orElse formatResult.inferredNewlineFormatting.get(token) getOrElse ""
-      }
-    }
-  }
-  override def getColumnName(col: Int) = col match {
-    case 0 ⇒ "Type"
-    case 1 ⇒ "Token text"
-    case 2 ⇒ "Start"
-    case 3 ⇒ "Finish"
-    case 4 ⇒ "Instruction"
-  }
 
-  def getDocumentRange(index: Int): (Int, Int) = {
-    val token = tokens(index)
-    (token.offset, token.lastCharacterOffset)
-  }
-}

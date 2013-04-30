@@ -5,6 +5,12 @@ import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils._
 
+object FormatResult {
+  
+  val EMPTY = FormatResult(Map(), Map(), Map())
+  
+}
+
 case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstruction],
                         inferredNewlineFormatting: Map[Token, IntertokenFormatInstruction],
                         xmlRewrites: Map[Token, String]) {
