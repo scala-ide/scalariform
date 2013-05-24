@@ -78,7 +78,6 @@ object Tokens {
   val SEMI = TokenType("SEMI")
   val COLON = TokenType("COLON")
   val OTHERID = TokenType("OTHERID")
-  val REQUIRES = TokenType("REQUIRES")
   val NEWLINE = TokenType("NEWLINE")
   val FINALLY = TokenType("FINALLY")
   val OVERRIDE = TokenType("OVERRIDE")
@@ -105,7 +104,7 @@ object Tokens {
     FINALLY, FOR, FORSOME, IF, IMPLICIT,
     IMPORT, LAZY, MATCH, NEW,
     OBJECT, OVERRIDE, PACKAGE, PRIVATE, PROTECTED,
-    REQUIRES, RETURN, SEALED, SUPER, THIS,
+    RETURN, SEALED, SUPER, THIS,
     THROW, TRAIT, TRY, TYPE,
     VAL, VAR, WHILE, WITH, YIELD)
 
