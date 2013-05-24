@@ -32,7 +32,6 @@ object Keywords {
     "package" -> PACKAGE,
     "private" -> PRIVATE,
     "protected" -> PROTECTED,
-    "requires" -> REQUIRES,
     "return" -> RETURN,
     "sealed" -> SEALED,
     "super" -> SUPER,
