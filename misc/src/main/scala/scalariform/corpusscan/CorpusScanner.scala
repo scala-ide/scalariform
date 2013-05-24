@@ -1,16 +1,17 @@
 package scalariform.corpusscan
 
-import scalariform.lexer.{ Token ⇒ _, _ }
-import scalariform.formatter._
-import scalariform.formatter.preferences._
-import scalariform.parser._
-import scala.util.parsing.input._
-import scala.util.parsing.combinator._
 import java.io.File
+
 import scala.io.Source
-import scalariform.utils.Utils.writeText
+
 import org.apache.commons.io.FileUtils
+
 import scalariform.commandline.ScalaFileWalker
+import scalariform.formatter._
+import scalariform.formatter.preferences.FormattingPreferences
+import scalariform.lexer._
+import scalariform.parser._
+import scalariform.utils.Utils.writeText
 
 sealed trait ParseFault
 case object TokensDoNotCoverSource extends ParseFault
@@ -31,9 +32,9 @@ object CorpusScanner extends SpecificFormatter {
     val tokens = ScalaLexer.tokenise(source)
     try {
       val result = new ScalaParser(tokens.toArray).compilationUnitOrScript()
-      if (result.tokens != tokens.init) /* drop EOF */
+      if (result.tokens != tokens) {
         Some(BadAstTokens)
-      else
+      } else
         None
     } catch {
       case e: ScalaParserException ⇒ Some(UnsuccessfulParse)
@@ -66,9 +67,9 @@ object CorpusScanner extends SpecificFormatter {
 
 }
 
-object Runner {
+object Runner extends App {
 
-  val corpusDir = "/home/matt/coding/scala-corpus"
+  val corpusDir = "/home/matthew/coding/scala-corpus/repos2"
   //  val corpusDir = "/home/matt/scala-corpus"
 
   def checkParser() {
@@ -93,14 +94,14 @@ object Runner {
     for (file ← ScalaFileWalker.findScalaFiles(corpusDir)) {
       print("Formatting: " + file)
       CorpusScanner.formatFile(file)
-      val parsed = CorpusScanner.attemptToParse(file)
-      require(parsed == None, parsed.toString)
+      val parseFaultOpt = CorpusScanner.attemptToParse(file)
+      require(parseFaultOpt == None, parseFaultOpt.toString)
       println()
       count += 1
     }
     println(count + " files formatted.")
   }
 
-  def main(args: Array[String]) = formatInPlace()
+  formatInPlace()
 
 }
