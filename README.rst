@@ -78,7 +78,7 @@ Integration with sbt
 
 `sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions for sbt 0.7.x.
 
-A version for sbt 0.10.x has been written by Peter Vlugter: https://github.com/typesafehub/sbt-scalariform
+A version for sbt 0.10.x has been written by Peter Vlugter: https://github.com/sbt/sbt-scalariform
 
 .. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
 
