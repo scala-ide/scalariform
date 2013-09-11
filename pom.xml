@@ -14,8 +14,8 @@
   </scm>
 
   <properties>
-    <tycho.version>0.12.0</tycho.version>
-    <scala.version>2.8.0</scala.version>
+    <tycho.version>0.18.1</tycho.version>
+    <scala.version>2.10.2</scala.version>
     <repo.scala-ide>http://download.scala-ide.org</repo.scala-ide>
     <encoding>UTF-8</encoding>
     <maven.version>3.0.4</maven.version>
@@ -57,14 +57,10 @@
       </plugin>
       <!-- git hash extractor -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.1</version>
-      </plugin>
-      <plugin>
         <!-- plugin used to extract the git hash and store it in ${buildNumber} -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.1</version>
         <executions>
           <execution>
             <phase>validate</phase>
@@ -113,9 +109,9 @@
   </build>
   <repositories>
     <repository>
-      <id>galileo</id>
+      <id>kepler</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/galileo</url>
+      <url>http://download.eclipse.org/releases/kepler</url>
     </repository>
     <repository>
       <id>sonatype.release</id>
@@ -133,39 +129,6 @@
     </repository>
   </repositories>
   <profiles>
-    <profile>
-      <id>release-ide-29</id>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-scalaide-2.0</id>
-          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/incoming-release-29/dependencies/osgi-toolchain</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>release-ide-210</id>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-scalaide-2.1</id>
-          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/incoming-release-210/dependencies/osgi-toolchain</url>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
-      <id>release-ide-211</id>
-      <repositories>
-        <repository>
-          <id>scala-toolchain-scalaide-2.1</id>
-          <name>Scala Toolchain for Scala IDE 2.0 p2 repository</name>
-          <layout>p2</layout>
-          <url>http://download.scala-ide.org/incoming-release-211/dependencies/osgi-toolchain</url>
-        </repository>
-      </repositories>
-    </profile>
     <profile>
       <id>scala-2.9.x</id>
       <repositories>
