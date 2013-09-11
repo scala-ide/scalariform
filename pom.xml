@@ -113,9 +113,9 @@
   </build>
   <repositories>
     <repository>
-      <id>galileo</id>
+      <id>kepler</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/galileo</url>
+      <url>http://download.eclipse.org/releases/kepler</url>
     </repository>
     <repository>
       <id>sonatype.release</id>
