@@ -115,6 +115,13 @@ Library
 
   https://github.com/mdr/scalariform/wiki/Library
 
+Formatting server
+-----------------
+
+`scalariver`_ relies on scalariform and provide a client/server architecture for faster formatting.
+
+.. _scalariver: http://github.com/ornicar/scalariver
+
 Preferences
 -----------
 
