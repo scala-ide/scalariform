@@ -188,9 +188,7 @@ Default: ``false``
 
 When ``compactControlReadability`` is ``true``, ``if``/``else`` and
 ``try``/``catch``/``finally`` control structures will be formatted
-using `Compact Control Readability`_ style:
-
-.. _Compact Control Readability: http://en.wikipedia.org/wiki/Indent_style#Compact_Control_Readability_style
+using `Compact Control Readability`_ style::
 
   if (x == y) {
     foo()
@@ -211,6 +209,8 @@ using `Compact Control Readability`_ style:
   finally {
     baz()
   }
+
+.. _Compact Control Readability: http://en.wikipedia.org/wiki/Indent_style#Compact_Control_Readability_style
 
 compactStringConcatenation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
