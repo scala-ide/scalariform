@@ -318,7 +318,46 @@ class TemplateFormatterTest extends AbstractFormatterTest {
 
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(AlignParameters, true)
-  """class A(n: Int, 
+
+  // Split into 3 columns: name, type, and default
+  """def showInput[A](
+    | parent: Component = null,
+    | message: Any,
+    | title: String = uiString("OptionPane.inputDialogTitle"),
+    | messageType: Message.Value = Message.Question,
+    | icon: Icon = EmptyIcon,
+    | entries: Seq[A] = Nil,
+    | initial: A): Option[A]""" ==>
+  """def showInput[A](
+    |     parent: Component     = null,
+    |    message: Any,
+    |      title: String        = uiString("OptionPane.inputDialogTitle"),
+    |messageType: Message.Value = Message.Question,
+    |       icon: Icon          = EmptyIcon,
+    |    entries: Seq[A]        = Nil,
+    |    initial: A
+    |): Option[A]"""
+
+  // Preserve first line spacing
+  """case class Spacing(param: Int = 1,
+    |paramTwo: Int = 2
+    |paramThree: String = "3")""" ==>
+  """case class Spacing(param: Int    = 1,
+    |                paramTwo: Int    = 2
+    |              paramThree: String = "3")"""
+
+  // Aligns parameters even with currying, and automatically splits long lines into rows
+  """class SomeClass(
+    |parameterOne: Int = 1,
+    |val paramTwo: Option[String] = None,
+    |three: String = "three")(implicit val four: Int)""" ==>
+  """class SomeClass(
+    |       parameterOne: Int            = 1,
+    |       val paramTwo: Option[String] = None,
+    |              three: String         = "three")(
+    |  implicit val four: Int)"""
+
+  """class A(n: Int,
     |z: { val m
     |val n },
     |m: Int)""" ==>
