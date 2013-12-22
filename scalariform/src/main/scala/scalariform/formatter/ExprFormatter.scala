@@ -838,15 +838,15 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val ParamClauses(_, paramClausesAndNewlines) = paramClauses
 
     type Params = (ParamClause,Option[Token])
-    type Result = (FormatResult,FormatterState,Option[Token])
-    paramClausesAndNewlines.foldLeft((FormatResult.EMPTY, formatterState, None: Option[Token])) { (partialResult: Result, current: Params) =>
-      val (result, format, previousLeftParen) = partialResult
+    type Result = (FormatResult,Option[Token])
+    paramClausesAndNewlines.foldLeft((FormatResult.EMPTY, None: Option[Token])) { (partialResult: Result, current: Params) =>
+      val (result, previousLeftParen) = partialResult
       val (paramClause, _) = current
-      val formatResult =  formatParamClause(paramClause, doubleIndentParams)(format)
+      val formatResult =  formatParamClause(paramClause, doubleIndentParams)
       val resultWithNewLines = formatResult._1 ++ previousLeftParen.map { p =>
         result.before(paramClause.lparen,EnsureNewlineAndIndent(0,Some(p)))
       }.getOrElse(FormatResult.EMPTY)
-      (resultWithNewLines,formatResult._2,Some(paramClause.lparen))
+      (resultWithNewLines,Some(paramClause.lparen))
     }._1
   }
 
