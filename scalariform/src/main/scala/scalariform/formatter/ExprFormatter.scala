@@ -835,9 +835,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   def formatParamClauses(paramClauses: ParamClauses, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): FormatResult = {
 
-
-    type Params = (ParamClause,Option[Token])
-    type Result = (FormatResult,FormatterState,Option[IntertokenFormatInstruction])
+    type Params = (ParamClause, Option[Token])
+    type Result = (FormatResult, FormatterState, Option[IntertokenFormatInstruction])
 
     val ParamClauses(_, paramClausesAndNewlines) = paramClauses
     val start: Result = (FormatResult.EMPTY, formatterState, None: Option[IntertokenFormatInstruction])
@@ -846,9 +845,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val paramClause = current._1
       val formatResult = formatParamClause(paramClause, doubleIndentParams)(formatterState)
       val resultWithNewLines = previousLeftFormat.filter(_ => formattingPreferences(BreakMultipleParameterGroups)).map{ p =>
-        FormatResult.EMPTY.before(paramClause.lparen,p)
+        FormatResult.EMPTY.before(paramClause.lparen, p)
       }.foldLeft(formatResult._1 ++ result) { _ ++ _ }
-      val currentLeftFormat = Some(EnsureNewlineAndIndent(0,paramClause.firstTokenOption))
+      val currentLeftFormat = Some(EnsureNewlineAndIndent(0, paramClause.firstTokenOption))
       formattingPreferences.indentStyle
       (resultWithNewLines, formatResult._2, currentLeftFormat)
     }._1
