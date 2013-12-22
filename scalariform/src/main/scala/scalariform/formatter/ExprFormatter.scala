@@ -837,7 +837,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     type Params = (ParamClause, Option[Token])
     type Result = (FormatResult, FormatterState, Option[IntertokenFormatInstruction])
-    val breakLine = paramClauses.rangeOpt.map(_.length > formattingPreferences(BreakMultipleParameterGroups.BreakingThreshold)).get
+    val breakLine = paramClauses.rangeOpt.map(_.length > formattingPreferences(BreakMultipleParameterGroups.BreakingThreshold)).getOrElse(false)
     val ParamClauses(_, paramClausesAndNewlines) = paramClauses
     val start: Result = (FormatResult.EMPTY, formatterState, None: Option[IntertokenFormatInstruction])
     paramClausesAndNewlines.foldLeft(start) { (accumulator: Result, current: Params) =>
