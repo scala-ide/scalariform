@@ -1,7 +1,7 @@
 package scalariform.formatter
 
 import scalariform.parser.{CompilationUnit, FunDefOrDcl, FullDefOrDcl, ScalaParser}
-import scalariform.formatter.preferences.{IndentLocalDefs, FormattingPreferences}
+import scalariform.formatter.preferences.{BreakMultipleParameterGroups, IndentLocalDefs, FormattingPreferences}
 
 class MultipleParameterListsFormatterTest extends AbstractFormatterTest {
 
@@ -13,6 +13,7 @@ class MultipleParameterListsFormatterTest extends AbstractFormatterTest {
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
+  implicit val formatting = FormattingPreferences.setPreference(BreakMultipleParameterGroups,true)
 
   """def f(x: Int)(y: Int): Int = {
     |}

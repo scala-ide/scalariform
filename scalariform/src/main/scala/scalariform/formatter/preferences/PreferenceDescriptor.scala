@@ -64,7 +64,7 @@ object AllPreferences {
     PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
-    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk)
+    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, BreakMultipleParameterGroups)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -195,5 +195,11 @@ case object CompactControlReadability extends BooleanPreferenceDescriptor {
 case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenceDescriptor {
   val key = "placeScaladocAsterisksBeneathSecondAsterisk"
   val description = "Place Scaladoc asterisks beneath the second asterisk in the opening '/**', as opposed to the first"
+  val defaultValue = false
+}
+
+case object BreakMultipleParameterGroups extends BooleanPreferenceDescriptor {
+  val key = "breakMultipleParametersGroups"
+  val description = "Place newline after end of parameter group on multiple parameter group function definition"
   val defaultValue = false
 }
