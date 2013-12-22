@@ -13,7 +13,27 @@ class MultipleParameterListsFormatterTest extends AbstractFormatterTest {
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
-  implicit val formatting = FormattingPreferences.setPreference(BreakMultipleParameterGroups,true)
+  implicit var formatting = FormattingPreferences.setPreference(BreakMultipleParameterGroups,true)
+
+  """def f(x: Int)
+    |(y: Int): Int = {
+    |}
+    |""" ==>
+    """def f(x: Int)(y: Int): Int = {
+      |}
+      |"""
+
+  """def f(x: Int)
+    |     (y: Int)(z: Int): Int = {
+    |}
+  """ ==>
+    """def f(x: Int)(y: Int)(z: Int): Int = {
+      |}
+      |"""
+
+
+  formatting = FormattingPreferences.setPreference(BreakMultipleParameterGroups,true)
+                                    .setPreference(BreakMultipleParameterGroups.BreakingThreshold,4)
 
   """def f(x: Int)(y: Int): Int = {
     |}
