@@ -802,8 +802,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     var formatResult: FormatResult = NoFormatResult
     val FunDefOrDcl(defToken: Token, nameToken: Token, typeParamClauseOpt: Option[TypeParamClause], paramClauses: ParamClauses,
       returnTypeOpt: Option[(Token, Type)], funBodyOpt: Option[FunBody], localDef: Boolean) = funDefOrDcl
-    for (typeParamClause ← typeParamClauseOpt)
+    for (typeParamClause ← typeParamClauseOpt){
       formatResult ++= format(typeParamClause.contents)
+    }
     formatResult ++= formatParamClauses(paramClauses)
     for ((colon, type_) ← returnTypeOpt)
       formatResult ++= format(type_)
@@ -834,16 +835,19 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def formatParamClauses(paramClauses: ParamClauses, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): FormatResult = {
-    val ParamClauses(initialNewlineOpt, paramClausesAndNewlines) = paramClauses
-    var formatResult: FormatResult = NoFormatResult
-    var currentFormatterState = formatterState
-    for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines. // maybe already done in some cases by format(tmplDef)?
+    val ParamClauses(_, paramClausesAndNewlines) = paramClauses
 
-      val (paramClauseFormatResult, newFormatterState) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
-      formatResult ++= paramClauseFormatResult
-      currentFormatterState = newFormatterState
-    }
-    formatResult
+    type Params = (ParamClause,Option[Token])
+    type Result = (FormatResult,FormatterState,Option[Token])
+    paramClausesAndNewlines.foldLeft((FormatResult.EMPTY, formatterState, None: Option[Token])) { (partialResult: Result, current: Params) =>
+      val (result, format, previousLeftParen) = partialResult
+      val (paramClause, _) = current
+      val formatResult =  formatParamClause(paramClause, doubleIndentParams)(format)
+      val resultWithNewLines = formatResult._1 ++ previousLeftParen.map { p =>
+        result.before(paramClause.lparen,EnsureNewlineAndIndent(0,Some(p)))
+      }.getOrElse(FormatResult.EMPTY)
+      (resultWithNewLines,formatResult._2,Some(paramClause.lparen))
+    }._1
   }
 
   private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
