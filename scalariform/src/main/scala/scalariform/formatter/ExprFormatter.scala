@@ -859,14 +859,20 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
    *         Right stores an unalignable param.
    */
   private def groupParams(paramClause: ParamClause, alignParameters: Boolean)(implicit formatterState: FormatterState): List[EitherAlignableParam] = {
-    val ParamClause(_, _, firstParamOption, otherParams, _) = paramClause
+    val ParamClause(_, implicitOption, firstParamOption, otherParams, _) = paramClause
 
     val paramsList: List[Param] =  otherParams.map { case (comma, param) => param }.reverse
 
     def appendParamToGroup(paramToAppend: Param,
                            groupedParams: List[EitherAlignableParam],
                            isFirstParam: Boolean): List[EitherAlignableParam] = {
-      if (alignParameters) {
+
+      val firstParamAlignable = !implicitOption.isDefined ||
+        (newlineBefore(implicitOption.get) && otherParams != Nil && newlineBefore(otherParams.head._2))
+
+      val paramIsAlignable = alignParameters && (!isFirstParam || firstParamAlignable)
+
+      if (alignParameters && paramIsAlignable) {
         calculateParamSectionLengths(paramToAppend, isFirstParam) match {
           case Some(sectionLengths) =>
             groupedParams match {

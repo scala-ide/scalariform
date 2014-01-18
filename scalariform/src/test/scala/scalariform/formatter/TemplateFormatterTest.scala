@@ -376,6 +376,16 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
 {
     implicit val formattingPreferences = FormattingPreferences.setPreference(AlignParameters, true)
 
+    // Make sure spacing in same line implicit parameters is preserved
+    """class A[T](a: T)(implicit b: B)""" ==>
+      """class A[T](a: T)(implicit b: B)"""
+    """class A[T](a: T)(implicit b: B, c: C)""" ==>
+      """class A[T](a: T)(implicit b: B, c: C)"""
+    """class A[T](a: T)(implicit b: B, c: C,
+        |d: D)""" ==>
+      """class A[T](a: T)(implicit b: B, c: C,
+        |                 d: D)"""
+
    // Split into 3 columns: name, type, and default
     """def showInput[A](
       | parent: Component = null,
