@@ -325,16 +325,16 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
    """def a(
      |a: Int = 1,
      |abc: Boolean = true): Int""" ==>
-     """def a(
-       |  a :   Int     = 1,
-       |  abc : Boolean = true) : Int"""
+   """def a(
+     |  a :   Int     = 1,
+     |  abc : Boolean = true) : Int"""
 
    """def a(
      |a: Option[Either[Int]] = 1,
      |abc: Boolean = true): Int""" ==>
-     """def a(
-       |  a :   Option[ Either[ Int ] ] = 1,
-       |  abc : Boolean                 = true) : Int"""
+   """def a(
+     |  a :   Option[ Either[ Int ] ] = 1,
+     |  abc : Boolean                 = true) : Int"""
 }
 
 {
@@ -377,30 +377,30 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     implicit val formattingPreferences = FormattingPreferences.setPreference(AlignParameters, true)
 
    // Split into 3 columns: name, type, and default
-   """def showInput[A](
-     | parent: Component = null,
-     | message: Any,
-     | title: String = uiString("OptionPane.inputDialogTitle"),
-     | messageType: Message.Value = Message.Question,
-     | icon: Icon = EmptyIcon,
-     | entries: Seq[A] = Nil,
-     | initial: A): Option[A]""" ==>
-   """def showInput[A](
-     |  parent:      Component     = null,
-     |  message:     Any,
-     |  title:       String        = uiString("OptionPane.inputDialogTitle"),
-     |  messageType: Message.Value = Message.Question,
-     |  icon:        Icon          = EmptyIcon,
-     |  entries:     Seq[A]        = Nil,
-     |  initial:     A): Option[A]"""
+    """def showInput[A](
+      | parent: Component = null,
+      | message: Any,
+      | title: String = uiString("OptionPane.inputDialogTitle"),
+      | messageType: Message.Value = Message.Question,
+      | icon: Icon = EmptyIcon,
+      | entries: Seq[A] = Nil,
+      | initial: A): Option[A]""" ==>
+    """def showInput[A](
+      |  parent:      Component     = null,
+      |  message:     Any,
+      |  title:       String        = uiString("OptionPane.inputDialogTitle"),
+      |  messageType: Message.Value = Message.Question,
+      |  icon:        Icon          = EmptyIcon,
+      |  entries:     Seq[A]        = Nil,
+      |  initial:     A): Option[A]"""
 
     // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
     """case class Spacing(param: Int = 1,
       |paramTwo: Int = 2,
       |paramThree: String = "3")""" ==>
-      """case class Spacing(param:      Int    = 1,
-        |                   paramTwo:   Int    = 2,
-        |                   paramThree: String = "3")"""
+    """case class Spacing(param:      Int    = 1,
+      |                   paramTwo:   Int    = 2,
+      |                   paramThree: String = "3")"""
 
     // Groups and formats consecutive single line parameters
     """case class Spacing(param: Int = 1,
@@ -428,15 +428,15 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |implicit val four: Int,
       |five: String,
       |six: Boolean)""" ==>
-      """class SomeClass(
-        |  parameterOne:     Int            = 1,
-        |  val parameterTwo: Option[String] = None,
-        |  three:            String         = "three")(
-        |    intermediate: Int)(
-        |      implicit
-        |      val four: Int,
-        |      five:     String,
-        |      six:      Boolean)"""
+    """class SomeClass(
+      |  parameterOne:     Int            = 1,
+      |  val parameterTwo: Option[String] = None,
+      |  three:            String         = "three")(
+      |    intermediate: Int)(
+      |      implicit
+      |      val four: Int,
+      |      five:     String,
+      |      six:      Boolean)"""
 
     // Handles annotations, modifiers, and comments
    """def extraStuff(
@@ -489,32 +489,32 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |        },
     |        m: Int)"""
 
-    """class A(
-      |implicit n: {
-      |def x: Int
-      |def y: Int
-      |})""" ==>
-    """class A(
-      |  implicit
-      |  n: {
-      |    def x: Int
-      |    def y: Int
-      |  })"""
+  """class A(
+    |implicit n: {
+    |def x: Int
+    |def y: Int
+    |})""" ==>
+  """class A(
+    |  implicit
+    |  n: {
+    |    def x: Int
+    |    def y: Int
+    |  })"""
 
-    """class A(n: {
-      |def x: Int
-      |})""" ==>
-      """class A(n: {
-        |          def x: Int
-        |        })"""
+  """class A(n: {
+    |def x: Int
+    |})""" ==>
+  """class A(n: {
+    |          def x: Int
+    |        })"""
 
-    """class A(a: Int,
-      |b: Int)(c: { val d: Int
-      |})""" ==>
-      """class A(a: Int,
-        |        b: Int)(c: {
-        |                  val d: Int
-        |                })"""
+  """class A(a: Int,
+    |b: Int)(c: { val d: Int
+    |})""" ==>
+  """class A(a: Int,
+    |        b: Int)(c: {
+    |                  val d: Int
+    |                })"""
 
   }
 

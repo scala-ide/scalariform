@@ -1016,7 +1016,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     var paramFormatterState = formatterState
     val alignParameters = formattingPreferences(AlignParameters) && !formattingPreferences(IndentWithTabs)
 
-    if (formattingPreferences(PreserveDanglingCloseParenthesis))
+    val hasContent = implicitOption.isDefined || firstParamOption.isDefined || !otherParams.isEmpty
+    if (formattingPreferences(PreserveDanglingCloseParenthesis) && hiddenPredecessors(rparen).containsNewline && hasContent)
       formatResult = formatResult.before(rparen, formatterState.currentIndentLevelInstruction)
 
     val groupedParams = groupParams(paramClause, alignParameters)
