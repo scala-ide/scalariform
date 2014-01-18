@@ -162,11 +162,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           builder.append(" ")
         else
           writeIntertokenCompact()
-      case PlaceAtColumn(indentLevel, spaces) ⇒
+      case PlaceAtColumn(indentLevel, spaces, relativeTo) ⇒
         require(!formattingPreferences(IndentWithTabs))
         writeIntertokenCompact()
+        val relativeIndent = relativeTo flatMap tokenIndentMap.get getOrElse 0
         val indentLength = Spaces(formattingPreferences(IndentSpaces)).length(indentLevel)
-        builder.append(" " * (indentLength + spaces - builder.currentColumn))
+        builder.append(" " * (indentLength + relativeIndent + spaces - builder.currentColumn))
       case EnsureNewlineAndIndent(indentLevel, relativeTo) ⇒
         require(!(formattingPreferences(IndentWithTabs) && relativeTo.isDefined))
         val baseIndentOption = relativeTo flatMap tokenIndentMap.get

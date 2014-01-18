@@ -4,7 +4,7 @@ import scalariform.lexer.Chars
 import scalariform.lexer.Token
 import scalariform.lexer.Tokens._
 import scalariform.parser._
-import scalariform.utils.Utils
+import scalariform.utils.{TextEditProcessor, Utils}
 import scalariform.formatter.preferences._
 import scala.PartialFunction._
 
@@ -837,52 +837,321 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val ParamClauses(initialNewlineOpt, paramClausesAndNewlines) = paramClauses
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = formatterState
+    var index = 0
     for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines. // maybe already done in some cases by format(tmplDef)?
-
-      val (paramClauseFormatResult, newFormatterState) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
+      val (paramClauseFormatResult, newFormatterState) = formatParamClause(paramClause, index, doubleIndentParams)(currentFormatterState)
       formatResult ++= paramClauseFormatResult
       currentFormatterState = newFormatterState
+      index += 1
     }
     formatResult
   }
 
-  private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
+  private type EitherAlignableParam = Either[ConsecutiveSingleLineParams, Param]
+  /**
+   * Groups consecutive single line params in a [[scalariform.parser.ParamClause]] for alignment.
+   * The head of the return value (and head of the params list in the returned ConsecutiveSingleLineParams is guaranteed
+   * to be the very first parameter in the paramClause. The other parameters are not necessarily in the order they appear.
+   * @param paramClause
+   * @param formatterState
+   *
+   * @return List of grouped params. Left stores a group of parameters that can be aligned together,
+   *         Right stores an unalignable param.
+   */
+  private def groupParams(paramClause: ParamClause, alignParameters: Boolean)(implicit formatterState: FormatterState): List[EitherAlignableParam] = {
+    val ParamClause(_, _, firstParamOption, otherParams, _) = paramClause
+
+    val paramsList: List[Param] =  otherParams.map { case (comma, param) => param }.reverse
+
+    def appendParamToGroup(paramToAppend: Param,
+                           groupedParams: List[EitherAlignableParam],
+                           isFirstParam: Boolean): List[EitherAlignableParam] = {
+      if (alignParameters) {
+        calculateParamSectionLengths(paramToAppend, isFirstParam) match {
+          case Some(sectionLengths) =>
+            groupedParams match {
+              case Right(param) :: tail =>
+                Left(ConsecutiveSingleLineParams(List(paramToAppend), sectionLengths, sectionLengths)) :: groupedParams
+              case Left(existingParams) :: tail =>
+                Left(existingParams.prepend(paramToAppend, sectionLengths)) :: tail
+              case Nil =>
+                Left(ConsecutiveSingleLineParams(List(paramToAppend), sectionLengths, sectionLengths)) :: Nil
+            }
+          case None =>
+            Right(paramToAppend) :: groupedParams
+        }
+      } else {
+        Right(paramToAppend) :: groupedParams
+      }
+    }
+
+    var paramsGroup = paramsList.foldLeft(List[EitherAlignableParam]()) { (groupedParams, nextParam) =>
+      appendParamToGroup(nextParam, groupedParams, isFirstParam = false)
+    }
+    for (firstParam <- firstParamOption) {
+      paramsGroup = appendParamToGroup(firstParam, paramsGroup, isFirstParam = true)
+    }
+
+    paramsGroup
+  }
+
+  private case class ConsecutiveSingleLineParams(params: List[Param], maxSectionLengths: ParamSectionLengths, thisSectionLengths: ParamSectionLengths) {
+    def prepend(param: Param, newLengths: ParamSectionLengths): ConsecutiveSingleLineParams = {
+      ConsecutiveSingleLineParams(param :: params, maxSectionLengths.max(newLengths), thisSectionLengths)
+    }
+
+    // Splits the head param off, returning it and the remaining params.
+    // This doesn't recalculate section lengths.
+    def pop: (Option[Param], ConsecutiveSingleLineParams) = params match {
+      case param :: remainingParams =>
+        (Some(param), copy(params = remainingParams))
+      case Nil =>
+        (None, copy(params = Nil))
+    }
+  }
+
+  private case class ParamSectionLengths(prefixLength: Int, idLength: Int, prefixAndIdLength: Int, typeLength: Int) {
+    def max(newParamSectionLength: ParamSectionLengths): ParamSectionLengths = {
+      val ParamSectionLengths(newPrefixLength, newIdLength, newPrefixAndIdLength, newTypeLength) = newParamSectionLength
+      ParamSectionLengths(
+        math.max(prefixLength, newPrefixLength),
+        math.max(idLength, newIdLength),
+        math.max(prefixAndIdLength, newPrefixAndIdLength),
+        math.max(typeLength, newTypeLength)
+      )
+    }
+  }
+
+  private def calculateParamSectionLengths(param: Param, first: Boolean)(implicit formatterState: FormatterState): Option[ParamSectionLengths] = {
+    val Param(annotations, modifiers, valOrVarOpt, id, paramTypeOpt, defaultValueOpt) = param
+
+    val formattedParam = {
+      val source = getSource(param)
+      val paramFormatResult = format(param)(formatterState)
+      val offset = param.firstToken.offset
+      val edits = writeTokens(source, param.tokens, paramFormatResult, offset)
+      TextEditProcessor.runEdits(source, edits)
+    }
+
+    def calculateLengths: ParamSectionLengths = {
+
+      def calculatePrefixLength: Int = {
+        // Calculate longest "prefix" length. Annotations, modifiers, and val/var contribute
+        // to this number.
+        val allPrefixTokens =
+          annotations.flatMap(_.tokens) ++
+          modifiers.flatMap(_.tokens) ++
+          valOrVarOpt
+        var prefixLength = 0
+        allPrefixTokens.filter(!_.isNewline).foreach {
+          prefixLength += _.length
+        }
+
+        // Account for whitespace between prefix token types. This assumes everything
+        // will be placed on a single line with no newlines between prefixes.
+        val numberOfPrefixTypes = Seq(
+          !annotations.isEmpty,
+          valOrVarOpt.isDefined
+        ).count(_ == true) + modifiers.length
+        if (numberOfPrefixTypes > 0)
+          prefixLength += numberOfPrefixTypes - 1
+
+        prefixLength
+      }
+
+      // Account for the colon (and possible space) after the parameter's name
+      def calculateIdLength: Int = {
+        if (formattingPreferences(SpaceBeforeColon))
+          id.length + 2
+        else
+          id.length + 1
+      }
+
+      def calculateTypeLength: Int = {
+        // Calculate longest "type" length.
+        var typeLength = 0
+        for ((_, typeAst) <- paramTypeOpt) {
+          if (formattingPreferences(SpaceInsideBrackets)) {
+            typeAst.tokens.foreach { token =>
+            // Add two to count, accounting for spaces between brackets
+              if (token.tokenType == RBRACKET)
+                typeLength += 2
+              typeLength += token.length
+            }
+          } else {
+            typeAst.tokens.foreach { typeLength += _.length}
+          }
+        }
+
+        typeLength
+      }
+
+      val prefixLength = calculatePrefixLength
+      val idLength = calculateIdLength
+      val prefixAndIdLength = {
+        if (prefixLength > 0)
+          prefixLength + idLength + 1 // the + 1 is to account for whitespace
+        else
+          idLength
+      }
+
+      ParamSectionLengths(prefixLength, idLength, prefixAndIdLength, calculateTypeLength)
+    }
+
+    val newlineBeforeParam = hiddenPredecessors(param.firstToken).containsNewline
+
+    if (formattedParam.contains('\n') || (!first && !newlineBeforeParam))
+      None
+    else
+      Some(calculateLengths)
+
+  }
+
+  // TODO: figure out how to preserve relative indentation when first param is on first line,
+  private def formatParamClause(paramClause: ParamClause, clauseIndex: Int, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
     val ParamClause(lparen, implicitOption, firstParamOption, otherParams, rparen) = paramClause
     val paramIndent = if (doubleIndentParams) 2 else 1
     val relativeToken = paramClause.tokens(1) // TODO
     var formatResult: FormatResult = NoFormatResult
     var paramFormatterState = formatterState
     val alignParameters = formattingPreferences(AlignParameters) && !formattingPreferences(IndentWithTabs)
-    for (firstParam ← firstParamOption) {
-      val token = implicitOption getOrElse firstParam.firstToken
-      if (hiddenPredecessors(token).containsNewline) {
-        formatResult = formatResult.before(token, formatterState.indent(paramIndent).currentIndentLevelInstruction)
-        paramFormatterState = if (alignParameters) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
-      } else if (containsNewline(firstParam) && alignParameters)
-        paramFormatterState = formatterState.alignWithToken(relativeToken)
+
+    if (formattingPreferences(PreserveDanglingCloseParenthesis))
+      formatResult = formatResult.before(rparen, formatterState.currentIndentLevelInstruction)
+
+    val groupedParams = groupParams(paramClause, alignParameters)
+
+    // Separate the first parameter from the groupedParams, since we have to
+    // do special formatting for the first param.
+    val ((firstGroupedParamOption, maxSectionLengthsOption), otherGroupedParams) = groupedParams.headOption match {
+      case Some(x) => x match {
+        case Left(consecutiveParams) =>
+          val (firstParam, remainingConsecutiveParams) = consecutiveParams.pop
+          ((firstParam, Some(remainingConsecutiveParams.maxSectionLengths)), Left(remainingConsecutiveParams) :: groupedParams.tail)
+        case p @ Right(param) =>
+          ((Some(param), None), groupedParams.tail)
+      }
+      case None => ((None, None), Nil)
+    }
+
+    for (firstParam <- firstGroupedParamOption) {
+      maxSectionLengthsOption match {
+        case Some(lengths) =>
+
+          // Indent prefixes (annotations, modifiers, and id) if alignParameters is enabled
+          alignFirstParam(firstParam)
+
+          // Indent Type
+          indentType(firstParam, lengths)
+
+          // Indent Default
+          indentDefault(firstParam, lengths)
+        case None =>
+          alignFirstParam(firstParam)
+      }
       formatResult ++= format(firstParam)(paramFormatterState)
     }
 
-    for ((comma, param) ← otherParams) {
-      val token = param.firstToken
-      if (hiddenPredecessors(token).containsNewline) {
-        paramFormatterState = if (alignParameters) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
-        formatResult = formatResult.before(token, paramFormatterState.currentIndentLevelInstruction)
-      }
-      formatResult ++= format(param)(paramFormatterState)
+    otherGroupedParams.foreach {
+      case Left(ConsecutiveSingleLineParams(params, maxSectionLengths, thisSectionLengths)) =>
+        params.foreach { param =>
+          val firstToken = param.firstToken
+
+          // Indent prefixes (annotations, modifiers, and id)
+          alignOtherParams(firstToken)
+
+          // Indent Type
+          indentType(param, maxSectionLengths)
+
+          // Indent Default
+          indentDefault(param, maxSectionLengths)
+
+          formatResult ++= format(param)(paramFormatterState)
+        }
+      case Right(param) =>
+        alignOtherParams(param.firstToken)
+        formatResult ++= format(param)(paramFormatterState)
     }
+
+    def alignFirstParam(firstParam: Param) = {
+      // Place implicit on it's own line
+      for (implicitToken <- implicitOption) {
+        if (hiddenPredecessors(implicitToken).containsNewline || (containsNewline(firstParam) && alignParameters))
+          formatResult = formatResult.before(implicitToken, paramFormatterState.indent(paramIndent).currentIndentLevelInstruction)
+      }
+
+      val firstToken = firstParam.firstToken
+      val implicitOrFirstToken = implicitOption getOrElse firstToken
+
+      if (alignParameters)
+        paramFormatterState = formatterState.alignWithToken(relativeToken)
+
+      if (hiddenPredecessors(implicitOrFirstToken).containsNewline) {
+        formatResult = formatResult.before(firstToken, formatterState.indent(paramIndent).currentIndentLevelInstruction)
+        if (!alignParameters)
+           paramFormatterState = formatterState.indent(paramIndent)
+      } else if (containsNewline(firstParam) && alignParameters) {
+        println(relativeToken)
+        paramFormatterState = formatterState.alignWithToken(relativeToken)
+      }
+    }
+
+    def alignOtherParams(firstToken: Token) = {
+      if (hiddenPredecessors(firstToken).containsNewline) {
+        paramFormatterState = if (alignParameters) formatterState.alignWithToken(relativeToken) else formatterState.indent(paramIndent)
+        formatResult = formatResult.before(firstToken, paramFormatterState.currentIndentLevelInstruction)
+      }
+    }
+
+    def indentType(param: Param, maxSectionLengths: ParamSectionLengths) = {
+      for ((colon, typeAst) <- param.paramTypeOpt) {
+        val typeSpaces = maxSectionLengths.prefixAndIdLength + 1
+        formatResult = formatResult.before(
+          typeAst.firstToken,
+          PlaceAtColumn(
+            0,
+            typeSpaces,
+            paramFormatterState.indentRelativeToTokenOption
+          )
+        )
+      }
+    }
+
+    def indentDefault(param: Param, maxSectionLengths: ParamSectionLengths) = {
+      for ((equal, default) <- param.defaultValueOpt) {
+        val defaultSpaces = {
+          maxSectionLengths.prefixAndIdLength +
+            maxSectionLengths.typeLength + 2
+        }
+        formatResult = formatResult.before(
+          equal,
+          PlaceAtColumn(
+            0,
+            defaultSpaces,
+            paramFormatterState.indentRelativeToTokenOption
+          )
+        )
+      }
+    }
+
     (formatResult, paramFormatterState)
+
   }
 
   private def format(param: Param)(implicit formatterState: FormatterState): FormatResult = {
     val Param(annotations: List[Annotation], modifiers: List[Modifier], valOrVarOpt: Option[Token], id: Token, paramTypeOpt: Option[(Token, Type)], defaultValueOpt: Option[(Token, Expr)]) = param
     var formatResult: FormatResult = NoFormatResult
-    for (annotation ← annotations)
+
+
+    for (annotation ← annotations) {
       formatResult ++= format(annotation)
-    for ((colon, paramType) ← paramTypeOpt)
+    }
+    for ((colon, paramType) ← paramTypeOpt) {
       formatResult ++= format(paramType)
-    for ((equals, expr) ← defaultValueOpt)
+    }
+    for ((equals, expr) ← defaultValueOpt) {
       formatResult ++= format(expr)
+    }
     formatResult
   }
 

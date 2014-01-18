@@ -63,4 +63,4 @@ case object CompactPreservingGap extends IntertokenFormatInstruction
 case class EnsureNewlineAndIndent(indentLevel: Int, relativeTo: Option[Token] = None) extends IntertokenFormatInstruction
 
 /** Places the token at spaces number of spaces after the indent level, padding with spaces if necessary */
-case class PlaceAtColumn(indentLevel: Int, spaces: Int) extends IntertokenFormatInstruction
+case class PlaceAtColumn(indentLevel: Int, spaces: Int, relativeTo: Option[Token] = None) extends IntertokenFormatInstruction

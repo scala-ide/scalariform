@@ -82,7 +82,6 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
             previousCaseClauseEndsWithNewline(caseClause, caseClausesAstNode)
 
           // To evaluate whether a clause body is multiline, we ignore a trailing newline: 
-          val prunedStatSeq = pruneTrailingNewline(statSeq)
           val clauseBodyIsMultiline = containsNewline(pruneTrailingNewline(statSeq)) ||
             statSeq.firstTokenOption.exists(hiddenPredecessors(_).containsNewline)
 
