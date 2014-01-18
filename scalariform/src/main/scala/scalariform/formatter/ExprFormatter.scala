@@ -968,18 +968,22 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
 
       def calculateTypeLength: Int = {
+        val spacesInsideBrackets = formattingPreferences(SpaceInsideBrackets)
         // Calculate longest "type" length.
         var typeLength = 0
         for ((_, typeAst) <- paramTypeOpt) {
-          if (formattingPreferences(SpaceInsideBrackets)) {
-            typeAst.tokens.foreach { token =>
-            // Add two to count, accounting for spaces between brackets
-              if (token.tokenType == RBRACKET)
-                typeLength += 2
-              typeLength += token.length
+          typeAst.tokens.foreach { token =>
+
+            // Add two to count, accounting for spaces between brackets, (ex: Option[ String ])
+            if (spacesInsideBrackets && token.tokenType == RBRACKET)
+              typeLength += 2
+
+            // Add two to count, accounting for spaces in function types, (ex: Int => String)
+            if (token.tokenType == ARROW) {
+              typeLength += 2
             }
-          } else {
-            typeAst.tokens.foreach { typeLength += _.length}
+
+            typeLength += token.length
           }
         }
 
@@ -1092,7 +1096,6 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         if (!alignParameters)
            paramFormatterState = formatterState.indent(paramIndent)
       } else if (containsNewline(firstParam) && alignParameters) {
-        println(relativeToken)
         paramFormatterState = formatterState.alignWithToken(relativeToken)
       }
     }

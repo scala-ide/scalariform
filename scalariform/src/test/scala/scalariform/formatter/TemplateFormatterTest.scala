@@ -393,6 +393,16 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |  icon:        Icon          = EmptyIcon,
       |  entries:     Seq[A]        = Nil,
       |  initial:     A): Option[A]"""
+  
+    // Formats function types correctly
+    """private def executeWithinClient[T](
+      |crawlerConfig: String => JsValue = Fancy.function,
+      |f: HttpCrawlerClient => T,
+      |port: Int = SpecHelper.port): T""" ==>
+    """private def executeWithinClient[T](
+      |  crawlerConfig: String => JsValue      = Fancy.function,
+      |  f:             HttpCrawlerClient => T,
+      |  port:          Int                    = SpecHelper.port): T"""
 
     // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
     """case class Spacing(param: Int = 1,
