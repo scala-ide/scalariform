@@ -22,7 +22,7 @@ Scala IDE for Eclipse uses Scalariform for code formatting:
 - Right click in the editor -> Source -> Format
 - Press Ctrl-Shift-F
 
-If you select some lines, only those will be formatted. 
+If you select some lines, only those will be formatted.
 
 You can also configure formatting to be run as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
 
@@ -31,7 +31,7 @@ To set preferences, go to Window -> Preferences -> Scala -> Formatter
 Integration with Emacs/ENSIME
 -----------------------------
 
-"`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer." 
+"`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer."
 
   http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8
 
@@ -123,23 +123,41 @@ alignParameters
 
 Default: ``false``
 
-Align class/function parameters in the same column. For example, if ``false``, then::
+Align class/function parameters (modifiers and name, type, and defaults) in three columns.
+
+For example, if ``false``, then::
 
   class Person(name: String,
-    age: Int,
+    age: Int = 24,
     birthdate: Date,
-    astrologicalSign: String,
+    astrologicalSign: String = "libra",
     shoeSize: Int,
     favoriteColor: java.awt.Color)
 
 If ``true``, then::
 
-  class Person(name: String,
-               age: Int,
-               birthdate: Date,
-               astrologicalSign: String,
-               shoeSize: Int,
-               favoriteColor: java.awt.Color)
+  class Person(name:             String,
+               age:              Int            = 24,
+               birthdate:        Date,
+               astrologicalSign: String         = "libra",
+               shoeSize:         Int,
+               favoriteColor:    java.awt.Color)
+
+This will also place the "implicit" keyword in parameters on it's own line, whenever
+the parameter being formatted contains a newline::
+
+For example, if ``false``, then::
+
+  def formatBirthDate(
+    implicit birthdate: Date = Date("11/11/11"),
+    birthtime: Time): DateTime
+
+If ``true``, then::
+
+  def formatBirthDate(
+    implicit
+    birthdate: Date = Date("11/11/11"),
+    birthtime: Time): DateTime
 
 This option is disabled if ``indentWithTabs`` is ``true``.
 
@@ -204,7 +222,7 @@ using `Compact Control Readability`_ style:
 
   try {
     foo()
-  } 
+  }
   catch {
     case _ => bar()
   }
@@ -319,7 +337,7 @@ indentSpaces
 
 Default: ``2``
 
-The number of spaces to use for each level of indentation. 
+The number of spaces to use for each level of indentation.
 
 This option is ignored if ``indentWithTabs`` is ``true``.
 
@@ -341,14 +359,14 @@ Default: ``false``
 
 If ``true``, start a multi-line Scaladoc comment body on same line as the opening comment delimiter::
 
-  /** This method applies f to each 
+  /** This method applies f to each
    *  element of the given list.
    */
 
 If ``false``, start the comment body on a separate line below the opening delimiter::
 
-  /** 
-   * This method applies f to each 
+  /**
+   * This method applies f to each
    * element of the given list.
    */
 
@@ -358,7 +376,7 @@ preserveDanglingCloseParenthesis
 Default: ``false``
 
 If ``true``, it will keep a newline before a close parenthesis ')' in an
-argument expression. For example::
+argument expression or parameter clause. For example::
 
   val book = Book(
     name = "Name",
@@ -373,6 +391,21 @@ If ``false``, the parenthesis will be joined to the end of the argument list::
     author = "Author",
     rating = 5)
 
+
+Or with parameters, if ``true``::
+
+  def findBooks(
+    author: Option[String] = None,
+    title: Option[String] = None
+  ): List[Book]
+
+If ``false``::
+
+  def findBooks(
+    author: Option[String] = None,
+    title: Option[String] = None): List[Book]
+
+
 placeScaladocAsterisksBeneathSecondAsterisk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -381,14 +414,14 @@ Default: ``false``
 If ``true``, Scaladoc asterisks will be placed beneath the second asterisk::
 
   /** Wibble
-    * wobble 
+    * wobble
     */
   class A
 
 Otherwise, if ``false``, beneath the first asterisk::
 
   /** Wibble
-   *  wobble 
+   *  wobble
    */
   class A
 
@@ -487,14 +520,14 @@ make uncompliant source more compliant.
 ============================                ========= =========
 Preference                                  Value     Default?
 ============================                ========= =========
-alignParameters                             ``false`` 
-compactStringConcatenation                  ``false`` 
+alignParameters                             ``false``
+compactStringConcatenation                  ``false``
 doubleIndentClassDeclaration                ``true``    No
-indentSpaces                                ``2``       
+indentSpaces                                ``2``
 placeScaladocAsterisksBeneathSecondAsterisk ``true``    No
-preserveSpaceBeforeArguments                ``false`` 
-rewriteArrowSymbols                         ``false`` 
-spaceBeforeColon                            ``false`` 
+preserveSpaceBeforeArguments                ``false``
+rewriteArrowSymbols                         ``false``
+spaceBeforeColon                            ``false``
 spaceInsideBrackets                         ``false``
 spaceInsideParentheses                      ``false``
 ============================                ========= =========
@@ -510,24 +543,24 @@ format: [ON|OFF]
 Disables the formatter for selective portions of a source file::
 
   // format: OFF    <-- this directive disables formatting from this point
-  class AsciiDSL { 
+  class AsciiDSL {
     n ¦- "1" -+ { n: Node =>
-            n ¦- "i"  
-            n ¦- "ii"  
-            n ¦- "iii"  
-            n ¦- "iv"  
+            n ¦- "i"
+            n ¦- "ii"
+            n ¦- "iii"
+            n ¦- "iv"
             n ¦- "v"
     }
     n ¦- "2"
     n ¦- "3" -+ { n: Node =>
-            n ¦- "i"  
+            n ¦- "i"
             n ¦- "ii" -+ { n: Node =>
                      n ¦- "a"
                      n ¦- "b"
                      n ¦- "c"
             }
-            n ¦- "iii"  
-            n ¦- "iv"  
+            n ¦- "iii"
+            n ¦- "iv"
             n ¦- "v"
     }
     // format: ON   <-- formatter resumes from this point
