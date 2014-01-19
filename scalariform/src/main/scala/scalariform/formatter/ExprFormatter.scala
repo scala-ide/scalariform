@@ -938,6 +938,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       TextEditProcessor.runEdits(source, edits)
     }
 
+    // TODO: is there a less brittle way of calculating the extra '+ 1' character
+    // spaces besides guessing?
     def calculateLengths: ParamSectionLengths = {
 
       def calculatePrefixLength: Int = {
@@ -976,21 +978,27 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         // Calculate longest "type" length.
         var typeLength = 0
         for ((_, typeAst) ← paramTypeOpt) {
-          typeAst.tokens.foreach { token ⇒
+          val firstTypeToken :: otherTypeTokens = typeAst.tokens
+
+          // Add one to count, accounting for spaces in call by name params, (ex: => String)
+          if (firstTypeToken.tokenType == ARROW)
+            typeLength += 1
+
+          typeLength += firstTypeToken.length
+
+          otherTypeTokens.foreach { token ⇒
 
             // Add two to count, accounting for spaces between brackets, (ex: Option[ String ])
             if (spacesInsideBrackets && token.tokenType == RBRACKET)
               typeLength += 2
 
             // Add two to count, accounting for spaces in function types, (ex: Int => String)
-            if (token.tokenType == ARROW) {
+            if (token.tokenType == ARROW)
               typeLength += 2
-            }
 
             // Add one to count, accounting for spaces after commas, (ex: Map[Int, String])
-            if (token.tokenType == COMMA) {
+            if (token.tokenType == COMMA)
               typeLength += 1
-            }
 
             typeLength += token.length
           }

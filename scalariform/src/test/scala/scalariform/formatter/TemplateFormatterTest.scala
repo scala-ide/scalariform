@@ -414,6 +414,14 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |  f:             HttpCrawlerClient => T,
       |  port:          Int                    = SpecHelper.port): T"""
 
+    // By name parameters have correct spacing
+    """def a(
+      |  p1: => (SomeLongByNameParam => SomeShorterParam) = Null,
+      |  param2: SomeShorterParam = Null): A""" ==>
+   """def a(
+      |  p1:     => (SomeLongByNameParam => SomeShorterParam) = Null,
+      |  param2: SomeShorterParam                             = Null): A"""
+
     // Formats parameterized types correctly
     """def A(complicatedType: Option[B  ,C,      D[E, F,G]] = None,
       | simpleType: String = ""): B""" ==>
@@ -421,7 +429,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |      simpleType:      String                   = ""): B"""
 
 
-  // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
+    // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
     """case class Spacing(param: Int = 1,
       |paramTwo: Int = 2,
       |paramThree: String = "3")""" ==>
