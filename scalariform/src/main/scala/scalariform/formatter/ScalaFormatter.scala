@@ -45,6 +45,23 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     result
   }
 
+  /**
+   * Converts an AstNode into what it should look like in text after Scalariform has run.
+   * Useful for calculating the actual length of an [[scalariform.parser.AstNode]] after formatting.
+   *
+   * @param ast The AST to format and render as a string
+   * @param astFormatResult Should run formatting actions for 'ast'
+   * @return Formatted string representation of what the AstNode should look like after Scalariform
+   *         has run
+   */
+  protected def formattedAstNode(ast: AstNode)(astFormatResult: ⇒ FormatResult): String = {
+    val source = getSource(ast)
+    val formatResult = astFormatResult
+    val offset = ast.firstToken.offset
+    val edits = writeTokens(source, ast.tokens, formatResult, offset)
+    TextEditProcessor.runEdits(source, edits)
+  }
+
   private def alterSuspendFormatting(text: String): Option[Boolean] =
     if (text contains "format: OFF")
       Some(true)

@@ -70,12 +70,8 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
         case (caseClause @ CaseClause(casePattern, statSeq)) :: otherClauses ⇒
           val otherClausesGrouped = groupClauses(otherClauses, first = false)
 
-          val formattedCasePattern = {
-            val casePatternSource = getSource(casePattern)
-            val casePatternFormatResult = formatCasePattern(casePattern)(FormatterState(indentLevel = 0))
-            val offset = casePattern.firstToken.offset
-            val edits = writeTokens(casePatternSource, casePattern.tokens, casePatternFormatResult, offset)
-            TextEditProcessor.runEdits(casePatternSource, edits)
+          val formattedCasePattern = formattedAstNode(casePattern) {
+            formatCasePattern(casePattern)(FormatterState(indentLevel = 0))
           }
 
           val newlineBeforeClause = hiddenPredecessors(caseClause.firstToken).containsNewline ||

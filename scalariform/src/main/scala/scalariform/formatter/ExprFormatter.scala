@@ -927,21 +927,15 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     }
   }
 
+  // TODO: Parts of this function might be useful in implementing other alignment features
   private def calculateParamSectionLengths(param: Param, first: Boolean)(implicit formatterState: FormatterState): Option[ParamSectionLengths] = {
     val Param(annotations, modifiers, valOrVarOpt, id, paramTypeOpt, defaultValueOpt) = param
 
-    val formattedParam = {
-      val source = getSource(param)
-      val paramFormatResult = format(param)(formatterState)
-      val offset = param.firstToken.offset
-      val edits = writeTokens(source, param.tokens, paramFormatResult, offset)
-      TextEditProcessor.runEdits(source, edits)
+    val formattedParam = formattedAstNode(param) {
+      format(param)(formatterState)
     }
 
-    // TODO: is there a less brittle way of calculating the extra '+ 1' character
-    // spaces besides guessing?
     def calculateLengths: ParamSectionLengths = {
-
       def calculatePrefixLength: Int = {
         // Calculate longest "prefix" length. Annotations, modifiers, and val/var contribute
         // to this number.
@@ -974,37 +968,16 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
 
       def calculateTypeLength: Int = {
-        val spacesInsideBrackets = formattingPreferences(SpaceInsideBrackets)
         // Calculate longest "type" length.
-        var typeLength = 0
-        for ((_, typeAst) ← paramTypeOpt) {
-          val firstTypeToken :: otherTypeTokens = typeAst.tokens
-
-          // Add one to count, accounting for spaces in call by name params, (ex: => String)
-          if (firstTypeToken.tokenType == ARROW)
-            typeLength += 1
-
-          typeLength += firstTypeToken.length
-
-          otherTypeTokens.foreach { token ⇒
-
-            // Add two to count, accounting for spaces between brackets, (ex: Option[ String ])
-            if (spacesInsideBrackets && token.tokenType == RBRACKET)
-              typeLength += 2
-
-            // Add two to count, accounting for spaces in function types, (ex: Int => String)
-            if (token.tokenType == ARROW)
-              typeLength += 2
-
-            // Add one to count, accounting for spaces after commas, (ex: Map[Int, String])
-            if (token.tokenType == COMMA)
-              typeLength += 1
-
-            typeLength += token.length
-          }
+        val typeLengthOpt = paramTypeOpt map {
+          case (_, typeAst) ⇒
+            val formattedType = formattedAstNode(typeAst) {
+              format(typeAst)(formatterState)
+            }
+            formattedType.length
         }
 
-        typeLength
+        typeLengthOpt.getOrElse(0)
       }
 
       val prefixLength = calculatePrefixLength

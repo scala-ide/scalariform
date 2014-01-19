@@ -340,9 +340,22 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
 {
    implicit val formattingPreferences = FormattingPreferences.
      setPreference(AlignParameters, true).
-     setPreference(PreserveDanglingCloseParenthesis, true)
+     setPreference(PreserveDanglingCloseParenthesis, true).
+     setPreference(RewriteArrowSymbols, true)
 
-   """class a(
+    // Formats rewritten arrows correctly
+    """def A(
+      |  a: A => B = null,
+      |  bee: => B = null,
+      |  c: B => C = null
+      |): D""" ==>
+    """def A(
+      |  a:   A ⇒ B = null,
+      |  bee: ⇒ B   = null,
+      |  c:   B ⇒ C = null
+      |): D"""
+
+  """class a(
      |  b: Int
      |)""" ==>
    """class a(
