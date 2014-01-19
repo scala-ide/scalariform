@@ -31,7 +31,7 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
     val fields = astNode.getFields
 
     lazy val children = fields flatMap {
-       case (_, None) | (_, Nil) ⇒ None
+      case (_, None) | (_, Nil) ⇒ None
       case (fieldName, value)   ⇒ Some(makeTreeNode(value.asInstanceOf[AnyRef], fieldName))
     }
 

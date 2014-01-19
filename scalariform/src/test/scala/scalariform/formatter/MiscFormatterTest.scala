@@ -28,18 +28,17 @@ class MiscFormatterTest extends AbstractFormatterTest {
       |)""" ==>
       """class Foo()"""
 
-   """class a()""" ==>
-   """class a()"""
+    """class a()""" ==>
+    """class a()"""
 
-   """def a()""" ==>
-   """def a()"""
+    """def a()""" ==>
+    """def a()"""
 
-   """class a(b: Int)""" ==>
-   """class a(b: Int)"""
+    """class a(b: Int)""" ==>
+    """class a(b: Int)"""
 
-   """def a(b: Int)""" ==>
-   """def a(b: Int)"""
-
+    """def a(b: Int)""" ==>
+    """def a(b: Int)"""
   }
 
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
