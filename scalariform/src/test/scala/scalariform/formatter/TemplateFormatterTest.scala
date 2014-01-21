@@ -431,7 +431,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     """def a(
       |  p1: => (SomeLongByNameParam => SomeShorterParam) = Null,
       |  param2: SomeShorterParam = Null): A""" ==>
-   """def a(
+    """def a(
       |  p1:     => (SomeLongByNameParam => SomeShorterParam) = Null,
       |  param2: SomeShorterParam                             = Null): A"""
 
@@ -450,7 +450,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |                   paramTwo:   Int    = 2,
       |                   paramThree: String = "3")"""
 
-    // Groups and formats consecutive single line parameters
+    // Groups and formats consecutive single line parameters (multi line params)
     """case class Spacing(param: Int = 1,
       |paramTwo: Int = 2,
       |paramThree: {
@@ -465,6 +465,20 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |                   },
       |                   paramFour: Option[String] = Some("One"),
       |                   paramFive: Any            = Nothing)"""
+
+    // Groups and formats consecutive single line parameters (newlines)
+    """case class Spacing(
+      |param: Int = 1,
+      |paramTwo: Int = 2,
+      |
+      |paramFour: Option[String] = Some("One"),
+      |paramFive: Any = Nothing)""" ==>
+    """case class Spacing(
+      |  param:    Int = 1,
+      |  paramTwo: Int = 2,
+      |
+      |  paramFour: Option[String] = Some("One"),
+      |  paramFive: Any            = Nothing)"""
 
     // Aligns implicits and curried parameters properly
     """class SomeClass(
@@ -486,7 +500,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |      five:     String,
       |      six:      Boolean)"""
 
-    // Handles annotations, modifiers, and comments
+   // Handles annotations, modifiers, and comments
    """def extraStuff(
      |// comment 1
      |@Annotated paramOne: Int = 1, // comment 2

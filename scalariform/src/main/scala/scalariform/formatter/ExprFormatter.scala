@@ -859,16 +859,26 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
    *         Right stores an unalignable param.
    */
   private def groupParams(paramClause: ParamClause, alignParameters: Boolean)(implicit formatterState: FormatterState): List[EitherAlignableParam] = {
-    val ParamClause(_, implicitOption, firstParamOption, otherParams, _) = paramClause
+    val ParamClause(_, implicitOption, firstParamOption, otherParamsWithComma, _) = paramClause
 
-    val paramsList: List[Param] = otherParams.map { case (comma, param) ⇒ param }.reverse
+    val otherParams = otherParamsWithComma.map { case (comma, param) ⇒ param }
 
-    def appendParamToGroup(paramToAppend: Param,
-                           groupedParams: List[EitherAlignableParam],
-                           isFirstParam: Boolean): List[EitherAlignableParam] = {
+    // This is reversed because "appendParamToGroup" works on lists, and will
+    // create the list in the reverse order of the list it is given.
+    val allParams = (firstParamOption.toList ++ otherParams).reverse
+
+    def appendParamToGroup(previousParam: Option[Param],
+                           paramToAppend: Param,
+                           nextParam: Option[Param],
+                           groupedParams: List[EitherAlignableParam]
+                          ): List[EitherAlignableParam] = {
+
+      // This unintuitive line is dependent on the ordering of groupedParams being passed
+      // in. It's in reverse.
+      val isFirstParam = !nextParam.isDefined
 
       val firstParamAlignable = !implicitOption.isDefined ||
-        (newlineBefore(implicitOption.get) && otherParams != Nil && newlineBefore(otherParams.head._2))
+        (newlineBefore(implicitOption.get) && otherParams != Nil && newlineBefore(otherParams.head))
 
       val paramIsAlignable = alignParameters && (!isFirstParam || firstParamAlignable)
 
@@ -879,7 +889,22 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
               case Right(param) :: tail ⇒
                 Left(ConsecutiveSingleLineParams(List(paramToAppend), sectionLengths, sectionLengths)) :: groupedParams
               case Left(existingParams) :: tail ⇒
-                Left(existingParams.prepend(paramToAppend, sectionLengths)) :: tail
+                if (previousParam.isDefined) {
+                  /* Group params separately if a blank line between two params:
+                   * case class Spacing(a:   Int = 1,
+                   *                    bee: Int = 2,
+                   *
+                   *                    ceee:  String = "",
+                   *                    deeee: Any    = Nothing)
+                   */
+                  val numNewlinesBeforeParam = hiddenPredecessors(previousParam.get.firstToken).text.count(_ == '\n')
+                  if (numNewlinesBeforeParam >= 2)
+                    Left(ConsecutiveSingleLineParams(List(paramToAppend), sectionLengths, sectionLengths)) :: groupedParams
+                  else
+                    Left(existingParams.prepend(paramToAppend, sectionLengths)) :: tail
+                } else {
+                  Left(existingParams.prepend(paramToAppend, sectionLengths)) :: tail
+                }
               case Nil ⇒
                 Left(ConsecutiveSingleLineParams(List(paramToAppend), sectionLengths, sectionLengths)) :: Nil
             }
@@ -891,11 +916,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
     }
 
-    var paramsGroup = paramsList.foldLeft(List[EitherAlignableParam]()) { (groupedParams, nextParam) ⇒
-      appendParamToGroup(nextParam, groupedParams, isFirstParam = false)
-    }
-    for (firstParam ← firstParamOption) {
-      paramsGroup = appendParamToGroup(firstParam, paramsGroup, isFirstParam = true)
+    val staggeredParams = Utils.withPreviousAndNext(allParams)
+
+    val paramsGroup = staggeredParams.foldLeft(List[EitherAlignableParam]()) { (groupedParams, prevAndNext) ⇒
+      val (prevParam, param, nextParam) = prevAndNext
+      appendParamToGroup(prevParam, param, nextParam, groupedParams)
     }
 
     paramsGroup
