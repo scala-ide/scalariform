@@ -788,38 +788,79 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 //
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(PreserveDanglingCloseParenthesis, true)
+    implicit val formattingPreferences = FormattingPreferences.
+      setPreference(PreserveDanglingCloseParenthesis, true).
+      setPreference(AlignArguments, true)
 
-      """Method(a = "",
-        |b,
-        |c = null)""" ==>
-      """Method(a = "",
-        |       b,
-        |       c = null)"""
+//      """Method(a = "",
+//        |b,
+//        |c = null)""" ==>
+//      """Method(a = "",
+//        |       b,
+//        |       c = null)"""
 
-//    """method(multiLineArgument = {
-//      |  val string = "hello world"
-//      |  println(string)
-//      |},
-//      |b = 1,
-//      |c = null)""" ==>
-//    """method(multiLineArgument = {
-//      |                               val string = "hello world"
-//      |                               println(string)
-//      |                             },
-//      |          b                = 1,
-//      |          c                = null)"""
+//      """new Method(a = "",
+//        |b,
+//        |c = null)""" ==>
+//      """new Method(a = "",
+//        |           b,
+//        |           c = null)"""
 
-//    """multiClause(
-//      |  arg1 = 1,
-//      |  argument2 = 2)(
-//      |  args3 = 3)(
-//      |  arg4 = 4)""" ==>
-//    """multiClause(
-//      |  arg1      = 1,
-//      |  argument2 = 2)(
-//      |    args3 = 3)(
-//      |      arg4  = 4)"""
+    """method(multiLineArgument = {
+      |  val string = "hello world"
+      |  println(string)
+      |},
+      |b = 1,
+      |c = null)""" ==>
+    """method(multiLineArgument = {
+      |                             val string = "hello world"
+      |                             println(string)
+      |                           },
+      |       shortParam        = 1,
+      |       shorter           = null)"""
+
+    """o.grouped(
+      |  firstGroupOne = 1,
+      |  firstGroup2   = "One",
+      |
+      |  secondGroupOne = 2,
+      |  secondGroup2   = "Two",
+      |
+      |  3rdGroupOne = 3,
+      |  3rdGroup2   = "Three"
+      |)"""
+
+    """o.grouped(
+      |  firstGroupOne = 1,
+      |  firstGroup2 = "One",
+      |
+      |  secondGroupOne = 2,
+      |  secondGroup2 = "Two",
+      |
+      |  3rdGroupOne = 3,
+      |  3rdGroup2 = "Three"
+      |)""" ==>
+      """o.grouped(
+      |  firstGroupOne = 1,
+      |  firstGroup2   = "One",
+      |
+      |  secondGroupOne = 2,
+      |  secondGroup2   = "Two",
+      |
+      |  3rdGroupOne = 3,
+      |  3rdGroup2   = "Three"
+      |)"""
+
+    //    """multiClause(
+    //      |  arg1 = 1,
+    //      |  argument2 = 2)(
+    //      |  args3 = 3)(
+    //      |  arg4 = 4)""" ==>
+    //    """multiClause(
+    //      |  arg1      = 1,
+    //      |  argument2 = 2)(
+    //      |    args3 = 3)(
+    //      |      arg4  = 4)"""
 
   }
   override val debug = false

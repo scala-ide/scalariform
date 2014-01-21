@@ -60,8 +60,9 @@ trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
 }
 
 object AllPreferences {
-  val preferences: List[PreferenceDescriptor[_]] = List(RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
-    PreserveSpaceBeforeArguments, AlignParameters, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
+  val preferences: List[PreferenceDescriptor[_]] = List(
+    RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
+    PreserveSpaceBeforeArguments, AlignParameters, AlignArguments, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
     CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk)
@@ -109,6 +110,12 @@ case object PreserveSpaceBeforeArguments extends BooleanPreferenceDescriptor {
 case object AlignParameters extends BooleanPreferenceDescriptor {
   val key = "alignParameters"
   val description = "Align parameters on different lines in the same column"
+  val defaultValue = false
+}
+
+case object AlignArguments extends BooleanPreferenceDescriptor {
+  val key = "alignArguments"
+  val description = "Align method arguments on different lines in the same column"
   val defaultValue = false
 }
 
