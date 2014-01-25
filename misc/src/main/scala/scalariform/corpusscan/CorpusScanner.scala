@@ -67,10 +67,14 @@ object CorpusScanner extends SpecificFormatter {
 
 }
 
-object Runner extends App {
+object Runner {
 
   val corpusDir = "/home/matthew/coding/scala-corpus/repos2"
   //  val corpusDir = "/home/matt/scala-corpus"
+
+  def main(args: Array[String]) {
+    formatInPlace()
+  }
 
   def checkParser() {
     val files = ScalaFileWalker.findScalaFiles(corpusDir)
@@ -101,7 +105,4 @@ object Runner extends App {
     }
     println(count + " files formatted.")
   }
-
-  formatInPlace()
-
 }
