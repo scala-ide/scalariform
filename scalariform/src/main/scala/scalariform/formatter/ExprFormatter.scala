@@ -294,7 +294,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   def calculateEqualsExprIdLength(equalsExpr: EqualsExpr): Int = {
     val maybeLength = condOpt(equalsExpr.lhs) {
-      case List(callExpr: CallExpr) => callExpr.id.length
+      case List(callExpr: CallExpr) ⇒ callExpr.id.length
     }
     maybeLength.getOrElse(0)
   }
@@ -319,10 +319,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
      *   bb,
      *   cc)
      */
-    val firstTwoArguments = contents.iterator.filter { x =>
+    val firstTwoArguments = contents.iterator.filter { x ⇒
       cond(x) {
-        case Argument(Expr(List(equalsExpr : EqualsExpr))) => true
-        case Argument(Expr(List(callExpr : CallExpr))) => true
+        case Argument(Expr(List(equalsExpr: EqualsExpr))) ⇒ true
+        case Argument(Expr(List(callExpr: CallExpr)))     ⇒ true
       }
     }.take(2).toList
     if (firstTwoArguments.size == 2) {
@@ -335,31 +335,31 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     var currentExprNewlineCount = 0
     // TODO: refactor this as well as "def groupParams" to share logic
-    val eitherAlignableArguments = contents.foldLeft(List[EitherAlignableEqualsExpr]()){ (existingExprs, exprElement) =>
+    val eitherAlignableArguments = contents.foldLeft(List[EitherAlignableEqualsExpr]()) { (existingExprs, exprElement) ⇒
       exprElement match {
-        case Argument(Expr(List(equalsExpr : EqualsExpr))) =>
+        case Argument(Expr(List(equalsExpr: EqualsExpr))) ⇒
           currentExprNewlineCount = hiddenPredecessors(exprElement.firstToken).text.count(_ == '\n')
           existingExprs match {
-            case Left(exprs @ ConsecutiveSingleLineEqualsExprs(_, length)) :: tail =>
+            case Left(exprs @ ConsecutiveSingleLineEqualsExprs(_, length)) :: tail ⇒
               if (currentExprNewlineCount >= 2)
                 Left(ConsecutiveSingleLineEqualsExprs(List(equalsExpr), calculateEqualsExprIdLength(equalsExpr))) :: existingExprs
               else
                 Left(exprs.prepend(equalsExpr, calculateEqualsExprIdLength(equalsExpr))) :: tail
-            case Right(y) :: tail =>
+            case Right(y) :: tail ⇒
               Left(ConsecutiveSingleLineEqualsExprs(List(equalsExpr), calculateEqualsExprIdLength(equalsExpr))) :: existingExprs
-            case Nil =>
+            case Nil ⇒
               Left(ConsecutiveSingleLineEqualsExprs(List(equalsExpr), calculateEqualsExprIdLength(equalsExpr))) :: existingExprs
           }
-        case Argument(Expr(List(callExpr : CallExpr))) =>
+        case Argument(Expr(List(callExpr: CallExpr))) ⇒
           currentExprNewlineCount = hiddenPredecessors(exprElement.firstToken).text.count(_ == '\n')
           Right(callExpr) :: existingExprs
-        case _ => existingExprs
+        case _ ⇒ existingExprs
       }
     }
 
     eitherAlignableArguments foreach {
-      case Left(ConsecutiveSingleLineEqualsExprs(exprs, maxIdLength)) =>
-        exprs foreach { expr =>
+      case Left(ConsecutiveSingleLineEqualsExprs(exprs, maxIdLength)) ⇒
+        exprs foreach { expr ⇒
           val firstToken = expr.firstToken
 
           // If there's a newline before this argument, OR there will be a newline after formatting
@@ -370,12 +370,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
               PlaceAtColumn(
                 0,
                 maxIdLength + 1,
-                Some(firstToken)
-              )
-            )
+                Some(firstToken)))
           }
         }
-      case Right(callExpr) =>
+      case Right(callExpr) ⇒
         val firstToken = callExpr.firstToken
         if (hiddenPredecessors(firstToken).containsNewline) {
           formatResult = formatResult.before(firstToken, argumentFormatterState.nextIndentLevelInstruction)
@@ -385,29 +383,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult
   }
 
-  def pp(tree: String, indentSize: Int = 2): String = {
-    var indentLevel = 0
-    var outputTree = ""
-    tree foreach { char => char match {
-      case '(' =>
-        indentLevel += 1
-        outputTree += char.toString+'\n'+indents
-      case ')' =>
-        indentLevel -= 1
-        outputTree += "\n" + indents + char.toString
-      case ',' => outputTree += char.toString + "\n" + indents
-      case _ => outputTree += char.toString
-    }}
-
-    def indents = " " * indentLevel * indentSize
-
-    outputTree
-  }
   private def format(parenExpr: ParenExpr)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
     val ParenExpr(lparen, contents, rparen) = parenExpr
     format(ParenArgumentExprs(lparen, contents, rparen))
   }
-
 
   private def format(tryExpr: TryExpr)(implicit formatterState: FormatterState): FormatResult = {
     val TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[CatchClause], finallyClauseOption: Option[(Token, Expr)]) = tryExpr
@@ -1062,8 +1041,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     def appendParamToGroup(previousParam: Option[Param],
                            paramToAppend: Param,
                            nextParam: Option[Param],
-                           groupedParams: List[EitherAlignableParam]
-                          ): List[EitherAlignableParam] = {
+                           groupedParams: List[EitherAlignableParam]): List[EitherAlignableParam] = {
 
       // This unintuitive line is dependent on the ordering of groupedParams being passed
       // in. It's in reverse.

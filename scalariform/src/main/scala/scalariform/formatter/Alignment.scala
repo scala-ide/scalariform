@@ -36,8 +36,8 @@ object Alignment {
   }
 
   case class ConsecutiveSingleLineCaseClauses(
-    clauses: List[CaseClause], 
-    largestCasePatternLength: Int, 
+    clauses: List[CaseClause],
+    largestCasePatternLength: Int,
     smallestCasePatternLength: Int) {
     def prepend(clause: CaseClause, length: Int) =
       ConsecutiveSingleLineCaseClauses(clause :: clauses, max(length, largestCasePatternLength), min(length, smallestCasePatternLength))

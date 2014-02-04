@@ -36,7 +36,7 @@ case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstru
 
   def tokenWillHaveNewline(token: Token): Boolean = {
     val hasNewlineInstruction = predecessorFormatting.get(token) map {
-      PartialFunction.cond(_) { case newlineInstruction: EnsureNewlineAndIndent => true }
+      PartialFunction.cond(_) { case newlineInstruction: EnsureNewlineAndIndent ⇒ true }
     }
     hasNewlineInstruction.getOrElse(false)
   }
