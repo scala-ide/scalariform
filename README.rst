@@ -14,6 +14,13 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
+Integration with sbt
+--------------------
+
+`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions for sbt 0.7.x.
+
+A version for sbt >= 0.13.x has been written by Peter Vlugter: https://github.com/sbt/sbt-scalariform
+
 Integration with Eclipse
 ------------------------
 
@@ -72,16 +79,6 @@ Usage::
       </execution>
     </executions>
   </plugin>
-
-Integration with sbt
---------------------
-
-`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions for sbt 0.7.x.
-
-A version for sbt 0.10.x has been written by Peter Vlugter: https://github.com/typesafehub/sbt-scalariform
-
-.. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
-
 
 Integration with TextMate
 -------------------------
