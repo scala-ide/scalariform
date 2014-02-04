@@ -7,6 +7,7 @@ import scalariform.utils.Utils
 import scalariform.utils.TextEditProcessor
 import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
+import Alignment._
 import PartialFunction._
 import scala.math.{ max, min }
 
@@ -61,10 +62,10 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     formatResult
   }
 
-  private def groupClauses(caseClausesAstNode: CaseClauses): List[Either[ConsecutiveSingleLineCaseClauses, CaseClause]] = {
+  private def groupClauses(caseClausesAstNode: CaseClauses): List[EitherAlignableCaseClause] = {
     val clausesAreMultiline = containsNewline(caseClausesAstNode) || hiddenPredecessors(caseClausesAstNode.firstToken).containsNewline
 
-    def groupClauses(caseClauses: List[CaseClause], first: Boolean): List[Either[ConsecutiveSingleLineCaseClauses, CaseClause]] =
+    def groupClauses(caseClauses: List[CaseClause], first: Boolean): List[EitherAlignableCaseClause] =
       caseClauses match {
         case Nil ⇒ Nil
         case (caseClause @ CaseClause(casePattern, statSeq)) :: otherClauses ⇒
@@ -95,14 +96,6 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
           }
       }
     groupClauses(caseClausesAstNode.caseClauses, first = true)
-  }
-
-  private case class ConsecutiveSingleLineCaseClauses(clauses: List[CaseClause], largestCasePatternLength: Int, smallestCasePatternLength: Int) {
-    def prepend(clause: CaseClause, length: Int) =
-      ConsecutiveSingleLineCaseClauses(clause :: clauses, max(length, largestCasePatternLength), min(length, smallestCasePatternLength))
-
-    def patternLengthRange = largestCasePatternLength - smallestCasePatternLength
-
   }
 
   private def formatCasePattern(casePattern: CasePattern, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {
@@ -159,5 +152,4 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     case Some((separator, None)) if separator.isNewline ⇒ statSeq.copy(otherStats = statSeq.otherStats.init)
     case _ ⇒ statSeq
   }
-
 }

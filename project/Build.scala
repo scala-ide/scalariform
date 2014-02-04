@@ -45,7 +45,7 @@ object ScalariformBuild extends Build {
     case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
-  def getScalaLangModules(scalaVersion: String): List[ModuleID] = scalaVersion match {
+  def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
     case "2.11.0-M7" => List(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.0-RC7",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.0-RC5"
@@ -57,7 +57,7 @@ object ScalariformBuild extends Build {
     subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ eclipseSettings ++
       Seq(
         libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
-          deps ++ getScalaLangModules(sv) :+ getScalaTestDependency(sv)
+          deps ++ get2_11Dependencies(sv) :+ getScalaTestDependency(sv)
         },
         pomExtra := pomExtraXml,
         publishMavenStyle := true,

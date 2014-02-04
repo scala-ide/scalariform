@@ -34,6 +34,13 @@ case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstru
     if (token.isNewline) formatNewline(token, formatInstruction)
     else before(token, formatInstruction)
 
+  def tokenWillHaveNewline(token: Token): Boolean = {
+    val hasNewlineInstruction = predecessorFormatting.get(token) map {
+      PartialFunction.cond(_) { case newlineInstruction: EnsureNewlineAndIndent => true }
+    }
+    hasNewlineInstruction.getOrElse(false)
+  }
+
   def mergeWith(other: FormatResult): FormatResult =
     FormatResult(this.predecessorFormatting ++ other.predecessorFormatting,
       this.inferredNewlineFormatting ++ other.inferredNewlineFormatting,
