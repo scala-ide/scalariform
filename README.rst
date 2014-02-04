@@ -169,8 +169,8 @@ Aligns mult-line arguments
 For example, if ``false``, then::
 
   Cake(candles = 10,
-    frostingFlavor = Vanilla
-    layerFlavor = Chocolate
+    frostingFlavor = Vanilla,
+    layerFlavor = Chocolate,
     icecream = true
   )
 
@@ -178,8 +178,8 @@ If ``true``, then::
 
   Cake(
     candles        = 10,
-    frostingFlavor = Vanilla
-    layerFlavor    = Chocolate
+    frostingFlavor = Vanilla,
+    layerFlavor    = Chocolate,
     icecream       = true
   )
 
