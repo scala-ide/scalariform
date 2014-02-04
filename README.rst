@@ -532,6 +532,18 @@ If ``false``,::
 
   case elem@Multi(values@_*) =>
 
+spacesAroundMultiImports
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``true``
+
+Whether or not to add spaces around mutli-imports. For example, If ``true``, then::
+
+  import a.{ b, c, d }
+
+If ``false``, then::
+
+  import a.{b,c,d}
 
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~

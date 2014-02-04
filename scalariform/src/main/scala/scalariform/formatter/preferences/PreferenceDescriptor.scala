@@ -65,7 +65,7 @@ object AllPreferences {
     PreserveSpaceBeforeArguments, AlignParameters, AlignArguments, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
-    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, NoSpacesAroundMultiImports)
+    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, SpacesAroundMultiImports)
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
     var map: Map[String, PreferenceDescriptor[_]] = Map()
@@ -205,8 +205,8 @@ case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenc
   val defaultValue = false
 }
 
-case object NoSpacesAroundMultiImports extends BooleanPreferenceDescriptor {
-  val key = "noSpacesAroundMultiImports"
-  val description = "Don't place spaces around multi imports (Java-style)"
-  val defaultValue = false
+case object SpacesAroundMultiImports extends BooleanPreferenceDescriptor {
+  val key = "spacesAroundMultiImports"
+  val description = "Place spaces around multi imports (import a.{ b, c, d }"
+  val defaultValue = true
 }

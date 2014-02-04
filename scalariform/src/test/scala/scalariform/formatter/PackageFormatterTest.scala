@@ -60,8 +60,5 @@ class PackageFormatterTest extends AbstractFormatterTest {
     |class Baz
     |}
     |}"""
-
   }
-
-
 }

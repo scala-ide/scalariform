@@ -1283,12 +1283,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val newFormatterState = formatterState.copy(inSingleLineBlock = singleLineBlock)
 
     if (singleLineBlock) {
-      if (formattingPreferences(NoSpacesAroundMultiImports))
+      if (!formattingPreferences(SpacesAroundMultiImports))
         formatResult = formatResult.before(firstImportSelector.firstToken, Compact)
       formatResult ++= format(firstImportSelector)
       for ((comma, otherImportSelector) ← otherImportSelectors)
         formatResult ++= format(otherImportSelector)
-      if (formattingPreferences(NoSpacesAroundMultiImports))
+      if (!formattingPreferences(SpacesAroundMultiImports))
         formatResult = formatResult.before(rbrace, Compact)
     } else {
       formatResult = formatResult.before(firstImportSelector.firstToken, formatterState.nextIndentLevelInstruction)
