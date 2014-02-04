@@ -161,6 +161,31 @@ If ``true``, then::
 
 This option is disabled if ``indentWithTabs`` is ``true``.
 
+
+alignArguments
+~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Aligns mult-line arguments
+
+For example, if ``false``, then::
+
+  Cake(candles = 10,
+    frostingFlavor = Vanilla
+    layerFlavor = Chocolate
+    icecream = true
+  )
+
+If ``true``, then::
+
+  Cake(
+    candles        = 10,
+    frostingFlavor = Vanilla
+    layerFlavor    = Chocolate
+    icecream       = true
+  )
+
 alignSingleLineCaseStatements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
