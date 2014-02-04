@@ -1301,5 +1301,4 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     }
     formatResult
   }
-
 }
