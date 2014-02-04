@@ -186,6 +186,9 @@ If ``true``, then::
     icecream       = true
   )
 
+This option is disabled if ``indentWithTabs`` is ``true``.
+
+
 alignSingleLineCaseStatements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -373,7 +376,7 @@ Default: ``false``
 
 Use a tab for each level of indentation. When set to ``true``, this
 ignores any setting given for ``indentSpaces``. In addition, for the
-moment, ``alignSingleLineCaseStatements`` and ``alignParameters``
+moment, ``alignSingleLineCaseStatements``, ``alignArguments``, and ``alignParameters``
 options are not supported when indenting with tabs, and XML
 indentation is handled differently.
 

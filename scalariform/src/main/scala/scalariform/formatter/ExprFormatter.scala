@@ -300,7 +300,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   protected def alignArguments(parenArguments: ParenArgumentExprs)(implicit formatterState: FormatterState): FormatResult = {
-    val alignArgsEnabled = formattingPreferences(AlignArguments)
+    val alignArgsEnabled = formattingPreferences(AlignArguments) && !formattingPreferences(IndentWithTabs)
     var formatResult: FormatResult = NoFormatResult
 
     if (!alignArgsEnabled)
