@@ -17,9 +17,9 @@ Scalariform is licenced under `The MIT Licence`_.
 Integration with sbt
 --------------------
 
-`sbt-scalariform`_, written by Olivier Michallat, provides an sbt plugin contributing formatting actions for sbt 0.7.x.
+A version for sbt >= 0.13.x has been written by Peter Vlugter: https://github.com/daniel-trinh/sbt-scalariform
 
-A version for sbt >= 0.13.x has been written by Peter Vlugter: https://github.com/sbt/sbt-scalariform
+Please see https://github.com/sbt/sbt-scalariform for older versions of sbt.
 
 Integration with Eclipse
 ------------------------
