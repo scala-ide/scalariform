@@ -10,12 +10,12 @@ class CommentFormatterTest extends AbstractFormatterTest {
   type Result = CompilationUnit
 
   def parse(parser: ScalaParser) = parser.scriptBody()
-  
+
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 
   override val debug = false
 
-  """/** 
+  """/**
     |*a
     |b
     | */c""" ==>
@@ -25,7 +25,7 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */
     |c"""
 
-  """/** 
+  """/**
     |*a
     |b
     | */""" ==>
@@ -37,7 +37,7 @@ class CommentFormatterTest extends AbstractFormatterTest {
 
   """/**
     | *
-    | *Wibble*/ 
+    | *Wibble*/
     |class X""" ==>
   """/**
     | *
@@ -88,7 +88,7 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | * b
     | */
     |"""
-      
+
   // nested comments
   """/**
     |/*
@@ -99,17 +99,17 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | * */
     | */
     |"""
-      
+
   {
   implicit val formattingPreferences = FormattingPreferences.setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
 
-  """/** This method applies f to each 
+  """/** This method applies f to each
     | *  element of the given list.
     | */""" ==>
   """/** This method applies f to each
     | *  element of the given list.
     | */
-    |""" 
+    |"""
 
   """/** Foo
     |Bar
@@ -132,18 +132,18 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */
     |"""
   }
-  
+
   {
   implicit val formattingPreferences = FormattingPreferences.setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
 
-  """/** This method applies f to each 
+  """/** This method applies f to each
     | * element of the given list.
     | */""" ==>
   """/**
     |  * This method applies f to each
     |  * element of the given list.
     |  */
-    |""" 
+    |"""
 
   """/** Foo
     |Bar
@@ -168,18 +168,18 @@ class CommentFormatterTest extends AbstractFormatterTest {
     |  */
     |"""
   }
-  
+
   {
   implicit val formattingPreferences = FormattingPreferences
     .setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
     .setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
-  """/** This method applies f to each 
+  """/** This method applies f to each
     | * element of the given list.
     | */""" ==>
   """/** This method applies f to each
     |  * element of the given list.
     |  */
-    |""" 
+    |"""
 
   """/** Foo
     |Bar
@@ -199,6 +199,14 @@ class CommentFormatterTest extends AbstractFormatterTest {
   """/**
     |*/""" ==>
   """/**
+    |  */
+    |"""
+
+  """/**          This method applies f to each
+    | * element of the given list.
+    | */""" ==>
+  """/** This method applies f to each
+    |  * element of the given list.
     |  */
     |"""
   }
