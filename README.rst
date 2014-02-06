@@ -1,6 +1,9 @@
 Scalariform
 ===========
 
+.. image:: https://travis-ci.org/bambuchaAdm/scalariform.png?branch=master   
+   :target: https://travis-ci.org/bambuchaAdm/scalariform
+
 Scalariform is a code formatter for Scala. It's available as a
 library, a stand-alone command line tool, or via integrations with
 various editors and build tools (listed below).
