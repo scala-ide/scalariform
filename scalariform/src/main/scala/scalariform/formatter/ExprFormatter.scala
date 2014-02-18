@@ -115,8 +115,17 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (PrefixExprElement(_), _) ⇒ if (Chars.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact
             case (Argument(_), _) ⇒ Compact
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr
-            case (_, _) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.tokenType) } ⇒
-              currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+            case (_, elem) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.tokenType) } ⇒
+              val isNestedArgument = cond(elem) {
+                case Argument(Expr(CallExpr(_, _, _, moreArgs, _) :: tail)) =>
+                  if (!moreArgs.isEmpty) true else false
+                case Argument(Expr(EqualsExpr(_, _, Expr(CallExpr(_, _, _, moreArgs, _) :: innerTail)) :: tail)) =>
+                  if (!moreArgs.isEmpty) true else false
+                case Argument(Expr(EqualsExpr(_, _, Expr(EqualsExpr(_,_,_) :: innerTail)) :: tail)) => true
+              }
+              if (isNestedArgument)
+                currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
+              
               currentFormatterState.currentIndentLevelInstruction
           }
 
@@ -278,8 +287,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       var currentFormatterState = formatterState
       var formatResult: FormatResult = NoFormatResult
 
-      if (formattingPreferences(PreserveDanglingCloseParenthesis) && hiddenPredecessors(rparen).containsNewline && contents.nonEmpty)
+      if (contents.exists(x => hiddenPredecessors(x.firstToken).containsNewline)) {
         formatResult = formatResult.before(rparen, currentFormatterState.currentIndentLevelInstruction)
+      }
 
       val (contentsFormatResult, updatedFormatterState) = formatExprElements(GeneralTokens(List(lparen)) :: contents)(currentFormatterState)
       formatResult ++= contentsFormatResult
@@ -302,9 +312,6 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   protected def alignArguments(parenArguments: ParenArgumentExprs)(implicit formatterState: FormatterState): FormatResult = {
     val alignArgsEnabled = formattingPreferences(AlignArguments) && !formattingPreferences(IndentWithTabs)
     var formatResult: FormatResult = NoFormatResult
-
-    if (!alignArgsEnabled)
-      return formatResult
 
     var argumentFormatterState = formatterState
     val ParenArgumentExprs(leftParen, contents, rightParen) = parenArguments
@@ -332,6 +339,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         formatResult = formatResult.before(firstArgument.firstToken, argumentFormatterState.nextIndentLevelInstruction)
       }
     }
+
+    if (!alignArgsEnabled)
+      return formatResult
 
     var currentExprNewlineCount = 0
     // TODO: refactor this as well as "def groupParams" to share logic

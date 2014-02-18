@@ -157,6 +157,7 @@ case object IndentLocalDefs extends BooleanPreferenceDescriptor {
   val defaultValue = false
 }
 
+@deprecated("This has been dropped in favor of always placing ')' on a newline if the clause is multi-line.", since = "0.1.5")
 case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor {
   val key = "preserveDanglingCloseParenthesis"
   val description = "Allow a newline before a ')' in an argument expression"
