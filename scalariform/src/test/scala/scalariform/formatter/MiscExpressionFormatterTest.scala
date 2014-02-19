@@ -299,49 +299,62 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |  2 +
      |  3"""
 
-   """foo(1,
-     |2)""" ==>
-   """foo(1,
-     |  2)"""
+  """foo(1,
+    |2)""" ==>
+  """foo(
+    |  1,
+    |  2
+    |)"""
 
    """/* a */
      |b""" ==>
    """/* a */ b"""
 
-   """a(
-     |if (b) c)""" ==>
-   """a(
-     |  if (b) c)"""
+  """a(
+    |if (b) c)""" ==>
+  """a(
+    |  if (b) c
+    |)"""
 
-   """a(
-     |if (b)
-     |c)""" ==>
-   """a(
-     |  if (b)
-     |    c)"""
+  """a(
+    |if (b)
+    |c)""" ==>
+  """a(
+    |  if (b)
+    |    c
+    |)"""
 
-   """a("A",
-     |  b("B",
-     |     c(1, 2),
-     |     c(3, 4)),
-     |  b("B2",
-     |     c(5, 6)))""" ==>
-   """a("A",
-     |  b("B",
-     |    c(1, 2),
-     |    c(3, 4)),
-     |  b("B2",
-     |    c(5, 6)))"""
+  """a("A",
+    |  b("B",
+    |     c(1, 2),
+    |     c(3, 4)),
+    |  b("B2",
+    |     c(5, 6)))""" ==>
+  """a(
+    |  "A",
+    |  b(
+    |    "B",
+    |    c(1, 2),
+    |    c(3, 4)
+    |  ),
+    |  b(
+    |    "B2",
+    |    c(5, 6)
+    |  )
+    |)"""
 
-   """1 + (a,
-     | b, c)""" ==>
-   """1 + (a,
-     |  b, c)"""
+  """1 + (a,
+    | b, c)""" ==>
+  """1 + (
+    |  a,
+    |  b, c
+    |)"""
 
    """1 + (
      |  a, b, c)""" ==>
    """1 + (
-     |  a, b, c)"""
+     |  a, b, c
+     |)"""
 
    """1 + (a
      |, b, c)""" ==>
@@ -386,85 +399,78 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |  println(b)
      |}"""
 
-   """a(b,
-     |/* c */d)""" ==>
-   """a(b,
-     |  /* c */ d)"""
+  """a(b,
+    |/* c */d)""" ==>
+    """a(
+      |  b,
+      |  /* c */ d
+      |)"""
 
    """submit(
      |
      |)""" ==>
    """submit()"""
 
-   """(
-     |42,
-     |46
-     |)""" ==>
-   """(
-     |  42,
-     |  46)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
+  """(
+    |42,
+    |46
+    |)""" ==>
+  """(
+    |  42,
+    |  46
+    |)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
 
-   """a(b,
-     |c => {
-     |d})""" ==>
-   """a(b,
-     |  c => {
-     |    d
-     |  })"""
+  """a(b,
+    |c => {
+    |d})""" ==>
+  """a(
+    |  b,
+    |  c => {
+    |    d
+    |  }
+    |)"""
 
-   """a(b,
-     |(c), {
-     |d})""" ==>
-   """a(b,
-     |  (c), {
-     |    d
-     |  })"""
+  """a(b,
+    |(c), {
+    |d})""" ==>
+  """a(
+    |  b,
+    |  (c), {
+    |    d
+    |  }
+    |)"""
 
-   """a(
-     |    () =>
-     |    b)""" ==>
-   """a(
-     |  () =>
-     |    b)"""
-
-
-   {
-     implicit val formattingPreferences = FormattingPreferences.setPreference(PreserveDanglingCloseParenthesis, true)
-
-   """Book(
-     |  name = "Name",
-     |  author = "Author",
-     |  rating = 5
-     |)""" ==>
-   """Book(
-     |  name = "Name",
-     |  author = "Author",
-     |  rating = 5
-     |)"""
-
-   }
-
-   """Book(
-     |  name = "Name",
-     |  author = "Author",
-     |  rating = 5
-     |)""" ==>
-   """Book(
-     |  name = "Name",
-     |  author = "Author",
-     |  rating = 5)"""
+  """a(
+    |    () =>
+    |    b)""" ==>
+  """a(
+    |  () =>
+    |    b
+    |)"""
 
 
-"""foobar(
-     |(1,2),
-     |(3, 4),
-     |(5, 6),
-     |(7, 8))""" ==>
-   """foobar(
-     |  (1, 2),
-     |  (3, 4),
-     |  (5, 6),
-     |  (7, 8))"""
+  """Book(
+    |  name = "Name",
+    |  author = "Author",
+    |  rating = 5
+    |)""" ==>
+  """Book(
+    |  name = "Name",
+    |  author = "Author",
+    |  rating = 5
+    |)"""
+
+  """foobar(
+    |(1,2),
+    |(3, 4),
+    |(5, 6),
+    |(7, 8))""" ==>
+  """foobar(
+    |  (1, 2),
+    |  (3, 4),
+    |  (5, 6),
+    |  (7, 8)
+    |)"""
 
    """(1
      |,2)""" ==>
@@ -474,14 +480,16 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |,2)""" ==>
    """a(1, 2)"""
 
-   """a(
-     |b,
-     |c +
-     |d)""" ==>
-   """a(
-     |  b,
-     |  c +
-     |    d)"""
+  """a(
+    |b,
+    |c +
+    |d)""" ==>
+  """a(
+    |  b,
+    |  c +
+    |    d
+    |)"""
+
 
    """(a ->
      |new B)""" ==>
@@ -573,7 +581,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |d))""" ==>
    """a()
      |  .b(c(
-     |    d))"""
+     |    d
+     |  ))"""
 
    """a().
      |b(c => {
@@ -667,16 +676,20 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |c) + {
      |d
      |}""" ==>
-   """a(b,
-     |  c) + {
-     |    d
-     |  }"""
+   """a(
+     |  b,
+     |  c
+     |) + {
+     |  d
+     |}"""
 
    """(b,
      |c) + {
      |d}""" ==>
-   """(b,
-     |  c) + {
+   """(
+     |  b,
+     |  c
+     |) + {
      |    d
      |  }"""
 
@@ -688,11 +701,14 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |        )
      |      )
      |    )""" ==>
-   """XScalaWT.shell("title",
+   """XScalaWT.shell(
+     |  "title",
      |  label("label"),
      |  popupMenu(
      |    viewer( // TODO
-     |    )))"""
+     |    )
+     |  )
+     |)"""
 
    """a(b)
      |.c(d)
@@ -707,23 +723,34 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |b) + (c,
      |d) + (e,
      | f) + g""" ==>
-   """(a,
-     |  b) + (c,
-     |    d) + (e,
-     |      f) + g"""
+   """(
+     |  a,
+     |  b
+     |) + (
+     |    c,
+     |    d
+     |  ) + (
+     |      e,
+     |      f
+     |    ) + g"""
 
+    """(a, b)""" ==> """(a, b)"""
    """a + (b,
      |c) +
      |d""" ==>
-   """a + (b,
-     |  c) +
+   """a + (
+     |  b,
+     |  c
+     |) +
      |  d"""
 
    """a + f(b,
      | c) +
      |d""" ==>
-   """a + f(b,
-     |  c) +
+   """a + f(
+     |  b,
+     |  c
+     |) +
      |  d"""
 
    """a
@@ -732,7 +759,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |.d""" ==>
    """a
      |  .b(
-     |    c)
+     |    c
+     |  )
      |  .d"""
 
 
@@ -787,6 +815,24 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |  val x = 42
      |})"""
 
+  """a(
+    |b,
+    |c,
+    |d
+    |)(
+    |  e,
+    |  f,
+    |  g
+    |)""" ==>
+  """a(
+    |  b,
+    |  c,
+    |  d
+    |)(
+    |  e,
+    |  f,
+    |  g
+    |)"""
 
   {
     implicit val formattingPreferences = FormattingPreferences.
@@ -898,23 +944,23 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
          |  thirdGroup2   = Three(3)
          |)"""
 
-     """multiClause(
-        |  arg1 = 1,
-        |  argument2 = 2)(
-        |  args3 = 3,
-        |  arg4 = 4)(
-        |  arg5 = 5)""" ==>
-     """multiClause(
-        |  arg1      = 1,
-        |  argument2 = 2
-        |)(
-        |  args3 = 3,
-        |  arg4  = 4
-        |)(
-        |  arg5 = 5
-        |)"""
+      """multiClause(
+         |  arg1 = 1,
+         |  argument2 = 2)(
+         |  args3 = 3,
+         |  arg4 = 4)(
+         |  arg5 = 5)""" ==>
+      """multiClause(
+         |  arg1      = 1,
+         |  argument2 = 2
+         |)(
+         |  args3 = 3,
+         |  arg4  = 4
+         |)(
+         |  arg5 = 5
+         |)"""
 
-    """a(
+   """a(
       |b = c)(
       |c,
       |d)(
@@ -928,7 +974,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
         |  d
         |)"""
 
-    """Nested0(
+   """Nested0(
        |  arg1   = Nested1(abcccc = 1,
        |    abc2 = 2,
        |    abcThree = 3
@@ -938,7 +984,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
        |     abcThree = 3
        |  )
        |)""" ==>
-    """Nested0(
+   """Nested0(
        |  arg1 = Nested1(
        |    abcccc   = 1,
        |    abc2     = 2,
@@ -950,8 +996,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
        |    abcThree = 3
        |  )
        |)"""
-
-
-  }
+}
   override val debug = false
 }

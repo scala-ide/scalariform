@@ -53,9 +53,9 @@ object ScalariformBuild extends Build {
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
     case "2.11.0-M7" ⇒ "org.scalatest" % s"scalatest_$scalaVersion" % "2.0.1-SNAP4" % "test"
-    case r"2.10.\d+" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case "2.9.3"     ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+    case r"2.10.\d+" ⇒ "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
+    case "2.9.3"     ⇒ "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
+    case _           ⇒ "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
@@ -72,6 +72,7 @@ object ScalariformBuild extends Build {
         libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
           deps ++ get2_11Dependencies(sv) :+ getScalaTestDependency(sv)
         },
+        testOptions in Test += Tests.Argument("-oI"),
         pomExtra := pomExtraXml,
         publishMavenStyle := true,
         publishArtifact in Test := false,

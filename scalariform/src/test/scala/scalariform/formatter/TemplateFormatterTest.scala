@@ -101,7 +101,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |      case b =>
     |        val c = { d: Int => 1 }
     |        1.toString
-    |    })
+    |    }
+    |  )
     |}"""
 
   """class C1492 {

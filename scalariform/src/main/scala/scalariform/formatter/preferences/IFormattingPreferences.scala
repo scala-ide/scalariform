@@ -12,6 +12,7 @@ trait IFormattingPreferences {
 
 }
 
+
 abstract sealed class IndentStyle {
   def indent(n: Int): String
   protected def repeat(s: String, n: Int) = 1 to n map { _ ⇒ s } mkString
