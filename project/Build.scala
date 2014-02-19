@@ -27,6 +27,7 @@ object ScalariformBuild extends Build {
     version := "0.1.5-SNAPSHOT",
     scalaVersion := "2.10.3",
     crossScalaVersions := Seq(
+      "2.11.0-M8",
       "2.11.0-M7",
       "2.10.0", "2.10.1",
       "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
@@ -52,14 +53,15 @@ object ScalariformBuild extends Build {
   }
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case "2.11.0-M7" ⇒ "org.scalatest" % s"scalatest_$scalaVersion" % "2.0.1-SNAP4" % "test"
-    case r"2.10.\d+" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case "2.9.3"     ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case _           ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+    case "2.11.0-M8" ⇒ "org.scalatest" %% s"scalatest"  % "2.1.RC1" % "test"
+    case "2.11.0-M7" ⇒ "org.scalatest" %% s"scalatest"  % "2.0.1-SNAP4" % "test"
+    case r"2.10.\d+" ⇒ "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
+    case "2.9.3"     ⇒ "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
+    case _           ⇒ "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
-    case "2.11.0-M7" => List(
+    case r"2.11.0-M\d" => List(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.0-RC7",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.0-RC5"
     )
@@ -72,6 +74,7 @@ object ScalariformBuild extends Build {
         libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
           deps ++ get2_11Dependencies(sv) :+ getScalaTestDependency(sv)
         },
+        testOptions in Test += Tests.Argument("-oI"),
         pomExtra := pomExtraXml,
         publishMavenStyle := true,
         publishArtifact in Test := false,
