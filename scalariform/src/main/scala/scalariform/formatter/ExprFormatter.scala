@@ -117,17 +117,17 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr
             case (_, elem) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.tokenType) } ⇒
               val isNestedArgument = elem match {
-                case Argument(Expr(CallExpr(_, _, _, moreArgs, _) :: tail)) if moreArgs.isEmpty => false
-                case Argument(Expr(EqualsExpr(_, _, Expr(headExpr :: innerTail)) :: tail)) => headExpr match {
-                  case CallExpr(_, _, _, moreArgs, _) => if (moreArgs.isEmpty) false else true
-                  case _ => false
+                case Argument(Expr(CallExpr(_, _, _, moreArgs, _) :: tail)) if moreArgs.isEmpty ⇒ false
+                case Argument(Expr(EqualsExpr(_, _, Expr(headExpr :: innerTail)) :: tail)) ⇒ headExpr match {
+                  case CallExpr(_, _, _, moreArgs, _) ⇒ if (moreArgs.isEmpty) false else true
+                  case _                              ⇒ false
                 }
-                case _ => true
+                case _ ⇒ true
               }
 
               if (isNestedArgument)
                 currentFormatterState = currentFormatterState.indentForExpressionBreakIfNeeded
-              
+
               currentFormatterState.currentIndentLevelInstruction
           }
 
@@ -297,7 +297,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val alignedFormatResult = alignArguments(args)
 
       formatResult ++= alignedFormatResult
-      val firstTokenIsOnNewline = contents.headOption.exists { x =>
+      val firstTokenIsOnNewline = contents.headOption.exists { x ⇒
         val firstToken = x.firstToken
         hiddenPredecessors(firstToken).containsNewline || formatResult.tokenWillHaveNewline(firstToken)
       }
@@ -333,9 +333,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
      */
     val firstTwoArguments = contents.iterator.filter { x ⇒
       cond(x) {
-        case Argument(_) ⇒ true
-        case callExpr: CallExpr => true
-        case equalsExpr: EqualsExpr => true
+        case Argument(_)            ⇒ true
+        case callExpr: CallExpr     ⇒ true
+        case equalsExpr: EqualsExpr ⇒ true
       }
     }.take(2).toList
     if (firstTwoArguments.size == 2) {
@@ -352,9 +352,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val eitherAlignableArguments = contents.foldLeft(List[EitherAlignableEqualsExpr]()) { (existingExprs, exprElement) ⇒
       if (!alignArgsEnabled) {
         val nextArg = condOpt(exprElement) {
-          case Argument(Expr(List(callExpr: CallExpr))) =>
+          case Argument(Expr(List(callExpr: CallExpr))) ⇒
             Right(callExpr) :: existingExprs
-          case Argument(Expr(List(equalsExpr: EqualsExpr))) =>
+          case Argument(Expr(List(equalsExpr: EqualsExpr))) ⇒
             Left(ConsecutiveSingleLineEqualsExprs(List(equalsExpr), calculateEqualsExprIdLength(equalsExpr))) :: existingExprs
         }
         nextArg.getOrElse(existingExprs)
@@ -1057,7 +1057,6 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     // This is reversed because "appendParamToGroup" works on lists, and will
     // create the list in the reverse order of the list it is given.
     val allParams = (firstParamOption.toList ++ otherParams).reverse
-
 
     def appendParamToGroup(previousParam: Option[Param],
                            paramToAppend: Param,
