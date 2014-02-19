@@ -77,6 +77,9 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
    "makeColour(red = 253, green = 712, blue = 120)" ==> "makeColour(red = 253, green = 712, blue = 120)"
 
+  """a(
+    |)""" ==> """a()"""
+  
    "_ => 3" ==> "_ => 3"
    "(_: Int) => 3" ==> "(_: Int) => 3"
    "(x: String, y: Map[String, String]) => y(x)" ==> "(x: String, y: Map[String, String]) => y(x)"
@@ -835,9 +838,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |)"""
 
   {
-    implicit val formattingPreferences = FormattingPreferences.
-      setPreference(PreserveDanglingCloseParenthesis, true).
-      setPreference(AlignArguments, true)
+    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignArguments, true)
 
        """Method(a, b, c)""" ==> """Method(a, b, c)"""
 
