@@ -6,9 +6,9 @@ import scalariform.parser._
 import scalariform.utils._
 
 object FormatResult {
-  
+
   val EMPTY = FormatResult(Map(), Map(), Map())
-  
+
 }
 
 case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstruction],
@@ -33,6 +33,13 @@ case class FormatResult(predecessorFormatting: Map[Token, IntertokenFormatInstru
   def formatNewlineOrOrdinary(token: Token, formatInstruction: IntertokenFormatInstruction) =
     if (token.isNewline) formatNewline(token, formatInstruction)
     else before(token, formatInstruction)
+
+  def tokenWillHaveNewline(token: Token): Boolean = {
+    val hasNewlineInstruction = predecessorFormatting.get(token) map {
+      PartialFunction.cond(_) { case newlineInstruction: EnsureNewlineAndIndent ⇒ true }
+    }
+    hasNewlineInstruction.getOrElse(false)
+  }
 
   def mergeWith(other: FormatResult): FormatResult =
     FormatResult(this.predecessorFormatting ++ other.predecessorFormatting,
@@ -63,4 +70,4 @@ case object CompactPreservingGap extends IntertokenFormatInstruction
 case class EnsureNewlineAndIndent(indentLevel: Int, relativeTo: Option[Token] = None) extends IntertokenFormatInstruction
 
 /** Places the token at spaces number of spaces after the indent level, padding with spaces if necessary */
-case class PlaceAtColumn(indentLevel: Int, spaces: Int) extends IntertokenFormatInstruction
+case class PlaceAtColumn(indentLevel: Int, spaces: Int, relativeTo: Option[Token] = None) extends IntertokenFormatInstruction

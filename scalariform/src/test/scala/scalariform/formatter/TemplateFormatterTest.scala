@@ -7,77 +7,77 @@ import scalariform.formatter.preferences._
 // format: OFF
 class TemplateFormatterTest extends AbstractFormatterTest {
 
-  "case class A" ==> "case class A"
+"case class A" ==> "case class A"
 
-  """class A extends B {
-    |  foo()
-    |  bar()
-    |}""" ==>
-  """class A extends B {
-    |  foo()
-    |  bar()
-    |}"""
+"""class A extends B {
+   |  foo()
+   |  bar()
+   |}""" ==>
+"""class A extends B {
+   |  foo()
+   |  bar()
+   |}"""
+
+"""class A {
+   |val n: Int
+   |}""" ==>
+"""class A {
+   |  val n: Int
+   |}"""
+
+"class A" ==> "class A"
+"trait A" ==> "trait A"
+
+"class A private (val b: C)" ==> "class A private (val b: C)"
+"class A [B]" ==> "class A[B]"
+"class A[B]private(val c: D)" ==> "class A[B] private (val c: D)"
+"class A (val b: C) (val d: E) (implicit val f: G)" ==> "class A(val b: C)(val d: E)(implicit val f: G)"
+"class A (implicit val f: G)" ==> "class A(implicit val f: G)"
+
+"abstract class E [F]private(val h: I) (implicit j: K) extends{} with L(2) with M{}" ==>
+   "abstract class E[F] private (val h: I)(implicit j: K) extends {} with L(2) with M {}"
+
+"class A{}" ==> "class A {}"
+
+"class A@Deprecated()private (val b: C)" ==> "class A @Deprecated() private (val b: C)"
+"class A@Annotation1()@Annotation2()(val b: C)" ==> "class A @Annotation1() @Annotation2() (val b: C)"
+"class A[B]@Annotation()private(val c: D)" ==> "class A[B] @Annotation() private (val c: D)"
+
+"class A @Deprecated" ==> "class A @Deprecated"
+"class A @Deprecated private" ==> "class A @Deprecated private"
+"class A @Deprecated private (n: Int)" ==> "class A @Deprecated private (n: Int)"
+
+"""@A@B(c = "d")abstract class E [F]@G()private(val h: I) (implicit j: K) extends{} with L(2) with M{}""" ==>
+"""@A @B(c = "d") abstract class E[F] @G() private (val h: I)(implicit j: K) extends {} with L(2) with M {}"""
+
+"""@A/*a*/@B
+   |/*b*/class E""" =/=>
+"""@A/*a*/
+   |@B
+   |/*b*/
+   |class E""" because "of inconsistency between spacing between annotations and comments"
+
+"""/*a*/@A/*b*/@B(c = "d")/*c*/abstract class/*d*/E/*e*/[F]/*f*/@G()/*g*/private/*h*/(val h: I)/*i*/(implicit j: K)/*j*/extends/*k*/{} with/*l*/L(2) with M/*m*/{}""" =/=>
+"""/*a*/
+   |@A/*b*/
+   |@B(c = "d")/*c*/
+   |abstract class/*d*/E/*e*/[F]/*f*/@G()/*g*/private/*h*/(val h: I)/*i*/(implicit j: K)/*j*/extends/*k*/{} with/*l*/L(2) with M/*m*/{}""" because "sort out what we want"
+
+
+{
+
+implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, true)
+
+"@(Id@Field) class A" ==> "@(Id @Field) class A"
+
+}
 
   """class A {
-    |val n: Int
-    |}""" ==>
-  """class A {
-    |  val n: Int
-    |}"""
-
-  "class A" ==> "class A"
-  "trait A" ==> "trait A"
-
-  "class A private (val b: C)" ==> "class A private (val b: C)"
-  "class A [B]" ==> "class A[B]"
-  "class A[B]private(val c: D)" ==> "class A[B] private (val c: D)"
-  "class A (val b: C) (val d: E) (implicit val f: G)" ==> "class A(val b: C)(val d: E)(implicit val f: G)"
-  "class A (implicit val f: G)" ==> "class A(implicit val f: G)"
-
-  "abstract class E [F]private(val h: I) (implicit j: K) extends{} with L(2) with M{}" ==>
-    "abstract class E[F] private (val h: I)(implicit j: K) extends {} with L(2) with M {}"
-
-  "class A{}" ==> "class A {}"
-
-  "class A@Deprecated()private (val b: C)" ==> "class A @Deprecated() private (val b: C)"
-  "class A@Annotation1()@Annotation2()(val b: C)" ==> "class A @Annotation1() @Annotation2() (val b: C)"
-  "class A[B]@Annotation()private(val c: D)" ==> "class A[B] @Annotation() private (val c: D)"
-
-  "class A @Deprecated" ==> "class A @Deprecated" 
-  "class A @Deprecated private" ==> "class A @Deprecated private" 
-  "class A @Deprecated private (n: Int)" ==> "class A @Deprecated private (n: Int)" 
-    
-  """@A@B(c = "d")abstract class E [F]@G()private(val h: I) (implicit j: K) extends{} with L(2) with M{}""" ==>
-  """@A @B(c = "d") abstract class E[F] @G() private (val h: I)(implicit j: K) extends {} with L(2) with M {}"""
-
-  """@A/*a*/@B
-    |/*b*/class E""" =/=>
-  """@A/*a*/
-    |@B
-    |/*b*/
-    |class E""" because "of inconsistency between spacing between annotations and comments"
-
-  """/*a*/@A/*b*/@B(c = "d")/*c*/abstract class/*d*/E/*e*/[F]/*f*/@G()/*g*/private/*h*/(val h: I)/*i*/(implicit j: K)/*j*/extends/*k*/{} with/*l*/L(2) with M/*m*/{}""" =/=>
-  """/*a*/
-    |@A/*b*/
-    |@B(c = "d")/*c*/
-    |abstract class/*d*/E/*e*/[F]/*f*/@G()/*g*/private/*h*/(val h: I)/*i*/(implicit j: K)/*j*/extends/*k*/{} with/*l*/L(2) with M/*m*/{}""" because "sort out what we want"
-  
-
-  {
-  
-  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, true)
-
-  "@(Id@Field) class A" ==> "@(Id @Field) class A"
-  
-  }
-    
-  """class A {
-    |  
+    |
     |  class B
-    | 
+    |
     |  protected def c
-    |  
+    |
     |}""" ==>
   """class A {
     |
@@ -88,7 +88,7 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |}"""
 
   """class A{
-    |( 
+    |(
     |null match {
     |case b => val c = {d: Int => 1}
     |1.toString
@@ -101,7 +101,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |      case b =>
     |        val c = { d: Int => 1 }
     |        1.toString
-    |    })
+    |    }
+    |  )
     |}"""
 
   """class C1492 {
@@ -156,7 +157,7 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |}"""
 
   """trait A {
-    |this: B => 
+    |this: B =>
     |val c
     |}""" ==>
     """trait A {
@@ -164,8 +165,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  val c
     |}"""
 
-  """trait A { 
-    |this: B => 
+  """trait A {
+    |this: B =>
     |println("foo")
     |}""" ==>
   """trait A {
@@ -179,12 +180,12 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "@serializable class A" ==> "@serializable class A"
 
   "@volatile var nParticles = 0" ==> "@volatile var nParticles = 0" // Issue #28
-    
+
   """@volatile
     |var nParticles = 0""" ==>
   """@volatile
     |var nParticles = 0"""
-    
+
   """class A extends B[C] {
     |println("foo")
     |}""" ==>
@@ -287,9 +288,9 @@ class TemplateFormatterTest extends AbstractFormatterTest {
   "class A {\r\n  b()\r\n}" ==> "class A {\r\n  b()\r\n}"
 
   """class A(
-    |m: Int, 
+    |m: Int,
     |n: { def open(): Unit
-    |def close(): Unit}, 
+    |def close(): Unit},
     |o: Int)""" ==>
   """class A(
     |  m: Int,
@@ -297,12 +298,13 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |    def open(): Unit
     |    def close(): Unit
     |  },
-    |  o: Int)"""
+    |  o: Int
+    |)"""
 
   """class A(
     |n: Int, m: {def foo(): Int
     |def bar(a: String): Int}, o: Int,
-    |p: Int, 
+    |p: Int,
     |m: {def foo(): Int
     |def bar(a: String): Int})""" ==>
   """class A(
@@ -314,22 +316,234 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  m: {
     |    def foo(): Int
     |    def bar(a: String): Int
-    |  })"""
+    |  }
+    |)"""
 
-  {
+{
+   implicit val formattingPreferences = FormattingPreferences.
+     setPreference(AlignParameters, true).
+     setPreference(SpaceBeforeColon, true).
+     setPreference(SpaceInsideBrackets, true)
+
+  """def a(
+    |a: Int = 1,
+    |abc: Boolean = true): Int""" ==>
+  """def a(
+    |  a :   Int     = 1,
+    |  abc : Boolean = true
+    |) : Int"""
+
+  """def a(
+    |a: Option[Either[Int]] = 1,
+    |abc: Boolean = true): Int""" ==>
+  """def a(
+    |  a :   Option[ Either[ Int ] ] = 1,
+    |  abc : Boolean                 = true
+    |) : Int"""
+}
+
+{
+   implicit val formattingPreferences = FormattingPreferences.
+     setPreference(AlignParameters, true).
+     setPreference(RewriteArrowSymbols, true)
+
+    // Formats rewritten arrows correctly
+    """def A(
+      |  a: A => B = null,
+      |  bee: => B = null,
+      |  c: B => C = null
+      |): D""" ==>
+    """def A(
+      |  a:   A ⇒ B = null,
+      |  bee: ⇒ B   = null,
+      |  c:   B ⇒ C = null
+      |): D"""
+
+  """class a(
+     |  b: Int
+     |)""" ==>
+   """class a(
+     |  b: Int
+     |)"""
+
+   """class a(
+     |  a: String = "",
+     |  b: Int = 0
+     |)(
+     |  c: String = "",
+     |  d: Int = 1
+     |)(
+     |  implicit
+     |  val e: String = "",
+     |  f: Int = 2
+     |)""" =/=>
+   """class a(
+     |  a: String = ""
+     |  b: Int    = 0
+     |)(
+     |  c: String = ""
+     |  d: Int    = 1
+     |)(
+     |  implicit
+     |  val e: String = ""
+     |  f: Int        = 2
+     |)"""
+}
+
+{
     implicit val formattingPreferences = FormattingPreferences.setPreference(AlignParameters, true)
-  """class A(n: Int, 
+
+    // Make sure spacing in same line implicit parameters is preserved
+    """class A[T](a: T)(implicit b: B)""" ==>
+      """class A[T](a: T)(implicit b: B)"""
+    """class A[T](a: T)(implicit b: B, c: C)""" ==>
+      """class A[T](a: T)(implicit b: B, c: C)"""
+    """class A[T](a: T)(implicit b: B, c: C,
+        |d: D)""" ==>
+      """class A[T](a: T)(implicit b: B, c: C,
+        |                 d: D)"""
+
+   // Split into 3 columns: name, type, and default
+  """def showInput[A](
+    | parent: Component = null,
+    | message: Any,
+    | title: String = uiString("OptionPane.inputDialogTitle"),
+    | messageType: Message.Value = Message.Question,
+    | icon: Icon = EmptyIcon,
+    | entries: Seq[A] = Nil,
+    | initial: A): Option[A]""" ==>
+  """def showInput[A](
+    |  parent:      Component     = null,
+    |  message:     Any,
+    |  title:       String        = uiString("OptionPane.inputDialogTitle"),
+    |  messageType: Message.Value = Message.Question,
+    |  icon:        Icon          = EmptyIcon,
+    |  entries:     Seq[A]        = Nil,
+    |  initial:     A
+    |): Option[A]"""
+  
+    // Formats function types correctly
+  """private def executeWithinClient[T](
+    |crawlerConfig: String => JsValue = Fancy.function,
+    |f: HttpCrawlerClient => T,
+    |port: Int = SpecHelper.port): T""" ==>
+  """private def executeWithinClient[T](
+    |  crawlerConfig: String => JsValue      = Fancy.function,
+    |  f:             HttpCrawlerClient => T,
+    |  port:          Int                    = SpecHelper.port
+    |): T"""
+
+    // By name parameters have correct spacing
+  """def a(
+    |  p1: => (SomeLongByNameParam => SomeShorterParam) = Null,
+    |  param2: SomeShorterParam = Null): A""" ==>
+  """def a(
+    |  p1:     => (SomeLongByNameParam => SomeShorterParam) = Null,
+    |  param2: SomeShorterParam                             = Null
+    |): A"""
+
+    // Formats parameterized types correctly
+    """def A(complicatedType: Option[B  ,C,      D[E, F,G]] = None,
+      | simpleType: String = ""): B""" ==>
+    """def A(
+      |  complicatedType: Option[B, C, D[E, F, G]] = None,
+      |  simpleType:      String                   = ""
+      |): B"""
+
+
+    // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
+  """case class Spacing(param: Int = 1,
+    |paramTwo: Int = 2,
+    |paramThree: String = "3")""" ==>
+  """case class Spacing(
+    |  param:      Int    = 1,
+    |  paramTwo:   Int    = 2,
+    |  paramThree: String = "3"
+    |)"""
+
+    // Groups and formats consecutive single line parameters (multi line params)
+  """case class Spacing(param: Int = 1,
+    |paramTwo: Int = 2,
+    |paramThree: {
+    |  val test: Int
+    |},
+    |paramFour: Option[String] = Some("One"),
+    |paramFive: Any = Nothing)""" ==>
+  """case class Spacing(
+    |  param:    Int = 1,
+    |  paramTwo: Int = 2,
+    |  paramThree: {
+    |    val test: Int
+    |  },
+    |  paramFour: Option[String] = Some("One"),
+    |  paramFive: Any            = Nothing
+    |)"""
+
+    // Groups and formats consecutive single line parameters (newlines)
+  """case class Spacing(
+    |param: Int = 1,
+    |paramTwo: Int = 2,
+    |
+    |paramFour: Option[String] = Some("One"),
+    |paramFive: Any = Nothing)""" ==>
+  """case class Spacing(
+    |  param:    Int = 1,
+    |  paramTwo: Int = 2,
+    |
+    |  paramFour: Option[String] = Some("One"),
+    |  paramFive: Any            = Nothing
+    |)"""
+
+    // Aligns implicits and curried parameters properly
+  """class SomeClass(
+    |parameterOne: Int = 1,
+    |val parameterTwo: Option[String] = None,
+    |three: String = "three")(
+    |intermediate: Int
+    |)(
+    |implicit val four: Int,
+    |five: String,
+    |six: Boolean)""" ==>
+  """class SomeClass(
+    |  parameterOne:     Int            = 1,
+    |  val parameterTwo: Option[String] = None,
+    |  three:            String         = "three"
+    |)(
+    |  intermediate: Int
+    |)(
+    |  implicit
+    |  val four: Int,
+    |  five:     String,
+    |  six:      Boolean
+    |)"""
+
+   // Handles annotations, modifiers, and comments
+  """def extraStuff(
+    |// comment 1
+    |@Annotated paramOne: Int = 1, // comment 2
+    |/* comment 3 */ private val modifiedTwo: String = "two",
+    |@Annotated2("complicatedAnnotation") @A3("Another") protected annotatedAndModified: Option[Int] = Some(3))""" ==>
+  """def extraStuff(
+    |  // comment 1
+    |  @Annotated paramOne:                                                               Int         = 1, // comment 2
+    |  /* comment 3 */ private val modifiedTwo:                                           String      = "two",
+    |  @Annotated2("complicatedAnnotation")@A3("Another") protected annotatedAndModified: Option[Int] = Some(3)
+    |)"""
+
+  """class A(n: Int,
     |z: { val m
     |val n },
     |m: Int)""" ==>
-  """class A(n: Int,
-    |        z: {
-    |          val m
-    |          val n
-    |        },
-    |        m: Int)"""
-    
-  """class A(m: Int, 
+  """class A(
+    |  n: Int,
+    |  z: {
+    |    val m
+    |    val n
+    |  },
+    |  m: Int
+    |)"""
+
+  """class A(m: Int,
     |n: {
     |val x: String
     |val y : String
@@ -337,38 +551,43 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     | o: Int = {
     |  42
     |})""" ==>
-  """class A(m: Int,
-    |        n: {
-    |          val x: String
-    |          val y: String
-    |        },
-    |        o: Int = {
-    |          42
-    |        })"""
+  """class A(
+    |  m: Int,
+    |  n: {
+    |    val x: String
+    |    val y: String
+    |  },
+    |  o: Int = {
+    |    42
+    |  }
+    |)"""
 
   """class A(n: {
     | def close(): Unit
     | def open(): Unit
-    |}, 
+    |},
     |m: Int)""" ==>
-  """class A(n: {
-    |          def close(): Unit
-    |          def open(): Unit
-    |        },
-    |        m: Int)"""
-   
+  """class A(
+    |  n: {
+    |    def close(): Unit
+    |    def open(): Unit
+    |  },
+    |  m: Int
+    |)"""
+
   """class A(
     |implicit n: {
     |def x: Int
     |def y: Int
     |})""" ==>
   """class A(
-    |  implicit n: {
+    |  implicit
+    |  n: {
     |    def x: Int
     |    def y: Int
-    |  })"""
-    
-    
+    |  }
+    |)"""
+
   """class A(n: {
     |def x: Int
     |})""" ==>
@@ -376,53 +595,59 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |          def x: Int
     |        })"""
 
-  """class A(a: Int, 
+  """class A(a: Int,
     |b: Int)(c: { val d: Int
     |})""" ==>
-  """class A(a: Int,
-    |        b: Int)(c: {
-    |                  val d: Int
-    |                })"""   
-    
-  }
-    
-  """class A(a: Int, 
-    |b: Int)(c: { val d: Int
-    |})""" ==>
-  """class A(a: Int,
-    |  b: Int)(c: {
+  """class A(
+    |  a: Int,
+    |  b: Int
+    |)(c: {
     |    val d: Int
     |  })"""
 
+  }
+
+  """class A(a: Int,
+    |b: Int)(c: { val d: Int
+    |})""" ==>
+  """class A(
+    |  a: Int,
+    |  b: Int
+    |)(c: {
+    |  val d: Int
+    |})"""
+
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentClassDeclaration, true)
-  """class Person(
-    |  name: String,
-    |  age: Int)
-    |    extends Entity
-    |    with Logging
-    |    with Identifiable
-    |    with Serializable""" ==>
-  """class Person(
-    |  name: String,
-    |  age: Int)
-    |    extends Entity
-    |    with Logging
-    |    with Identifiable
-    |    with Serializable""" 
+    """class Person(
+      |  name: String,
+      |  age: Int)
+      |    extends Entity
+      |    with Logging
+      |    with Identifiable
+      |    with Serializable""" ==>
+    """class Person(
+      |  name: String,
+      |  age: Int
+      |)
+      |    extends Entity
+      |    with Logging
+      |    with Identifiable
+      |    with Serializable"""
 
-  """class Person(
-    |    name: String,
-    |    age: Int) {
-    |  def firstMethod = 42
-    |}""" ==>
-  """class Person(
-    |    name: String,
-    |    age: Int) {
-    |  def firstMethod = 42
-    |}"""
+    """class Person(
+      |    name: String,
+      |    age: Int) {
+      |  def firstMethod = 42
+      |}""" ==>
+    """class Person(
+      |    name: String,
+      |    age: Int
+      |) {
+      |  def firstMethod = 42
+      |}"""
 
-  """class Person(name: String, age: Int, birthdate: Date, astrologicalSign: String, shoeSize: Int, favoriteColor: java.awt.Color) 
+  """class Person(name: String, age: Int, birthdate: Date, astrologicalSign: String, shoeSize: Int, favoriteColor: java.awt.Color)
     |extends Entity
     |with Logging
     |with Identifiable
@@ -437,21 +662,22 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  def firstMethod = 42
     |}"""
 
-  """class Person(
-    |name: String,
-    |  age: Int) 
-    |extends Entity  {
-    |def method() = 42
-    |}""" ==>
-  """class Person(
-    |  name: String,
-    |  age: Int)
-    |    extends Entity {
-    |  def method() = 42
-    |}"""
+    """class Person(
+      |name: String,
+      |  age: Int)
+      |extends Entity  {
+      |def method() = 42
+      |}""" ==>
+    """class Person(
+      |  name: String,
+      |  age: Int
+      |)
+      |    extends Entity {
+      |  def method() = 42
+      |}"""
 
-  """trait A 
-    |extends B 
+  """trait A
+    |extends B
     |with C {
     |println("d")
     |}""" ==>
@@ -462,11 +688,11 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |}"""
 
   }
-    
+
   "trait Function1[@specialized(Int, Long, Double) -T1, @specialized(Unit, Int, Long, Double) +R] extends AnyRef" ==>
   "trait Function1[@specialized(Int, Long, Double) -T1, @specialized(Unit, Int, Long, Double) +R] extends AnyRef"
-  
- """class C
+
+"""class C
     |extends {
     |val name = "Bob"
     |}""" ==>
@@ -607,7 +833,7 @@ class TemplateFormatterTest extends AbstractFormatterTest {
     |  bar()
     |}"""
 
-  // format: ON
+//  format: ON
 
   override val debug = false
 
