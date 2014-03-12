@@ -18,3 +18,4 @@ docs/build
 nohup.out
 .history
 .cache
+.idea/

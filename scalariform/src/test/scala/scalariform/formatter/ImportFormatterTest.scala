@@ -2,6 +2,7 @@ package scalariform.formatter
 
 import scalariform.parser._
 import scalariform.formatter._
+import scalariform.formatter.preferences.{SpacesAroundMultiImports, FormattingPreferences}
 
 // format: OFF
 class ImportFormatterTest extends AbstractFormatterTest {
@@ -17,6 +18,14 @@ class ImportFormatterTest extends AbstractFormatterTest {
     |  bar => baz,
     |  wibble => wobble
     |}"""
+
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesAroundMultiImports, false)
+
+    "import foo.{bar=>baz}" ==> "import foo.{bar => baz}"
+    "import foo.{bar=>baz},baz.biz" ==> "import foo.{bar => baz}, baz.biz"
+  }
 
   override val debug = false
 

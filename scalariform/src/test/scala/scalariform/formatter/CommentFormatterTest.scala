@@ -201,6 +201,13 @@ class CommentFormatterTest extends AbstractFormatterTest {
   """/**
     |  */
     |"""
-  }
 
+  """/**          This method applies f to each
+    | * element of the given list.
+    | */""" ==>
+  """/** This method applies f to each
+    |  * element of the given list.
+    |  */
+    |"""
+  }
 }

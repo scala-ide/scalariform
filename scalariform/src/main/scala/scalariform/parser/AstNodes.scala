@@ -446,4 +446,3 @@ case class XmlProcessingInstruction(token: Token) extends XmlContents { lazy val
 case class XmlExpr(first: XmlContents, otherElements: List[XmlContents]) extends ExprElement {
   lazy val tokens = flatten(first, otherElements)
 }
-

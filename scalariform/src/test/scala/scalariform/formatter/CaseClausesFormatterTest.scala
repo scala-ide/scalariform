@@ -28,8 +28,8 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   """{
-    |case x => 
-    |while (true) { 
+    |case x =>
+    |while (true) {
     |1
     |}
     |}""" ==>
@@ -89,8 +89,8 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
   "a match { case b => ; c }" ==> "a match { case b => ; c }"
 
   // See issue #60
-  """a match { 
-    |case b => 
+  """a match {
+    |case b =>
     |val c = d
     |case e =>
     |}""" ==>
@@ -99,7 +99,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |    val c = d
     |  case e =>
     |}"""
-    
+
   """a match {
     |/* foo*/
     |case x if z=> 1
@@ -186,7 +186,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   """a match {
-    |  case b 
+    |  case b
     |=> 1
     |  case ccc => 2
     |}""" ==>
@@ -217,7 +217,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
 
   {
-  implicit val formattingPreferences = 
+  implicit val formattingPreferences =
     FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true).setPreference(RewriteArrowSymbols, true)
 
   """a match {
@@ -228,12 +228,11 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case b   ⇒ 42
     |  case ccc ⇒ 24
     |}"""
-
   }
 
   {
 
-  implicit val formattingPreferences = 
+  implicit val formattingPreferences =
     FormattingPreferences
       .setPreference(AlignSingleLineCaseStatements, true)
       .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 5)

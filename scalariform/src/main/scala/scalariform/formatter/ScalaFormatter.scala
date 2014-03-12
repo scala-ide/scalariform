@@ -45,6 +45,23 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     result
   }
 
+  /**
+   * Converts an AstNode into what it should look like in text after Scalariform has run.
+   * Useful for calculating the actual length of an [[scalariform.parser.AstNode]] after formatting.
+   *
+   * @param ast The AST to format and render as a string
+   * @param astFormatResult Should run formatting actions for 'ast'
+   * @return Formatted string representation of what the AstNode should look like after Scalariform
+   *         has run
+   */
+  protected def formattedAstNode(ast: AstNode)(astFormatResult: ⇒ FormatResult): String = {
+    val source = getSource(ast)
+    val formatResult = astFormatResult
+    val offset = ast.firstToken.offset
+    val edits = writeTokens(source, ast.tokens, formatResult, offset)
+    TextEditProcessor.runEdits(source, edits)
+  }
+
   private def alterSuspendFormatting(text: String): Option[Boolean] =
     if (text contains "format: OFF")
       Some(true)
@@ -162,11 +179,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
           builder.append(" ")
         else
           writeIntertokenCompact()
-      case PlaceAtColumn(indentLevel, spaces) ⇒
+      case PlaceAtColumn(indentLevel, spaces, relativeTo) ⇒
         require(!formattingPreferences(IndentWithTabs))
         writeIntertokenCompact()
+        val relativeIndent = relativeTo flatMap tokenIndentMap.get getOrElse 0
         val indentLength = Spaces(formattingPreferences(IndentSpaces)).length(indentLevel)
-        builder.append(" " * (indentLength + spaces - builder.currentColumn))
+        builder.append(" " * (indentLength + relativeIndent + spaces - builder.currentColumn))
       case EnsureNewlineAndIndent(indentLevel, relativeTo) ⇒
         require(!(formattingPreferences(IndentWithTabs) && relativeTo.isDefined))
         val baseIndentOption = relativeTo flatMap tokenIndentMap.get

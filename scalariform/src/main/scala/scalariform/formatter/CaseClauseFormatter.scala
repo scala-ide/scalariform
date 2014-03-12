@@ -7,6 +7,7 @@ import scalariform.utils.Utils
 import scalariform.utils.TextEditProcessor
 import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
+import Alignment._
 import PartialFunction._
 import scala.math.{ max, min }
 
@@ -61,28 +62,23 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     formatResult
   }
 
-  private def groupClauses(caseClausesAstNode: CaseClauses): List[Either[ConsecutiveSingleLineCaseClauses, CaseClause]] = {
+  private def groupClauses(caseClausesAstNode: CaseClauses): List[EitherAlignableCaseClause] = {
     val clausesAreMultiline = containsNewline(caseClausesAstNode) || hiddenPredecessors(caseClausesAstNode.firstToken).containsNewline
 
-    def groupClauses(caseClauses: List[CaseClause], first: Boolean): List[Either[ConsecutiveSingleLineCaseClauses, CaseClause]] =
+    def groupClauses(caseClauses: List[CaseClause], first: Boolean): List[EitherAlignableCaseClause] =
       caseClauses match {
         case Nil ⇒ Nil
         case (caseClause @ CaseClause(casePattern, statSeq)) :: otherClauses ⇒
           val otherClausesGrouped = groupClauses(otherClauses, first = false)
 
-          val formattedCasePattern = {
-            val casePatternSource = getSource(casePattern)
-            val casePatternFormatResult = formatCasePattern(casePattern)(FormatterState(indentLevel = 0))
-            val offset = casePattern.firstToken.offset
-            val edits = writeTokens(casePatternSource, casePattern.tokens, casePatternFormatResult, offset)
-            TextEditProcessor.runEdits(casePatternSource, edits)
+          val formattedCasePattern = formattedAstNode(casePattern) {
+            formatCasePattern(casePattern)(FormatterState(indentLevel = 0))
           }
 
           val newlineBeforeClause = hiddenPredecessors(caseClause.firstToken).containsNewline ||
             previousCaseClauseEndsWithNewline(caseClause, caseClausesAstNode)
 
           // To evaluate whether a clause body is multiline, we ignore a trailing newline: 
-          val prunedStatSeq = pruneTrailingNewline(statSeq)
           val clauseBodyIsMultiline = containsNewline(pruneTrailingNewline(statSeq)) ||
             statSeq.firstTokenOption.exists(hiddenPredecessors(_).containsNewline)
 
@@ -100,14 +96,6 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
           }
       }
     groupClauses(caseClausesAstNode.caseClauses, first = true)
-  }
-
-  private case class ConsecutiveSingleLineCaseClauses(clauses: List[CaseClause], largestCasePatternLength: Int, smallestCasePatternLength: Int) {
-    def prepend(clause: CaseClause, length: Int) =
-      ConsecutiveSingleLineCaseClauses(clause :: clauses, max(length, largestCasePatternLength), min(length, smallestCasePatternLength))
-
-    def patternLengthRange = largestCasePatternLength - smallestCasePatternLength
-
   }
 
   private def formatCasePattern(casePattern: CasePattern, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {
@@ -164,5 +152,4 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     case Some((separator, None)) if separator.isNewline ⇒ statSeq.copy(otherStats = statSeq.otherStats.init)
     case _ ⇒ statSeq
   }
-
 }
