@@ -132,16 +132,19 @@ For example, if ``false``, then::
     birthdate: Date,
     astrologicalSign: String = "libra",
     shoeSize: Int,
-    favoriteColor: java.awt.Color)
+    favoriteColor: java.awt.Color
+  )
 
 If ``true``, then::
 
-  class Person(name:             String,
-               age:              Int            = 24,
-               birthdate:        Date,
-               astrologicalSign: String         = "libra",
-               shoeSize:         Int,
-               favoriteColor:    java.awt.Color)
+  class Person(
+    name:             String,
+    age:              Int            = 24,
+    birthdate:        Date,
+    astrologicalSign: String         = "libra",
+    shoeSize:         Int,
+    favoriteColor:    java.awt.Color
+  )
 
 This will also place the "implicit" keyword in parameters on it's own line, whenever
 the parameter being formatted contains a newline::
@@ -150,14 +153,16 @@ For example, if ``false``, then::
 
   def formatBirthDate(
     implicit birthdate: Date = Date("11/11/11"),
-    birthtime: Time): DateTime
+    birthtime: Time
+  ): DateTime
 
 If ``true``, then::
 
   def formatBirthDate(
     implicit
     birthdate: Date = Date("11/11/11"),
-    birthtime: Time): DateTime
+    birthtime: Time
+  ): DateTime
 
 This option is disabled if ``indentWithTabs`` is ``true``.
 
@@ -397,42 +402,6 @@ If ``false``, start the comment body on a separate line below the opening delimi
    * This method applies f to each
    * element of the given list.
    */
-
-preserveDanglingCloseParenthesis
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Default: ``false``
-
-If ``true``, it will keep a newline before a close parenthesis ')' in an
-argument expression or parameter clause. For example::
-
-  val book = Book(
-    name = "Name",
-    author = "Author",
-    rating = 5
-  )
-
-If ``false``, the parenthesis will be joined to the end of the argument list::
-
-  val book = Book(
-    name = "Name",
-    author = "Author",
-    rating = 5)
-
-
-Or with parameters, if ``true``::
-
-  def findBooks(
-    author: Option[String] = None,
-    title: Option[String] = None
-  ): List[Book]
-
-If ``false``::
-
-  def findBooks(
-    author: Option[String] = None,
-    title: Option[String] = None): List[Book]
-
 
 placeScaladocAsterisksBeneathSecondAsterisk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

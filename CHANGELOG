@@ -1,7 +1,12 @@
-0.1.5 (..)
+0.1.5 (4/May/14)
 * FIX: Type formatter crash on multiline types
 * Track scalac parser -- allow trait-position parents to have parameter blocks
 * Sync changes to InferredSemicolonParser
+* FIX: Scaladoc formatting wasn't idempotent (issue #62)
+* Added "SpacesAroundMultiImports" option
+* Modified "AlignParameters" option to align by column -- see readme
+* Deprecated "PreserveDanglingCloseParenthesis" in favor of
+  automatic parentheses level detection.
 
 0.1.4 (24/April/13)
 * FIX: Allow declarations as last statement in case block (issue #60)
@@ -99,7 +104,7 @@
 * Disallow staircase expression breaks before commas and colons
 * FIX: incorrect indentation within multiple param clauses
 * Improved formatting for case blocks
-* Command line tool learned "--encoding=" option 
+* Command line tool learned "--encoding=" option
 * FIX: honour previously-ignored formatXml preference
 
 0.0.5 (15/September/10)
@@ -130,11 +135,11 @@
 * command line tool (scalariform.commandline.Main)
 * _~_ formatting fix
 
-0.0.2 (31/May/10) 
+0.0.2 (31/May/10)
 
 * parser update for multiple guards in a generator to match new scalac behaviour
 * small compiler fixes to match trunk
 
-0.0.1 (11/April/10) 
+0.0.1 (11/April/10)
 
 * initial release

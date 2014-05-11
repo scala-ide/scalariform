@@ -8,11 +8,11 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
 object ScalariformBuild extends Build {
-   
-   // This is to make sure nobody tries to compile with 1.6 as the target JDK. 
+
+   // This is to make sure nobody tries to compile with 1.6 as the target JDK.
    // Not clear if this will actually work on 1.8, needs to be tested when that is out.
    val specVersion = sys.props("java.specification.version")
-   val mismatchedSpecificationMessage = 
+   val mismatchedSpecificationMessage =
    """|Java 1.7 is required for building Scalariform.
       |
       |This is due to a dependency on the javax.swing library, which
@@ -24,12 +24,11 @@ object ScalariformBuild extends Build {
 
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ Seq(
     organization := "com.danieltrinh",
-    version := "0.1.5-SNAPSHOT",
-    scalaVersion := "2.10.3",
+    version := "0.1.5",
+    scalaVersion := "2.10.4",
     crossScalaVersions := Seq(
-      "2.11.0-M8",
-      "2.11.0-M7",
-      "2.10.0", "2.10.1",
+      "2.11.0",
+      "2.10.4",
       "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
@@ -53,17 +52,16 @@ object ScalariformBuild extends Build {
   }
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case "2.11.0-M8" ⇒ "org.scalatest" %% s"scalatest"  % "2.1.RC1" % "test"
-    case "2.11.0-M7" ⇒ "org.scalatest" %% s"scalatest"  % "2.0.1-SNAP4" % "test"
-    case r"2.10.\d+" ⇒ "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
-    case "2.9.3"     ⇒ "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
-    case _           ⇒ "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
+    case "2.11.0"    => "org.scalatest" %  "scalatest_2.11" % "2.1.5" % "test"
+    case r"2.10.\d+" => "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
+    case "2.9.3"     => "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
+    case _           => "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
-    case r"2.11.0-M\d" => List(
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.0-RC7",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.0-RC5"
+    case r"2.11.0" => List(
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.1",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
     )
     case _ => Nil
   }
