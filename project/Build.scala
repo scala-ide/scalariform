@@ -6,6 +6,8 @@ import com.typesafe.sbteclipse.core.EclipsePlugin._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
+import xerial.sbt.Sonatype._
+import xerial.sbt.Sonatype.SonatypeKeys._
 
 object ScalariformBuild extends Build {
 
@@ -22,8 +24,9 @@ object ScalariformBuild extends Build {
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
    assert(specVersion == "1.7", mismatchedSpecificationMessage)
 
-  lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ Seq(
+  lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "com.danieltrinh",
+    profileName := "com.danieltrinh",
     version := "0.1.5",
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq(
@@ -76,6 +79,8 @@ object ScalariformBuild extends Build {
         pomExtra := pomExtraXml,
         publishMavenStyle := true,
         publishArtifact in Test := false,
+        publishArtifact in (Compile, packageDoc) := true,
+        publishArtifact in (Compile, packageSrc) := true,
         pomIncludeRepository := { _ ⇒ false },
         sbtbuildinfo.Plugin.buildInfoKeys := Seq[sbtbuildinfo.Plugin.BuildInfoKey](version),
         sbtbuildinfo.Plugin.buildInfoPackage := "scalariform",
