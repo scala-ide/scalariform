@@ -2,15 +2,15 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.scalariform</groupId>
+  <groupId>com.danieltrinh</groupId>
   <artifactId>scalariform.parent</artifactId>
   <version>0.1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <!-- scm configuration is require to extract the github hash-->
   <scm>
-    <connection>scm:git://github.com/mdr/scalariform.git</connection>
-    <url>https://github.com/mdr/scalariform</url>
+    <connection>scm:git://github.com/daniel-trinh/scalariform.git</connection>
+    <url>https://github.com/daniel-trinh/scalariform</url>
   </scm>
 
   <properties>

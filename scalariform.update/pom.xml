@@ -8,7 +8,7 @@
 	<version>0.1.5-SNAPSHOT</version>
 	<parent>
 		<artifactId>scalariform.parent</artifactId>
-		<groupId>org.scalariform</groupId>
+		<groupId>com.danieltrinh</groupId>
 		<version>0.1.5-SNAPSHOT</version>
 	</parent>
 </project>
