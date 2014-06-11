@@ -3,10 +3,11 @@ package scalariform.formatter
 import scalariform.lexer.Token
 
 case class FormatterState(
-  indentLevel: Int = 0,
+  indentLevel:                 Int           = 0,
   indentRelativeToTokenOption: Option[Token] = None,
-  val inSingleLineBlock: Boolean = false,
-  val expressionBreakHappened: Boolean = false) {
+  val inSingleLineBlock:       Boolean       = false,
+  val expressionBreakHappened: Boolean       = false
+) {
 
   private val nextIndentLevel = indentLevel + 1
 

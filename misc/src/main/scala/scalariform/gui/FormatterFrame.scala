@@ -396,7 +396,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
 
     val productions = List(
       new ProductionItem("Compilation unit or script", compilationUnitFormatter),
-      new ProductionItem("Expression", expressionFormatter))
+      new ProductionItem("Expression", expressionFormatter)
+    )
 
     override def getSize = productions.size
     override def getElementAt(index: Int) = productions(index)

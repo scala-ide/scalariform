@@ -12,9 +12,10 @@ import scalariform.utils.Utils
 import scalariform._
 
 class ScalaLexer(
-  protected val reader: IUnicodeEscapeReader,
-  protected val forgiveErrors: Boolean = false,
-  protected val scalaVersion: ScalaVersion = ScalaVersions.DEFAULT)
+  protected val reader:        IUnicodeEscapeReader,
+  protected val forgiveErrors: Boolean              = false,
+  protected val scalaVersion:  ScalaVersion         = ScalaVersions.DEFAULT
+)
   extends ScalaOnlyLexer with XmlLexer with ModeStack with TokenTests with Iterator[Token] {
 
   import ScalaLexer._

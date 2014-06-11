@@ -485,7 +485,8 @@ class ScalaParser(tokens: Array[Token]) {
       if (location == Local)
         typ().contents
       else
-        startInfixType())
+        startInfixType()
+    )
 
   private def annotTypeRest(): List[TypeElement] =
     typeElementFlatten3(annotations(skipNewLines = false))
@@ -1540,7 +1541,8 @@ class ScalaParser(tokens: Array[Token]) {
       accessModifierOpt = None,
       paramClausesOpt = None,
       templateInheritanceSectionOpt = templateOpt_.templateInheritanceSectionOpt,
-      templateBodyOption = templateOpt_.templateBodyOpt)
+      templateBodyOption = templateOpt_.templateBodyOpt
+    )
   }
 
   private def templateParents(): TemplateParents = {
