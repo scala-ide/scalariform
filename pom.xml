@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.danieltrinh</groupId>
   <artifactId>scalariform.parent</artifactId>
-  <version>0.1.5</version>
+  <version>0.1.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <!-- scm configuration is require to extract the github hash-->
@@ -86,7 +86,7 @@
           <format>'${version.suffix}-'yyyyMMddHHmm'-${buildNumber}'</format>
           <archiveSite>true</archiveSite>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
