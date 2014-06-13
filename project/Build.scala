@@ -12,12 +12,11 @@ object ScalariformBuild extends Build {
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ Seq(
     organization := "org.scalariform",
     version := "0.1.5-SNAPSHOT",
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.11.1",
     crossScalaVersions := Seq(
-      //      "2.11.0-M2",
-      "2.10.0", "2.10.1",
-      "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0",
-      "2.8.2", "2.8.1", "2.8.0"),
+      "2.11.1",
+      "2.10.4",
+      "2.9.3"),
     exportJars := true, // Needed for cli oneJar
     retrieveManaged := true,
     scalacOptions += "-deprecation",
@@ -34,18 +33,16 @@ object ScalariformBuild extends Build {
     publish := (),
     publishLocal := ())) aggregate (scalariform, cli, misc)
 
-  def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case "2.8.0"  ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
-    case "2.10.0" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case "2.10.1" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case "2.9.3"  ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-    case _        ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+  def getScalaVersionDependencies(scalaVersion: String) = scalaVersion match {
+    case "2.9.3" | "2.10.4" ⇒ Seq("org.scalatest" %% "scalatest" % "1.9.1" % "test")
+    case "2.11.0" | "2.11.1" ⇒ Seq("org.scalatest" %% "scalatest" % "2.1.4" % "test", "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1", "org.scala-lang.modules" %% "scala-xml" % "1.0.1")
+    case _        ⇒ Seq("org.scalatest" %% "scalatest" % "2.1.4" % "test")
   }
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings =
     subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ eclipseSettings ++
       Seq(
-        libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒ deps :+ getScalaTestDependency(sv) },
+        libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒ deps ++ getScalaVersionDependencies(sv) },
         pomExtra := pomExtraXml,
         publishMavenStyle := true,
         publishArtifact in Test := false,

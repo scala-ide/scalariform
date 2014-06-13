@@ -13,7 +13,7 @@ import scalariform.ScalaVersions
 object Main {
 
   def main(args: Array[String]) {
-    exit(if (process(args)) 1 else 0)
+    java.lang.System.exit(if (process(args)) 1 else 0)
   }
 
   def process(args: Array[String]): Boolean = {
