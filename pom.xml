@@ -151,5 +151,19 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>scala-2.12.x</id>
+      <properties>
+        <scala.version>2.12.0-SNAPSHOT</scala.version>
+        <version.suffix>2_12</version.suffix>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-xml_${scala.binary.version}</artifactId>
+          <version>${scala.xml.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 </project>
