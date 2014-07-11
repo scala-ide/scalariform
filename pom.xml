@@ -18,8 +18,9 @@
     <scala.version>2.10.2</scala.version>
     <encoding>UTF-8</encoding>
     <maven.version>3.0.4</maven.version>
-    <scala.binary.version>2.11.0-M5</scala.binary.version>
-    <scala.xml.version>1.0.0-RC5</scala.xml.version>
+    <scala.binary.version>2.11</scala.binary.version>
+    <scala.xml.version>1.0.2</scala.xml.version>
+    <scala.parser-combinators.version>1.0.1</scala.parser-combinators.version>
     <version.suffix>2_10</version.suffix>
   </properties>
 
@@ -148,6 +149,11 @@
           <groupId>org.scala-lang.modules</groupId>
           <artifactId>scala-xml_${scala.binary.version}</artifactId>
           <version>${scala.xml.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
+          <version>${scala.parser-combinators.version}</version>
         </dependency>
       </dependencies>
     </profile>

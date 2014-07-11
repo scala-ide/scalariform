@@ -9,7 +9,7 @@ Import-Package: scala.xml.parsing,
  scala.util.parsing.combinator.lexical,
  scala.util.parsing.combinator.syntactical,
  scala.util.parsing.combinator.token,
- scala.util.parsing.combinator.input
+ scala.util.parsing.input
 Bundle-ClassPath: .
 Export-Package: scalariform,
  scalariform.astselect,
