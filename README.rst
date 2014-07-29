@@ -17,6 +17,21 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://davetron5000.github.com/scala-style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
+Packaging an executable JAR
+---------------------------
+
+If you would like to package scalariform for use on the command line with java -jar, clone the repo and perform the following simple steps: ::
+
+    sbt one-jar
+
+sbt will build one jar with all the dependencies and put it in ::
+
+    cli/target/scala-$your_scala_version/scalariform.jar
+
+You can copy this to a location in your path and execute it as follows: ::
+
+   java -jar /home/me/bin/scalariform.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +preserveDanglingCloseParenthesis +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
+
 Integration with sbt
 --------------------
 
@@ -99,11 +114,13 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gq`` command by adding
 the following to ``.vimrc`` ::
 
-  au BufEnter *.scala setl formatprg=/path/to/scalariform.jar\ --stdin\ --stdout
+  au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +preserveDanglingCloseParenthesis\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
 
-The executable scalariform.jar can be downloaded from:
+Or, if you don't like escaping spaces, you can set up a mapping: ::
 
-  https://s3.amazonaws.com/scalariform/scalariform.jar
+    map ,st :%!java -jar /home/me/bin/scalariform.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +preserveDanglingCloseParenthesis +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdin --stdout <CR>
+
+You can create your own executable scalariform.jar by following the instructions at the top of this file, in "Packaging an executable JAR."
 
 Command line tool
 -----------------
