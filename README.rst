@@ -31,11 +31,11 @@ To set preferences, go to Window -> Preferences -> Scala -> Formatter
 Integration with Emacs/ENSIME
 -----------------------------
 
-"`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer." 
+"`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer."
 
-  http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8
+  http://ensime.github.io/#tth_sEc4.10
 
-.. _ENSIME: http://github.com/aemoncannon/ensime
+.. _ENSIME: https://github.com/ensime/ensime-server
 
 Integration with jEdit
 ----------------------
