@@ -23,7 +23,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     var formatResult: FormatResult = NoFormatResult
     var isFirstCaseClause = true
 
-    // We have to decide whether to indent the hidden tokens before the CASE token (or possibly a preceeding
+    // We have to decide whether to indent the hidden tokens before the CASE token (or possibly a preceding
     // NEWLINE token from a prior case block).
     def handleCaseIndent(caseClause: CaseClause) {
       if (!isFirstCaseClause) {
@@ -132,10 +132,27 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
    */
   private def getTrailingNewline(caseClause: CaseClause): Option[Token] =
     for {
-      (separator, stat) ← caseClause.statSeq.otherStats.lastOption
+      (separator, stat) ← lastStat(caseClause.statSeq)
       if stat.isEmpty
       if separator.isNewline
     } yield separator
+
+  /**
+   * @return the last stat of a block which may be wrapped inside of an anonymous function definition
+   */
+  def lastStat(statSeq: StatSeq): Option[(Token, Option[Stat])] =
+    statSeq.otherStats match {
+      case Nil ⇒ None
+        statSeq.firstStatOpt flatMap {
+          case Expr(List(AnonymousFunction(_, _, body))) ⇒ lastStat(body)
+          case _                                         ⇒ None
+        }
+      case others ⇒
+        others.lastOption match {
+          case Some((_, Some(Expr(List(AnonymousFunction(_, _, body)))))) ⇒ lastStat(body)
+          case x ⇒ x
+        }
+    }
 
   private def previousCaseClauseTrailingNewlineOpt(caseClause: CaseClause, caseClauses: CaseClauses): Option[Token] =
     Utils.pairWithPrevious(caseClauses.caseClauses).collect {
