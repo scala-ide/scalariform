@@ -117,6 +117,35 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case zzz => 3
     |}"""
 
+  """a match {
+    |case x => x
+    |a =>
+    |x
+    |case y => b =>
+    |b + 1
+    |}""" ==>
+  """a match {
+    |  case x =>
+    |    x
+    |    a =>
+    |      x
+    |  case y => b =>
+    |    b + 1
+    |}"""
+
+  """a match {
+    |case x => a =>
+    |x
+    |case y => b =>
+    |b + 1
+    |}""" ==>
+  """a match {
+    |  case x => a =>
+    |    x
+    |  case y => b =>
+    |    b + 1
+    |}"""
+
   {
   implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
 
