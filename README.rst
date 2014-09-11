@@ -268,7 +268,7 @@ using `Compact Control Readability`_ style
   else if (y == z) {
     bar()
   } 
-  else
+  else {
     baz()
   }  
 
@@ -278,7 +278,7 @@ using `Compact Control Readability`_ style
   catch {
     case _ => bar()
   } 
-  finally
+  finally {
     baz()
   }  
 
