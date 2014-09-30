@@ -218,6 +218,10 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   "for(<book/><-Nil)Nil" producesTokens (FOR, LPAREN, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE, LARROW, VARID, RPAREN, VARID)
 
+  "a -> b" producesTokens(VARID, WS, RARROW, WS, VARID)
+  
+  "a → b" producesTokens(VARID, WS, RARROW, WS, VARID)
+  
   "\"\\u001A\"" producesTokens (STRING_LITERAL)
 
   "\"\"\"\\u001A\"\"\"" producesTokens (STRING_LITERAL)

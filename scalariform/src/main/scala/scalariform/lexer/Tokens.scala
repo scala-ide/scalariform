@@ -52,6 +52,7 @@ object Tokens {
   val LBRACE = TokenType("LBRACE")
   val FOR = TokenType("FOR")
   val LARROW = TokenType("LARROW")
+  val RARROW = TokenType("RARROW")
   val ABSTRACT = TokenType("ABSTRACT")
   val LPAREN = TokenType("LPAREN")
   val IF = TokenType("IF")

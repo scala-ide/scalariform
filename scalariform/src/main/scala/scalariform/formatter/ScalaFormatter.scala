@@ -268,6 +268,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
       val actualReplacementOption = replacementOption orElse (condOpt(token.tokenType) {
         case ARROW if rewriteArrows  ⇒ "⇒"
         case LARROW if rewriteArrows ⇒ "←"
+        case RARROW if rewriteArrows ⇒ "→"
         case EOF                     ⇒ ""
       })
       builder.append(actualReplacementOption getOrElse token.rawText)
@@ -444,7 +445,7 @@ object ScalaFormatter {
     RETURN, SEALED, /* SUPER, THIS, */
     THROW, TRAIT, TRY, /* TYPE ,*/
     VAL, VAR, WHILE, WITH, YIELD, 
-    /* USCORE, */ COLON, EQUALS, ARROW, LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /* HASH, AT */
+    /* USCORE, */ COLON, EQUALS, ARROW, LARROW, RARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /* HASH, AT */
     LBRACE, SEMI)
 
   val ENSURE_SPACE_BEFORE = Set(
@@ -456,7 +457,7 @@ object ScalaFormatter {
     /* RETURN, */ SEALED, /* SUPER, THIS, */
     /* THROW, */ TRAIT, /* TRY, TYPE, */
     VAL, VAR, /* WHILE, */ WITH, YIELD, 
-    /* USCORE, COLON, */ EQUALS, /* ARROW, */ LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /*, HASH, AT, */
+    /* USCORE, COLON, */ EQUALS, /* ARROW, */ LARROW, RARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /*, HASH, AT, */
     RBRACE)
   // format: ON
 

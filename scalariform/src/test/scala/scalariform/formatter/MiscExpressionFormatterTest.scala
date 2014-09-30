@@ -7,7 +7,7 @@ import scalariform.formatter.preferences._
 // format: OFF
 class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
-   "→" ==> "→"
+   "a → b" ==> "a → b"
    "this" ==> "this"
    "super [ B ] . t" ==> "super[B].t"
    "E2 . super [ B ] . t" ==> "E2.super[B].t"
