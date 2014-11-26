@@ -352,23 +352,22 @@ Default: ``false``
 With this set to ``true``, class (and trait / object) declarations
 will be formatted as recommended_ by the Scala Style Guide. That is,
 if the declaration section spans multiple lines, it will be formatted
-so that either the parameter section or the inheritance section is
-doubly indented. This provides a visual distinction from the members
-of the class. For example:
+so that the parameter section is doubly indented. This provides a visual
+distinction between the constructor arguments & the extensions. For example:
 
 .. code:: scala
 
   class Person(
-    name: String,
-    age: Int,
-    birthdate: Date,
-    astrologicalSign: String,
-    shoeSize: Int,
-    favoriteColor: java.awt.Color)
-      extends Entity
-      with Logging
-      with Identifiable
-      with Serializable {
+      name: String,
+      age: Int,
+      birthdate: Date,
+      astrologicalSign: String,
+      shoeSize: Int,
+      favoriteColor: java.awt.Color)
+    extends Entity
+    with Logging
+    with Identifiable
+    with Serializable {
     def firstMethod = ...
   }
 

@@ -1,7 +1,7 @@
 package scalariform.formatter
 
-import scalariform.parser._
 import scalariform.formatter.preferences._
+import scalariform.parser._
 
 // format: OFF
 class TemplateFormatterTest extends AbstractFormatterTest {
@@ -613,78 +613,6 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |)(c: {
     |  val d: Int
     |})"""
-
-  {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentClassDeclaration, true)
-    """class Person(
-      |  name: String,
-      |  age: Int)
-      |    extends Entity
-      |    with Logging
-      |    with Identifiable
-      |    with Serializable""" ==>
-    """class Person(
-      |  name: String,
-      |  age: Int
-      |)
-      |    extends Entity
-      |    with Logging
-      |    with Identifiable
-      |    with Serializable"""
-
-    """class Person(
-      |    name: String,
-      |    age: Int) {
-      |  def firstMethod = 42
-      |}""" ==>
-    """class Person(
-      |    name: String,
-      |    age: Int
-      |) {
-      |  def firstMethod = 42
-      |}"""
-
-  """class Person(name: String, age: Int, birthdate: Date, astrologicalSign: String, shoeSize: Int, favoriteColor: java.awt.Color)
-    |extends Entity
-    |with Logging
-    |with Identifiable
-    |with Serializable {
-    |def firstMethod = 42
-    |}""" ==>
-  """class Person(name: String, age: Int, birthdate: Date, astrologicalSign: String, shoeSize: Int, favoriteColor: java.awt.Color)
-    |    extends Entity
-    |    with Logging
-    |    with Identifiable
-    |    with Serializable {
-    |  def firstMethod = 42
-    |}"""
-
-    """class Person(
-      |name: String,
-      |  age: Int)
-      |extends Entity  {
-      |def method() = 42
-      |}""" ==>
-    """class Person(
-      |  name: String,
-      |  age: Int
-      |)
-      |    extends Entity {
-      |  def method() = 42
-      |}"""
-
-  """trait A
-    |extends B
-    |with C {
-    |println("d")
-    |}""" ==>
-  """trait A
-    |    extends B
-    |    with C {
-    |  println("d")
-    |}"""
-
-  }
 
   "trait Function1[@specialized(Int, Long, Double) -T1, @specialized(Unit, Int, Long, Double) +R] extends AnyRef" ==>
   "trait Function1[@specialized(Int, Long, Double) -T1, @specialized(Unit, Int, Long, Double) +R] extends AnyRef"
