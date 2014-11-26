@@ -82,5 +82,15 @@ class DoubleIndentClassDeclaration extends AbstractFormatterTest {
     |  println("d")
     |}"""
 
+  """class Person(
+    |  name: String,
+    |  age: Int)
+    |    extends Entity with Logging""" ==>
+  """class Person(
+    |    name: String,
+    |    age: Int
+    |)
+    |  extends Entity with Logging"""
+
 }
 
