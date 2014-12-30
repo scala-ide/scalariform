@@ -272,7 +272,7 @@ object Main {
     }
     val padding = " " * (6 - resultString.length)
     log("[" + resultString + "]" + padding + " " + file)
-    formatResult != FormattedCorrectly
+    formatResult == FormattedCorrectly
   }
 
   /**
