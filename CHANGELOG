@@ -1,3 +1,6 @@
+0.1.6 (17/Jan/15)
+* FIX: FQN package name changed from scalariform to com.danieltrinh.scalariform to avoid dependency collision with prior mdr/scalariform fork
+
 0.1.5 (4/May/14)
 * FIX: Type formatter crash on multiline types
 * Track scalac parser -- allow trait-position parents to have parameter blocks
