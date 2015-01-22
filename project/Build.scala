@@ -13,16 +13,15 @@ object ScalariformBuild extends Build {
 
    // This is to make sure nobody tries to compile with 1.6 as the target JDK.
    // Not clear if this will actually work on 1.8, needs to be tested when that is out.
-   val specVersion = sys.props("java.specification.version")
+   val validateJavaVersion = taskKey[Unit]("Check if we are running using required Java version")
    val mismatchedSpecificationMessage =
-   """|Java 1.7 is required for building Scalariform.
+   """|Java 1.7 is required for building the `misc` subproject of Scalariform.
       |
       |This is due to a dependency on the javax.swing library, which
       |had an API change from 1.6 to 1.7.
       |
       |Using 1.7 to build requires setting SBT to use JDK 1.7 or higher -- if SBT is
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
-   assert(specVersion == "1.7", mismatchedSpecificationMessage)
 
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "com.danieltrinh",
@@ -109,6 +108,16 @@ object ScalariformBuild extends Build {
         "com.miglayout" % "miglayout" % "3.7.4"),
       publish := (),
       publishLocal := (),
+      validateJavaVersion := {
+        val specJavaVersion = sys.props("java.specification.version")
+        val compatibleJavaVersion = specJavaVersion == "1.7" || specJavaVersion == "1.8"
+        if (!compatibleJavaVersion)
+          sys.error(mismatchedSpecificationMessage)
+      },
+      // this means we'll validate required Java version only _right before_ running the compile
+      // command in misc subproject. In particular, build won't fail if user is not interested
+      // in building `misc` subproject.
+      compile in Compile := ((compile in Compile) dependsOn validateJavaVersion).value,
       mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform, cli)
 
   def pomExtraXml =
