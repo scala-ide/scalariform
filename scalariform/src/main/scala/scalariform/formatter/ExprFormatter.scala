@@ -636,15 +636,22 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                     (CompactEnsuringGap, indentedState)
                 formatResult = formatResult.before(statSeq.firstToken, instruction)
                 formatResult ++= format(params)
+
+                val hasNewScopeAfterArrow = {
+                  val arrowIndex = statSeq.tokens.indexWhere(_.tokenType == ARROW)
+                  val tokenAfterArrow = statSeq.tokens.lift(arrowIndex + 1)
+                  tokenAfterArrow.map(_.tokenType == lbrace.tokenType).getOrElse(false)
+                }
                 for (firstToken ← subStatSeq.firstTokenOption) {
                   val instruction =
-                    if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
+                    if (!hasNewScopeAfterArrow && (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq)))
                       statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
                     else
                       CompactEnsuringGap
                   formatResult = formatResult.before(firstToken, instruction)
                 }
-                formatResult ++= format(subStatSeq)(subStatState)
+                val subStatStateAfterArrow = if(hasNewScopeAfterArrow) newFormatterState.indent else subStatState
+                formatResult ++= format(subStatSeq)(subStatStateAfterArrow)
               case _ ⇒
                 val instruction = statSeq.selfReferenceOpt match {
                   case Some((selfReference, arrow)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
@@ -683,7 +690,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     }
 
     for (stat ← firstStatOpt)
-      formatResult ++= format(stat)(firstStatFormatterState)
+      formatResult ++= format(stat, true)(firstStatFormatterState)
 
     for ((semi, otherStatOption) ← otherStats) {
 
@@ -702,7 +709,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
               CompactEnsuringGap
           formatResult = formatResult.before(firstToken, instruction)
         }
-        formatResult ++= format(otherStat)(otherStatFormatterState)
+        formatResult ++= format(otherStat, false)(otherStatFormatterState)
       }
 
     }
@@ -710,14 +717,46 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult
   }
 
-  private def format(stat: Stat)(implicit formatterState: FormatterState): FormatResult =
+  private def format(stat: Stat, firstStat: Boolean)(implicit formatterState: FormatterState): FormatResult =
     stat match {
       case expr: Expr                 ⇒ format(expr)
       case fullDefOrDcl: FullDefOrDcl ⇒ format(fullDefOrDcl)
       case import_ : ImportClause     ⇒ format(import_)
       case packageBlock: PackageBlock ⇒ format(packageBlock)
+      case packageStat: PackageStat   ⇒ format(packageStat, firstStat)
       case _                          ⇒ NoFormatResult // TODO
     }
+
+  def format(packageStat: PackageStat, firstPackage: Boolean)(implicit formatterState: FormatterState): FormatResult = {
+    var formatResult: FormatResult = NoFormatResult
+
+    if (formattingPreferences(ChainedPackageClauses)) {
+      val PackageStat(packageToken: Token, name: CallExpr) = packageStat
+
+      val packageDepth = if(firstPackage) formattingPreferences(ChainedPackageClauses.PackageDepth) else 1
+
+      def dotsForPackageNames(name: CallExpr): List[Token] = {
+        name.exprDotOpt match {
+          case Some((List(c@CallExpr(_, id, _, _, _)), dot)) =>
+            dot :: dotsForPackageNames(c)
+          case _                                             =>
+            Nil
+        }
+      }
+
+      val dotsBetweenPackageNames = dotsForPackageNames(name)
+
+      val lineBreaksAfter = dotsBetweenPackageNames.reverse.drop(packageDepth-1)
+
+      for {
+        token <- lineBreaksAfter
+      } {
+        formatResult ++= FormatResult(Map(token -> EnsureNewlineAndIndent(0, Some(packageToken))), Map(), Map())
+      }
+    }
+
+    formatResult
+  }
 
   def format(packageBlock: PackageBlock)(implicit formatterState: FormatterState): FormatResult = {
     val PackageBlock(packageToken: Token, name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) = packageBlock
@@ -909,9 +948,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val newFormatterState = formatterState.copy(inSingleLineBlock = singleLineBlock)
 
     if (singleLineBlock) {
+      if (formattingPreferences(NoSpacesAroundMultiImports))
+        formatResult = formatResult.before(firstImportSelector.firstToken, Compact)
       formatResult ++= format(firstImportSelector)
       for ((comma, otherImportSelector) ← otherImportSelectors)
         formatResult ++= format(otherImportSelector)
+      if (formattingPreferences(NoSpacesAroundMultiImports))
+        formatResult = formatResult.before(rbrace, Compact)
     } else {
       formatResult = formatResult.before(firstImportSelector.firstToken, formatterState.nextIndentLevelInstruction)
       formatResult ++= format(firstImportSelector)
