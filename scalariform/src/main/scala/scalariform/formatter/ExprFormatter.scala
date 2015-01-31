@@ -151,7 +151,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           val (extraFormatResult, newFormatterState) = format(parenExpr)(currentFormatterState.clearExpressionBreakHappened)
           formatResult ++= extraFormatResult
           currentFormatterState = newFormatterState.copy(
-            expressionBreakHappened = expressionBreakHappened || newFormatterState.expressionBreakHappened)
+            expressionBreakHappened = expressionBreakHappened || newFormatterState.expressionBreakHappened
+          )
         case GeneralTokens(_) | PrefixExprElement(_) ⇒
           for (token ← element.tokens if token != firstToken)
             if (isInferredNewline(token))
@@ -204,7 +205,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val expressionBreakHappened = currentFormatterState.expressionBreakHappened
       val (argResult, argUpdatedFormatterState) = format(argumentExprs)(currentFormatterState.clearExpressionBreakHappened)
       currentFormatterState = argUpdatedFormatterState.copy(
-        expressionBreakHappened = expressionBreakHappened || argUpdatedFormatterState.expressionBreakHappened)
+        expressionBreakHappened = expressionBreakHappened || argUpdatedFormatterState.expressionBreakHappened
+      )
 
       formatResult ++= argResult
     }
@@ -394,7 +396,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
               PlaceAtColumn(
                 0,
                 maxIdLength + 1,
-                Some(firstToken)))
+                Some(firstToken)
+              )
+            )
           }
         }
       case Right(callExpr) ⇒
@@ -992,7 +996,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         // will be placed on a single line with no newlines between prefixes.
         val numberOfPrefixTypes = Seq(
           !annotations.isEmpty,
-          valOrVarOpt.isDefined).count(_ == true) + modifiers.length
+          valOrVarOpt.isDefined
+        ).count(_ == true) + modifiers.length
         if (numberOfPrefixTypes > 0)
           prefixLength += numberOfPrefixTypes - 1
 
@@ -1058,10 +1063,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     // create the list in the reverse order of the list it is given.
     val allParams = (firstParamOption.toList ++ otherParams).reverse
 
-    def appendParamToGroup(previousParam: Option[Param],
-                           paramToAppend: Param,
-                           nextParam: Option[Param],
-                           groupedParams: List[EitherAlignableParam]): List[EitherAlignableParam] = {
+    def appendParamToGroup(
+      previousParam: Option[Param],
+      paramToAppend: Param,
+      nextParam:     Option[Param],
+      groupedParams: List[EitherAlignableParam]
+    ): List[EitherAlignableParam] = {
 
       // This unintuitive line is dependent on the ordering of groupedParams being passed
       // in. It's in reverse.
@@ -1241,7 +1248,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           PlaceAtColumn(
             0,
             typeSpaces,
-            paramFormatterState.indentRelativeToTokenOption))
+            paramFormatterState.indentRelativeToTokenOption
+          )
+        )
       }
     }
 
@@ -1256,7 +1265,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           PlaceAtColumn(
             0,
             defaultSpaces,
-            paramFormatterState.indentRelativeToTokenOption))
+            paramFormatterState.indentRelativeToTokenOption
+          )
+        )
       }
     }
 
@@ -1280,7 +1291,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult
   }
 
-  protected def format(import_ : ImportClause)(implicit formatterState: FormatterState): FormatResult = {
+  protected def format(import_ :ImportClause)(implicit formatterState: FormatterState): FormatResult = {
     val ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) = import_
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(importExpr)

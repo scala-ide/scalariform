@@ -10,7 +10,7 @@ import scalariform.lexer.Chars
 
 trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter with ExprFormatter with ScalaFormatter ⇒
 
-  def format(type_ : Type)(implicit formatterState: FormatterState): FormatResult = format(type_.contents)
+  def format(type_ :Type)(implicit formatterState: FormatterState): FormatResult = format(type_.contents)
 
   def format(typeElements: List[TypeElement])(implicit formatterState: FormatterState): FormatResult = {
     var formatResult = format(typeElements.head)

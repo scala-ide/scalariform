@@ -62,6 +62,7 @@ object Keywords {
     "*" -> STAR,
     "|" -> PIPE,
     "~" -> TILDE,
-    "!" -> EXCLAMATION)
+    "!" -> EXCLAMATION
+  )
 
 }

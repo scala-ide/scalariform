@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>scalariform.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
-	<version>0.1.5-SNAPSHOT</version>
+	<version>0.1.6-SNAPSHOT</version>
 	<parent>
 		<artifactId>scalariform.parent</artifactId>
-		<groupId>org.scalariform</groupId>
-		<version>0.1.5-SNAPSHOT</version>
+		<groupId>com.danieltrinh</groupId>
+		<version>0.1.6-SNAPSHOT</version>
 	</parent>
 </project>
 

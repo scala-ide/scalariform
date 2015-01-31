@@ -27,8 +27,9 @@ object Alignment {
   }
 
   case class ConsecutiveSingleLineEqualsExprs(
-    equalsExprs: List[EqualsExpr],
-    largestIdLength: Int) {
+    equalsExprs:     List[EqualsExpr],
+    largestIdLength: Int
+  ) {
 
     def prepend(equalsExpr: EqualsExpr, length: Int) = {
       ConsecutiveSingleLineEqualsExprs(equalsExpr :: equalsExprs, max(length, largestIdLength))
@@ -36,9 +37,10 @@ object Alignment {
   }
 
   case class ConsecutiveSingleLineCaseClauses(
-    clauses: List[CaseClause],
-    largestCasePatternLength: Int,
-    smallestCasePatternLength: Int) {
+    clauses:                   List[CaseClause],
+    largestCasePatternLength:  Int,
+    smallestCasePatternLength: Int
+  ) {
     def prepend(clause: CaseClause, length: Int) =
       ConsecutiveSingleLineCaseClauses(clause :: clauses, max(length, largestCasePatternLength), min(length, smallestCasePatternLength))
 
@@ -53,7 +55,8 @@ object Alignment {
         math.max(prefixLength, newPrefixLength),
         math.max(idLength, newIdLength),
         math.max(prefixAndIdLength, newPrefixAndIdLength),
-        math.max(typeLength, newTypeLength))
+        math.max(typeLength, newTypeLength)
+      )
     }
   }
 }

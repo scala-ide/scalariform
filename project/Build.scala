@@ -27,10 +27,10 @@ object ScalariformBuild extends Build {
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "com.danieltrinh",
     profileName := "com.danieltrinh",
-    version := "0.1.5",
+    version := "0.1.6-SNAPSHOT",
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq(
-      "2.11.0",
+      "2.11.1",
       "2.10.4",
       "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
@@ -55,14 +55,14 @@ object ScalariformBuild extends Build {
   }
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case "2.11.0"    => "org.scalatest" %  "scalatest_2.11" % "2.1.5" % "test"
+    case "2.11.1"    => "org.scalatest" %  "scalatest_2.11" % "2.1.5" % "test"
     case r"2.10.\d+" => "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
     case "2.9.3"     => "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
     case _           => "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
-    case r"2.11.0" => List(
+    case r"2.11.1" => List(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.1",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
     )

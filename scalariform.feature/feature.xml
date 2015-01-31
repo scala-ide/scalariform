@@ -2,7 +2,7 @@
 <feature
       id="scalariform.feature"
       label="Scalariform"
-      version="0.1.5.qualifier">
+      version="0.1.6.qualifier">
 
    <description>
       Code formatter for Scala 2.8

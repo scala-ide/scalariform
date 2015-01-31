@@ -3,7 +3,7 @@
    <description name="Scalariform Update Site" url="http://scalariform.googlecode.com/svn/trunk/update-site/">
       Scalariform Update Site
    </description>
-   <feature url="features/scalariform.feature_0.1.5.qualifier.jar" id="scalariform.feature" version="0.1.5.qualifier">
+   <feature url="features/scalariform.feature_0.0.0.jar" id="scalariform.feature" version="0.0.0">
       <category name="Scala"/>
    </feature>
    <category-def name="Scala" label="Scala"/>

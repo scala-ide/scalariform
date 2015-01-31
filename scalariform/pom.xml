@@ -2,14 +2,14 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.scalariform</groupId>
+  <groupId>com.danieltrinh</groupId>
   <artifactId>scalariform</artifactId>
-  <version>0.1.5-SNAPSHOT</version>
+  <version>0.1.6-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   <parent>
     <artifactId>scalariform.parent</artifactId>
-    <groupId>org.scalariform</groupId>
-    <version>0.1.5-SNAPSHOT</version>
+    <groupId>com.danieltrinh</groupId>
+    <version>0.1.6-SNAPSHOT</version>
   </parent>
   <dependencies>
   </dependencies>

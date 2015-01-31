@@ -46,7 +46,8 @@ object AstSelector {
       classOf[TmplDef],
       classOf[TypeDefOrDcl],
       classOf[TypeExprElement],
-      classOf[TypeParamClause])
+      classOf[TypeParamClause]
+    )
 
 }
 
