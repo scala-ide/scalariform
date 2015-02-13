@@ -41,6 +41,16 @@ class ParserTest extends FlatSpec with ShouldMatchers {
     evaluating { parseCompilationUnit("package a {} package b {}") } should produce[ScalaParserException]
   }
 
+  // issue #44
+  "Parser" should "allow qualified type parameter in pattern matching" in {
+    parseExpression("""
+    {
+      case List[scala.Int]() => 1
+      case _: List[scala.Int] => 2
+    }
+    """)
+  }
+
   private def parser(s: String) = new ScalaParser(ScalaLexer.tokenise(s).toArray)
   private def parseExpression(s: String) = parser(s).expr
   private def parseCompilationUnit(s: String) = parser(s).compilationUnit

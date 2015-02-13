@@ -949,7 +949,7 @@ class ScalaParser(tokens: Array[Token]) {
         val uscore = nextToken()
         val wildcardTypeOpt = if (SUBTYPE || SUPERTYPE) Some(wildcardType()) else None
         typeElementFlatten3(uscore, wildcardTypeOpt)
-      case _ if isIdent && isVariableName(currentToken.text) ⇒
+      case _ if isIdent && isVariableName(currentToken.text) && !(Set(DOT, HASH) contains lookahead(1)) ⇒
         typeElementFlatten3(ident())
       case _ ⇒
         List(typ())
