@@ -1,5 +1,7 @@
 package com.danieltrinh.scalariform.formatter
 
+import com.danieltrinh.scalariform.formatter.Alignment._
+import com.danieltrinh.scalariform.formatter.AnnotationFormatter
 import com.danieltrinh.scalariform.lexer.Chars
 import com.danieltrinh.scalariform.lexer.Token
 import com.danieltrinh.scalariform.lexer.Tokens._
@@ -7,7 +9,6 @@ import com.danieltrinh.scalariform.parser._
 import com.danieltrinh.scalariform.utils.{ TextEditProcessor, Utils }
 import com.danieltrinh.scalariform.formatter.preferences._
 import scala.PartialFunction._
-import Alignment._
 
 trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter with CaseClauseFormatter ⇒
 
@@ -756,8 +757,16 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           if (statSeq.firstTokenOption.isDefined) {
             statSeq.firstStatOpt match {
               case Some(Expr(List(anonFn @ AnonymousFunction(params, arrowToken, subStatSeq)))) ⇒
+                def hasNestedAnonymousFunction(subStatSeq: StatSeq): Boolean =
+                  (for {
+                    firstStat <- subStatSeq.firstStatOpt
+                    head <- firstStat.immediateChildren.headOption
+                  } yield head.isInstanceOf[AnonymousFunction]).getOrElse(false)
+
                 val (instruction, subStatState) =
-                  if (hiddenPredecessors(params(0).firstToken).containsNewline)
+                  if (hasNestedAnonymousFunction(subStatSeq))
+                    (CompactEnsuringGap, indentedState.indent(-1))
+                  else if (hiddenPredecessors(params(0).firstToken).containsNewline)
                     (indentedInstruction, indentedState.indent)
                   else
                     (CompactEnsuringGap, indentedState)
@@ -765,7 +774,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
                 formatResult ++= format(params)
                 for (firstToken ← subStatSeq.firstTokenOption) {
                   val instruction =
-                    if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
+                    if (hasNestedAnonymousFunction(subStatSeq))
+                      CompactEnsuringGap
+                    else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
                       statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
                     else
                       CompactEnsuringGap
