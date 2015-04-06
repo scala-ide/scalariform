@@ -2,24 +2,24 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.scalariform</groupId>
+  <groupId>com.danieltrinh</groupId>
   <artifactId>scalariform.parent</artifactId>
-  <version>0.1.5-SNAPSHOT</version>
+  <version>0.1.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <!-- scm configuration is require to extract the github hash-->
   <scm>
-    <connection>scm:git://github.com/mdr/scalariform.git</connection>
-    <url>https://github.com/mdr/scalariform</url>
+    <connection>scm:git://github.com/daniel-trinh/scalariform.git</connection>
+    <url>https://github.com/daniel-trinh/scalariform</url>
   </scm>
 
   <properties>
-    <tycho.version>0.18.1</tycho.version>
-    <scala.version>2.10.2</scala.version>
+    <tycho.version>0.20.0</tycho.version>
+    <scala.version>2.10.4</scala.version>
     <encoding>UTF-8</encoding>
     <maven.version>3.0.4</maven.version>
-    <scala.binary.version>2.11.0-M5</scala.binary.version>
-    <scala.xml.version>1.0.0-RC5</scala.xml.version>
+    <scala.binary.version>2.11</scala.binary.version>
+    <scala.xml.version>1.0.2</scala.xml.version>
     <version.suffix>2_10</version.suffix>
   </properties>
 
@@ -86,7 +86,7 @@
           <format>'${version.suffix}-'yyyyMMddHHmm'-${buildNumber}'</format>
           <archiveSite>true</archiveSite>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
@@ -140,8 +140,22 @@
     <profile>
       <id>scala-2.11.x</id>
       <properties>
-        <scala.version>2.11.0-SNAPSHOT</scala.version>
+        <scala.version>2.11.1</scala.version>
         <version.suffix>2_11</version.suffix>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-xml_${scala.binary.version}</artifactId>
+          <version>${scala.xml.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>scala-2.12.x</id>
+      <properties>
+        <scala.version>2.12.0-SNAPSHOT</scala.version>
+        <version.suffix>2_12</version.suffix>
       </properties>
       <dependencies>
         <dependency>

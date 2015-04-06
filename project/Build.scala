@@ -13,24 +13,23 @@ object ScalariformBuild extends Build {
 
    // This is to make sure nobody tries to compile with 1.6 as the target JDK.
    // Not clear if this will actually work on 1.8, needs to be tested when that is out.
-   val specVersion = sys.props("java.specification.version")
+   val validateJavaVersion = taskKey[Unit]("Check if we are running using required Java version")
    val mismatchedSpecificationMessage =
-   """|Java 1.7 is required for building Scalariform.
+   """|Java 1.7 is required for building the `misc` subproject of Scalariform.
       |
       |This is due to a dependency on the javax.swing library, which
       |had an API change from 1.6 to 1.7.
       |
       |Using 1.7 to build requires setting SBT to use JDK 1.7 or higher -- if SBT is
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
-   assert(specVersion == "1.7", mismatchedSpecificationMessage)
 
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "com.danieltrinh",
     profileName := "com.danieltrinh",
-    version := "0.1.5",
+    version := "0.1.6-SNAPSHOT",
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq(
-      "2.11.0",
+      "2.11.1",
       "2.10.4",
       "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
@@ -55,14 +54,14 @@ object ScalariformBuild extends Build {
   }
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case "2.11.0"    => "org.scalatest" %  "scalatest_2.11" % "2.1.5" % "test"
-    case r"2.10.\d+" => "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
+    case r"2.11.\d+[-\w]*" => "org.scalatest" %  "scalatest_2.11" % "2.1.5" % "test"
+    case r"2.10.\d+[-\w]*" => "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
     case "2.9.3"     => "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
     case _           => "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
-    case r"2.11.0" => List(
+    case r"2.11.\d+[-\w]*" => List(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.1",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
     )
@@ -109,6 +108,16 @@ object ScalariformBuild extends Build {
         "com.miglayout" % "miglayout" % "3.7.4"),
       publish := (),
       publishLocal := (),
+      validateJavaVersion := {
+        val specJavaVersion = sys.props("java.specification.version")
+        val compatibleJavaVersion = specJavaVersion == "1.7" || specJavaVersion == "1.8"
+        if (!compatibleJavaVersion)
+          sys.error(mismatchedSpecificationMessage)
+      },
+      // this means we'll validate required Java version only _right before_ running the compile
+      // command in misc subproject. In particular, build won't fail if user is not interested
+      // in building `misc` subproject.
+      compile in Compile := ((compile in Compile) dependsOn validateJavaVersion).value,
       mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform, cli)
 
   def pomExtraXml =
