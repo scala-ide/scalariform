@@ -163,7 +163,7 @@ If ``true``, then::
     favoriteColor:    java.awt.Color
   )
 
-This will also place the "implicit" keyword in parameters on it's own line, whenever
+This will also place the "implicit" keyword in parameters on its own line, whenever
 the parameter being formatted contains a newline::
 
 For example, if ``false``, then::
@@ -189,14 +189,14 @@ alignArguments
 
 Default: ``false``
 
-Aligns mult-line arguments
+Aligns multi-line arguments
 
 For example, if ``false``, then::
 
   Cake(candles = 10,
     frostingFlavor = Vanilla,
     layerFlavor = Chocolate,
-    icecream = true
+    iceCream = true
   )
 
 If ``true``, then::
@@ -205,7 +205,7 @@ If ``true``, then::
     candles        = 10,
     frostingFlavor = Vanilla,
     layerFlavor    = Chocolate,
-    icecream       = true
+    iceCream       = true
   )
 
 This option is disabled if ``indentWithTabs`` is ``true``.
@@ -288,7 +288,7 @@ compactStringConcatenation
 
 Default: ``false``
 
-Omit spaces when formatting a '+' operator on String literals. For example, If ``false``, then::
+Omit spaces when formatting a '+' operator on String literals. For example, if ``false``, then::
 
   "Hello " + name + "!"
 
@@ -477,7 +477,7 @@ spaceBeforeColon
 
 Default: ``false``
 
-Whether to ensure a space before colon. For example, If ``false``, then::
+Whether to ensure a space before colon. For example, if ``false``, then::
 
   def add(a: Int, b: Int): Int = a + b
 
@@ -529,7 +529,7 @@ spacesAroundMultiImports
 
 Default: ``true``
 
-Whether or not to add spaces around mutli-imports. For example, If ``true``, then::
+Whether or not to add spaces around multi-imports. For example, if ``true``, then::
 
   import a.{ b, c, d }
 
@@ -542,7 +542,7 @@ Scala Style Guide
 
 Scalariform is compatible with the `Scala Style Guide`_ in the sense
 that, given the right preference settings, source code that is
-initially compiliant with the Style Guide will not become uncompliant
+initially compliant with the Style Guide will not become uncompliant
 after formatting. In a number of cases, running the formatter will
 make uncompliant source more compliant.
 
@@ -561,7 +561,7 @@ spaceInsideBrackets                         ``false``
 spaceInsideParentheses                      ``false``
 ============================                ========= =========
 
-Source directives
+Source Directives
 -----------------
 
 As well as global preferences, formatting can be tweaked at the source level through comments.
@@ -600,7 +600,7 @@ Disables the formatter for selective portions of a source file::
 format: [+|-]<preferenceName>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sets a preference for the entire of the source file, overriding the global formatting settings::
+Sets a preference for the entirety of the source file, overriding the global formatting settings::
 
   // format: +preserveSpaceBeforeArguments
   class StackSpec extends FlatSpec with ShouldMatchers {
