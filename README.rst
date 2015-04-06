@@ -14,7 +14,7 @@ the way you'd like it, and I'll see what I can do.
 
 Scalariform is licenced under `The MIT Licence`_.
 
-.. _Scala Style Guide: http://davetron5000.github.com/scala-style/
+.. _Scala Style Guide: http://docs.scala-lang.org/style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
 Packaging an executable JAR
@@ -299,7 +299,7 @@ If ``true``, then::
 The Scala Style Guide recommends_ that operators, "should `always` be
 invoked using infix notation with spaces separated the target".
 
-.. _recommends: http://davetron5000.github.com/scala-style/method_invocation/operators.html
+.. _recommends: http://docs.scala-lang.org/style/method-invocation.html#symbolic-methodsoperators
 
 doubleIndentClassDeclaration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -307,7 +307,7 @@ doubleIndentClassDeclaration
 Default: ``false``
 
 With this set to ``true``, class (and trait / object) declarations
-will be formatted as recommended by the `Scala Style Guide`_. That is,
+will be formatted as recommended_ by the Scala Style Guide. That is,
 if the declaration section spans multiple lines, it will be formatted
 so that either the parameter section or the inheritance section is
 doubly indented. This provides a visual distinction from the members
@@ -338,6 +338,8 @@ Or::
       favoriteColor: java.awt.Color) {
     def firstMethod = ...
   }
+
+.. _recommended: http://docs.scala-lang.org/style/declarations.html#classes
 
 formatXml
 ~~~~~~~~~
