@@ -22,15 +22,15 @@ Packaging an executable JAR
 
 If you would like to package scalariform for use on the command line with java -jar, clone the repo and perform the following simple steps: ::
 
-    sbt one-jar
+    sbt "project cli" "assembly"
 
 sbt will build one jar with all the dependencies and put it in ::
 
-    cli/target/scala-$your_scala_version/scalariform.jar
+    cli/target/scala-2.10/cli-assembly-0.1.6.jar
 
 You can copy this to a location in your path and execute it as follows: ::
 
-   java -jar /home/me/bin/scalariform.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +preserveDanglingCloseParenthesis +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
+   java -jar /home/me/bin/cli-assembly-0.1.6.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +preserveDanglingCloseParenthesis +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
 
 Integration with sbt
 --------------------
