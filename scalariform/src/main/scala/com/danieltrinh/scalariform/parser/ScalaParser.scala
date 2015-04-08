@@ -1,9 +1,9 @@
-package com.danieltrinh.scalariform.parser
+package scalariform.parser
 
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.utils.Utils._
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.lexer.Tokens._
+import scalariform.lexer._
+import scalariform.utils.Utils._
+import scalariform.ScalaVersions
 import scala.collection.mutable.ListBuffer
 import scala.PartialFunction._
 

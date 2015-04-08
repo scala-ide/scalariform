@@ -1,9 +1,9 @@
-package com.danieltrinh.scalariform.astselect
+package scalariform.astselect
 
 import org.scalatest._
 import org.scalatest.matchers._
-import com.danieltrinh.scalariform.utils.Range
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.utils.Range
+import scalariform.ScalaVersions
 
 // format: OFF
 class AstSelectorTest extends FlatSpec with ShouldMatchers {

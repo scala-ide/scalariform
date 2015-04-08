@@ -24,8 +24,8 @@ object ScalariformBuild extends Build {
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
 
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
-    organization := "com.danieltrinh",
-    profileName := "com.danieltrinh",
+    organization := "org.scalariform",
+    profileName := "org.scalariform",
     version := "0.1.6-SNAPSHOT",
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq(

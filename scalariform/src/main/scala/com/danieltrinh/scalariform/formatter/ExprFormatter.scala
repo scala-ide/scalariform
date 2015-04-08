@@ -1,13 +1,13 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.formatter.Alignment._
-import com.danieltrinh.scalariform.formatter.AnnotationFormatter
-import com.danieltrinh.scalariform.lexer.Chars
-import com.danieltrinh.scalariform.lexer.Token
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils.{ TextEditProcessor, Utils }
-import com.danieltrinh.scalariform.formatter.preferences._
+import scalariform.formatter.Alignment._
+import scalariform.formatter.AnnotationFormatter
+import scalariform.lexer.Chars
+import scalariform.lexer.Token
+import scalariform.lexer.Tokens._
+import scalariform.parser._
+import scalariform.utils.{ TextEditProcessor, Utils }
+import scalariform.formatter.preferences._
 import scala.PartialFunction._
 
 trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with TemplateFormatter with ScalaFormatter with XmlFormatter with CaseClauseFormatter ⇒

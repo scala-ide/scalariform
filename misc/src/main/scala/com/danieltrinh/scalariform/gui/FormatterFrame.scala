@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.gui
+package scalariform.gui
 
 import java.awt.event._
 import java.awt.{ List ⇒ _, _ }
@@ -13,16 +13,16 @@ import javax.swing.border.TitledBorder
 import net.miginfocom.layout._
 import net.miginfocom.swing._
 
-import com.danieltrinh.scalariform.astselect._
-import com.danieltrinh.scalariform.utils.Utils._
-import com.danieltrinh.scalariform.utils.Range
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.formatter._
-import com.danieltrinh.scalariform.formatter.preferences._
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.gui.SwingUtils._
-import com.danieltrinh.scalariform.parser._
+import scalariform.astselect._
+import scalariform.utils.Utils._
+import scalariform.utils.Range
+import scalariform.parser._
+import scalariform.formatter._
+import scalariform.formatter.preferences._
+import scalariform.lexer._
+import scalariform.lexer.Tokens._
+import scalariform.gui.SwingUtils._
+import scalariform.parser._
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 

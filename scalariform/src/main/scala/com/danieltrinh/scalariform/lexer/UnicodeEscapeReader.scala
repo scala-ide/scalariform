@@ -1,7 +1,7 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform.lexer.CharConstants.SU
-import com.danieltrinh.scalariform.utils.Utils._
+import scalariform.lexer.CharConstants.SU
+import scalariform.utils.Utils._
 
 object UnicodeEscapeDecoder {
 

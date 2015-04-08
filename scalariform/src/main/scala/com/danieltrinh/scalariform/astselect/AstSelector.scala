@@ -1,11 +1,11 @@
-package com.danieltrinh.scalariform.astselect
+package scalariform.astselect
 
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils.Range
-import com.danieltrinh.scalariform.utils.Utils._
+import scalariform.lexer._
+import scalariform.parser._
+import scalariform.utils.Range
+import scalariform.utils.Utils._
 import scala.util.control.Exception._
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.ScalaVersions
 
 object AstSelector {
 

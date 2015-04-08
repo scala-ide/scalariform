@@ -1,10 +1,10 @@
-package com.danieltrinh.scalariform.gui
+package scalariform.gui
 
-import com.danieltrinh.scalariform.formatter.FormatResult
+import scalariform.formatter.FormatResult
 import javax.swing.JTable
-import com.danieltrinh.scalariform.lexer.Token
+import scalariform.lexer.Token
 import javax.swing.table.AbstractTableModel
-import com.danieltrinh.scalariform.utils.Range
+import scalariform.utils.Range
 
 class TokenTable extends JTable(new TokenTableModel(Nil, FormatResult.EMPTY)) {
 

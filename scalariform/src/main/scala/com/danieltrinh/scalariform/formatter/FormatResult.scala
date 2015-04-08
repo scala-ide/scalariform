@@ -1,9 +1,9 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils._
+import scalariform.lexer.Tokens._
+import scalariform.lexer._
+import scalariform.parser._
+import scalariform.utils._
 
 object FormatResult {
 

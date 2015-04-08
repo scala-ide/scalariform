@@ -1,14 +1,14 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils.Utils._
-import com.danieltrinh.scalariform.utils._
-import com.danieltrinh.scalariform.utils.BooleanLang._
-import com.danieltrinh.scalariform.formatter.preferences._
+import scalariform.lexer.Tokens._
+import scalariform.lexer._
+import scalariform.parser._
+import scalariform.utils.Utils._
+import scalariform.utils._
+import scalariform.utils.BooleanLang._
+import scalariform.formatter.preferences._
 import PartialFunction._
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.ScalaVersions
 
 trait HasHiddenTokenInfo {
 
@@ -343,7 +343,7 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
   }
   private def actualDefaultFormattingInstruction(token1: Token, token2: Token): IntertokenFormatInstruction = {
     import ScalaFormatter._
-    import com.danieltrinh.scalariform.lexer.Chars.isOperatorPart
+    import scalariform.lexer.Chars.isOperatorPart
     val type1 = token1.tokenType
     val type2 = token2.tokenType
     if (type2 == EOF)

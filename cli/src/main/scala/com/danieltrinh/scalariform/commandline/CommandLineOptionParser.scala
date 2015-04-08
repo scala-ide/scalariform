@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.commandline
+package scalariform.commandline
 
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._

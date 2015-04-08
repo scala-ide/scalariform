@@ -1,10 +1,10 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform.utils.Range
-import com.danieltrinh.scalariform.utils.Utils._
-import com.danieltrinh.scalariform.utils.TextEdit
-import com.danieltrinh.scalariform.utils.TextEditProcessor
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.utils.Range
+import scalariform.utils.Utils._
+import scalariform.utils.TextEdit
+import scalariform.utils.TextEditProcessor
+import scalariform.ScalaVersions
 
 object RedundantSemicolonDetector {
 

@@ -1,12 +1,12 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform._
-import com.danieltrinh.scalariform.lexer.Tokens._
+import scalariform._
+import scalariform.lexer.Tokens._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.TestFailedException
 import org.scalatest.TestPendingException
-import com.danieltrinh.scalariform.utils.Utils._
+import scalariform.utils.Utils._
 
 class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
 

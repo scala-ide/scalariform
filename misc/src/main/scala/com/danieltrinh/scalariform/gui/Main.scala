@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.gui
+package scalariform.gui
 
-import com.danieltrinh.scalariform.utils.Utils._
+import scalariform.utils.Utils._
 import javax.swing.JFrame
 
 object Main {

@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform.lexer.Tokens._
+import scalariform.lexer.Tokens._
 
 object Keywords {
 

@@ -1,8 +1,8 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.formatter._
-import com.danieltrinh.scalariform.formatter.preferences.{SpacesAroundMultiImports, FormattingPreferences}
+import scalariform.parser._
+import scalariform.formatter._
+import scalariform.formatter.preferences.{SpacesAroundMultiImports, FormattingPreferences}
 
 // format: OFF
 class ImportFormatterTest extends AbstractFormatterTest {

@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.gui
+package scalariform.gui
 
 import javax.swing.event.ListSelectionListener
 import javax.swing.event.ListSelectionEvent

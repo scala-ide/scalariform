@@ -1,5 +1,5 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform.parser.ScalaParserException
+import scalariform.parser.ScalaParserException
 
 class ScalaLexerException(message: String) extends ScalaParserException(message)

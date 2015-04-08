@@ -1,8 +1,8 @@
-package com.danieltrinh.scalariform.formatter.preferences
+package scalariform.formatter.preferences
 
 import java.util.Properties
 import scala.collection.JavaConversions._
-import com.danieltrinh.scalariform.utils.Utils._
+import scalariform.utils.Utils._
 import java.io.IOException
 
 object PreferencesImporterExporter {

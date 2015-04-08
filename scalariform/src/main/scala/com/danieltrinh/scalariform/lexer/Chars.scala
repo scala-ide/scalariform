@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
 import scala.annotation.switch
 

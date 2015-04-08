@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.lexer.Token
+import scalariform.lexer.Token
 
 case class FormatterState(
   indentLevel:                 Int           = 0,

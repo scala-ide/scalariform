@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers

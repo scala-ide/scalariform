@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 

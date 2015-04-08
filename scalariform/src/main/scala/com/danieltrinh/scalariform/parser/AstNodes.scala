@@ -1,8 +1,8 @@
-package com.danieltrinh.scalariform.parser
+package scalariform.parser
 
-import com.danieltrinh.scalariform.utils.CaseClassReflector
-import com.danieltrinh.scalariform.utils.Range
-import com.danieltrinh.scalariform.lexer.Token
+import scalariform.utils.CaseClassReflector
+import scalariform.utils.Range
+import scalariform.lexer.Token
 
 sealed trait AstNode extends CaseClassReflector {
 

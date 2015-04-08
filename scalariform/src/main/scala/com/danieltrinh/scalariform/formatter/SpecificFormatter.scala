@@ -1,11 +1,11 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils._
-import com.danieltrinh.scalariform.formatter.preferences._
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.lexer.Tokens._
+import scalariform.lexer._
+import scalariform.parser._
+import scalariform.utils._
+import scalariform.formatter.preferences._
+import scalariform.ScalaVersions
 
 trait SpecificFormatter {
 
@@ -25,7 +25,7 @@ trait SpecificFormatter {
 
   @throws(classOf[ScalaParserException])
   def fullFormat(source: String, lineDelimiter: Option[String] = None, scalaVersion: String = ScalaVersions.DEFAULT_VERSION)(baseFormattingPreferences: IFormattingPreferences): (List[TextEdit], FormatResult) = {
-    import com.danieltrinh.scalariform.parser._
+    import scalariform.parser._
 
     val startTime = System.currentTimeMillis
     val tokens = ScalaLexer.tokenise(source, scalaVersion = scalaVersion)

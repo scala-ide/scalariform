@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.parser.{CompilationUnit, ScalaParser}
+import scalariform.parser.{CompilationUnit, ScalaParser}
 
 // format: OFF
 class FunctionFormatterTest extends AbstractFormatterTest {

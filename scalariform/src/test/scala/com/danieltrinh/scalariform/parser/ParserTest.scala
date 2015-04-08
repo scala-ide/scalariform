@@ -1,7 +1,7 @@
-package com.danieltrinh.scalariform.parser
+package scalariform.parser
 
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.parser._
+import scalariform.lexer._
+import scalariform.parser._
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers

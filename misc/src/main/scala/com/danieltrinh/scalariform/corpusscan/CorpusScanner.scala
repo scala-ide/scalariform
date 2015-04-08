@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.corpusscan
+package scalariform.corpusscan
 
 import java.io.File
 
@@ -6,12 +6,12 @@ import scala.io.Source
 
 import org.apache.commons.io.FileUtils
 
-import com.danieltrinh.scalariform.commandline.ScalaFileWalker
-import com.danieltrinh.scalariform.formatter._
-import com.danieltrinh.scalariform.formatter.preferences.FormattingPreferences
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils.Utils.writeText
+import scalariform.commandline.ScalaFileWalker
+import scalariform.formatter._
+import scalariform.formatter.preferences.FormattingPreferences
+import scalariform.lexer._
+import scalariform.parser._
+import scalariform.utils.Utils.writeText
 
 sealed trait ParseFault
 case object TokensDoNotCoverSource extends ParseFault

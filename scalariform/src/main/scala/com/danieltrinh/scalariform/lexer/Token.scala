@@ -1,7 +1,7 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.utils.Range
+import scalariform.lexer.Tokens._
+import scalariform.utils.Range
 
 /**
  * A token of Scala source.

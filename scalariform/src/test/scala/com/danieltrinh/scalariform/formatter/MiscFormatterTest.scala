@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.parser.{FullDefOrDcl, ScalaParser}
+import scalariform.parser.{FullDefOrDcl, ScalaParser}
 
 class MiscFormatterTest extends AbstractFormatterTest {
 
