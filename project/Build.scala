@@ -1,6 +1,5 @@
 import sbt._
 import sbt.Keys._
-import com.github.retronym.SbtOneJar
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys._
 import com.typesafe.sbteclipse.core.EclipsePlugin._
 import com.typesafe.sbt.SbtScalariform
@@ -8,6 +7,7 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 import xerial.sbt.Sonatype._
 import xerial.sbt.Sonatype.SonatypeKeys._
+import sbtassembly.AssemblyPlugin.autoImport._
 
 object ScalariformBuild extends Build {
 
@@ -94,13 +94,17 @@ object ScalariformBuild extends Build {
     else
       Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 
-  lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
+  lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
-      artifactName in SbtOneJar.oneJar := { (version: ScalaVersion, module: ModuleID, artifact: Artifact) ⇒ "scalariform.jar" },
-      publish := (),
-      publishLocal := ())) dependsOn (scalariform)
+      mainClass in assembly := Some("scalariform.commandline.Main"),
+      artifact in (Compile, assembly) := {
+        val art = (artifact in (Compile, assembly)).value
+        art.copy(`classifier` = Some("assembly"))
+      }
+    ) ++ addArtifact(artifact in (Compile, assembly), assembly)
+  ) dependsOn (scalariform)
 
   lazy val misc: Project = Project("misc", file("misc"), settings = subprojectSettings ++
     Seq(
