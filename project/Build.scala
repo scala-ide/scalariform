@@ -29,7 +29,7 @@ object ScalariformBuild extends Build {
     version := "0.1.6-SNAPSHOT",
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq(
-      "2.11.1",
+      "2.11.6",
       "2.10.4",
       "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
@@ -48,6 +48,7 @@ object ScalariformBuild extends Build {
   lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
     publish := (),
     publishLocal := ())) aggregate (scalariform, cli, misc)
+
 
   implicit class Regex(sc: StringContext) {
     def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)

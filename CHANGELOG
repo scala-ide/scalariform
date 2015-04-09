@@ -1,5 +1,10 @@
-0.1.6 (17/Jan/15)
-* FIX: FQN package name changed from scalariform to com.danieltrinh.scalariform to avoid dependency collision with prior mdr/scalariform fork
+0.1.6 (08/April/15)
+* FIX: Bug in parser prevented DOT characters inside type parameters (issue #44)
+* Newline no longer added for each function in `=> => =>` scenarios (issue #45)
+* Update build to sbt 0.13.7 and update java version validation (PR #42)
+* Rewrite -> into → when RewriteArrowSymbols is on (issue #34)
+* Sync maven build with sbt build (PR #22)
+* Add support for Scala 2.12 in the maven build (PR #20)
 
 0.1.5 (4/May/14)
 * FIX: Type formatter crash on multiline types
