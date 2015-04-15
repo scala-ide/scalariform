@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
 import java.io.File
 import scala.annotation._
@@ -6,10 +6,10 @@ import scala.collection.mutable.{ Queue, ListBuffer }
 import scala.io.Source
 import scala.math.min
 import scala.xml.parsing.TokenTests
-import com.danieltrinh.scalariform.lexer.CharConstants.SU
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.utils.Utils
-import com.danieltrinh.scalariform._
+import scalariform.lexer.CharConstants.SU
+import scalariform.lexer.Tokens._
+import scalariform.utils.Utils
+import scalariform._
 
 class ScalaLexer(
   protected val reader:        IUnicodeEscapeReader,

@@ -1,9 +1,9 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
 import preferences.FormattingPreferences._
-import com.danieltrinh.scalariform.formatter.preferences._
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.formatter._
+import scalariform.formatter.preferences._
+import scalariform.parser._
+import scalariform.formatter._
 
 // format: OFF
 class CompactControlReadabilityTest extends AbstractExpressionFormatterTest {

@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.utils
+package scalariform.utils
 
 import java.io.FileOutputStream
 import java.io.FileInputStream

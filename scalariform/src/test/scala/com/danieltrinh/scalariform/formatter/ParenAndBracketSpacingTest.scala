@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.formatter.preferences._
+import scalariform.formatter.preferences._
 
 class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
 

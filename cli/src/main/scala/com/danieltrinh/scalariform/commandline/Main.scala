@@ -1,14 +1,14 @@
-package com.danieltrinh.scalariform.commandline
+package scalariform.commandline
 
 import java.io.File
 import java.io.IOException
 import java.nio.charset._
 import scala.io.Source
-import com.danieltrinh.scalariform.formatter.preferences._
-import com.danieltrinh.scalariform.formatter.ScalaFormatter
-import com.danieltrinh.scalariform.parser.ScalaParserException
-import com.danieltrinh.scalariform.utils.Utils._
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.formatter.preferences._
+import scalariform.formatter.ScalaFormatter
+import scalariform.parser.ScalaParserException
+import scalariform.utils.Utils._
+import scalariform.ScalaVersions
 
 object Main {
 

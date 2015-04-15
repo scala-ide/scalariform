@@ -1,8 +1,8 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.parser._
+import scalariform.parser._
 import Math._
-import com.danieltrinh.scalariform.formatter.preferences._
+import scalariform.formatter.preferences._
 
 // For now, this is just a place to store alignment related functionality.
 // TOOD: refactor duplicate behavior in here 

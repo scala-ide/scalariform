@@ -1,7 +1,7 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform._
-import com.danieltrinh.scalariform.lexer.Tokens._
+import scalariform._
+import scalariform.lexer.Tokens._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.TestFailedException

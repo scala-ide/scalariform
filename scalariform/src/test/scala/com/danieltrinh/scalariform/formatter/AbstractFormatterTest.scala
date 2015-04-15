@@ -1,15 +1,15 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.lexer._
-import com.danieltrinh.scalariform.formatter.preferences._
+import scalariform.parser._
+import scalariform.lexer._
+import scalariform.formatter.preferences._
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.TestFailedException
 import org.scalatest.TestPendingException
-import com.danieltrinh.scalariform.ScalaVersions
+import scalariform.ScalaVersions
 
 abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with SpecificFormatter {
 

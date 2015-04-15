@@ -1,12 +1,12 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.lexer.Token
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.utils._
-import com.danieltrinh.scalariform.lexer.Tokens
-import com.danieltrinh.scalariform.formatter.preferences._
-import com.danieltrinh.scalariform.lexer.Chars
+import scalariform.lexer.Tokens._
+import scalariform.lexer.Token
+import scalariform.parser._
+import scalariform.utils._
+import scalariform.lexer.Tokens
+import scalariform.formatter.preferences._
+import scalariform.lexer.Chars
 
 trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter with ExprFormatter with ScalaFormatter ⇒
 

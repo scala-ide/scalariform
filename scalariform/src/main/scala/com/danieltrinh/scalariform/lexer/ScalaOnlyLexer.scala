@@ -1,12 +1,12 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
 import scala.annotation._
-import com.danieltrinh.scalariform.lexer.CharConstants.SU
-import com.danieltrinh.scalariform.lexer.Chars._
-import com.danieltrinh.scalariform.lexer.ScalaLexer._
-import com.danieltrinh.scalariform.lexer.Tokens._
-import com.danieltrinh.scalariform.utils.Utils
-import com.danieltrinh.scalariform._
+import scalariform.lexer.CharConstants.SU
+import scalariform.lexer.Chars._
+import scalariform.lexer.ScalaLexer._
+import scalariform.lexer.Tokens._
+import scalariform.utils.Utils
+import scalariform._
 
 /**
  * Lexer implementation for non-XML Scala

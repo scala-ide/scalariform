@@ -1,6 +1,6 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
-import com.danieltrinh.scalariform.lexer.Tokens._
+import scalariform.lexer.Tokens._
 
 /**
  * Logic for promoting intertoken whitespace/comments to a NEWLINE or NEWLINES token as required.

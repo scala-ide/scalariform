@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.formatter.preferences
+package scalariform.formatter.preferences
 
 sealed trait PreferenceType[T] {
 

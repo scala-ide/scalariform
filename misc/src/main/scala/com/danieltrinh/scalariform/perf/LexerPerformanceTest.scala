@@ -1,11 +1,11 @@
-package com.danieltrinh.scalariform.perf
+package scalariform.perf
 
 import java.io.File
 import scala.io.Source
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.lexer.{ Token ⇒ _, _ }
-import com.danieltrinh.scalariform.utils.Utils.time
-import com.danieltrinh.scalariform.formatter._
+import scalariform.parser._
+import scalariform.lexer.{ Token ⇒ _, _ }
+import scalariform.utils.Utils.time
+import scalariform.formatter._
 
 object LexerPerformanceTest {
 

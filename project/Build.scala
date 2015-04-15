@@ -24,14 +24,14 @@ object ScalariformBuild extends Build {
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
 
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
-    organization := "com.danieltrinh",
-    profileName := "com.danieltrinh",
-    version := "0.1.6-SNAPSHOT",
+    organization := "org.scalariform",
+    profileName := "org.scalariform",
+    version := "0.1.6",
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq(
-      "2.11.1",
+      "2.11.6",
       "2.10.4",
-      "2.9.3", "2.9.2", "2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
+      "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
     retrieveManaged := true,
@@ -47,7 +47,9 @@ object ScalariformBuild extends Build {
 
   lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
     publish := (),
-    publishLocal := ())) aggregate (scalariform, cli, misc)
+    publishLocal := ())
+  ) aggregate (scalariform, cli, misc)
+
 
   implicit class Regex(sc: StringContext) {
     def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
@@ -68,22 +70,25 @@ object ScalariformBuild extends Build {
     case _ => Nil
   }
 
+  def publishSettings(projectName: String) = Seq(
+    pomExtra := pomExtraXml,
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    publishArtifact in (Compile, packageDoc) := true,
+    publishArtifact in (Compile, packageSrc) := true,
+    pomIncludeRepository := { _ ⇒ false },
+    sbtbuildinfo.Plugin.buildInfoKeys := Seq[sbtbuildinfo.Plugin.BuildInfoKey](version),
+    sourceGenerators in Compile <+= sbtbuildinfo.Plugin.buildInfo,
+    sbtbuildinfo.Plugin.buildInfoPackage := projectName
+  )
+
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings =
-    subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ eclipseSettings ++
+    subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ publishSettings("scalariform") ++ eclipseSettings ++
       Seq(
         libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
           deps ++ get2_11Dependencies(sv) :+ getScalaTestDependency(sv)
         },
         testOptions in Test += Tests.Argument("-oI"),
-        pomExtra := pomExtraXml,
-        publishMavenStyle := true,
-        publishArtifact in Test := false,
-        publishArtifact in (Compile, packageDoc) := true,
-        publishArtifact in (Compile, packageSrc) := true,
-        pomIncludeRepository := { _ ⇒ false },
-        sbtbuildinfo.Plugin.buildInfoKeys := Seq[sbtbuildinfo.Plugin.BuildInfoKey](version),
-        sbtbuildinfo.Plugin.buildInfoPackage := "scalariform",
-        sourceGenerators in Compile <+= sbtbuildinfo.Plugin.buildInfo,
         EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed,
         publishTo <<= isSnapshot(getPublishToRepo)))
 
@@ -93,11 +98,13 @@ object ScalariformBuild extends Build {
     else
       Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 
-  lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++
+  lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ publishSettings("cli") ++
+    sbtbuildinfo.Plugin.buildInfoSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
       mainClass in (Compile, packageBin) := Some("scalariform.commandline.Main"),
       mainClass in assembly := Some("scalariform.commandline.Main"),
+      publishTo <<= isSnapshot(getPublishToRepo),
       artifact in (Compile, assembly) := {
         val art = (artifact in (Compile, assembly)).value
         art.copy(`classifier` = Some("assembly"))

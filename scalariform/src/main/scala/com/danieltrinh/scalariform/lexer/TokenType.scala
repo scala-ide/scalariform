@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
 case class TokenType(name: String, isXml: Boolean = false) {
 

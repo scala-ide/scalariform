@@ -1,8 +1,8 @@
-package com.danieltrinh.scalariform.formatter
+package scalariform.formatter
 
-import com.danieltrinh.scalariform.parser._
-import com.danieltrinh.scalariform.formatter._
-import com.danieltrinh.scalariform.formatter.preferences._
+import scalariform.parser._
+import scalariform.formatter._
+import scalariform.formatter.preferences._
 
 // format: OFF
 class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {

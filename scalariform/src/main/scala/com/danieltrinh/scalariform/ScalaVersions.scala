@@ -1,7 +1,7 @@
-package com.danieltrinh.scalariform
+package scalariform
 
 import scala.util.Properties
-import com.danieltrinh.scalariform.utils.Utils._
+import scalariform.utils.Utils._
 import scala.math.Ordering
 
 object ScalaVersion {

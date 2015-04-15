@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.commandline
+package scalariform.commandline
 
 import java.io.File
 import java.util.{ ArrayList, Collection }

@@ -1,10 +1,10 @@
-package com.danieltrinh.scalariform.gui
+package scalariform.gui
 
 import javax.swing.event.TreeModelListener
 import javax.swing.tree._
-import com.danieltrinh.scalariform.lexer.Token
-import com.danieltrinh.scalariform.parser.AstNode
-import com.danieltrinh.scalariform.utils.Range
+import scalariform.lexer.Token
+import scalariform.parser.AstNode
+import scalariform.utils.Range
 
 class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
 

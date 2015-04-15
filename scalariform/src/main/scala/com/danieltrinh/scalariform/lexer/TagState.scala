@@ -1,4 +1,4 @@
-package com.danieltrinh.scalariform.lexer
+package scalariform.lexer
 
 abstract sealed trait TagState
 case object InStartTag extends TagState
