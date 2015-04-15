@@ -39,6 +39,13 @@ A version for sbt >= 0.13.x has been written by Peter Vlugter: https://github.co
 
 Please see https://github.com/sbt/sbt-scalariform for older versions of sbt.
 
+Usage within a project
+----------------------
+
+Have a use for the scalariform source code directly? You can use it as a build dependency: ::
+
+    "org.scalariform" %% "scalariform" % "0.1.6"
+
 Integration with Eclipse
 ------------------------
 
