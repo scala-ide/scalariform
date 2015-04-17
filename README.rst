@@ -1,3 +1,14 @@
+Scalariform has moved!
+======================
+
+Please note that this repository is no longer actively maintained.
+
+All future development and recent releases can be found at https://github.com/daniel-trinh/scalariform
+
+Public releases of the "`org.scalariform.*`" JARs since version `0.1.5` have come from that repository.
+
+-----
+
 Scalariform
 ===========
 
