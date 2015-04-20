@@ -210,5 +210,5 @@ case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenc
 case object SpacesAroundMultiImports extends BooleanPreferenceDescriptor {
   val key = "spacesAroundMultiImports"
   val description = "Place spaces around multi imports (import a.{ b, c, d }"
-  val defaultValue = true
+  val defaultValue = false
 }

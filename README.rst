@@ -536,19 +536,20 @@ If ``false``,::
 spacesAroundMultiImports
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default: ``true``
+Default: ``false``
 
-Whether or not to add spaces around multi-imports. For example, if ``true``, then::
-
-  import a.{ b, c, d }
-  import foo.{ bar => baz }
-
-If ``false``, then::
+Whether or not to add spaces around multi-imports.
+For example, if ``false``, then::
 
   import a.{b,c,d}
   import foo.{bar => baz}
 
-The default is ``true`` for backwards-compatibility with older versions of `Scalariform`,
+If ``true``, then::
+
+  import a.{ b, c, d }
+  import foo.{ bar => baz }
+
+Older versions of `Scalariform` used ``true``,
 but the standard Scala formatting requires ``false``.
 
 See the examples given in "Chapter 13 - Packages and Imports.", page 244 of *Programming in Scala*
@@ -576,7 +577,7 @@ rewriteArrowSymbols                         ``false``
 spaceBeforeColon                            ``false``
 spaceInsideBrackets                         ``false``
 spaceInsideParentheses                      ``false``
-spacesAroundMultiImports                    ``false``   No
+spacesAroundMultiImports                    ``false``
 =========================================== ========= =========
 
 Source Directives
