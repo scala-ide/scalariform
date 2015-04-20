@@ -555,9 +555,9 @@ initially compliant with the Style Guide will not become uncompliant
 after formatting. In a number of cases, running the formatter will
 make uncompliant source more compliant.
 
-============================                ========= =========
+=========================================== ========= =========
 Preference                                  Value     Default?
-============================                ========= =========
+=========================================== ========= =========
 alignParameters                             ``false``
 compactStringConcatenation                  ``false``
 doubleIndentClassDeclaration                ``true``    No
@@ -568,7 +568,7 @@ rewriteArrowSymbols                         ``false``
 spaceBeforeColon                            ``false``
 spaceInsideBrackets                         ``false``
 spaceInsideParentheses                      ``false``
-============================                ========= =========
+=========================================== ========= =========
 
 Source Directives
 -----------------
