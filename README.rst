@@ -199,9 +199,9 @@ Default: ``false``
 
 When ``compactControlReadability`` is ``true``, ``if``/``else`` and
 ``try``/``catch``/``finally`` control structures will be formatted
-using `Compact Control Readability`_ style:
+using `Stroustrup K&R`_ style:
 
-.. _Compact Control Readability: http://en.wikipedia.org/wiki/Indent_style#Compact_Control_Readability_style
+.. _Stroustrup K&R: http://en.wikipedia.org/wiki/Indent_style#Variant:_Stroustrup
 
   if (x == y) {
     foo()
