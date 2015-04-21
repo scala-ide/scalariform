@@ -17,6 +17,19 @@ Scalariform is licenced under `The MIT Licence`_.
 .. _Scala Style Guide: http://docs.scala-lang.org/style/
 .. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
 
+Installing with Homebrew (for OS X users)
+-----------------------------------------
+
+Mac OS X users can install the scalariform CLI tool using the `Homebrew`_ package manager. ::
+
+    brew install scalariform
+
+Or, if you would like to install the latest development release: ::
+
+    brew install --HEAD scalariform
+
+.. _Homebrew: https://github.com/Homebrew/homebrew
+
 Packaging an executable JAR
 ---------------------------
 
