@@ -91,7 +91,7 @@ Integration with sbt
 
 A version for sbt 0.10.x has been written by Peter Vlugter: https://github.com/typesafehub/sbt-scalariform
 
-.. _sbt-scalariform: http://github.com/olim7t/sbt-scalariform
+.. _sbt-scalariform: http://github.com/sbt/sbt-scalariform
 
 
 Integration with TextMate
