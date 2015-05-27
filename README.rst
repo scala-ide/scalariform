@@ -74,7 +74,7 @@ You can also configure formatting to be run as a save action (Window -> Preferen
 To set preferences, go to either
 
 - Window -> Preferences -> Scala -> Editor -> Formatter
-- Project -> Preferences -> Scala Formatter
+- Project -> Properties -> Scala Formatter
 
 Integration with Emacs/ENSIME
 -----------------------------
