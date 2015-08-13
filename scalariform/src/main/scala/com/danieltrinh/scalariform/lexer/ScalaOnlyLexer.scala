@@ -42,7 +42,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
           possibleInterpolationId = false
       case '<' ⇒
         lastCh match {
-          case SU | ' ' | '\t' | '\n' | '{' | '(' | '>' if ch(1) != SU && (isNameStart(ch(1)) || ch(1) == '!' || ch(1) == '?') ⇒
+          case SU | ' ' | '\t' | '\n' | '{' | '(' | '>' if ch(1) != SU && ch(1) != ':' && (isNameStart(ch(1)) || ch(1) == '!' || ch(1) == '?') ⇒
             switchToXmlModeAndFetchToken()
           case _ ⇒
             nextChar()

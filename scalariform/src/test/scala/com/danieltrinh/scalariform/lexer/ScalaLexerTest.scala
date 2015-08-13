@@ -155,6 +155,7 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   "\"\\u0061\"" producesTokens (STRING_LITERAL)
   "\"\\u000a\"" producesTokens (STRING_LITERAL)
 
+  "<:" producesTokens (SUBTYPE)
   "<foo />" producesTokens (XML_START_OPEN, XML_NAME, XML_WHITESPACE, XML_EMPTY_CLOSE)
   "<foo></foo>" producesTokens (XML_START_OPEN, XML_NAME, XML_TAG_CLOSE, XML_END_OPEN, XML_NAME, XML_TAG_CLOSE)
   "<foo></foo  >" producesTokens (XML_START_OPEN, XML_NAME, XML_TAG_CLOSE, XML_END_OPEN, XML_NAME, XML_WHITESPACE, XML_TAG_CLOSE)

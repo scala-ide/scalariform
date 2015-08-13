@@ -27,10 +27,10 @@ object ScalariformBuild extends Build {
     organization := "org.scalariform",
     profileName := "org.scalariform",
     version := "0.1.6",
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.10.5",
     crossScalaVersions := Seq(
       "2.11.6",
-      "2.10.4",
+      "2.10.5",
       "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
