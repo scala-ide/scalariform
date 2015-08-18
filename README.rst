@@ -71,7 +71,10 @@ If you select some lines, only those will be formatted.
 
 You can also configure formatting to be run as a save action (Window -> Preferences -> Java -> Editor -> Save Actions).
 
-To set preferences, go to Window -> Preferences -> Scala -> Formatter
+To set preferences, go to either
+
+- Window -> Preferences -> Scala -> Editor -> Formatter
+- Project -> Properties -> Scala Formatter
 
 Integration with Emacs/ENSIME
 -----------------------------
