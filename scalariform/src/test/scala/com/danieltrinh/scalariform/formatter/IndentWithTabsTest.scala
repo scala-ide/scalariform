@@ -42,6 +42,26 @@ class IndentWithTabsTest extends AbstractFormatterTest {
     |	bar
     |</foo>"""
 
+  """foo(
+    |alpha = "foo",
+    |beta = "bar",
+    |gamma = false)""" ==>
+  """foo(
+    |	alpha = "foo",
+    |	beta = "bar",
+    |	gamma = false
+    |)"""
+
+  """foo(
+    |"foo",
+    |"bar",
+    |false)""" ==>
+  """foo(
+    |	"foo",
+    |	"bar",
+    |	false
+    |)"""
+
 
   override val debug = false
 
