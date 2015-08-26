@@ -392,14 +392,15 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
           // If there's a newline before this argument, OR there will be a newline after formatting
           if (hiddenPredecessors(firstToken).containsNewline || formatResult.tokenWillHaveNewline(firstToken)) {
             formatResult = formatResult.before(firstToken, argumentFormatterState.nextIndentLevelInstruction)
-            formatResult = formatResult.before(
-              expr.equals,
-              PlaceAtColumn(
-                0,
-                maxIdLength + 1,
-                Some(firstToken)
+            if (!formattingPreferences(IndentWithTabs))
+              formatResult = formatResult.before(
+                expr.equals,
+                PlaceAtColumn(
+                  0,
+                  maxIdLength + 1,
+                  Some(firstToken)
+                )
               )
-            )
           }
         }
       case Right(callExpr) ⇒
