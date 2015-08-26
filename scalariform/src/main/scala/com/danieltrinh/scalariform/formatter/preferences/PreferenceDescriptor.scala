@@ -68,13 +68,10 @@ object AllPreferences {
     CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, SpacesAroundMultiImports
   )
 
-  val preferencesByKey: Map[String, PreferenceDescriptor[_]] = {
-    var map: Map[String, PreferenceDescriptor[_]] = Map()
-    for (preference ← preferences)
-      map = map + (preference.key -> preference)
-    map
-  }
-
+  val preferencesByKey: Map[String, PreferenceDescriptor[_]] =
+    preferences.foldLeft(Map.empty[String, PreferenceDescriptor[_]]) {
+      case (m, preference) ⇒ m + (preference.key → preference)
+    }
 }
 
 case object RewriteArrowSymbols extends BooleanPreferenceDescriptor {
