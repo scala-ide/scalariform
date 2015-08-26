@@ -1320,17 +1320,27 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def format(blockImportExpr: BlockImportExpr)(implicit formatterState: FormatterState): FormatResult = {
     val BlockImportExpr(prefixExpr, importSelectors @ ImportSelectors(lbrace, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace)) = blockImportExpr
     var formatResult: FormatResult = NoFormatResult
+
     formatResult ++= format(prefixExpr)
 
     val singleLineBlock = !containsNewline(importSelectors)
     val newFormatterState = formatterState.copy(inSingleLineBlock = singleLineBlock)
 
     if (singleLineBlock) {
+      // We are in a braced import statement like "import foo.{bar=>baz}"
+      // or "import foo.{a,b,c}".
+      // The default formatting instruction for a LBRACE is "CompactEnsuringGap"
+      // (See ScalaFormatter.actualDefaultFormattingInstruction), so if we don't
+      // emit an overriding instruction here, then a space will be inserted.
+      // That's against the Scala Style Guide, so we need to use the extra
+      // context we have at this time to mark this as not a normal LBRACE.
       if (!formattingPreferences(SpacesAroundMultiImports))
         formatResult = formatResult.before(firstImportSelector.firstToken, Compact)
+
       formatResult ++= format(firstImportSelector)
       for ((comma, otherImportSelector) ← otherImportSelectors)
         formatResult ++= format(otherImportSelector)
+
       if (!formattingPreferences(SpacesAroundMultiImports))
         formatResult = formatResult.before(rbrace, Compact)
     } else {

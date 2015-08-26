@@ -7,24 +7,36 @@ import scalariform.formatter.preferences.{SpacesAroundMultiImports, FormattingPr
 // format: OFF
 class ImportFormatterTest extends AbstractFormatterTest {
 
-  "import foo . _" ==> "import foo._" 
-  "import foo . bar" ==> "import foo.bar" 
-  "import foo.{bar=>baz}" ==> "import foo.{ bar => baz }"
-  "import foo.{bar=>baz},baz.biz" ==> "import foo.{ bar => baz }, baz.biz"
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(
+      SpacesAroundMultiImports, true)
 
-  """import foo.{bar => baz,
-    |wibble => wobble}""" ==>
-  """import foo.{
-    |  bar => baz,
-    |  wibble => wobble
-    |}"""
-
+    "import foo . _" ==> "import foo._"
+    "import foo . bar" ==> "import foo.bar"
+    "import foo.{bar=>baz}" ==> "import foo.{ bar => baz }"
+    "import foo.{bar=>baz},baz.biz" ==> "import foo.{ bar => baz }, baz.biz"
+    """import foo.{bar => baz,
+        |wibble => wobble}""" ==>
+      """import foo.{
+        |  bar => baz,
+        |  wibble => wobble
+        |}"""
+  }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesAroundMultiImports, false)
+    implicit val formattingPreferences = FormattingPreferences.setPreference(
+      SpacesAroundMultiImports, false)
 
+    "import foo . _" ==> "import foo._"
+    "import foo . bar" ==> "import foo.bar"
     "import foo.{bar=>baz}" ==> "import foo.{bar => baz}"
     "import foo.{bar=>baz},baz.biz" ==> "import foo.{bar => baz}, baz.biz"
+    """import foo.{bar => baz,
+      |wibble => wobble}""" ==>
+      """import foo.{
+        |  bar => baz,
+        |  wibble => wobble
+        |}"""
   }
 
   override val debug = false
