@@ -1,3 +1,8 @@
+0.1.7 (27/August/15)
+* FIX: correct checkFile exit status in scalariform-cli (issue #61)
+* FIX: Fix multi-line argument lists when IndentWithTabs is enabled. (issue #63)
+* FIX: Parse <: as SUBTYPE in scala 2.10.5 (PR #73)
+
 0.1.6 (08/April/15)
 * FIX: Bug in parser prevented DOT characters inside type parameters (issue #44)
 * Newline no longer added for each function in `=> => =>` scenarios (issue #45)

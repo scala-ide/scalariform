@@ -57,7 +57,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.1.6"
+    "org.scalariform" %% "scalariform" % "0.1.7"
 
 Integration with Eclipse
 ------------------------
@@ -287,23 +287,23 @@ using `Compact Control Readability`_ style
 
   if (x == y) {
     foo()
-  } 
+  }
   else if (y == z) {
     bar()
-  } 
+  }
   else {
     baz()
-  }  
+  }
 
   try {
     foo()
-  } 
+  }
   catch {
     case _ => bar()
-  } 
+  }
   finally {
     baz()
-  }  
+  }
 
 
 compactStringConcatenation
