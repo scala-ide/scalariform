@@ -26,7 +26,7 @@ object ScalariformBuild extends Build {
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "org.scalariform",
     profileName := "org.scalariform",
-    version := "0.1.7-SNAPSHOT",
+    version := "0.1.7",
     scalaVersion := "2.10.5",
     crossScalaVersions := Seq(
       "2.11.6",
