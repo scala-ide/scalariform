@@ -23,4 +23,111 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
     "foo[Bar][Baz][Buz]" ==> "foo[ Bar ][ Baz ][ Buz ]"
   }
 
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false
+      |)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false
+      |)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false)"""
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false
+      |)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false
+      |)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false
+      |)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false
+      |)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false)"""
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false
+      |)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false
+      |)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false)"""
+  }
+
 }

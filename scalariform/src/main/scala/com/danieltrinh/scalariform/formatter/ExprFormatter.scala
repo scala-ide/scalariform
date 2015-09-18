@@ -302,9 +302,14 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       formatResult ++= alignedFormatResult
       val firstTokenIsOnNewline = contents.headOption.exists { x ⇒
         val firstToken = x.firstToken
-        hiddenPredecessors(firstToken).containsNewline || formatResult.tokenWillHaveNewline(firstToken)
+        val forceNewline = formattingPreferences(DanglingCloseParenthesis) == Force
+        forceNewline && (hiddenPredecessors(firstToken).containsNewline || formatResult.tokenWillHaveNewline(firstToken))
       }
-      if (firstTokenIsOnNewline)
+      val shouldPreserveNewline =
+        (formattingPreferences(DanglingCloseParenthesis) == Preserve) &&
+        hiddenPredecessors(rparen).containsNewline &&
+        contents.nonEmpty
+      if (firstTokenIsOnNewline || shouldPreserveNewline)
         formatResult = formatResult.before(rparen, formatterState.currentIndentLevelInstruction)
 
       (formatResult, currentFormatterState)

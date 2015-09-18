@@ -8,6 +8,30 @@ sealed trait PreferenceType[T] {
 
 }
 
+/** Trinary state setting for preference which can be enforced two ways or disabled. */
+sealed trait Intent extends Product with Serializable
+
+/** Preserve the formatting choice made at the site. */
+case object Preserve extends Intent
+
+/** Force the formatting choice in the preference name. */
+case object Force extends Intent
+
+/** Prevent the formatting choice in the preference name. */
+case object Prevent extends Intent
+
+case object IntentPreference extends PreferenceType[Intent] {
+
+  def parseValue(s: String) =
+    s.toLowerCase match {
+      case "preserve"  ⇒ Right(Preserve)
+      case "force"     ⇒ Right(Force)
+      case "prevent"   ⇒ Right(Prevent)
+      case _           ⇒ Left("Could not parse as intent value: " + s)
+    }
+}
+
+
 case object BooleanPreference extends PreferenceType[Boolean] {
 
   def parseValue(s: String) =
@@ -46,6 +70,12 @@ trait PreferenceDescriptor[T] {
   val preferenceType: PreferenceType[T]
 
   val defaultValue: T
+
+}
+
+trait IntentPreferenceDescriptor extends PreferenceDescriptor[Intent] {
+
+  val preferenceType = IntentPreference
 
 }
 
@@ -155,11 +185,17 @@ case object IndentLocalDefs extends BooleanPreferenceDescriptor {
   val defaultValue = false
 }
 
-@deprecated("This has been dropped in favor of always placing ')' on a newline if the clause is multi-line.", since = "0.1.5")
+@deprecated("This has been dropped in favor of DanglingCloseParenthesis.", since = "0.1.5")
 case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor {
   val key = "preserveDanglingCloseParenthesis"
   val description = "Allow a newline before a ')' in an argument expression"
   val defaultValue = false
+}
+
+case object DanglingCloseParenthesis extends IntentPreferenceDescriptor {
+  val key = "danglingCloseParenthesis"
+  val description = "Put a newline before a ')' in an argument expression"
+  val defaultValue = Force
 }
 
 case object SpaceInsideParentheses extends BooleanPreferenceDescriptor {
