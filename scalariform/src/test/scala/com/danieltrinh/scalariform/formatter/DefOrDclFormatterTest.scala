@@ -157,6 +157,90 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   }
 
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
+
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}"""
+
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
+
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
+
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}"""
+  }
+
   """def foo(n, m)""" ==>
   """def foo(n, m)"""
 

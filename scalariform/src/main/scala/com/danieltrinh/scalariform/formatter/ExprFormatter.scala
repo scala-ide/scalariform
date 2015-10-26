@@ -1170,8 +1170,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val hasContent = implicitOption.isDefined || firstParamOption.isDefined || !otherParams.isEmpty
     val firstTokenIsOnNewline = hiddenPredecessors(relativeToken).containsNewline || formatResult.tokenWillHaveNewline(relativeToken)
 
+    val shouldIndentParen = (hiddenPredecessors(rparen).containsNewline &&
+      formattingPreferences(DanglingCloseParenthesis) == Preserve) ||
+      formattingPreferences(DanglingCloseParenthesis) == Force
     // Place rparen on it's own line if this is a multi-line param clause
-    if (firstTokenIsOnNewline && hasContent)
+    if (firstTokenIsOnNewline && hasContent && shouldIndentParen)
       formatResult = formatResult.before(rparen, paramFormatterState.currentIndentLevelInstruction)
 
     val groupedParams = groupParams(paramClause, alignParameters)
