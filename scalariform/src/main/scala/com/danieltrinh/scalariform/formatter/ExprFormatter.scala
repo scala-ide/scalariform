@@ -120,8 +120,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
               val isNestedArgument = elem match {
                 case Argument(Expr(CallExpr(_, _, _, moreArgs, _) :: tail)) if moreArgs.isEmpty ⇒ false
                 case Argument(Expr(EqualsExpr(_, _, Expr(headExpr :: innerTail)) :: tail)) ⇒ headExpr match {
-                  case CallExpr(_, _, _, moreArgs, _) ⇒ if (moreArgs.isEmpty) false else true
-                  case _                              ⇒ false
+                  case CallExpr(children, _, _, moreArgs, _) ⇒ moreArgs.nonEmpty || headExpr.tokens.exists(tk => hiddenPredecessors(tk).containsNewline)
+                  case MatchExpr(_, _, _)                    ⇒ true
+                  case _                                     ⇒ false
                 }
                 case _ ⇒ true
               }
