@@ -303,7 +303,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val firstTokenIsOnNewline = contents.headOption.exists { x ⇒
         val firstToken = x.firstToken
         val forceNewline = formattingPreferences(DanglingCloseParenthesis) == Force
-        forceNewline && (hiddenPredecessors(firstToken).containsNewline || formatResult.tokenWillHaveNewline(firstToken))
+        hiddenPredecessors(rparen).containsComment ||
+          forceNewline && (hiddenPredecessors(firstToken).containsNewline || formatResult.tokenWillHaveNewline(firstToken))
       }
       val shouldPreserveNewline =
         (formattingPreferences(DanglingCloseParenthesis) == Preserve) &&
@@ -1170,9 +1171,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val hasContent = implicitOption.isDefined || firstParamOption.isDefined || !otherParams.isEmpty
     val firstTokenIsOnNewline = hiddenPredecessors(relativeToken).containsNewline || formatResult.tokenWillHaveNewline(relativeToken)
 
-    val shouldIndentParen = (hiddenPredecessors(rparen).containsNewline &&
+    val shouldIndentParen = hiddenPredecessors(rparen).containsComment || 
+      ((hiddenPredecessors(rparen).containsNewline &&
       formattingPreferences(DanglingCloseParenthesis) == Preserve) ||
-      formattingPreferences(DanglingCloseParenthesis) == Force
+      formattingPreferences(DanglingCloseParenthesis) == Force)
     // Place rparen on it's own line if this is a multi-line param clause
     if (firstTokenIsOnNewline && hasContent && shouldIndentParen)
       formatResult = formatResult.before(rparen, paramFormatterState.currentIndentLevelInstruction)

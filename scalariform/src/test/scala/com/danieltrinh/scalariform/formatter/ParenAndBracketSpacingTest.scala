@@ -128,6 +128,17 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |  "foo",
       |  "bar",
       |  false)"""
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false // comment
+      |)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false // comment
+      |)"""
   }
 
 }
