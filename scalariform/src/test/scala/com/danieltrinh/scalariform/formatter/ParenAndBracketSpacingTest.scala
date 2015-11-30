@@ -21,6 +21,45 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
     "super[X].y" ==> "super[ X ].y"
     "foo[Bar](baz)[Biz]" ==> "foo[ Bar ](baz)[ Biz ]"
     "foo[Bar][Baz][Buz]" ==> "foo[ Bar ][ Baz ][ Buz ]"
+
+	  """foo(
+      |alpha = "foo",
+      |beta = bar match {
+      |  case _ => "bar"
+      |},
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = bar match {
+      |    case _ => "bar"
+      |  },
+      |  gamma = false
+      |)"""
+
+	  """foo(
+      |alpha = "foo",
+      |beta = bar(
+      |a = 1
+      |),
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = bar(
+      |    a = 1
+      |  ),
+      |  gamma = false
+      |)"""
+
+	 """foo(
+      |arg = bar(
+      |baz = "a"
+      |).xyz
+      |)""" ==>
+    """foo(
+      |  arg = bar(
+      |    baz = "a"
+      |  ).xyz
+      |)"""
   }
 
 }
