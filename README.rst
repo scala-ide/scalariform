@@ -15,7 +15,7 @@ the way you'd like it, and I'll see what I can do.
 Scalariform is licenced under `The MIT Licence`_.
 
 .. _Scala Style Guide: http://docs.scala-lang.org/style/
-.. _The MIT Licence: http://www.opensource.org/licenses/mit-license.php
+.. _The MIT Licence: http://opensource.org/licenses/mit-license.php
 
 Installing with Homebrew (for OS X users)
 -----------------------------------------
@@ -81,16 +81,16 @@ Integration with Emacs/ENSIME
 
 "`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer."
 
-  http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8
+  http://www.aemon.com/file_dump/ensime_manual.html#tth_sEc4.8
 
-.. _ENSIME: http://github.com/aemoncannon/ensime
+.. _ENSIME: https://github.com/ensime/ensime-server
 
 Integration with jEdit
 ----------------------
 
 See `ScalaSidekick`_ by Stefan Ettrup:
 
-.. _ScalaSidekick: http://github.com/StefanE/ScalaSidekick
+.. _ScalaSidekick: https://github.com/StefanE/ScalaSidekick
 
 Run Plugins -> scalaSidekickPlugin -> Format Scala File
 
@@ -126,7 +126,7 @@ Integration with TextMate
 
 See Mads Jensen's Scala TextMate bundle:
 
-  http://github.com/mads379/scala.tmbundle
+  https://github.com/mads379/scala.tmbundle
 
 Reformat using Ctrl-Shift-H.
 
@@ -281,7 +281,7 @@ When ``compactControlReadability`` is ``true``, then ``if``/``else`` and
 ``try``/``catch``/``finally`` control structures will be formatted
 using `Compact Control Readability`_ style
 
-.. _Compact Control Readability: http://en.wikipedia.org/wiki/Indent_style#Variant:_Stroustrup
+.. _Compact Control Readability: https://en.wikipedia.org/wiki/Indent_style#Variant:_Stroustrup
 
 ::
 
