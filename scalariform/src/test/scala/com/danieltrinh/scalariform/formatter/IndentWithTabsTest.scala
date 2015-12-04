@@ -62,6 +62,111 @@ class IndentWithTabsTest extends AbstractFormatterTest {
     |	false
     |)"""
 
+  {
+    implicit val formattingPreferences = FormattingPreferences
+      .setPreference(IndentWithTabs, true)
+      .setPreference(DanglingCloseParenthesis, Force)
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |	alpha = "foo",
+      |	beta = "bar",
+      |	gamma = false
+      |)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false
+      |)"""
+
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false)""" ==>
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false
+      |)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences
+      .setPreference(IndentWithTabs, true)
+      .setPreference(DanglingCloseParenthesis, Preserve)
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |	alpha = "foo",
+      |	beta = "bar",
+      |	gamma = false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false)"""
+
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false)""" ==>
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences
+      .setPreference(IndentWithTabs, true)
+      .setPreference(DanglingCloseParenthesis, Prevent)
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false
+      |)""" ==>
+    """foo(
+      |	alpha = "foo",
+      |	beta = "bar",
+      |	gamma = false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false
+      |)""" ==>
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false)"""
+
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false
+      |)""" ==>
+    """foo(
+      |	"foo",
+      |	"bar",
+      |	false)"""
+  }
+
 
   override val debug = false
 

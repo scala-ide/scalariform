@@ -62,4 +62,122 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |)"""
   }
 
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false
+      |)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false
+      |)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false)"""
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false
+      |)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false
+      |)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false
+      |)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false
+      |)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false)"""
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false
+      |)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false)"""
+
+    """foo(
+      |"foo",
+      |"bar",
+      |false
+      |)""" ==>
+    """foo(
+      |  "foo",
+      |  "bar",
+      |  false)"""
+
+    """foo(
+      |alpha = "foo",
+      |beta = "bar",
+      |gamma = false // comment
+      |)""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = "bar",
+      |  gamma = false // comment
+      |)"""
+  }
+
 }

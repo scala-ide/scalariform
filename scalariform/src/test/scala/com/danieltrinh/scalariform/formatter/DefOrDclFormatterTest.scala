@@ -1,3 +1,4 @@
+
 package scalariform.formatter
 
 import scalariform.parser._
@@ -155,6 +156,113 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
     |  plus1
     |}"""
 
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
+
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}"""
+
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
+
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}"""
+
+    """case class FqnSymbol(
+      |  id: Option[Int],
+      |  file: String, // the underlying file
+      |  path: String, // the VFS handle (e.g. classes in jars)
+      |  fqn: String,
+      |  descriptor: Option[String], // for methods
+      |  internal: Option[String], // for fields
+      |  source: Option[String], // VFS
+      |  line: Option[Int],
+      |  offset: Option[Int] = None // future features:
+      |)""" ==>
+    """case class FqnSymbol(
+      |  id: Option[Int],
+      |  file: String, // the underlying file
+      |  path: String, // the VFS handle (e.g. classes in jars)
+      |  fqn: String,
+      |  descriptor: Option[String], // for methods
+      |  internal: Option[String], // for fields
+      |  source: Option[String], // VFS
+      |  line: Option[Int],
+      |  offset: Option[Int] = None // future features:
+      |)"""
+  }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
+
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false): Double = {
+      |
+      |  bar
+      |}""" ==>
+    """private def foo(
+      |  alpha: Int,
+      |  beta: String = "default",
+      |  gamma: Boolean = true,
+      |  delta: Boolean = false
+      |): Double = {
+      |
+      |  bar
+      |}"""
   }
 
   """def foo(n, m)""" ==>

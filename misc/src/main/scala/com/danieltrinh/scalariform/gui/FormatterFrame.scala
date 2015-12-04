@@ -25,6 +25,7 @@ import scalariform.gui.SwingUtils._
 import scalariform.parser._
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
+import scala.util.Try
 
 class FormatterFrame extends JFrame with SpecificFormatter {
 
@@ -225,7 +226,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   add(splitPane, BorderLayout.CENTER)
 
   object OptionsPanel extends JPanel(new MigLayout) {
-    def addChangeListener(box: JCheckBox) {
+    def addChangeListener(box: JToggleButton) {
       box.addItemListener(new ItemListener() {
         def itemStateChanged(e: ItemEvent) {
           runFormatter()
@@ -245,6 +246,31 @@ class FormatterFrame extends JFrame with SpecificFormatter {
             add(checkBox, new CC().wrap)
             addChangeListener(checkBox)
             preferenceToWidgetMap += (preference -> checkBox)
+          case IntentPreference ⇒
+            val label = new JLabel(preference.description)
+            val radioPanel = new JPanel(new GridLayout(0, 1));
+            val radioGroup = new ButtonGroup()
+            val radioForce = new JRadioButton("force")
+            val radioPrevent = new JRadioButton("prevent")
+            val radioPreserve = new JRadioButton("preserve")
+            radioGroup.add(radioForce)
+            radioGroup.add(radioPrevent)
+            radioGroup.add(radioPreserve)
+
+            radioPanel.add(label)
+            radioPanel.add(radioForce)
+            radioPanel.add(radioPrevent)
+            radioPanel.add(radioPreserve)
+            preference.defaultValue.asInstanceOf[Intent] match {
+              case Force ⇒ radioForce.setSelected(true)
+              case Prevent ⇒ radioPrevent.setSelected(true)
+              case Preserve ⇒ radioPreserve.setSelected(true)
+            }
+            add(radioPanel, new CC().wrap)
+            addChangeListener(radioForce)
+            addChangeListener(radioPrevent)
+            addChangeListener(radioPreserve)
+            preferenceToWidgetMap += (preference -> radioPanel)
           case IntegerPreference(min, max) ⇒
             val label = new JLabel(preference.description)
             add(label, new CC)
@@ -293,7 +319,18 @@ class FormatterFrame extends JFrame with SpecificFormatter {
             val checkBox = widget.asInstanceOf[JCheckBox]
             preferences = preferences.setPreference(prefType.cast(preference), widget.asInstanceOf[JCheckBox].isSelected)
           case prefType @ IntegerPreference(min, max) ⇒
-            preferences = preferences.setPreference(prefType.cast(preference), Integer.parseInt(widget.asInstanceOf[JSpinner].getValue.toString))
+            preferences = preferences.setPreference(
+              prefType.cast(preference),
+              Integer.parseInt(widget.asInstanceOf[JSpinner].getValue.toString))
+          case prefType @ IntentPreference ⇒
+            val selected = widget.asInstanceOf[JPanel].getComponents.find(c =>
+              Try(c.asInstanceOf[JRadioButton]).map(_.isSelected).getOrElse(false)
+            ).get.asInstanceOf[JRadioButton].getText
+            preferences = preferences.setPreference[Intent](
+              prefType.cast(preference),
+              IntentPreference.parseValue(selected).fold(
+                err => throw new Exception(err),
+                a => a))
         }
       }
       preferences
