@@ -262,8 +262,8 @@ class FormatterFrame extends JFrame with SpecificFormatter {
             radioPanel.add(radioPrevent)
             radioPanel.add(radioPreserve)
             preference.defaultValue.asInstanceOf[Intent] match {
-              case Force ⇒ radioForce.setSelected(true)
-              case Prevent ⇒ radioPrevent.setSelected(true)
+              case Force    ⇒ radioForce.setSelected(true)
+              case Prevent  ⇒ radioPrevent.setSelected(true)
               case Preserve ⇒ radioPreserve.setSelected(true)
             }
             add(radioPanel, new CC().wrap)
@@ -321,16 +321,18 @@ class FormatterFrame extends JFrame with SpecificFormatter {
           case prefType @ IntegerPreference(min, max) ⇒
             preferences = preferences.setPreference(
               prefType.cast(preference),
-              Integer.parseInt(widget.asInstanceOf[JSpinner].getValue.toString))
+              Integer.parseInt(widget.asInstanceOf[JSpinner].getValue.toString)
+            )
           case prefType @ IntentPreference ⇒
             val selected = widget.asInstanceOf[JPanel].getComponents.find(c =>
-              Try(c.asInstanceOf[JRadioButton]).map(_.isSelected).getOrElse(false)
-            ).get.asInstanceOf[JRadioButton].getText
+              Try(c.asInstanceOf[JRadioButton]).map(_.isSelected).getOrElse(false)).get.asInstanceOf[JRadioButton].getText
             preferences = preferences.setPreference[Intent](
               prefType.cast(preference),
               IntentPreference.parseValue(selected).fold(
                 err => throw new Exception(err),
-                a => a))
+                a => a
+              )
+            )
         }
       }
       preferences

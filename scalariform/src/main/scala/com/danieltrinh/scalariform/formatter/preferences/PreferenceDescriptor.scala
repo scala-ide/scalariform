@@ -24,13 +24,12 @@ case object IntentPreference extends PreferenceType[Intent] {
 
   def parseValue(s: String) =
     s.toLowerCase match {
-      case "preserve"  ⇒ Right(Preserve)
-      case "force"     ⇒ Right(Force)
-      case "prevent"   ⇒ Right(Prevent)
-      case _           ⇒ Left("Could not parse as intent value: " + s)
+      case "preserve" ⇒ Right(Preserve)
+      case "force"    ⇒ Right(Force)
+      case "prevent"  ⇒ Right(Prevent)
+      case _          ⇒ Left("Could not parse as intent value: " + s)
     }
 }
-
 
 case object BooleanPreference extends PreferenceType[Boolean] {
 

@@ -1,7 +1,5 @@
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys._
-import com.typesafe.sbteclipse.core.EclipsePlugin._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
@@ -27,17 +25,16 @@ object ScalariformBuild extends Build {
     organization := "org.scalariform",
     profileName := "org.scalariform",
     version := "0.1.7",
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.10.6",
     crossScalaVersions := Seq(
-      "2.11.6",
-      "2.10.5",
+      "2.11.7",
+      "2.10.6",
       "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
     retrieveManaged := true,
-    scalacOptions += "-deprecation",
-    EclipseKeys.withSource := true,
-    EclipseKeys.eclipseOutput := Some("bin"))
+    scalacOptions += "-deprecation"
+  )
 
   lazy val subprojectSettings = commonSettings ++ Seq(
     ScalariformKeys.preferences <<= baseDirectory.apply(getScalariformPreferences))
@@ -56,10 +53,9 @@ object ScalariformBuild extends Build {
   }
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
-    case r"2.11.\d+[-\w]*" => "org.scalatest" %  "scalatest_2.11" % "2.1.5" % "test"
-    case r"2.10.\d+[-\w]*" => "org.scalatest" %  "scalatest_2.10" % "2.0"   % "test"
-    case "2.9.3"     => "org.scalatest" %% "scalatest"      % "1.9.1" % "test"
-    case _           => "org.scalatest" %% "scalatest"      % "1.7.2" % "test"
+    case r"2.11.\d+[-\w]*" | r"2.10.\d+[-\w]*" => "org.scalatest" %%  "scalatest" % "2.2.4" % "test"
+    case "2.9.3" => "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    case _       => "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
   def get2_11Dependencies(scalaVersion: String): List[ModuleID] = scalaVersion match {
@@ -83,13 +79,12 @@ object ScalariformBuild extends Build {
   )
 
   lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings =
-    subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ publishSettings("scalariform") ++ eclipseSettings ++
+    subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ publishSettings("scalariform") ++
       Seq(
         libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒
           deps ++ get2_11Dependencies(sv) :+ getScalaTestDependency(sv)
         },
         testOptions in Test += Tests.Argument("-oI"),
-        EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed,
         publishTo <<= isSnapshot(getPublishToRepo)))
 
   def getPublishToRepo(isSnapshot: Boolean) =
