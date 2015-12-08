@@ -142,7 +142,8 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
    */
   def lastStat(statSeq: StatSeq): Option[(Token, Option[Stat])] =
     statSeq.otherStats match {
-      case Nil ⇒ None
+      case Nil ⇒
+        None
         statSeq.firstStatOpt flatMap {
           case Expr(List(AnonymousFunction(_, _, body))) ⇒ lastStat(body)
           case _                                         ⇒ None
