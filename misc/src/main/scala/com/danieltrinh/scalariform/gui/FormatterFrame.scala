@@ -25,7 +25,6 @@ import scalariform.gui.SwingUtils._
 import scalariform.parser._
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
-import scala.util.Try
 
 class FormatterFrame extends JFrame with SpecificFormatter {
 
