@@ -1,3 +1,7 @@
+0.1.8 (7/December/15)
+* FIX: broken indentation in multiline argument lists. (issue #85)
+* Added backwards compatible dangling parenthesis via DanglingCloseParenthesis (issue #79, #29)
+
 0.1.7 (27/August/15)
 * FIX: correct checkFile exit status in scalariform-cli (issue #61)
 * FIX: Fix multi-line argument lists when IndentWithTabs is enabled. (issue #63)

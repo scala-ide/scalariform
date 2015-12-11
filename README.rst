@@ -57,7 +57,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.1.7"
+    "org.scalariform" %% "scalariform" % "0.1.8"
 
 Integration with Eclipse
 ------------------------
@@ -477,6 +477,36 @@ If ``true``, the formatter will keep an existing space before a parenthesis argu
   stack.pop() should equal (2)
 
 Otherwise, if ``false``, spaces before arguments will always be removed.
+
+danglingCloseParenthesis
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``Force``
+
+If ``Force``, any closing parentheses will be set to dangle. For example::
+
+   Box(
+     contents: List[Thing])
+
+becomes::
+
+   Box(
+     contents: List[Thing]
+   )
+
+If ``Prevent``, all dangling parenthesis are collapsed. For example::
+
+   Box(
+     contents: List[Thing]
+   )
+
+becomes::
+
+   Box(
+     contents: List[Thing])
+
+If ``Preserve``, scalariform will try to match what unformatted source code is already doing per parenthesis,
+either forcing or preventing.
 
 rewriteArrowSymbols
 ~~~~~~~~~~~~~~~~~~~

@@ -25,7 +25,6 @@ import scalariform.gui.SwingUtils._
 import scalariform.parser._
 import scala.util.parsing.input._
 import scala.util.parsing.combinator._
-import scala.util.Try
 
 class FormatterFrame extends JFrame with SpecificFormatter {
 
@@ -324,8 +323,13 @@ class FormatterFrame extends JFrame with SpecificFormatter {
               Integer.parseInt(widget.asInstanceOf[JSpinner].getValue.toString)
             )
           case prefType @ IntentPreference ⇒
-            val selected = widget.asInstanceOf[JPanel].getComponents.find(c =>
-              Try(c.asInstanceOf[JRadioButton]).map(_.isSelected).getOrElse(false)).get.asInstanceOf[JRadioButton].getText
+            val selected = widget.asInstanceOf[JPanel].getComponents.find { c =>
+              try {
+                c.asInstanceOf[JRadioButton].isSelected
+              } catch {
+                case _: Throwable => false
+              }
+            }.get.asInstanceOf[JRadioButton].getText
             preferences = preferences.setPreference[Intent](
               prefType.cast(preference),
               IntentPreference.parseValue(selected).fold(
