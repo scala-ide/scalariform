@@ -6,8 +6,6 @@ import java.awt.{ List ⇒ _, _ }
 import javax.swing._
 import javax.swing.text._
 import javax.swing.event._
-import javax.swing.tree._
-import javax.swing.table._
 import javax.swing.border.TitledBorder
 
 import net.miginfocom.layout._
@@ -23,8 +21,6 @@ import scalariform.lexer._
 import scalariform.lexer.Tokens._
 import scalariform.gui.SwingUtils._
 import scalariform.parser._
-import scala.util.parsing.input._
-import scala.util.parsing.combinator._
 
 class FormatterFrame extends JFrame with SpecificFormatter {
 
@@ -159,7 +155,6 @@ class FormatterFrame extends JFrame with SpecificFormatter {
           if (showAstCheckBox.isSelected) {
             val tokens = ScalaLexer.tokenise(inputText, scalaVersion = SCALA_VERSION)
             val rawTokens = ScalaLexer.rawTokenise(inputText, scalaVersion = SCALA_VERSION)
-            val tableModel = new TokenTableModel(tokens, FormatResult(Map(), Map(), Map()))
             tokensTable.setTokens(tokens)
             rawTokensTable.setTokens(rawTokens)
             try {
@@ -192,7 +187,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         astTree.setModel(treeModel)
         expandAll(astTree)
 
-        val (outputText, formatResult) = specificFormatter.fullFormat(inputText, scalaVersion = SCALA_VERSION)(OptionsPanel.getFormattingPreferences)
+        val (_, formatResult) = specificFormatter.fullFormat(inputText, scalaVersion = SCALA_VERSION)(OptionsPanel.getFormattingPreferences)
 
         tokensTable.setTokens(tokens, formatResult)
         rawTokensTable.setTokens(rawTokens)
@@ -315,7 +310,6 @@ class FormatterFrame extends JFrame with SpecificFormatter {
         val widget = preferenceToWidgetMap(preference)
         preference.preferenceType match {
           case prefType @ BooleanPreference ⇒
-            val checkBox = widget.asInstanceOf[JCheckBox]
             preferences = preferences.setPreference(prefType.cast(preference), widget.asInstanceOf[JCheckBox].isSelected)
           case prefType @ IntegerPreference(min, max) ⇒
             preferences = preferences.setPreference(

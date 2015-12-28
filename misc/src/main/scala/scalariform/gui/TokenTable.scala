@@ -4,7 +4,6 @@ import scalariform.formatter.FormatResult
 import javax.swing.JTable
 import scalariform.lexer.Token
 import javax.swing.table.AbstractTableModel
-import scalariform.utils.Range
 
 class TokenTable extends JTable(new TokenTableModel(Nil, FormatResult.EMPTY)) {
 

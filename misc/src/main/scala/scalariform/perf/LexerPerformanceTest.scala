@@ -2,10 +2,8 @@ package scalariform.perf
 
 import java.io.File
 import scala.io.Source
-import scalariform.parser._
 import scalariform.lexer.{ Token ⇒ _, _ }
 import scalariform.utils.Utils.time
-import scalariform.formatter._
 
 object LexerPerformanceTest {
 
