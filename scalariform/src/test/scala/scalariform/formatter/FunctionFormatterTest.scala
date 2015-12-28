@@ -18,7 +18,7 @@ class FunctionFormatterTest extends AbstractFormatterTest {
   """{ ctx =>
     |  ???
     |}""".stripMargin
-  
+
   """{ ctx => j =>
     |  ???
     |}""".stripMargin ==>
@@ -40,7 +40,7 @@ class FunctionFormatterTest extends AbstractFormatterTest {
   type Result = CompilationUnit
 
   def parse(parser: ScalaParser) = parser.compilationUnitOrScript()
-  
+
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 
 }

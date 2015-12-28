@@ -459,7 +459,7 @@ object Samples {
 
   val sample1 =
   """package  foo . bar . baz
-    |  /** 
+    |  /**
     |  * Scaladoc comment
     |   *
     |*/

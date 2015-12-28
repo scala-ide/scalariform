@@ -38,8 +38,8 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "     $               " ~
   " $$$$$$$$$           "
 
-  " class A(n: Int) " ~ 
-  "         $$$$$$  " ~ 
+  " class A(n: Int) " ~
+  "         $$$$$$  " ~
   " $$$$$$$$$$$$$$$ "
 
   " foo(42) " ~
@@ -69,7 +69,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " new Wibble " ~
   "     $$$$$$ " ~
   " $$$$$$$$$$ "
-  
+
   " new Wibble() " ~
   "         $$$  " ~
   " $$$$$$$$$$$$ "
@@ -77,11 +77,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " a + b + c " ~
   "   $       " ~
   " $$$$$     " ~
-  " $$$$$$$$$ " 
+  " $$$$$$$$$ "
 
   " a + b + c " ~
   "      $$$  " ~
-  " $$$$$$$$$ " 
+  " $$$$$$$$$ "
 
   " x + y * z " ~
   "      $$$  " ~
@@ -94,17 +94,17 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "      $$$$$$$$$$$$$ " ~
   " $$$$$$$$$$$$$$$$$$ "
 
-  " a :: b :: Nil ++ Nil " ~ 
-  "                  $$$ " ~ 
-  "           $$$$$$$$$$ " ~ 
-  "      $$$$$$$$$$$$$$$ " ~ 
+  " a :: b :: Nil ++ Nil " ~
+  "                  $$$ " ~
+  "           $$$$$$$$$$ " ~
+  "      $$$$$$$$$$$$$$$ " ~
   " $$$$$$$$$$$$$$$$$$$$ "
 
-  " a + b :: b + c :: Nil ++ Nil " ~ 
-  "              $               " ~ 
-  "          $$$$$               " ~ 
-  "          $$$$$$$$$$$$$$$$$$$ " ~ 
-  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+  " a + b :: b + c :: Nil ++ Nil " ~
+  "              $               " ~
+  "          $$$$$               " ~
+  "          $$$$$$$$$$$$$$$$$$$ " ~
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
 
   " i += 10 + 2 " ~
   " $           " ~
@@ -122,7 +122,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$                            " ~
   " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$                    " ~
   " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$       " ~
-  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
 
   " a.foo(b).bar(c) " ~
   " $               " ~
@@ -132,7 +132,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " def x = 42 " ~
   "         $$ " ~
   " $$$$$$$$$$ "
- 
+
   " x: Int " ~
   " $      " ~
   " $$$$$$ "
@@ -166,7 +166,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "             $$$$$ "
 
   " for (a <- b if c) {} " ~
-  "                $     " ~ 
+  "                $     " ~
   "      $$$$$$$$$$$     "
 
   " def a { b } " ~
@@ -178,11 +178,11 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "             $$$$$$      " ~
   "        $$$$$$$$$$$      "
 
-  " /** a */ class B " ~ 
+  " /** a */ class B " ~
   "                $ " ~
   " $$$$$$$$$$$$$$$$ "
 
-  " /** a */ class B " ~ 
+  " /** a */ class B " ~
   "  $$$$            " ~
   " $$$$$$$$         " ~
   " $$$$$$$$$$$$$$$$ "
@@ -191,7 +191,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$$$$$          " ~
   " $$$$$$$$$$$$$$$$$$$$$$$$$ "
 
-  " val a  = { b } " ~ 
+  " val a  = { b } " ~
   "            $   " ~
   "          $$$$$ " // A bit inconsistent with def's, but maybe OK
 
@@ -205,13 +205,13 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
 
   " def a = b(c) " ~
   "          $$$ " ~
-  "         $$$$ " 
+  "         $$$$ "
 
   " def a = { b } " ~
   "           $   " ~
   "         $$$$$ "
 
-  " for (a <- b) c(d) " ~ 
+  " for (a <- b) c(d) " ~
   "               $$$ " ~
   "              $$$$ "
 
@@ -225,7 +225,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$$$$$$$$$$$$ "
 
   " sealed class A " ~
-  "            $$$ " ~ 
+  "            $$$ " ~
   " $$$$$$$$$$$$$$ "
 
   " protected[a] val b " ~
@@ -233,16 +233,16 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$       "
 
   " evaluating { stack.pop() } should produce [NoSuchElementException] " ~
-  "              $$$$$$$                                               " ~ 
-  "              $$$$$$$$$$$                                           " ~ 
-  "            $$$$$$$$$$$$$$$                                         " ~ 
-  " $$$$$$$$$$$$$$$$$$$$$$$$$$                                         " ~ 
-  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+  "              $$$$$$$                                               " ~
+  "              $$$$$$$$$$$                                           " ~
+  "            $$$$$$$$$$$$$$$                                         " ~
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$                                         " ~
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
 
   " evaluating { stack.pop() } should produce [NoSuchElementException] " ~
-  "                                            $$$$$$$$$$$$$$$$$$$$$$  " ~ 
-  "                                   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " ~ 
-  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " 
+  "                                            $$$$$$$$$$$$$$$$$$$$$$  " ~
+  "                                   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ " ~
+  " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
 
   " } wibble  " ~
   "     $     " ~
@@ -261,10 +261,10 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   " $$$$$$$$$$$$$$$$$$ "
 
   " package foo.bar.baz " ~
-  "         $$$         " ~ 
+  "         $$$         " ~
   "         $$$$$$$     " ~
   "         $$$$$$$$$$$ " ~
-  " $$$$$$$$$$$$$$$$$$$ "  
+  " $$$$$$$$$$$$$$$$$$$ "
 
   " foo[bar][baz] " ~
   " $$$           " ~
@@ -275,16 +275,16 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   "   $$$  " ~
   "  $$$$  " ~
   " $$$$$$ "
-  
-  /* TODO: Need AST representation for [] calls 
+
+  /* TODO: Need AST representation for [] calls
   " foo[bar][baz][boz] " ~
   " $$$$$$$$           " ~
   " $$$$$$$$$$$$$      "
   */
-  
+
   {
     implicit val scalaVersion = "2.10.0"
-      
+
     """ s"my name is ${person.name}." """ ~
     """                $$$$$$       " """ ~
     """                $$$$$$$$$$$  " """ ~
@@ -304,14 +304,14 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
     """                $    """ ~
     """              $$$$   """
 
-    
+
   }
-  
-  private def findSelectionRange(s: String): Range = { 
+
+  private def findSelectionRange(s: String): Range = {
     val barLocation = s indexOf '|'
     if (barLocation >= 0)
       Range(barLocation, 0)
-    else { 
+    else {
       val firstDollarLocation = s indexOf '$'
       require(firstDollarLocation >= 0, "No selection marker: " + s)
       val dollars = s.drop(firstDollarLocation).takeWhile(_ == '$')
@@ -320,13 +320,13 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   }
 
   implicit def stringToTestString(source: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION): TestString = new TestString(source, scalaVersion)
-  class TestString(source: String, scalaVersion: String) { 
+  class TestString(source: String, scalaVersion: String) {
     def ~(initialSelectionDiagram: String) = IntermediateTest(source, initialSelectionDiagram, scalaVersion)
   }
 
-  case class IntermediateTest(source: String, initialSelectionDiagram: String, scalaVersion: String) { 
-    def ~(finalSelectionDiagram: String): IntermediateTest = { 
-       val initialSelection = findSelectionRange(initialSelectionDiagram)      
+  case class IntermediateTest(source: String, initialSelectionDiagram: String, scalaVersion: String) {
+    def ~(finalSelectionDiagram: String): IntermediateTest = {
+       val initialSelection = findSelectionRange(initialSelectionDiagram)
        val actualFinalSelection = AstSelector.expandSelection(source, initialSelection, scalaVersion) getOrElse initialSelection
        val expectedFinalSelection = findSelectionRange(finalSelectionDiagram)
        ("source\n>>>" + source + "<<<\n") should "expand\n>>>" + (initialSelectionDiagram + "<<<\n to \n>>>" + finalSelectionDiagram + "<<<\n") in {
