@@ -21,7 +21,7 @@ object ScalariformBuild extends Build {
       |Using 1.7 to build requires setting SBT to use JDK 1.7 or higher -- if SBT is
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
 
-  lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
+  lazy val commonSettings = SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "org.scalariform",
     profileName := "org.scalariform",
     version := "0.1.8",
@@ -41,11 +41,7 @@ object ScalariformBuild extends Build {
   def getScalariformPreferences(dir: File) =
     PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)
 
-  lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
-    publish := (),
-    publishLocal := ())
-  ) aggregate (scalariform, cli, misc)
-
+  lazy val root: Project = Project("root", file("."), settings = commonSettings) aggregate (scalariform, cli, misc)
 
   implicit class Regex(sc: StringContext) {
     def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
@@ -111,8 +107,6 @@ object ScalariformBuild extends Build {
       libraryDependencies ++= Seq(
         "commons-io" % "commons-io" % "1.4",
         "com.miglayout" % "miglayout" % "3.7.4"),
-      publish := (),
-      publishLocal := (),
       validateJavaVersion := {
         val specJavaVersion = sys.props("java.specification.version")
         val compatibleJavaVersion = specJavaVersion == "1.7" || specJavaVersion == "1.8"
