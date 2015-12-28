@@ -1,4 +1,0 @@
-scalac changes checked 26/April/2013
-
-Scanners.scala: cdffcf8962c9fa606c027fcb5a50a4273976a576
-Parsers.scala:  cd148d97225fc7738f7a8ff9d4479cd46d632371
