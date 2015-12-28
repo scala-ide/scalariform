@@ -285,7 +285,7 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
   {
     implicit val scalaVersion = "2.10.0"
 
-    """ s"my name is ${person.name}." """ ~
+    """ s"my name is ?{person.name}." """.replace('?', '$') ~
     """                $$$$$$       " """ ~
     """                $$$$$$$$$$$  " """ ~
     """              $$$$$$$$$$$$$$ " """ ~
@@ -303,7 +303,6 @@ class AstSelectorTest extends FlatSpec with ShouldMatchers {
     """ s"my name is $bob." """ ~
     """                $    """ ~
     """              $$$$   """
-
 
   }
 

@@ -35,8 +35,8 @@ class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
   {
     implicit val scalaVersion = "2.10.0";
     """
-      s"my name is ${person.name<;>}"
-    """.check
+      s"my name is ?{person.name<;>}"
+    """.replace('?', '$').check
   }
 
   private def checkSemis(encodedSource: String, scalaVersion: String) {
