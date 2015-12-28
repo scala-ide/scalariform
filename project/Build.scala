@@ -21,19 +21,34 @@ object ScalariformBuild extends Build {
       |Using 1.7 to build requires setting SBT to use JDK 1.7 or higher -- if SBT is
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
 
-  lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
+  lazy val commonSettings = SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "org.scalariform",
     profileName := "org.scalariform",
-    version := "0.1.8",
-    scalaVersion := "2.10.6",
+    version := "0.2.0-SNAPSHOT",
+    scalaVersion := "2.11.7",
     crossScalaVersions := Seq(
       "2.11.7",
       "2.10.6",
       "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
-    retrieveManaged := true,
-    scalacOptions += "-deprecation"
+    scalacOptions ++= (scalaBinaryVersion.value match {
+      case "2.11" => Seq(
+        "-deprecation:false",
+        "-encoding", "UTF-8",
+        "-feature",
+        "-language:_",
+        "-unchecked",
+        "-Xlint",
+        "-Xfuture",
+        "-Xfatal-warnings",
+        "-Yno-adapted-args",
+        "-Ywarn-dead-code",
+        "-Ywarn-unused-import",
+        "-Ywarn-unused"
+      )
+      case _ => Seq()
+    })
   )
 
   lazy val subprojectSettings = commonSettings ++ Seq(
@@ -42,11 +57,7 @@ object ScalariformBuild extends Build {
   def getScalariformPreferences(dir: File) =
     PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)
 
-  lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
-    publish := (),
-    publishLocal := ())
-  ) aggregate (scalariform, cli, misc)
-
+  lazy val root: Project = Project("root", file("."), settings = commonSettings) aggregate (scalariform, cli, misc)
 
   implicit class Regex(sc: StringContext) {
     def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
@@ -112,8 +123,6 @@ object ScalariformBuild extends Build {
       libraryDependencies ++= Seq(
         "commons-io" % "commons-io" % "1.4",
         "com.miglayout" % "miglayout" % "3.7.4"),
-      publish := (),
-      publishLocal := (),
       validateJavaVersion := {
         val specJavaVersion = sys.props("java.specification.version")
         val compatibleJavaVersion = specJavaVersion == "1.7" || specJavaVersion == "1.8"

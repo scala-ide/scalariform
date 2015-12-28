@@ -14,8 +14,11 @@ corpusscan/target/
 corpusscan/lib_managed/
 corpusscan/src_managed/
 docs/build
-.settings
 nohup.out
 .history
 .cache
 .idea/
+.settings
+.classpath
+.project
+.cache*
