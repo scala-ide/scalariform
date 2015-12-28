@@ -2,7 +2,6 @@
 package scalariform.formatter
 
 import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -21,7 +20,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   "def foo={doStuff()}" ==> "def foo = { doStuff() }"
 
   "def foo ()" ==> "def foo()"
- 
+
   "def foo(n:Int)" ==> "def foo(n: Int)"
 
   "def foo( n:Int,m:String )" ==> "def foo(n: Int, m: String)"
@@ -31,7 +30,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   "def modN ( n :Int ) (x: Int) = ((x % n) == 0)" ==> "def modN(n: Int)(x: Int) = ((x % n) == 0)"
 
   "def foo(a: Int=123+2, b: Int=456+7)" ==> "def foo(a: Int = 123 + 2, b: Int = 456 + 7)"
-  
+
   "def foo[X<%T1,Y<:T2,Z>:T3]()" ==> "def foo[X <% T1, Y <: T2, Z >: T3]()"
 
   "def foo(x: =>Int, y: Int *)" ==> "def foo(x: => Int, y: Int*)"
@@ -54,7 +53,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   """def foo =
     |    if (true)
-    | 	1
+    |   1
     |    else
     |   2""" ==>
   """def foo =
@@ -106,7 +105,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   {
 
-  implicit val formattingPreferences = 
+  implicit val formattingPreferences =
     FormattingPreferences
       .setPreference(IndentLocalDefs, true)
 
@@ -114,7 +113,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
     |  def b() = {
     |    def c() = 42
     |    println("d")
-    |    def e() = 
+    |    def e() =
     |    42
     |println("f")
     |    def g() {
@@ -271,14 +270,10 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   """def test(test: ^^ *)""" ==>
   """def test(test: ^^ *)"""
 
-    
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl
-  
+
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
-
 }
-
- 

@@ -1,14 +1,11 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
-
 // format: OFF
 class IfExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "if(x>y)(x)else(y)" ==> "if (x > y) (x) else (y)"
 
-  "if (true) 3 else 4" ==> "if (true) 3 else 4" 
+  "if (true) 3 else 4" ==> "if (true) 3 else 4"
 
   """if (true)
     |println("Hello world")""" ==>
@@ -40,7 +37,7 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |else if (1 == 2)
     |  println("wobble")
     |else
-    |  println("wobble")""" 
+    |  println("wobble")"""
 
   """if (1 == 1)   println("wibble")
     |  else println("wobble")""" ==>
@@ -52,14 +49,14 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
   "if(x>y){x}else{y}" ==> "if (x > y) { x } else { y }"
 
   """if (x > y) {
-    |println("Foo") }""" ==> 
+    |println("Foo") }""" ==>
   """if (x > y) {
     |  println("Foo")
     |}"""
- 
+
   """if (x > y) {
-    |println("Foo") } else { 
-    |println("Bar") }""" ==> 
+    |println("Foo") } else {
+    |println("Bar") }""" ==>
   """if (x > y) {
     |  println("Foo")
     |} else {
@@ -68,12 +65,11 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
 
   """if (x > y) {
     |println("Foo")
-    |println("Bar")}""" ==> 
+    |println("Bar")}""" ==>
   """if (x > y) {
     |  println("Foo")
     |  println("Bar")
     |}"""
-
 
   """if (1 == 2) {
     |println("bob")
@@ -125,8 +121,8 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   """if (true) {
-    |   println("wobble") } 
-    |else { 
+    |   println("wobble") }
+    |else {
     |println("wobble") }""" ==>
   """if (true) {
     |  println("wobble")
@@ -147,14 +143,14 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
   """if (1 == 2) {println("wibble");println("wobble")}""" ==>
   """if (1 == 2) { println("wibble"); println("wobble") }"""
 
-  """if (true) 
+  """if (true)
     |{ x }""" ==>
   """if (true) { x }"""
 
   """if (a)
-    |if (b) 
-    |x 
-    |else 
+    |if (b)
+    |x
+    |else
     |y""" ==>
   """if (a)
     |  if (b)
@@ -181,29 +177,29 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |  2
     |}"""
 
-  """if (true) 1 else 
+  """if (true) 1 else
     |{ 2 } """ ==>
   """if (true) 1 else { 2 }"""
 
-  """if (true) { 1 
+  """if (true) { 1
     |}
     |else 2""" ==>
   """if (true) {
     |  1
     |} else 2"""
 
-  """if (true) 1 else 
-    |{ 
+  """if (true) 1 else
+    |{
     |2 }""" ==>
   """if (true) 1 else {
     |  2
     |}"""
 
-  """if (true) { 
-    | 1 
+  """if (true) {
+    | 1
     |} + 2
     | else  {
-    |2 
+    |2
     |} + 2""" ==>
   """if (true) {
     |  1
@@ -276,7 +272,7 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
   """if (b)
     |  c
     |  { d }
-    |else 
+    |else
     |  e""" ==>
   """if (b)
     |  c { d }
@@ -298,9 +294,9 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
   """if (a) { println() }
     |else { println() }"""
 
-  """Some(if (a) 
-    |b 
-    |else 
+  """Some(if (a)
+    |b
+    |else
     |c)""" ==>
   """Some(if (a)
     |  b
@@ -308,27 +304,27 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
     |  c)"""
 
   """Some(if (a) {
-    |b 
-    |} else 
+    |b
+    |} else
     |c)""" ==>
   """Some(if (a) {
     |  b
     |} else
     |  c)"""
 
-  """Some(if (a) { b } else 
+  """Some(if (a) { b } else
     |c)""" ==>
   """Some(if (a) { b } else
     |  c)"""
 
-  """if (cond) 
+  """if (cond)
     |42 else
     | 42""" ==>
   """if (cond)
     |  42
     |else
     |  42"""
-    
+
   """if (a)
     |b else {
     |c
@@ -351,4 +347,3 @@ class IfExprFormatterTest extends AbstractExpressionFormatterTest {
   override val debug = false
 
 }
- 

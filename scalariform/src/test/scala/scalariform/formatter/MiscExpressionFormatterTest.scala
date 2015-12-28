@@ -1,7 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -79,7 +77,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   """a(
     |)""" ==> """a()"""
-  
+
    "_ => 3" ==> "_ => 3"
    "(_: Int) => 3" ==> "(_: Int) => 3"
    "(x: String, y: Map[String, String]) => y(x)" ==> "(x: String, y: Map[String, String]) => y(x)"
@@ -98,14 +96,12 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |  def m: Int
      |}"""
 
-
    """List[Int { val n: Int
      |val m: Int }]()""" ==>
    """List[Int {
      |  val n: Int
      |  val m: Int
      |}]()"""
-
 
    """42 match {
      |case x: Int { val n: Int
@@ -250,7 +246,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
    """println
      |{foo}""" ==>
    """println { foo }"""
-
 
    """doBlock(xs) {(x:Int) => println(x)
      |println("bobble")
@@ -451,7 +446,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    b
     |)"""
 
-
   """Book(
     |  name = "Name",
     |  author = "Author",
@@ -493,7 +487,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    d
     |)"""
 
-
    """(a ->
      |new B)""" ==>
    """(a ->
@@ -522,7 +515,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
    "if (true) 1; else 2" ==> "if (true) 1; else 2" // Check SEMI + ELSE rule
 
    "a: ::" ==> "a: ::"
-
 
    """(a
      | + b
@@ -766,7 +758,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |  )
      |  .d"""
 
-
    "Foo.this" ==> "Foo.this"
 
    """List.range(1, r) flatMap (
@@ -807,7 +798,6 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
    "a [ b . C ] [ d . E ] [ f . G ] " ==> "a[b.C][d.E][f.G]"
 
    "{ val P(a, b*c) = p }" ==> "{ val P(a, b * c) = p }"
-
 
    """new {} with A(new {
      |val x = 42}) with  B(new {

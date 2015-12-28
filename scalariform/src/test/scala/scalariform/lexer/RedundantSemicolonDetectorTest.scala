@@ -1,11 +1,8 @@
 package scalariform.lexer
 
 import scalariform._
-import scalariform.lexer.Tokens._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.TestFailedException
-import org.scalatest.TestPendingException
 import scalariform.utils.Utils._
 
 class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
@@ -14,22 +11,22 @@ class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
     new { def check() = checkSemis(s, scalaVersion) }; // Expected redundant semicolons are indicated with <;>
 
   """
-    class A { 
+    class A {
       def foo = 42<;>
-      def bar = 123; def baz = 1234 
+      def bar = 123; def baz = 1234
     }<;>
   """.check();
 
   """
-    { 
+    {
       println("Foo")<;>
     }
   """.check();
 
   """
-    class A { 
+    class A {
       for (
-        x <- 1 to 10; 
+        x <- 1 to 10;
         y <- 1 to 10
       ) yield x + y<;>
     }

@@ -1,15 +1,12 @@
 package scalariform.formatter
 
-import preferences.FormattingPreferences._
 import scalariform.formatter.preferences._
-import scalariform.parser._
-import scalariform.formatter._
 
 // format: OFF
 class CompactControlReadabilityTest extends AbstractExpressionFormatterTest {
 
   implicit val formattingPreferences = FormattingPreferences.setPreference(CompactControlReadability, true)
-  
+
   """if(a){
     |foo
     |} else {
@@ -98,9 +95,7 @@ class CompactControlReadabilityTest extends AbstractExpressionFormatterTest {
     |}"""
 
   "if (y > 0) positive else if (y < 0) negative else zero" ==> "if (y > 0) positive else if (y < 0) negative else zero"
-      
-  "try x catch y finally z" ==> "try x catch y finally z"    
-      
 
-      
+  "try x catch y finally z" ==> "try x catch y finally z"
+
 }

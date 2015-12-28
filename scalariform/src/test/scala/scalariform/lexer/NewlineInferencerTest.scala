@@ -4,9 +4,6 @@ import scalariform._
 import scalariform.lexer.Tokens._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.TestFailedException
-import org.scalatest.TestPendingException
-import java.io._
 
 /**
  * Test full tokeniser, including newline inferencing.
@@ -18,7 +15,7 @@ class NewlineInferencerTest extends FlatSpec with ShouldMatchers {
 
   // See issue #60
   """
-     a match { 
+     a match {
        case b =>
          val c = d
        case e =>
@@ -49,4 +46,3 @@ class NewlineInferencerTest extends FlatSpec with ShouldMatchers {
   }
 
 }
-

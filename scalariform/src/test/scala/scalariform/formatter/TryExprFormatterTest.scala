@@ -1,8 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
-
 // format: OFF
 class TryExprFormatterTest extends AbstractExpressionFormatterTest {
 
@@ -10,12 +7,12 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "try  println()" ==> "try println()"
 
-  """try 
+  """try
     |println()""" ==>
   """try
     |  println()"""
 
-  """try 
+  """try
     | {
     |println()
     | }""" ==>
@@ -41,21 +38,21 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "try { foo() }catch{ case e => }" ==> "try { foo() } catch { case e => }"
 
-  """try { foo() } 
+  """try { foo() }
     |catch{ case e => }""" ==>
   """try { foo() }
     |catch { case e => }"""
 
- """try { 
-    |foo() } 
+ """try {
+    |foo() }
     |catch{ case e => }""" ==>
   """try {
     |  foo()
     |} catch { case e => }"""
 
   """try {
-    |} catch { case e => }finally 
-    |{ 
+    |} catch { case e => }finally
+    |{
     |println("foo") }""" ==>
   """try {
     |} catch { case e => } finally {
@@ -64,14 +61,14 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "try {} catch { case e => } finally {}" ==> "try {} catch { case e => } finally {}"
 
-  """try {} 
-    |catch { case e => } 
+  """try {}
+    |catch { case e => }
     |finally {}""" ==>
   """try {}
     |catch { case e => }
     |finally {}"""
 
-  """try {} catch { case e => } 
+  """try {} catch { case e => }
     |finally{
     |resource.close()
     |}""" ==>
@@ -80,15 +77,15 @@ class TryExprFormatterTest extends AbstractExpressionFormatterTest {
     |  resource.close()
     |}"""
 
-  """try {} catch { case e => } 
+  """try {} catch { case e => }
     |finally resource.close()""" ==>
   """try {} catch { case e => }
     |finally resource.close()"""
 
-  """try 
+  """try
     |resource.useIt()
-    |catch { case e => } 
-    |finally 
+    |catch { case e => }
+    |finally
     |resource.close()""" ==>
   """try
     |  resource.useIt()

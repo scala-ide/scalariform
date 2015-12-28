@@ -1,7 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -17,10 +15,10 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   "<a>1</a>" ==> "<a>1</a>"
   "<a> 1 </a>" ==> "<a> 1 </a>"
-  "<a> b {c} d {e} f </a>" ==> "<a> b { c } d { e } f </a>" 
+  "<a> b {c} d {e} f </a>" ==> "<a> b { c } d { e } f </a>"
   "<b>ABORT: { msg }</b>" ==> "<b>ABORT: { msg }</b>" // See issue #27
   "<a>   {b} </c>" ==> "<a>   { b } </c>"
-  
+
   """<a>
     |{foo}
     |</a>""" ==>
@@ -45,14 +43,14 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  42<c/>
     |</a>"""
 
-  """b(<c d={e + 
+  """b(<c d={e +
     |"f"}/>)""" ==>
   """b(<c d={
     |  e +
     |    "f"
     |}/>)"""
 
-  """b(<c d={e + 
+  """b(<c d={e +
     |"f"}></c>)""" ==>
   """b(<c d={
     |  e +
@@ -85,12 +83,12 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |    println("Foo")
     |  }</html>
     |}"""
-    
+
   """{
     |    <package>
     |    <name>{ name.get }</name>
     |    <version>{ version.get }</version></package>
-    |}""" ==>    
+    |}""" ==>
   """{
     |  <package>
     |    <name>{ name.get }</name>
@@ -122,7 +120,6 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  <p>{ 1 }{ 1 }</p>
     |
     |}"""
-
 
   """{
     |{ <a><b/></a> }
@@ -201,7 +198,7 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
   """{
     |
-    |val x = 
+    |val x =
     |<foo/>
     |<bar/>
     |<biz>
@@ -242,7 +239,7 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |       </b> =>
     |
     |}"""
-  
+
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(FormatXml, false)
 
@@ -267,9 +264,9 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
   }
 
   "{<div></div>               }" ==> "{ <div></div> }"
-  
+
   "a match { case <foo>{_*}</foo> => }" ==> "a match { case <foo>{ _* }</foo> => }"
-    
+
   override val debug = false
 
 }

@@ -1,8 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
-
 // format: OFF
 class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
 
@@ -15,7 +12,7 @@ class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "while (true) { run() }" ==> "while (true) { run() }"
 
-  """while (true) { 
+  """while (true) {
     |run() }""" ==>
   """while (true) {
     |  run()
@@ -23,7 +20,7 @@ class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "do run()while( true )" ==> "do run() while (true)"
 
-  """do 
+  """do
     |run() while (true)""" ==>
   """do
     |  run()
@@ -55,14 +52,14 @@ class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
   """do run()
     |while (true)"""
 
-  """do 
+  """do
     |run()
     |while (true)""" ==>
   """do
     |  run()
     |while (true)"""
 
-  """do 
+  """do
     |run()
     |;
     |while (true)""" ==>
@@ -82,7 +79,7 @@ class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
 
   """while(true){do { run(); };
     |while (if (true) {
-    |a} else { 
+    |a} else {
     |b})
     |}""" ==>
   """while (true) {
@@ -94,11 +91,9 @@ class WhileExprFormatterTest extends AbstractExpressionFormatterTest {
     |  })
     |}"""
 
-  """a(while (b) 
+  """a(while (b)
     |c())""" ==>
   """a(while (b)
     |  c())"""
 
 }
-
- 

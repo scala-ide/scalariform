@@ -1,7 +1,6 @@
 package scalariform.parser
 
 import scalariform.lexer._
-import scalariform.parser._
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers

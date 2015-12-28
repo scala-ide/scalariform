@@ -1,7 +1,6 @@
 package scalariform.formatter
 
 import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -62,7 +61,6 @@ class TemplateFormatterTest extends AbstractFormatterTest {
    |@A/*b*/
    |@B(c = "d")/*c*/
    |abstract class/*d*/E/*e*/[F]/*f*/@G()/*g*/private/*h*/(val h: I)/*i*/(implicit j: K)/*j*/extends/*k*/{} with/*l*/L(2) with M/*m*/{}""" because "sort out what we want"
-
 
 {
 
@@ -421,7 +419,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  entries:     Seq[A]        = Nil,
     |  initial:     A
     |): Option[A]"""
-  
+
     // Formats function types correctly
   """private def executeWithinClient[T](
     |crawlerConfig: String => JsValue = Fancy.function,
@@ -449,7 +447,6 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |  complicatedType: Option[B, C, D[E, F, G]] = None,
       |  simpleType:      String                   = ""
       |): B"""
-
 
     // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
   """case class Spacing(param: Int = 1,
@@ -769,7 +766,6 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
   """class A @B ()
     |()""" ==>
   """class A @B() ()"""
-
 
   // See Scala trac #3672 for next two cases:
 

@@ -1,7 +1,6 @@
 package scalariform.formatter
 
 import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -173,7 +172,7 @@ class IndentWithTabsTest extends AbstractFormatterTest {
   type Result = CompilationUnit
 
   def parse(parser: ScalaParser) = parser.compilationUnitOrScript
-  
+
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 
 }

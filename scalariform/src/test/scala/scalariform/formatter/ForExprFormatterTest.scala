@@ -1,8 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
-
 // format: OFF
 class ForExprFormatterTest extends AbstractExpressionFormatterTest {
 
@@ -35,7 +32,7 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "for (x <- xs) a()" ==> "for (x <- xs) a()"
 
-  """for (x <- xs) 
+  """for (x <- xs)
     |a()""" ==>
   """for (x <- xs)
     |  a()"""
@@ -51,12 +48,12 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
   """for(x <- xs) { a() }""" ==>
   """for (x <- xs) { a() }"""
 
-  """for(x <- xs) 
+  """for(x <- xs)
     |{ a() }""" ==>
   """for (x <- xs) { a() }"""
 
   """for(x <- xs) yield
-    |{ 
+    |{
     |  a + b
     |}""" ==>
   """for (x <- xs) yield {
@@ -76,7 +73,7 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
 
   """for(x <- xs)
     |yield
-    |{ 
+    |{
     |z } """ ==>
   """for (x <- xs) yield {
     |  z
@@ -110,10 +107,10 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
     |  val z = x + y
     |) yield z"""
 
-  """for { 
+  """for {
     |x <- xs
     |y <- ys
-    |} 
+    |}
     |yield
     |2""" ==>
   """for {
@@ -121,10 +118,10 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
     |  y <- ys
     |} yield 2"""
 
-  """for { 
+  """for {
     |x <- xs
     |y <- ys
-    |} 
+    |}
     |println(x + y)""" ==>
   """for {
     |  x <- xs
@@ -150,7 +147,5 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
     |  for (n <- 1 to 10)
     |    proc()
     |)"""
-    
-}
 
- 
+}

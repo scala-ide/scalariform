@@ -1,7 +1,6 @@
 package scalariform.formatter
 
 import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -12,7 +11,7 @@ class PackageFormatterTest extends AbstractFormatterTest {
   type Result = CompilationUnit
 
   def parse(parser: ScalaParser) = parser.compilationUnit()
-  
+
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
 
   "" ==> ""
@@ -37,7 +36,7 @@ class PackageFormatterTest extends AbstractFormatterTest {
   """/* foo */
     |package wibble"""
 
-  """package a 
+  """package a
      |{}""" ==>
   """package a {}"""
 

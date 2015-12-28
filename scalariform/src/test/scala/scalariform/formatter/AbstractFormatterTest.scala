@@ -1,10 +1,7 @@
 package scalariform.formatter
 
-import scalariform.parser._
 import scalariform.lexer._
 import scalariform.formatter.preferences._
-import scala.util.parsing.input._
-import scala.util.parsing.combinator._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.TestFailedException

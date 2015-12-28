@@ -1,14 +1,11 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
-
 // format: OFF
 class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
 
   override val debug = false
 
-  """{ 
+  """{
     |  a();
     |  b()
     |}""" ==>
@@ -33,7 +30,7 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   """{
-    |val x = { 
+    |val x = {
     |a()
     |b()
     |}
@@ -58,7 +55,7 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
 
   "{ class A }" ==> "{ class A }"
 
-  """{ 
+  """{
     |class A
     |class B
     |}""" ==>
@@ -66,7 +63,7 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
     |  class A
     |  class B
     |}"""
-  
+
   "{ case 42 => }" ==> "{ case 42 => }"
   "{ case -42 => }" ==> "{ case -42 => }"
 
@@ -78,7 +75,7 @@ class BlockExprFormatterTest extends AbstractExpressionFormatterTest {
     |  println("foo")
     |  (x: Int) => 42
     |}"""
- 
+
   """{
     |c !
     |val b

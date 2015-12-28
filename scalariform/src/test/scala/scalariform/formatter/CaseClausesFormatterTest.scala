@@ -1,7 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.formatter._
 import scalariform.formatter.preferences._
 
 // format: OFF
@@ -244,7 +242,6 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case Cell[a](x: Int) => c.x = 5
     |}"""
 
-
   {
   implicit val formattingPreferences =
     FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true).setPreference(RewriteArrowSymbols, true)
@@ -298,7 +295,6 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  }
     |}"""
 
-
   "{ case a ::(b) ⇒ }" ==>
   "{ case a :: (b) ⇒ }"
 
@@ -314,7 +310,6 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |      a
     |    }
     |}"""
-
 
   {
   implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)

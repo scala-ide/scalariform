@@ -4,9 +4,6 @@ import scalariform._
 import scalariform.lexer.Tokens._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.TestFailedException
-import org.scalatest.TestPendingException
-import java.io._
 
 class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
@@ -208,7 +205,7 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   """<?this is a pi foo bar = && {{ ?>""" producesTokens (XML_PROCESSING_INSTRUCTION)
 
   """<foo/>
-     
+
      <bar/>""" producesTokens (XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE, XML_PCDATA, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE)
 
   """<foo/>
@@ -220,9 +217,9 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   "for(<book/><-Nil)Nil" producesTokens (FOR, LPAREN, XML_START_OPEN, XML_NAME, XML_EMPTY_CLOSE, LARROW, VARID, RPAREN, VARID)
 
   "a -> b" producesTokens(VARID, WS, RARROW, WS, VARID)
-  
+
   "a → b" producesTokens(VARID, WS, RARROW, WS, VARID)
-  
+
   "\"\\u001A\"" producesTokens (STRING_LITERAL)
 
   "\"\"\"\\u001A\"\"\"" producesTokens (STRING_LITERAL)
