@@ -474,20 +474,20 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
 
       val isDefinitelyNumber =
         (c: @switch) match {
-          /** Another digit is a giveaway. */
+          /* Another digit is a giveaway. */
           case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ⇒
             true
 
-          /** Backquoted idents like 22.`foo`. */
+          /* Backquoted idents like 22.`foo`. */
           case '`' ⇒
             token(INTEGER_LITERAL); return
-          /** Note the early return */
+          /* Note the early return */
 
-          /** These letters may be part of a literal, or a method invocation on an Int */
+          /* These letters may be part of a literal, or a method invocation on an Int */
           case 'd' | 'D' | 'f' | 'F' ⇒
             !isIdentifierPart(ch(2))
 
-          /** A little more special handling for e.g. 5e7 */
+          /* A little more special handling for e.g. 5e7 */
           case 'e' | 'E' ⇒
             val ch2 = ch(2)
             !isIdentifierPart(ch2) || (isDigit(ch2) || ch2 == '+' || ch2 == '-')
