@@ -347,7 +347,7 @@ class ScalaParser(tokens: Array[Token]) {
       val dot = accept(DOT)
       val id = selector()
       val subBaseCall = CallExpr(None, superToken, mixinQualifierOpt_)
-      val baseCall = CallExpr(Some(List(subBaseCall), dot), id)
+      val baseCall = CallExpr(Some((List(subBaseCall), dot)), id)
       if (DOT) {
         val dot2 = nextToken()
         selectors((baseCall, dot2), typeOK)
@@ -360,7 +360,7 @@ class ScalaParser(tokens: Array[Token]) {
         val dot = nextToken()
         if (THIS) {
           val thisToken = nextToken()
-          val baseCall2 = CallExpr(Some(List(baseCall), dot), thisToken)
+          val baseCall2 = CallExpr(Some((List(baseCall), dot)), thisToken)
           if (!thisOK || DOT) {
             val dot2 = accept(DOT)
             selectors((baseCall2, dot2), typeOK)
@@ -371,7 +371,7 @@ class ScalaParser(tokens: Array[Token]) {
           val mixinQualifierOpt_ = mixinQualifierOpt()
           val dot2 = accept(DOT)
           val id2 = selector()
-          val baseCall2 = CallExpr(Some(List(CallExpr(Some(List(baseCall), dot), superToken, mixinQualifierOpt_)), dot2), id2)
+          val baseCall2 = CallExpr(Some((List(CallExpr(Some((List(baseCall), dot)), superToken, mixinQualifierOpt_)), dot2)), id2)
           if (DOT) {
             val dot3 = nextToken()
             selectors((baseCall2, dot3), typeOK)
@@ -387,7 +387,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def path(thisOK: Boolean, typeOK: Boolean): List[Token] = pathC(thisOK, typeOK).tokens
 
   private def selectors(previousAndDot: (CallExpr, Token), typeOK: Boolean): CallExpr = {
-    val exprDotOpt = Some(exprElementFlatten2(previousAndDot._1), previousAndDot._2)
+    val exprDotOpt = Some((exprElementFlatten2(previousAndDot._1), previousAndDot._2))
     if (typeOK && TYPE)
       CallExpr(exprDotOpt, nextToken())
     else {
@@ -471,11 +471,9 @@ class ScalaParser(tokens: Array[Token]) {
       None
 
   private def typedOpt(): Option[(Token, Type)] =
-    if (COLON) {
-      val colonToken = nextToken()
-      val typ_ = typ()
-      Some(colonToken, typ_)
-    } else
+    if (COLON)
+      Some((nextToken(), typ()))
+    else
       None
 
   private def typeOrInfixType(location: Location): TypeExprElement =
@@ -567,7 +565,7 @@ class ScalaParser(tokens: Array[Token]) {
           case FINALLY ⇒
             val finallyToken = nextToken()
             val finallyExpr = expr()
-            Some(finallyToken, finallyExpr)
+            Some((finallyToken, finallyExpr))
           case _ ⇒
             None
         }
@@ -604,12 +602,12 @@ class ScalaParser(tokens: Array[Token]) {
       case RETURN ⇒
         val returnToken = nextToken()
         val returnExpr = if (isExprIntro) Some(expr()) else None
-        exprElementFlatten2(returnToken, returnExpr) // TODO: <-- use a different type?
+        exprElementFlatten2((returnToken, returnExpr)) // TODO: <-- use a different type?
 
       case THROW ⇒
         val throwToken = nextToken()
         val throwExpr = expr()
-        exprElementFlatten2(throwToken, throwExpr)
+        exprElementFlatten2((throwToken, throwExpr))
 
       case IMPLICIT ⇒
         val implicitToken = nextToken()
@@ -630,7 +628,7 @@ class ScalaParser(tokens: Array[Token]) {
           val rhs = if (USCORE) {
             val uscore = nextToken()
             val star = accept(STAR)
-            exprElementFlatten2(uscore, star)
+            exprElementFlatten2((uscore, star))
           } else if (AT) {
             annotations(skipNewLines = false)
           } else {
@@ -670,12 +668,12 @@ class ScalaParser(tokens: Array[Token]) {
     val colonTypeOpt = if (COLON) {
       val colonToken = nextToken()
       val type_ = typeOrInfixType(location)
-      Some(colonToken, type_)
+      Some((colonToken, type_))
     } else
       None
     val arrowToken = accept(ARROW)
     val body: StatSeq = if (location != InBlock) StatSeq(None, Some(expr()), Nil) else block()
-    AnonymousFunction(exprElementFlatten2(implicitToken, id, colonTypeOpt), arrowToken, body)
+    AnonymousFunction(exprElementFlatten2((implicitToken, id, colonTypeOpt)), arrowToken, body)
   }
 
   private final val otherLetters = Set[Char]('\u0024', '\u005F') // '$' and '_'
@@ -750,9 +748,9 @@ class ScalaParser(tokens: Array[Token]) {
       val unaryId = PrefixExprElement(ident())
       if (isMinus && isNumericLit) {
         val literal_ = literal()
-        simpleExprRest(exprElementFlatten2(unaryId, literal_), true)
+        simpleExprRest(exprElementFlatten2((unaryId, literal_)), true)
       } else
-        List(Expr(exprElementFlatten2(unaryId, simpleExpr())))
+        List(Expr(exprElementFlatten2((unaryId, simpleExpr()))))
     } else
       simpleExpr()
   }
@@ -793,7 +791,7 @@ class ScalaParser(tokens: Array[Token]) {
         require(newLineOpt.isEmpty)
         val dot = nextToken()
         val selector_ = selector()
-        val callExpr = CallExpr(Some(previousPart, dot), selector_, None, Nil, None)
+        val callExpr = CallExpr(Some((previousPart, dot)), selector_, None, Nil, None)
         simpleExprRest(List(callExpr), canApply = true)
       case LBRACKET ⇒
         require(newLineOpt.isEmpty)
@@ -803,10 +801,10 @@ class ScalaParser(tokens: Array[Token]) {
           val updatedPart = previousPart match {
             case List(callExpr: CallExpr) ⇒
               if (callExpr.typeArgsOpt.isDefined || callExpr.newLineOptsAndArgumentExprss.nonEmpty)
-                exprElementFlatten2(previousPart, newLineOpt, typeArgs_) // TODO: put these into some new type of AST node
+                exprElementFlatten2((previousPart, newLineOpt, typeArgs_)) // TODO: put these into some new type of AST node
               else
                 List(callExpr.copy(typeArgsOpt = Some(typeArgs_)))
-            case _ ⇒ exprElementFlatten2(previousPart, newLineOpt, typeArgs_)
+            case _ ⇒ exprElementFlatten2((previousPart, newLineOpt, typeArgs_))
           }
           simpleExprRest(updatedPart, canApply = true)
         } else
@@ -814,8 +812,8 @@ class ScalaParser(tokens: Array[Token]) {
       case LPAREN | LBRACE if canApply ⇒
         val argumentExprs_ = argumentExprs().get
         val updatedPart = previousPart match {
-          case List(callExpr: CallExpr) ⇒ List(callExpr.copy(newLineOptsAndArgumentExprss = callExpr.newLineOptsAndArgumentExprss :+ (newLineOpt, argumentExprs_)))
-          case _                        ⇒ exprElementFlatten2(previousPart, newLineOpt, argumentExprs_)
+          case List(callExpr: CallExpr) ⇒ List(callExpr.copy(newLineOptsAndArgumentExprss = callExpr.newLineOptsAndArgumentExprss :+ ((newLineOpt, argumentExprs_))))
+          case _                        ⇒ exprElementFlatten2((previousPart, newLineOpt, argumentExprs_))
         }
         simpleExprRest(updatedPart, canApply = true)
       case USCORE ⇒
@@ -955,7 +953,7 @@ class ScalaParser(tokens: Array[Token]) {
       val colonTypeOpt = if (COLON) {
         val colonToken = nextToken()
         val compoundType_ = Some(TypeExprElement(compoundType()))
-        Some(colonToken, compoundType_)
+        Some((colonToken, compoundType_))
       } else
         None
       makeExpr(firstPattern, colonTypeOpt)
@@ -984,10 +982,10 @@ class ScalaParser(tokens: Array[Token]) {
             lookahead(1) match {
               case RBRACE if isXML ⇒
                 val starToken = nextToken()
-                return exprElementFlatten2(simplePattern1, starToken)
+                return exprElementFlatten2((simplePattern1, starToken))
               case RPAREN if !isXML ⇒
                 val starToken = nextToken()
-                return exprElementFlatten2(simplePattern1, starToken)
+                return exprElementFlatten2((simplePattern1, starToken))
               case _ ⇒
             }
           case _ ⇒
@@ -1019,7 +1017,7 @@ class ScalaParser(tokens: Array[Token]) {
             if (LBRACKET) Some(List(TypeExprElement(typeArgs())))
             else None
           val argumentPatternsOpt = if (LPAREN) Some(argumentPatterns()) else None
-          exprElementFlatten2((id, literalOpt), typeArgsOpt, argumentPatternsOpt)
+          exprElementFlatten2(((id, literalOpt), typeArgsOpt, argumentPatternsOpt))
         case USCORE ⇒
           exprElementFlatten2(nextToken())
         case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | INTERPOLATION_ID |
@@ -1027,7 +1025,7 @@ class ScalaParser(tokens: Array[Token]) {
           exprElementFlatten2(literal(inPattern = true))
         case LPAREN ⇒
           val (lparen, patterns_, rparen) = makeParens(noSeq.patterns)
-          exprElementFlatten2(lparen, patterns_, rparen)
+          exprElementFlatten2((lparen, patterns_, rparen))
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
           exprElementFlatten2(xmlLiteralPattern())
         case _ ⇒
@@ -1069,7 +1067,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def argumentPatterns(): List[ExprElement] = {
     val (lparen, patterns_, rparen) = inParens { if (RPAREN) Nil else seqPatterns() }
-    exprElementFlatten2(lparen, patterns_, rparen)
+    exprElementFlatten2((lparen, patterns_, rparen))
   }
 
   private def accessQualifierOpt(): Option[AccessQualifier] =
@@ -1165,12 +1163,10 @@ class ScalaParser(tokens: Array[Token]) {
       val id = ident()
       if (COLON || !forgiving) {
         val colonToken = accept(COLON)
-        val paramType_ = paramType()
-        val paramTypeOpt = Some(colonToken, paramType_)
+        val paramTypeOpt = Some((colonToken, paramType()))
         val defaultValueOpt = if (EQUALS) {
           val equalsToken = nextToken()
-          val expr_ = expr()
-          Some(equalsToken, expr_)
+          Some((equalsToken, expr()))
         } else
           None
         Param(annotations_, modifiers_.toList, valOrVarOpt, id, paramTypeOpt, defaultValueOpt)
@@ -1261,11 +1257,9 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def bound(tokenType: TokenType): Option[(Token, Type)] = {
-    if (tokenType) {
-      val token = nextToken()
-      val type_ = typ()
-      Some(token, type_)
-    } else
+    if (tokenType)
+      Some((nextToken(), typ()))
+    else
       None
   }
 
@@ -1302,7 +1296,7 @@ class ScalaParser(tokens: Array[Token]) {
         val id = ident()
         if (DOT) {
           val dot = nextToken()
-          loop(idDots :+ (id, dot))
+          loop(idDots :+ ((id, dot)))
         } else
           makeExpr(initialSelection, idDots, id)
     }
@@ -1358,7 +1352,7 @@ class ScalaParser(tokens: Array[Token]) {
       // } else
 
       val clause = expr()
-      Some(equalsToken, clause)
+      Some((equalsToken, clause))
     } else
       None
     PatDefOrDcl(valOrVarToken, pattern_, otherPatterns.toList, typedOpt_, equalsClauseOption)
@@ -1455,8 +1449,7 @@ class ScalaParser(tokens: Array[Token]) {
     val extraTypeDclStuff = currentTokenType match {
       case EQUALS ⇒
         val equalsToken = nextToken()
-        val typ_ = typ()
-        Left(equalsToken, typ_)
+        Left((equalsToken, typ()))
       case SUPERTYPE | SUBTYPE | SEMI | NEWLINE | NEWLINES | COMMA | RBRACE | EOF /* <-- for Scalariform tests */ ⇒
         val typeBounds_ = typeBounds()
         Right(typeBounds_)
@@ -1782,7 +1775,7 @@ class ScalaParser(tokens: Array[Token]) {
       if (initialSemis.isEmpty)
         otherStatSeq
       else {
-        val otherStats = (initialSemis.init.toList.map((_, None)) :+ (initialSemis.last, otherStatSeq.firstStatOpt)) ++ otherStatSeq.otherStats
+        val otherStats = (initialSemis.init.toList.map((_, None)) :+ ((initialSemis.last, otherStatSeq.firstStatOpt))) ++ otherStatSeq.otherStats
         StatSeq(selfReferenceOpt = None, firstStatOpt = None, otherStats = otherStats)
       }
     }
