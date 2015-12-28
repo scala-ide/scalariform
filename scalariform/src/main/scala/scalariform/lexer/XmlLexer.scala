@@ -14,10 +14,6 @@ trait XmlLexer { self: ScalaLexer ⇒
 
   private def tagMode = xmlMode.isTagMode
 
-  private def tagMode_=(isTagMode: Boolean) {
-    xmlMode.isTagMode = isTagMode
-  }
-
   private def moreXmlToCome: Boolean = {
     // Amount of scanning ahead required is unlimited, so we can't use the circular buffer:
     val newReader = reader.copy.buffered

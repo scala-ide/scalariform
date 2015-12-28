@@ -14,7 +14,7 @@ trait ModeStack { self: ScalaLexer ⇒
   modeStack.push(new ScalaMode)
 
   protected def popMode() {
-    val mode = modeStack.pop()
+    modeStack.pop()
   }
 
   protected def isRootMode = modeStack.size == 1

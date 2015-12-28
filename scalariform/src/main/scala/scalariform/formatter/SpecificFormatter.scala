@@ -27,7 +27,6 @@ trait SpecificFormatter {
   def fullFormat(source: String, lineDelimiter: Option[String] = None, scalaVersion: String = ScalaVersions.DEFAULT_VERSION)(baseFormattingPreferences: IFormattingPreferences): (List[TextEdit], FormatResult) = {
     import scalariform.parser._
 
-    val startTime = System.currentTimeMillis
     val tokens = ScalaLexer.tokenise(source, scalaVersion = scalaVersion)
     if (debug) {
       println
@@ -56,9 +55,6 @@ trait SpecificFormatter {
       parseResult)
 
     if (debug) { println("Parse result: " + parseResult) }
-    val elapsedTime = System.currentTimeMillis - startTime
-    //     if (debug) 
-    //       println("Parse time = " + elapsedTime + "ms")
     val newlineSequence_ = lineDelimiter.getOrElse(if (source contains "\r\n") "\r\n" else "\n")
 
     val formatter = new ScalaFormatter() {

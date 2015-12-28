@@ -153,8 +153,6 @@ class ScalaParser(tokens: Array[Token]) {
     case _                                   ⇒ false
   }
 
-  private def isTypeIntro: Boolean = isTypeIntroToken(currentTokenType)
-
   private def isStatSeqEnd = RBRACE || EOF
 
   private def isStatSep(tokenType: TokenType) =
@@ -432,7 +430,7 @@ class ScalaParser(tokens: Array[Token]) {
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
 
-  private def interpolatedString(inPattern: Boolean = false): StringInterpolation = {
+  private def interpolatedString(inPattern: Boolean): StringInterpolation = {
     val interpolationId = nextToken()
     val stringPartsAndScala = ListBuffer[(Token, Expr)]()
     while (STRING_PART) {
@@ -508,7 +506,7 @@ class ScalaParser(tokens: Array[Token]) {
       val rparen = accept(RPAREN)
       CondExpr(lparen, expr_, rparen)
     } else {
-      val lparen = accept(LPAREN)
+      accept(LPAREN)
       // Seriously, WTF?
       throw new ScalaParserException("Straggling lparen thing")
     }
@@ -592,7 +590,6 @@ class ScalaParser(tokens: Array[Token]) {
 
       case FOR ⇒
         val forToken = nextToken()
-        val (open, close) = if (LBRACE) (LBRACE, RBRACE) else (LPAREN, RPAREN)
         val (lParenOrBrace, enumerators_, rParenOrBrace) =
           if (LBRACE) inBraces(enumerators())
           else inParens(enumerators())
@@ -718,11 +715,6 @@ class ScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def rotateRight(infixExpr: InfixExpr): InfixExpr = {
-    val NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) = infixExpr
-    InfixExpr(x, op1, newLineOpt1, List(InfixExpr(y, op2, newLineOpt2, z)))
-  }
-
   private def performRotationsForPrecedence(infixExpr: InfixExpr): InfixExpr = infixExpr match {
     case NestedInfixExpr(x, op1, newLineOpt1, y, op2, newLineOpt2, z) if hasHigherPrecedence(op2, op1) ⇒
       InfixExpr(x, op1, newLineOpt1, List(performRotationsForPrecedence(InfixExpr(y, op2, newLineOpt2, z))))
@@ -763,19 +755,6 @@ class ScalaParser(tokens: Array[Token]) {
         List(Expr(exprElementFlatten2(unaryId, simpleExpr())))
     } else
       simpleExpr()
-  }
-
-  private object PathEndingWithDotId {
-    def unapply(tokens: List[Token]) = condOpt(tokens.reverse) {
-      case (lastIdToken) :: dot :: rest if (lastIdToken.tokenType.isId || lastIdToken.tokenType == THIS) && dot.tokenType == DOT ⇒
-        (rest.reverse, dot, lastIdToken)
-    }
-  }
-
-  private object JustIdOrThis {
-    def unapply(tokens: List[Token]) = condOpt(tokens) {
-      case List(idToken) if (idToken.tokenType.isId || idToken.tokenType == THIS) ⇒ idToken
-    }
   }
 
   private def simpleExpr(): List[ExprElement] = {
@@ -973,7 +952,7 @@ class ScalaParser(tokens: Array[Token]) {
 
     def pattern1(): Expr = {
       val firstPattern = pattern2()
-      val colonTypeOpt = if (COLON) { // TODO: case Ident(name) if (treeInfo.isVarPattern(p) && in.token == COLON)
+      val colonTypeOpt = if (COLON) {
         val colonToken = nextToken()
         val compoundType_ = Some(TypeExprElement(compoundType()))
         Some(colonToken, compoundType_)
@@ -1246,7 +1225,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def typeParamClauseOpt(allowVariance: Boolean): Option[TypeParamClause] = {
     def typeParam(): TypeParam = {
       val typeElements = ListBuffer[TypeElementFlattenable]()
-      if (allowVariance && isIdent) { // TODO: condition 
+      if (allowVariance && isIdent) { // TODO: condition
         if (PLUS)
           typeElements += VarianceTypeElement(nextToken())
         else if (MINUS)
@@ -1374,7 +1353,7 @@ class ScalaParser(tokens: Array[Token]) {
     val equalsClauseOption = if (EQUALS) { // TODO: Check cond
       val equalsToken = accept(EQUALS)
       // Skip USCORE check: will be handled by expr() anyway
-      // if (USCORE) { // TODO: check cond 
+      // if (USCORE) { // TODO: check cond
       //   nextToken()
       // } else
 
@@ -1983,12 +1962,6 @@ class ScalaParser(tokens: Array[Token]) {
     ((first.isLower && first.isLetter) || first == '_')
   }
 
-  private def isVarPattern(token: Token) = {
-    isIdent(token.tokenType) &&
-      isVariableName(token.text) &&
-      !token.text.startsWith("`")
-  }
-
   private def optional[T](p: ⇒ T): Option[T] =
     or(Some(p), None)
 
@@ -2011,16 +1984,6 @@ class ScalaParser(tokens: Array[Token]) {
       Some(token)
     } else
       None
-  }
-
-  private def log[T](s: String)(f: ⇒ T): T = {
-    if (logging) {
-      println("Enter " + s + " [" + currentToken + "]")
-      val result = f
-      println("Exit " + s + " [" + currentToken + "]")
-      result
-    } else
-      f
   }
 
 }
@@ -2108,4 +2071,3 @@ case class TemplateOpt(templateInheritanceSectionOpt: Option[TemplateInheritance
 case class PrePackageBlock(name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) {
   def complete(packageToken: Token) = PackageBlock(packageToken, name, newlineOpt, lbrace, topStats, rbrace)
 }
-

@@ -10,7 +10,7 @@ import scalariform.formatter.preferences._
 trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with ExprFormatter with ScalaFormatter ⇒
 
   def format(tmplDef: TmplDef)(implicit formatterState: FormatterState): FormatResult = {
-    val TmplDef(markerTokens, name, typeParamClauseOpt, annotations, accessModifierOpt, paramClausesOpt, templateInheritanceSectionOpt, templateBodyOption) = tmplDef
+    val TmplDef(_, _, typeParamClauseOpt, annotations, accessModifierOpt, paramClausesOpt, templateInheritanceSectionOpt, templateBodyOption) = tmplDef
     var formatResult: FormatResult = NoFormatResult
     for (typeParamClause ← typeParamClauseOpt)
       formatResult ++= format(typeParamClause.contents)

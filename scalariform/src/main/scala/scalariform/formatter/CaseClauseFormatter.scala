@@ -78,7 +78,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
           val newlineBeforeClause = hiddenPredecessors(caseClause.firstToken).containsNewline ||
             previousCaseClauseEndsWithNewline(caseClause, caseClausesAstNode)
 
-          // To evaluate whether a clause body is multiline, we ignore a trailing newline: 
+          // To evaluate whether a clause body is multiline, we ignore a trailing newline:
           val clauseBodyIsMultiline = containsNewline(pruneTrailingNewline(statSeq)) ||
             statSeq.firstTokenOption.exists(hiddenPredecessors(_).containsNewline)
 
@@ -99,7 +99,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
   }
 
   private def formatCasePattern(casePattern: CasePattern, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {
-    val CasePattern(caseToken: Token, pattern: Expr, guardOption: Option[Guard], arrow: Token) = casePattern
+    val CasePattern(_, pattern: Expr, guardOption: Option[Guard], arrow: Token) = casePattern
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(pattern)
     for (guard ← guardOption)

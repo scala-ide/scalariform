@@ -47,7 +47,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def formatStringInterpolation(stringInterpolation: StringInterpolation)(implicit formatterState: FormatterState): FormatResult = {
-    val StringInterpolation(interpolationId, stringPartsAndScala, terminalString) = stringInterpolation
+    val StringInterpolation(_, stringPartsAndScala, terminalString) = stringInterpolation
     var formatResult: FormatResult = NoFormatResult
     formatResult = formatResult.before(terminalString, Compact)
     for ((stringPart, scala) ← stringPartsAndScala) {
@@ -66,7 +66,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(ascriptionExpr: AscriptionExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val AscriptionExpr(left: List[ExprElement], colon: Token, right: List[ExprElement]) = ascriptionExpr
+    val AscriptionExpr(left: List[ExprElement], _, right: List[ExprElement]) = ascriptionExpr
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = formatterState
     val (leftFormatResult, updatedFormatterState) = formatExprElements(left)
@@ -77,7 +77,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(equalsExpr: EqualsExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val EqualsExpr(lhs: List[ExprElement], equals: Token, rhs: Expr) = equalsExpr
+    val EqualsExpr(lhs: List[ExprElement], _, rhs: Expr) = equalsExpr
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = formatterState
     val (leftFormatResult, updatedFormatterState) = formatExprElements(lhs)
@@ -92,7 +92,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(matchExpr: MatchExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val MatchExpr(left: List[ExprElement], matchToken: Token, block: BlockExpr) = matchExpr
+    val MatchExpr(left: List[ExprElement], _, block: BlockExpr) = matchExpr
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = formatterState
     val (leftFormatResult, updatedFormatterState) = formatExprElements(left)
@@ -111,7 +111,6 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for ((previousElementOption, element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
       previousElementOption match {
         case Some(previousElement) ⇒
-          var nestedFormatterState = currentFormatterState
           val instructionOption = condOpt(previousElement, element) {
             case (PrefixExprElement(_), _) ⇒ if (Chars.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact
             case (Argument(_), _) ⇒ Compact
@@ -275,7 +274,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def format(anonymousFunction: AnonymousFunction)(implicit formatterState: FormatterState): FormatResult = { // <-- Also formatted specially in BlockExpr
-    val AnonymousFunction(parameters, arrow, body) = anonymousFunction
+    val AnonymousFunction(parameters, _, body) = anonymousFunction
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(parameters)
     val bodyFirstTokenOpt = body.tokens.headOption
@@ -329,7 +328,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     var formatResult: FormatResult = NoFormatResult
 
     var argumentFormatterState = formatterState
-    val ParenArgumentExprs(lparen, contents, rparen) = parenArguments
+    val ParenArgumentExprs(_, contents, _) = parenArguments
 
     /* Force a newline for the first argument if this is a set of
      *   multi line arguments:
@@ -426,7 +425,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(tryExpr: TryExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val TryExpr(tryToken: Token, body: Expr, catchClauseOption: Option[CatchClause], finallyClauseOption: Option[(Token, Expr)]) = tryExpr
+    val TryExpr(_, body: Expr, catchClauseOption: Option[CatchClause], finallyClauseOption: Option[(Token, Expr)]) = tryExpr
     var formatResult: FormatResult = NoFormatResult
 
     // TODO: similar to first half of ifExpr, whileExpr etc
@@ -501,7 +500,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(ifExpr: IfExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val IfExpr(ifToken: Token, condExpr: CondExpr, newlinesOpt: Option[Token], body: Expr, elseClauseOption: Option[ElseClause]) = ifExpr
+    val IfExpr(_, condExpr: CondExpr, newlinesOpt: Option[Token], body: Expr, elseClauseOption: Option[ElseClause]) = ifExpr
     var formatResult: FormatResult = NoFormatResult
 
     // TODO: Same as first half of whileExpr
@@ -559,7 +558,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(condExpr: CondExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val CondExpr(lparen: Token, condition: Expr, rparen: Token) = condExpr
+    val CondExpr(_, condition: Expr, _) = condExpr
     format(condition)
   }
 
@@ -567,8 +566,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(forExpr: ForExpr)(implicit formatterState: FormatterState): FormatResult = {
     val ForExpr(
-      forToken: Token,
-      lParenOrBrace: Token,
+      _,
+      _,
       enumerators: Enumerators,
       rParenOrBrace: Token,
       newlinesOpt: Option[Token],
@@ -649,7 +648,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(generator: Generator)(implicit formatterState: FormatterState): FormatResult = {
-    val Generator(valOption: Option[Token], pattern: Expr, equalsOrArrowToken: Token, expr: Expr, guards: List[Guard]) = generator
+    val Generator(_, pattern: Expr, _, expr: Expr, guards: List[Guard]) = generator
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(expr)
     formatResult ++= format(pattern)
@@ -659,13 +658,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def format(guard: Guard)(implicit formatterState: FormatterState): FormatResult = {
-    val Guard(ifToken: Token, expr: Expr) = guard
+    val Guard(_, expr: Expr) = guard
     format(expr)
   }
 
   private def format(whileExpr: WhileExpr)(implicit formatterState: FormatterState): FormatResult = {
     // TODO: Same as first half of ifExpr
-    val WhileExpr(whileToken: Token, condExpr: CondExpr, newlinesOpt: Option[Token], body: Expr) = whileExpr
+    val WhileExpr(_, condExpr: CondExpr, newlinesOpt: Option[Token], body: Expr) = whileExpr
     var formatResult: FormatResult = NoFormatResult
 
     formatResult ++= format(condExpr)
@@ -695,7 +694,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(doExpr: DoExpr)(implicit formatterState: FormatterState): FormatResult = {
     var formatResult: FormatResult = NoFormatResult
-    val DoExpr(doToken: Token, body: Expr, statSepOpt: Option[Token], whileToken: Token, condExpr: CondExpr) = doExpr
+    val DoExpr(_, body: Expr, statSepOpt: Option[Token], whileToken: Token, condExpr: CondExpr) = doExpr
 
     val bodyIsABlock = isBlockExpr(body)
     val indentBody = !bodyIsABlock && hiddenPredecessors(body.firstToken).containsNewline
@@ -740,7 +739,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def isBlockExpr(expr: Expr) = expr.contents.size == 1 && expr.contents(0).isInstanceOf[BlockExpr]
 
   def format(blockExpr: BlockExpr, indent: Boolean)(implicit formatterState: FormatterState): FormatResult = {
-    val BlockExpr(lbrace: Token, caseClausesOrStatSeq: Either[CaseClauses, StatSeq], rbrace: Token) = blockExpr
+    val BlockExpr(_, caseClausesOrStatSeq: Either[CaseClauses, StatSeq], rbrace: Token) = blockExpr
     var formatResult: FormatResult = NoFormatResult
     val singleLineBlock = !containsNewline(blockExpr)
     val newFormatterState = formatterState.copy(inSingleLineBlock = singleLineBlock)
@@ -866,7 +865,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     }
 
   def format(packageBlock: PackageBlock)(implicit formatterState: FormatterState): FormatResult = {
-    val PackageBlock(packageToken: Token, name: CallExpr, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) = packageBlock
+    val PackageBlock(_, _, newlineOpt: Option[Token], lbrace: Token, topStats: StatSeq, rbrace: Token) = packageBlock
 
     var formatResult: FormatResult = NoFormatResult
     formatResult = newlineOpt match {
@@ -881,11 +880,6 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   def format(fullDefOrDcl: FullDefOrDcl)(implicit formatterState: FormatterState): FormatResult = {
     val FullDefOrDcl(annotations: List[Annotation], modifiers: List[Modifier], defOrDcl: DefOrDcl) = fullDefOrDcl
     var formatResult: FormatResult = NoFormatResult
-    val preAnnotationFormattingInstruction =
-      if (formatterState.inSingleLineBlock)
-        CompactEnsuringGap
-      else
-        formatterState.currentIndentLevelInstruction
     for ((previousAnnotationOpt, annotation, nextAnnotationOpt) ← Utils.withPreviousAndNext(annotations)) {
       formatResult ++= format(annotation)
       for (previousAnnotation ← previousAnnotationOpt) {
@@ -921,7 +915,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   private def format(patDefOrDcl: PatDefOrDcl)(implicit formatterState: FormatterState): FormatResult = {
     var formatResult: FormatResult = NoFormatResult
-    val PatDefOrDcl(valOrVarToken: Token, pattern: Expr, otherPatterns: List[(Token, Expr)], typedOpt: Option[(Token, Type)], equalsClauseOption: Option[(Token, Expr)]) = patDefOrDcl
+    val PatDefOrDcl(_, pattern: Expr, otherPatterns: List[(Token, Expr)], typedOpt: Option[(Token, Type)], equalsClauseOption: Option[(Token, Expr)]) = patDefOrDcl
     formatResult ++= format(pattern)
     for ((comma, otherPattern) ← otherPatterns)
       formatResult ++= format(otherPattern)
@@ -946,8 +940,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   def format(funDefOrDcl: FunDefOrDcl)(implicit formatterState: FormatterState): FormatResult = {
     // TODO: Lots
     var formatResult: FormatResult = NoFormatResult
-    val FunDefOrDcl(defToken: Token, nameToken: Token, typeParamClauseOpt: Option[TypeParamClause], paramClauses: ParamClauses,
-      returnTypeOpt: Option[(Token, Type)], funBodyOpt: Option[FunBody], localDef: Boolean) = funDefOrDcl
+    val FunDefOrDcl(_, _, typeParamClauseOpt: Option[TypeParamClause], paramClauses: ParamClauses,
+      returnTypeOpt: Option[(Token, Type)], funBodyOpt: Option[FunBody], _) = funDefOrDcl
     for (typeParamClause ← typeParamClauseOpt)
       formatResult ++= format(typeParamClause.contents)
     formatResult ++= formatParamClauses(paramClauses)
@@ -980,11 +974,11 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   def formatParamClauses(paramClauses: ParamClauses, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): FormatResult = {
-    val ParamClauses(initialNewlineOpt, paramClausesAndNewlines) = paramClauses
+    val ParamClauses(_, paramClausesAndNewlines) = paramClauses
     var formatResult: FormatResult = NoFormatResult
     var currentFormatterState = formatterState
     for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines. // maybe already done in some cases by format(tmplDef)?
-      val (paramClauseFormatResult, newFormatterState) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
+      val (paramClauseFormatResult, _) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
       formatResult ++= paramClauseFormatResult
     }
     formatResult
@@ -992,7 +986,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   // TODO: Parts of this function might be useful in implementing other alignment features
   protected def calculateParamSectionLengths(param: Param, first: Boolean)(implicit formatterState: FormatterState): Option[ParamSectionLengths] = {
-    val Param(annotations, modifiers, valOrVarOpt, id, paramTypeOpt, defaultValueOpt) = param
+    val Param(annotations, modifiers, valOrVarOpt, id, paramTypeOpt, _) = param
 
     val formattedParam = formattedAstNode(param) {
       format(param)(formatterState)
@@ -1142,8 +1136,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     paramsGroup
   }
 
-  private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
-    val ParamClause(lparen, implicitOption, firstParamOption, otherParams, rparen) = paramClause
+  private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
+    val ParamClause(_, implicitOption, firstParamOption, otherParams, rparen) = paramClause
     val paramIndent = if (doubleIndentParams) 2 else 1
     val relativeToken = paramClause.tokens(1) // TODO
     var formatResult: FormatResult = NoFormatResult
@@ -1299,7 +1293,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(param: Param)(implicit formatterState: FormatterState): FormatResult = {
-    val Param(annotations: List[Annotation], modifiers: List[Modifier], valOrVarOpt: Option[Token], id: Token, paramTypeOpt: Option[(Token, Type)], defaultValueOpt: Option[(Token, Expr)]) = param
+    val Param(annotations: List[Annotation], _, _, _, paramTypeOpt: Option[(Token, Type)], defaultValueOpt: Option[(Token, Expr)]) = param
     var formatResult: FormatResult = NoFormatResult
 
     for (annotation ← annotations) {
@@ -1315,7 +1309,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   protected def format(import_ :ImportClause)(implicit formatterState: FormatterState): FormatResult = {
-    val ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) = import_
+    val ImportClause(_, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) = import_
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(importExpr)
     for ((comma, otherImportExpr) ← otherImportExprs)
@@ -1329,13 +1323,12 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def format(blockImportExpr: BlockImportExpr)(implicit formatterState: FormatterState): FormatResult = {
-    val BlockImportExpr(prefixExpr, importSelectors @ ImportSelectors(lbrace, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace)) = blockImportExpr
+    val BlockImportExpr(prefixExpr, importSelectors @ ImportSelectors(_, firstImportSelector: Expr, otherImportSelectors: List[(Token, Expr)], rbrace)) = blockImportExpr
     var formatResult: FormatResult = NoFormatResult
 
     formatResult ++= format(prefixExpr)
 
     val singleLineBlock = !containsNewline(importSelectors)
-    val newFormatterState = formatterState.copy(inSingleLineBlock = singleLineBlock)
 
     if (singleLineBlock) {
       // We are in a braced import statement like "import foo.{bar=>baz}"

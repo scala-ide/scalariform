@@ -160,8 +160,6 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     case _                                   ⇒ false
   }
 
-  private def isTypeIntro: Boolean = isTypeIntroToken(currentTokenType)
-
   private def isStatSeqEnd = RBRACE || EOF
 
   private def isStatSep(tokenType: TokenType) =
@@ -398,7 +396,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
 
-  private def interpolatedString(inPattern: Boolean = false) {
+  private def interpolatedString(inPattern: Boolean) {
     nextToken()
     while (STRING_PART) {
       nextToken()
@@ -415,7 +413,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
     if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
       throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken)
-    val terminalString = nextToken()
+    nextToken()
   }
 
   private def newLineOpt() { if (NEWLINE) nextToken() }
@@ -451,11 +449,6 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def wildcardType() = {
     typeBounds()
-  }
-
-  private def equalsExpr() = {
-    accept(EQUALS)
-    expr()
   }
 
   private def condExpr() = {
@@ -498,22 +491,21 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           case LPAREN ⇒ inParens(expr())
           case _      ⇒ expr
         }
-        val catchClauseOption =
-          if (!CATCH)
-            None
+        if (!CATCH)
+          None
+        else {
+          nextToken()
+          if (!LBRACE)
+            expr()
           else {
-            nextToken()
-            if (!LBRACE)
-              expr()
-            else {
-              inBraces {
-                if (CASE)
-                  caseClauses()
-                else
-                  expr()
-              }
+            inBraces {
+              if (CASE)
+                caseClauses()
+              else
+                expr()
             }
           }
+        }
         currentTokenType match {
           case FINALLY ⇒
             nextToken()
@@ -537,7 +529,6 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
       case FOR ⇒
         nextToken()
-        val (open, close) = if (LBRACE) (LBRACE, RBRACE) else (LPAREN, RPAREN)
         if (LBRACE) inBraces(enumerators())
         else inParens(enumerators())
         newLinesOpt()
@@ -556,7 +547,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         expr()
 
       case IMPLICIT ⇒
-        val implicitToken = nextToken()
+        nextToken()
         List(implicitClosure(location))
 
       case _ ⇒
@@ -599,18 +590,6 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
     accept(ARROW)
     if (location != InBlock) expr() else block()
-  }
-
-  private final val otherLetters = Set[Char]('\u0024', '\u005F') // '$' and '_'
-  private final val letterGroups = {
-    import java.lang.Character._
-    Set[Byte](LOWERCASE_LETTER, UPPERCASE_LETTER, OTHER_LETTER, TITLECASE_LETTER, LETTER_NUMBER)
-  }
-  private def isScalaLetter(ch: Char) = letterGroups(java.lang.Character.getType(ch).toByte) || otherLetters(ch)
-
-  private def isOpAssignmentName(name: String) = name match {
-    case "!=" | "<=" | ">=" | "" ⇒ false
-    case _                       ⇒ name.endsWith("=") && !name.startsWith("=") && Chars.isOperatorPart(name(0))
   }
 
   private def postfixExpr() {
@@ -663,7 +642,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   private def simpleExprRest(canApply: Boolean) {
-    val newLineOpt = if (canApply) newLineOptWhenFollowedBy(LBRACE) else None
+    if (canApply)
+      newLineOptWhenFollowedBy(LBRACE)
     currentTokenType match {
       case DOT ⇒
         nextToken()
@@ -788,7 +768,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
     def pattern1() {
       pattern2()
-      if (COLON) { // TODO: case Ident(name) if (treeInfo.isVarPattern(p) && in.token == COLON)
+      if (COLON) {
         nextToken()
         compoundType()
       }
@@ -1014,7 +994,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def typeParamClauseOpt(allowVariance: Boolean) {
     def typeParam() {
-      if (allowVariance && isIdent) { // TODO: condition 
+      if (allowVariance && isIdent) { // TODO: condition
         if (PLUS)
           nextToken()
         else if (MINUS)
@@ -1127,7 +1107,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     if (EQUALS) { // TODO: Check cond
       accept(EQUALS)
       // Skip USCORE check: will be handled by expr() anyway
-      // if (USCORE) { // TODO: check cond 
+      // if (USCORE) { // TODO: check cond
       //   nextToken()
       // } else
 
@@ -1343,7 +1323,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           else
             None
       }
-      val statSepOpt = if (!RBRACE && !EOF) acceptStatSep() else None
+      if (!RBRACE && !EOF)
+        acceptStatSep()
     }
   }
 
@@ -1376,13 +1357,13 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def refineStatSeq() {
     while (!isStatSeqEnd) {
-      if (isDclIntro) {
+      if (isDclIntro)
         defOrDcl()
-      } else if (!isStatSep)
+      else if (!isStatSep)
         throw new ScalaParserException("illegal start of definition: " + currentToken)
-      else
-        None
-      val statSepOpt = if (!RBRACE) acceptStatSep() else None
+
+      if (!RBRACE)
+        acceptStatSep()
     }
   }
 
@@ -1608,12 +1589,6 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     ((first.isLower && first.isLetter) || first == '_')
   }
 
-  private def isVarPattern(token: Token) = {
-    isIdent(token.tokenType) &&
-      isVariableName(token.text) &&
-      !token.text.startsWith("`")
-  }
-
   private def optional[T](p: ⇒ T): Option[T] =
     or(Some(p), None)
 
@@ -1639,4 +1614,3 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
 }
-

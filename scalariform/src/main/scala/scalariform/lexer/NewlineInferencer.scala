@@ -108,9 +108,6 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
       return previousToken != null && (TOKENS_WHICH_CAN_END_A_STATEMENT contains previousToken.tokenType)
   }
 
-  private def followingTokenIsClassOrObject(nextToken: Token): Boolean =
-    nextToken != null && (nextToken.tokenType == CLASS || nextToken.tokenType == OBJECT)
-
   private def containsBlankLine(s: String): Boolean = {
     var i = 0
     var inBlankLine = false

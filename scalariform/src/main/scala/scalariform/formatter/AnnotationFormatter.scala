@@ -8,7 +8,7 @@ import scalariform.formatter.preferences._
 trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter with ExprFormatter ⇒
 
   def format(annotation: Annotation)(implicit formatterState: FormatterState): FormatResult = {
-    val Annotation(atToken: Token, annotationType: Type, argumentExprss: List[ArgumentExprs], newlineOption: Option[Token]) = annotation
+    val Annotation(_, annotationType, argumentExprss, newlineOption) = annotation
     var formatResult: FormatResult = NoFormatResult
 
     formatResult = formatResult.before(annotationType.firstToken, Compact)
@@ -21,4 +21,3 @@ trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter wi
   }
 
 }
-

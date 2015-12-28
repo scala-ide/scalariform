@@ -129,10 +129,6 @@ class ScalaLexer(
       untilEof -= 1
   }
 
-  // For debug
-  private def bufferContents: String =
-    (for (n ← 0 until charsInBuffer) yield charBuffer((bufferStart + n) & BUFFER_MASK)).mkString
-
   /**
    * Mark the end of a token of the given type.
    */
@@ -271,7 +267,7 @@ object ScalaLexer {
 
   private val BUFFER_MASK = BUFFER_SIZE - 1
 
-  private def makeRawLexer(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT): ScalaLexer =
+  private def makeRawLexer(s: String, forgiveErrors: Boolean, scalaVersion: ScalaVersion): ScalaLexer =
     new ScalaLexer(new UnicodeEscapeReader(s, forgiveErrors), forgiveErrors, scalaVersion)
 
 }

@@ -168,7 +168,6 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
 
     val startPos = builder.length
     val allWhitespace = hiddenTokens forall { _.isInstanceOf[Whitespace] }
-    var edits: List[TextEdit] = Nil
     instruction match {
       case Compact ⇒ writeIntertokenCompact()
       case CompactEnsuringGap ⇒
@@ -299,7 +298,6 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     }
 
     def currentIndent = {
-      val current = currentColumn
       val lineStart = builder.length - currentColumn
       var pos = lineStart
       while (pos < builder.length && builder(pos).isWhitespace)
@@ -446,19 +444,19 @@ object ScalaFormatter {
     OBJECT, OVERRIDE, PACKAGE, PRIVATE, PROTECTED,
     RETURN, SEALED, /* SUPER, THIS, */
     THROW, TRAIT, TRY, /* TYPE ,*/
-    VAL, VAR, WHILE, WITH, YIELD, 
+    VAL, VAR, WHILE, WITH, YIELD,
     /* USCORE, */ COLON, EQUALS, ARROW, LARROW, RARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /* HASH, AT */
     LBRACE, SEMI)
 
   val ENSURE_SPACE_BEFORE = Set(
-    ABSTRACT, CASE, CATCH, CLASS, DEF, 
+    ABSTRACT, CASE, CATCH, CLASS, DEF,
     /* DO, */  ELSE, EXTENDS, FINAL,
-    FINALLY, /* FOR, */ FORSOME, /* IF, */ IMPLICIT, 
+    FINALLY, /* FOR, */ FORSOME, /* IF, */ IMPLICIT,
     /* IMPORT, */ LAZY, MATCH, /* NEW, */
     OBJECT, OVERRIDE, /* PACKAGE, */ PRIVATE, PROTECTED,
     /* RETURN, */ SEALED, /* SUPER, THIS, */
     /* THROW, */ TRAIT, /* TRY, TYPE, */
-    VAL, VAR, /* WHILE, */ WITH, YIELD, 
+    VAL, VAR, /* WHILE, */ WITH, YIELD,
     /* USCORE, COLON, */ EQUALS, /* ARROW, */ LARROW, RARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /*, HASH, AT, */
     RBRACE)
   // format: ON
