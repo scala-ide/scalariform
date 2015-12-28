@@ -32,7 +32,23 @@ object ScalariformBuild extends Build {
       "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
-    scalacOptions += "-deprecation"
+    scalacOptions ++= (scalaBinaryVersion.value match {
+      case "2.11" => Seq(
+        "-deprecation:false",
+        "-encoding", "UTF-8",
+        "-feature",
+        "-language:_",
+        "-unchecked",
+        "-Xlint",
+        "-Xfuture",
+        "-Xfatal-warnings",
+        "-Yno-adapted-args",
+        "-Ywarn-dead-code",
+        "-Ywarn-unused-import",
+        "-Ywarn-unused"
+      )
+      case _ => Seq()
+    })
   )
 
   lazy val subprojectSettings = commonSettings ++ Seq(
