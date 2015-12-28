@@ -327,7 +327,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val alignArgsEnabled = formattingPreferences(AlignArguments) && !formattingPreferences(IndentWithTabs)
     var formatResult: FormatResult = NoFormatResult
 
-    var argumentFormatterState = formatterState
+    val argumentFormatterState = formatterState
     val ParenArgumentExprs(_, contents, _) = parenArguments
 
     /* Force a newline for the first argument if this is a set of
@@ -976,7 +976,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   def formatParamClauses(paramClauses: ParamClauses, doubleIndentParams: Boolean = false)(implicit formatterState: FormatterState): FormatResult = {
     val ParamClauses(_, paramClausesAndNewlines) = paramClauses
     var formatResult: FormatResult = NoFormatResult
-    var currentFormatterState = formatterState
+    val currentFormatterState = formatterState
     for ((paramClause, newlineOption) ← paramClausesAndNewlines) { // TODO: Newlines. // maybe already done in some cases by format(tmplDef)?
       val (paramClauseFormatResult, _) = formatParamClause(paramClause, doubleIndentParams)(currentFormatterState)
       formatResult ++= paramClauseFormatResult

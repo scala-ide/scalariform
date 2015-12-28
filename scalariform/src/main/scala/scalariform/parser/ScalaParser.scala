@@ -1632,7 +1632,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def templateStatSeq(): StatSeq = {
     val statAndStatSeps = ListBuffer[(Option[Stat], Option[Token])]()
 
-    var selfReferenceOpt = if (isExprIntro) {
+    val selfReferenceOpt = if (isExprIntro) {
       val expr_ = expr(InTemplate)
       if (ARROW) {
         val arrowToken = nextToken()
