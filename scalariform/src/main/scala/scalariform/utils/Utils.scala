@@ -8,8 +8,6 @@ object Utils {
 
   def when[T](b: Boolean)(x: ⇒ T): Option[T] = if (b) Some(x) else None
 
-  def asInstanceOf[T](o: Any) = if (o.isInstanceOf[T]) Some(o.asInstanceOf[T]) else None
-
   def checkNotNull[T](item: T): T = { require(item != null); item }
 
   implicit def boolean2ImpliesWrapper(b: Boolean): ImpliesWrapper = new ImpliesWrapper(b)
@@ -145,4 +143,3 @@ object Utils {
     text.take(range.offset) + replacement + text.drop(range.offset + range.length)
 
 }
-
