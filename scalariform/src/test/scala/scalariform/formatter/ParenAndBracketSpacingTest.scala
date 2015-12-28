@@ -22,7 +22,7 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
     "foo[Bar](baz)[Biz]" ==> "foo[ Bar ](baz)[ Biz ]"
     "foo[Bar][Baz][Buz]" ==> "foo[ Bar ][ Baz ][ Buz ]"
 
-	  """foo(
+    """foo(
       |alpha = "foo",
       |beta = bar match {
       |  case _ => "bar"
@@ -36,7 +36,7 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |  gamma = false
       |)"""
 
-	  """foo(
+    """foo(
       |alpha = "foo",
       |beta = bar(
       |a = 1
@@ -50,7 +50,7 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |  gamma = false
       |)"""
 
-	 """foo(
+    """foo(
       |arg = bar(
       |baz = "a"
       |).xyz

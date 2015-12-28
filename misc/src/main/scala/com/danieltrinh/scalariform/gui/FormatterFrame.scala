@@ -454,8 +454,8 @@ object Samples {
 
   val sample0 =
   """class A {
-	|
-	|}""".stripMargin
+    |
+    |}""".stripMargin
 
   val sample1 =
   """package  foo . bar . baz
@@ -469,4 +469,3 @@ object Samples {
     |
     |}""".stripMargin
 } // format: ON
-
