@@ -38,7 +38,6 @@ class NewlineInferencerTest extends FlatSpec with ShouldMatchers {
         val actualTokenTypes = actualTokens.map(_.tokenType)
         require(actualTokenTypes.last == EOF, "Last token must be EOF, but was " + actualTokens.last.tokenType)
         require(actualTokenTypes.count(_ == EOF) == 1, "There must only be one EOF token")
-        val reconstitutedSource = actualTokens.init.map(_.rawText).mkString
         require(actualTokenTypes.init == expectedTokens, "Tokens do not match. Expected " + expectedTokens + ", but was " + actualTokenTypes.init)
       }
     }
