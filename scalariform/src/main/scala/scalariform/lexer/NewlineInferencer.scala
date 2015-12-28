@@ -140,6 +140,4 @@ object NewlineInferencer {
     ARROW, LARROW, RARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, HASH, LBRACKET, RPAREN, RBRACKET, RBRACE
   )
 
-  private val BLANK_LINE_PATTERN = """(?s).*\n\s*\n.*"""
-
 }

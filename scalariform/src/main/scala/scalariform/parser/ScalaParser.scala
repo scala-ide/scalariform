@@ -491,12 +491,6 @@ class ScalaParser(tokens: Array[Token]) {
     typeBounds()
   }
 
-  private def equalsExpr() = {
-    val equalsToken = accept(EQUALS)
-    val expr_ = expr()
-    (equalsToken, expr_)
-  }
-
   private def condExpr(): CondExpr = {
     if (LPAREN) {
       val lparen = nextToken()
@@ -1911,15 +1905,13 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def xmlLiteralPattern() = xml(isPattern = true)
 
-  private var tokensArray: Array[Token] = tokens.toArray
-
   private var pos = 0
 
   private def currentToken: Token = this(pos)
 
   private def apply(pos: Int): Token =
-    if (pos < tokensArray.length)
-      tokensArray(pos)
+    if (pos < tokens.length)
+      tokens(pos)
     else
       tokens.last
 

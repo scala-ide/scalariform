@@ -9,8 +9,6 @@ trait ModeStack { self: ScalaLexer ⇒
 
   private val modeStack = new Stack[LexerMode]
 
-  private var currentRegionStart: Int = 0
-
   modeStack.push(new ScalaMode)
 
   protected def popMode() {
