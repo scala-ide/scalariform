@@ -32,7 +32,6 @@ object ScalariformBuild extends Build {
       "2.9.3", "2.9.2" //"2.9.1-1", "2.9.1", "2.9.0-1", "2.9.0"
     ),
     exportJars := true, // Needed for cli oneJar
-    retrieveManaged := true,
     scalacOptions += "-deprecation"
   )
 
