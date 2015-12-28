@@ -1,7 +1,6 @@
 package scalariform.lexer
 
 import java.io.File
-import scala.annotation._
 import scala.collection.mutable.{ Queue, ListBuffer }
 import scala.io.Source
 import scala.math.min

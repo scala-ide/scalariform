@@ -1,6 +1,5 @@
 package scalariform.formatter
 
-import scalariform.lexer.Tokens._
 import scalariform.lexer.Token
 import scalariform.parser._
 import scalariform.utils._
@@ -35,7 +34,7 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         formatResult = formatResult.before(element.firstToken, instruction)
       }
       //      else if (previousElement.isInstanceOf[CallByNameTypeElement])
-      //	formatResult = formatResult.before(element.firstToken, Compact)
+      //  formatResult = formatResult.before(element.firstToken, Compact)
       formatResult ++= format(element)
     }
     formatResult
@@ -61,4 +60,3 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
 }
-

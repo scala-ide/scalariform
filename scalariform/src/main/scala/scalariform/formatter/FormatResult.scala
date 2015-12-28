@@ -1,9 +1,6 @@
 package scalariform.formatter
 
-import scalariform.lexer.Tokens._
 import scalariform.lexer._
-import scalariform.parser._
-import scalariform.utils._
 
 object FormatResult {
 

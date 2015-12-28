@@ -1,11 +1,9 @@
 package scalariform.formatter
 
 import scalariform.lexer.Token
-import scalariform.lexer.Tokens._
 import scalariform.parser._
 import scalariform.utils.Utils
 import scalariform.utils.TextEditProcessor
-import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
 import Alignment._
 import PartialFunction._

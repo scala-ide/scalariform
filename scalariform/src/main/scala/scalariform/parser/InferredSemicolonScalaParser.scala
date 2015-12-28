@@ -2,7 +2,6 @@ package scalariform.parser
 
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
-import scalariform.utils.Utils._
 import scala.collection.mutable.ListBuffer
 import PartialFunction._
 

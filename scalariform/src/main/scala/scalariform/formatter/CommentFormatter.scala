@@ -1,7 +1,5 @@
 package scalariform.formatter
 
-import scalariform.parser._
-import scalariform.utils._
 import scalariform.lexer._
 import scalariform.formatter.preferences._
 import scala.annotation.tailrec

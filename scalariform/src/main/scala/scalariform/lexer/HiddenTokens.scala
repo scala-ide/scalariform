@@ -1,6 +1,5 @@
 package scalariform.lexer
 
-import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 
 object NoHiddenTokens extends HiddenTokens(Nil)

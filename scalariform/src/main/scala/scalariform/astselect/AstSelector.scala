@@ -3,7 +3,6 @@ package scalariform.astselect
 import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils.Range
-import scalariform.utils.Utils._
 import scala.util.control.Exception._
 import scalariform.ScalaVersions
 

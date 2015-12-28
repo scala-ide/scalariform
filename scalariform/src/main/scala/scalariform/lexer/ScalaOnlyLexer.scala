@@ -3,7 +3,6 @@ package scalariform.lexer
 import scala.annotation._
 import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.Chars._
-import scalariform.lexer.ScalaLexer._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
 import scalariform._

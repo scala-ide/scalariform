@@ -3,9 +3,7 @@ package scalariform.formatter
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.parser._
-import scalariform.utils.Utils._
 import scalariform.utils._
-import scalariform.utils.BooleanLang._
 import scalariform.formatter.preferences._
 import PartialFunction._
 import scalariform.ScalaVersions

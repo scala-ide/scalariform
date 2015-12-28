@@ -1,5 +1,4 @@
 package scalariform.formatter
-import scala.util.parsing.input._
 import scala.util.parsing.combinator._
 
 class FormatterDirectiveParser extends JavaTokenParsers {

@@ -1,7 +1,6 @@
 package scalariform.formatter
 
 import scalariform.formatter.Alignment._
-import scalariform.formatter.AnnotationFormatter
 import scalariform.lexer.Chars
 import scalariform.lexer.Token
 import scalariform.lexer.Tokens._

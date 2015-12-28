@@ -2,10 +2,9 @@ package scalariform.formatter
 
 import scalariform.parser._
 import Math._
-import scalariform.formatter.preferences._
 
 // For now, this is just a place to store alignment related functionality.
-// TOOD: refactor duplicate behavior in here 
+// TOOD: refactor duplicate behavior in here
 object Alignment {
   type EitherAlignableParam = Either[ConsecutiveSingleLineParams, Param]
   type EitherAlignableEqualsExpr = Either[ConsecutiveSingleLineEqualsExprs, CallExpr]
