@@ -1,7 +1,5 @@
 package scalariform.utils
 
-import scala.math.Ordering
-
 case class Range(offset: Int, length: Int) {
 
   def contains(other: Range) = other.offset >= offset && other.offset + other.length <= offset + length

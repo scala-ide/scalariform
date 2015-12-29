@@ -68,16 +68,16 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
       token.associatedWhitespaceAndComments.rawTokens :+ token
   }
 
+  def expandSelection(initialSelection: Range): Option[Range] =
+    expandToToken(initialSelection) orElse
+      expandScaladocToAssociatedNode(initialSelection) orElse
+      (compilationUnitOpt flatMap { expandToEnclosingAst(_, initialSelection, enclosingNodes = Nil) })
+
   private def previousToken(token: Token): Option[Token] =
     tokens.indexOf(token) match {
       case 0 | -1 ⇒ None
       case n      ⇒ Some(tokens(n - 1))
     }
-
-  def expandSelection(initialSelection: Range): Option[Range] =
-    expandToToken(initialSelection) orElse
-      expandScaladocToAssociatedNode(initialSelection) orElse
-      (compilationUnitOpt flatMap { expandToEnclosingAst(_, initialSelection, enclosingNodes = Nil) })
 
   /**
    * If a Scaladoc comment is exactly selected, expand to an associated class, method etc.

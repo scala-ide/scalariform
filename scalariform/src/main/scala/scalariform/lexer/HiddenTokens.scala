@@ -33,7 +33,6 @@ case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken]
   lazy val text: String = {
     val sb = new StringBuilder
     for (token ← tokens) sb.append(token.text)
-    //    tokens.flatMap(_.token.text)(scala.collection.breakOut)
     sb.toString
   }
   lazy val rawText = tokens.map(_.token.rawText).mkString

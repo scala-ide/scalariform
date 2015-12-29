@@ -2,7 +2,6 @@ package scalariform.formatter
 
 import scalariform.lexer.Token
 import scalariform.parser._
-import scalariform.utils._
 import scalariform.lexer.Tokens
 import scalariform.formatter.preferences._
 import scalariform.lexer.Chars
@@ -13,7 +12,7 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
   def format(typeElements: List[TypeElement])(implicit formatterState: FormatterState): FormatResult = {
     var formatResult = format(typeElements.head)
-    for ((previousElement, element) ← Utils.stagger(typeElements)) {
+    for ((previousElement, element) ← typeElements zip typeElements.tail) {
       if (previousElement.isInstanceOf[Annotation] ||
         previousElement.isInstanceOf[Refinement] ||
         previousElement.isInstanceOf[InfixTypeConstructor] ||

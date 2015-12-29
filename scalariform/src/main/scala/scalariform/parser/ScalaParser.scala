@@ -2,7 +2,6 @@ package scalariform.parser
 
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
-import scalariform.utils.Utils._
 import scalariform.ScalaVersions
 import scala.collection.mutable.ListBuffer
 import scala.PartialFunction._
@@ -15,39 +14,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   import ScalaParser._
 
-  def safeParse[T](production: ⇒ T): Option[T] = try Some(production) catch { case e: ScalaParserException ⇒ None }
-
-  require(!tokens.isEmpty) // at least EOF
-
-  def inParens[T](body: ⇒ T): (Token, T, Token) = {
-    val openToken = accept(LPAREN)
-    val contents = body
-    val closeToken = accept(RPAREN)
-    (openToken, contents, closeToken)
-  }
-
-  def inBraces[T](body: ⇒ T): (Token, T, Token) = {
-    val openToken = accept(LBRACE)
-    val contents = body
-    val closeToken = accept(RBRACE)
-    (openToken, contents, closeToken)
-  }
-
-  def dropAnyBraces[T](body: ⇒ Expr): Expr =
-    if (LBRACE) {
-      val (lbrace, contents, rbrace) = inBraces(body)
-      makeExpr(lbrace, contents, rbrace)
-    } else
-      body
-
-  def inBrackets[T](body: ⇒ T): (Token, T, Token) = {
-    val openToken = accept(LBRACKET)
-    val contents = body
-    val closeToken = accept(RBRACKET)
-    (openToken, contents, closeToken)
-  }
-
-  def makeParens[T](body: ⇒ T) = inParens { if (RPAREN) None else Some(body) }
+  def safeParse[T](production: ⇒ T): Option[T] =
+    try Some(production) catch { case e: ScalaParserException ⇒ None }
 
   def compilationUnitOrScript(): CompilationUnit = {
     val originalPos = pos
@@ -63,7 +31,39 @@ class ScalaParser(tokens: Array[Token]) {
     }
   }
 
-  def scriptBody(): CompilationUnit = {
+  require(!tokens.isEmpty) // at least EOF
+
+  private def inParens[T](body: ⇒ T): (Token, T, Token) = {
+    val openToken = accept(LPAREN)
+    val contents = body
+    val closeToken = accept(RPAREN)
+    (openToken, contents, closeToken)
+  }
+
+  private def inBraces[T](body: ⇒ T): (Token, T, Token) = {
+    val openToken = accept(LBRACE)
+    val contents = body
+    val closeToken = accept(RBRACE)
+    (openToken, contents, closeToken)
+  }
+
+  private def dropAnyBraces[T](body: ⇒ Expr): Expr =
+    if (LBRACE) {
+      val (lbrace, contents, rbrace) = inBraces(body)
+      makeExpr(lbrace, contents, rbrace)
+    } else
+      body
+
+  private def inBrackets[T](body: ⇒ T): (Token, T, Token) = {
+    val openToken = accept(LBRACKET)
+    val contents = body
+    val closeToken = accept(RBRACKET)
+    (openToken, contents, closeToken)
+  }
+
+  private def makeParens[T](body: ⇒ T) = inParens { if (RPAREN) None else Some(body) }
+
+  private[scalariform] def scriptBody(): CompilationUnit = {
     val stmts = templateStats()
     val eofToken = accept(EOF)
     CompilationUnit(stmts, eofToken)
@@ -423,9 +423,9 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def literal(inPattern: Boolean = false): List[ExprElement] =
-    if (INTERPOLATION_ID) {
+    if (INTERPOLATION_ID)
       List(interpolatedString(inPattern))
-    } else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
+    else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
       exprElementFlatten2(nextToken())
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
@@ -1993,7 +1993,7 @@ object ScalaParser {
       case (GeneralTokens(_), GeneralTokens(_)) ⇒ true
       case _                                    ⇒ false
     }
-    val groups = groupBy(eq, xs)
+    val groups = scalariform.utils.Utils.groupBy(eq, xs)
     groups map { group ⇒
       {
         val item = group.head

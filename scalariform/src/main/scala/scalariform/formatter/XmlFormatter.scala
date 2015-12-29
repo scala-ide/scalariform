@@ -9,7 +9,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
 
   def format(xmlExpr: XmlExpr)(implicit formatterState: FormatterState): FormatResult = {
     if (formattingPreferences(FormatXml)) {
-      val XmlExpr(first: XmlContents, otherElements: List[XmlContents]) = xmlExpr
+      val XmlExpr(first, otherElements) = xmlExpr
       var formatResult: FormatResult = NoFormatResult
       formatResult ++= format(first)
       val nestedFormatterState =
@@ -32,7 +32,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
   }
 
   def format(xmlEmpty: XmlEmptyElement)(implicit formatterState: FormatterState): FormatResult = {
-    val XmlEmptyElement(_, _, attributes: List[(Option[Token], XmlAttribute)], whitespaceOption, _) = xmlEmpty
+    val XmlEmptyElement(_, _, attributes, whitespaceOption, _) = xmlEmpty
     var formatResult: FormatResult = NoFormatResult
     for ((whitespaceOption2, attribute) ← attributes) {
       for (whitespace ← whitespaceOption2 if formattingPreferences(FormatXml))
@@ -46,7 +46,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
 
   // TODO: Dup with XmlEmptyElement
   def format(xmlStart: XmlStartTag)(implicit formatterState: FormatterState): FormatResult = {
-    val XmlStartTag(_, _, attributes: List[(Option[Token], XmlAttribute)], whitespaceOption, _) = xmlStart
+    val XmlStartTag(_, _, attributes, whitespaceOption, _) = xmlStart
     var formatResult: FormatResult = NoFormatResult
     for ((whitespaceOption2, attribute) ← attributes) {
       for (whitespace ← whitespaceOption2 if formattingPreferences(FormatXml))
@@ -67,7 +67,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
   }
 
   def format(xmlAttribute: XmlAttribute)(implicit formatterState: FormatterState): FormatResult = {
-    val XmlAttribute(_, whitespaceOption, _, whitespaceOption2, valueOrEmbeddedScala: Either[Token, Expr]) = xmlAttribute
+    val XmlAttribute(_, whitespaceOption, _, whitespaceOption2, valueOrEmbeddedScala) = xmlAttribute
     var formatResult: FormatResult = NoFormatResult
     for (whitespace ← whitespaceOption if formattingPreferences(FormatXml))
       formatResult = formatResult.replaceXml(whitespace, "")
@@ -79,7 +79,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
   }
 
   def format(xmlNonEmpty: XmlNonEmptyElement)(implicit formatterState: FormatterState): FormatResult = {
-    val XmlNonEmptyElement(startTag: XmlStartTag, contents: List[XmlContents], endTag: XmlEndTag) = xmlNonEmpty
+    val XmlNonEmptyElement(startTag, contents, endTag) = xmlNonEmpty
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(startTag)
     val nestedFormatterState =

@@ -2,12 +2,11 @@ package scalariform.parser
 
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
-import scala.collection.mutable.ListBuffer
 import PartialFunction._
 
 object InferredSemicolonScalaParser {
 
-  def findSemicolons(tokens: Array[Token]) = {
+  def findSemicolons(tokens: Array[Token]): Set[Token] = {
     val parser = new InferredSemicolonScalaParser(tokens)
     parser.safeParse(parser.compilationUnitOrScript)
     parser.inferredSemicolons
@@ -19,37 +18,10 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private val logging: Boolean = false
 
-  val forgiving = true
+  private val forgiving = true
 
-  def safeParse[T](production: ⇒ T): Option[T] = try Some(production) catch { case e: ScalaParserException ⇒ None }
-
-  require(!tokens.isEmpty) // at least EOF
-
-  def inParens[T](body: ⇒ T) {
-    accept(LPAREN)
-    body
-    accept(RPAREN)
-  }
-
-  def inBraces[T](body: ⇒ T) {
-    accept(LBRACE)
-    body
-    accept(RBRACE)
-  }
-
-  def dropAnyBraces[T](body: ⇒ Any) =
-    if (LBRACE)
-      inBraces(body)
-    else
-      body
-
-  def inBrackets[T](body: ⇒ T) {
-    accept(LBRACKET)
-    body
-    accept(RBRACKET)
-  }
-
-  def makeParens[T](body: ⇒ T) = inParens { if (RPAREN) None else Some(body) }
+  def safeParse[T](production: ⇒ T): Option[T] =
+    try Some(production) catch { case e: ScalaParserException ⇒ None }
 
   def compilationUnitOrScript() {
     val originalPos = pos
@@ -65,7 +37,35 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  def scriptBody() {
+  require(tokens.nonEmpty) // at least EOF
+
+  private def inParens[T](body: ⇒ T) {
+    accept(LPAREN)
+    body
+    accept(RPAREN)
+  }
+
+  private def inBraces[T](body: ⇒ T) {
+    accept(LBRACE)
+    body
+    accept(RBRACE)
+  }
+
+  private def dropAnyBraces[T](body: ⇒ Any) =
+    if (LBRACE)
+      inBraces(body)
+    else
+      body
+
+  private def inBrackets[T](body: ⇒ T) {
+    accept(LBRACKET)
+    body
+    accept(RBRACKET)
+  }
+
+  private def makeParens[T](body: ⇒ T) = inParens { if (RPAREN) None else Some(body) }
+
+  private def scriptBody() {
     templateStats()
     accept(EOF)
   }

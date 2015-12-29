@@ -88,10 +88,10 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
   }
 
   def format(template: Template)(implicit formatterState: FormatterState): FormatResult = {
-    val Template(earlyDefsOpt: Option[EarlyDefs], templateParentsOpt: Option[TemplateParents], templateBodyOpt: Option[TemplateBody]) = template
+    val Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) = template
     var formatResult: FormatResult = NoFormatResult
 
-    for (EarlyDefs(earlyBody: TemplateBody, withOpt) ← earlyDefsOpt)
+    for (EarlyDefs(earlyBody, withOpt) ← earlyDefsOpt)
       formatResult ++= format(earlyBody)
 
     for (templateParents ← templateParentsOpt)
@@ -115,7 +115,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
 
   private def format(templateParents: TemplateParents)(implicit formatterState: FormatterState): FormatResult = {
     var formatResult: FormatResult = NoFormatResult
-    val TemplateParents((type1: Type, argumentExprss: List[ArgumentExprs]), withTypes: List[(Token, Type, List[ArgumentExprs])]) = templateParents
+    val TemplateParents((type1, argumentExprss), withTypes) = templateParents
     formatResult ++= format(type1)
     for (argumentExprs ← argumentExprss)
       formatResult ++= format(argumentExprs)._1

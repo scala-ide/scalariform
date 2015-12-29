@@ -12,7 +12,6 @@ import net.miginfocom.layout._
 import net.miginfocom.swing._
 
 import scalariform.astselect._
-import scalariform.utils.Utils._
 import scalariform.utils.Range
 import scalariform.parser._
 import scalariform.formatter._
@@ -139,7 +138,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
   setFont(inputTextPane, textFont)
   def runFormatter() {
     try {
-      onSwingThread {
+      Utils.onSwingThread {
         syntaxHighlight(inputTextPane)
         highlightRedundantSemis(inputTextPane)
         syntaxHighlight(outputTextPane)
@@ -161,7 +160,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
               val parseResult = specificFormatter.parse(new ScalaParser(tokens.toArray))
               val treeModel = new ParseTreeModel(parseResult)
               astTree.setModel(treeModel)
-              expandAll(astTree)
+              Utils.expandAll(astTree)
             } catch { case e: RuntimeException ⇒ }
           }
           throw e
@@ -185,7 +184,7 @@ class FormatterFrame extends JFrame with SpecificFormatter {
           }
         val treeModel = new ParseTreeModel(parseResult)
         astTree.setModel(treeModel)
-        expandAll(astTree)
+        Utils.expandAll(astTree)
 
         val (_, formatResult) = specificFormatter.fullFormat(inputText, scalaVersion = SCALA_VERSION)(OptionsPanel.getFormattingPreferences)
 

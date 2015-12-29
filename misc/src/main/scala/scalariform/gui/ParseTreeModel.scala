@@ -28,7 +28,10 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
 
   case class AstNodeNode(name: String, astNode: AstNode) extends TreeNode(name) {
 
-    val fields = astNode.getFields
+    val fields = {
+      val names = astNode.getClass.getDeclaredFields map { _.getName }
+      names.toList zip astNode.productIterator.toList
+    }
 
     lazy val children = fields flatMap {
       case (_, None) | (_, Nil) ⇒ None
@@ -125,4 +128,3 @@ class ParseTreeModel(rootAstNode: AstNode) extends TreeModel {
   private def getChildren(obj: AnyRef) = obj.asInstanceOf[TreeNode].children
 
 }
-

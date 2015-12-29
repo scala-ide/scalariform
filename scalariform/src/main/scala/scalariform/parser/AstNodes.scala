@@ -1,10 +1,9 @@
 package scalariform.parser
 
-import scalariform.utils.CaseClassReflector
 import scalariform.utils.Range
 import scalariform.lexer.Token
 
-sealed trait AstNode extends CaseClassReflector {
+sealed trait AstNode extends Product {
 
   def tokens: List[Token]
 

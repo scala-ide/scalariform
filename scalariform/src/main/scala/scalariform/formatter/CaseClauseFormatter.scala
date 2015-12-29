@@ -3,11 +3,9 @@ package scalariform.formatter
 import scalariform.lexer.Token
 import scalariform.parser._
 import scalariform.utils.Utils
-import scalariform.utils.TextEditProcessor
 import scalariform.formatter.preferences._
 import Alignment._
 import PartialFunction._
-import scala.math.{ max, min }
 
 trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter with HasHiddenTokenInfo with ScalaFormatter ⇒
 
@@ -97,7 +95,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
   }
 
   private def formatCasePattern(casePattern: CasePattern, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {
-    val CasePattern(_, pattern: Expr, guardOption: Option[Guard], arrow: Token) = casePattern
+    val CasePattern(_, pattern, guardOption, arrow) = casePattern
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(pattern)
     for (guard ← guardOption)
@@ -107,7 +105,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
   }
 
   private def formatCaseClause(caseClause: CaseClause, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {
-    val CaseClause(casePattern: CasePattern, statSeq: StatSeq) = caseClause
+    val CaseClause(casePattern, statSeq) = caseClause
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= formatCasePattern(casePattern, arrowInstructionOpt)
     val singleExpr =

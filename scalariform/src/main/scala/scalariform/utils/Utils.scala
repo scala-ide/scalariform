@@ -6,23 +6,11 @@ import java.io.IOException
 
 object Utils {
 
-  def when[T](b: Boolean)(x: ⇒ T): Option[T] = if (b) Some(x) else None
-
-  def checkNotNull[T](item: T): T = { require(item != null); item }
-
-  implicit def boolean2ImpliesWrapper(b: Boolean): ImpliesWrapper = new ImpliesWrapper(b)
-
-  class ImpliesWrapper(b: Boolean) {
-    def implies(b2: ⇒ Boolean) = if (!b) true else b2
-  }
-
   implicit def string2PimpedString(s: String) = new PimpedString(s)
 
   class PimpedString(s: String) {
     def toIntOpt: Option[Int] = try Some(s.toInt) catch { case _: NumberFormatException ⇒ None }
   }
-
-  def stagger[T](iterable: Iterable[T]) = iterable zip iterable.tail
 
   def pairWithPrevious[T](iterable: Iterable[T]): List[(Option[T], T)] = {
     if (iterable.isEmpty)
@@ -43,15 +31,6 @@ object Utils {
     }
   }
 
-  import scala.reflect.Manifest
-  implicit def any2optionable(x: AnyRef) = new {
-    def matchInstance[B](implicit m: Manifest[B]): Option[B] =
-      if (Manifest.singleType(x) <:< m)
-        Some(x.asInstanceOf[B])
-      else
-        None
-  }
-
   def groupBy[A](eq: (A, A) ⇒ Boolean, lst: List[A]): List[List[A]] =
     lst match {
       case Nil ⇒ Nil
@@ -61,40 +40,7 @@ object Utils {
       }
     }
 
-  // Swing ---------------------
-
-  def onSwingThread(proc: ⇒ Unit) = javax.swing.SwingUtilities.invokeLater(new Runnable() { def run() = proc })
-
-  import javax.swing.JTree
-  import javax.swing.tree._
-
-  def expandAll(tree: JTree) {
-    val root = tree.getModel().getRoot()
-    expandAll(tree, new TreePath(root))
-  }
-
-  private def expandAll(tree: JTree, parent: TreePath) {
-    val node = parent.getLastPathComponent()
-    val model = tree.getModel
-    val children = 0 until model.getChildCount(node) map { model.getChild(node, _) }
-    for (child ← children) {
-      val path = parent.pathByAddingChild(child)
-      expandAll(tree, path)
-    }
-    tree.expandPath(parent)
-  }
-
   // File ------------------
-
-  def writeText(file: java.io.File, text: String, encodingOpt: Option[String] = None) {
-    import java.io.{ OutputStreamWriter, FileOutputStream }
-    val encoding = encodingOpt getOrElse (System getProperty "file.encoding")
-    val writer = new OutputStreamWriter(new FileOutputStream(file), encoding)
-    try
-      writer.write(text)
-    finally
-      writer.close()
-  }
 
   @throws(classOf[IOException])
   def withFileInputStream[T](fileName: String)(p: FileInputStream ⇒ T): T = {
@@ -116,14 +62,6 @@ object Utils {
     } finally
       if (fis != null)
         fis.close()
-  }
-
-  def time[T](s: String)(f: ⇒ T): T = {
-    val start = System.currentTimeMillis
-    val result = f
-    val duration = System.currentTimeMillis - start
-    println(s + ": " + duration + "ms")
-    result
   }
 
   def digit2int(ch: Char, base: Int): Int =
