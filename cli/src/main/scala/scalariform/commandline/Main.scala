@@ -8,6 +8,7 @@ import scalariform.formatter.preferences._
 import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
 import scalariform.ScalaVersions
+import scalariform.Utils._
 
 object Main {
 
@@ -249,16 +250,6 @@ object Main {
         log("[Parse error]   " + file.getPath)
         true
     }
-  }
-
-  private def writeText(file: java.io.File, text: String, encodingOpt: Option[String]) {
-    import java.io.{ OutputStreamWriter, FileOutputStream }
-    val encoding = encodingOpt getOrElse (System getProperty "file.encoding")
-    val writer = new OutputStreamWriter(new FileOutputStream(file), encoding)
-    try
-      writer.write(text)
-    finally
-      writer.close()
   }
 
   private def transformFilesInPlace(files: Seq[File], encoding: String, doFormat: String ⇒ Option[String], log: String ⇒ Unit): Boolean = {

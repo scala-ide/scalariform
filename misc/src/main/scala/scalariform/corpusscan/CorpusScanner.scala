@@ -11,7 +11,7 @@ import scalariform.formatter._
 import scalariform.formatter.preferences.FormattingPreferences
 import scalariform.lexer._
 import scalariform.parser._
-import scalariform.utils.Utils.writeText
+import scalariform.Utils._
 
 sealed trait ParseFault
 case object TokensDoNotCoverSource extends ParseFault
