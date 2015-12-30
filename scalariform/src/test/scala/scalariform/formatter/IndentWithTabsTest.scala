@@ -20,46 +20,46 @@ class IndentWithTabsTest extends AbstractFormatterTest {
     |}""" ==>
   """class A {
     |
-    |	def meth() {
+    |\tdef meth() {
     |
-    |		println("42") // wibble
-    |		println("wobble")
+    |\t\tprintln("42") // wibble
+    |\t\tprintln("wobble")
     |
-    |	}
+    |\t}
     |
-    |}"""
+    |}""".replace("\\t", "\t")
 
   """val n = 42 +
     |3""" ==>
   """val n = 42 +
-    |	3"""
+    |\t3""".replace("\\t", "\t")
 
   """val xml = <foo>
     |bar
     |</foo>""" ==>
   """val xml = <foo>
-    |	bar
-    |</foo>"""
+    |\tbar
+    |</foo>""".replace("\\t", "\t")
 
   """foo(
     |alpha = "foo",
     |beta = "bar",
     |gamma = false)""" ==>
   """foo(
-    |	alpha = "foo",
-    |	beta = "bar",
-    |	gamma = false
-    |)"""
+    |\talpha = "foo",
+    |\tbeta = "bar",
+    |\tgamma = false
+    |)""".replace("\\t", "\t")
 
   """foo(
     |"foo",
     |"bar",
     |false)""" ==>
   """foo(
-    |	"foo",
-    |	"bar",
-    |	false
-    |)"""
+    |\t"foo",
+    |\t"bar",
+    |\tfalse
+    |)""".replace("\\t", "\t")
 
   {
     implicit val formattingPreferences = FormattingPreferences
@@ -71,30 +71,30 @@ class IndentWithTabsTest extends AbstractFormatterTest {
       |beta = "bar",
       |gamma = false)""" ==>
     """foo(
-      |	alpha = "foo",
-      |	beta = "bar",
-      |	gamma = false
-      |)"""
+      |\talpha = "foo",
+      |\tbeta = "bar",
+      |\tgamma = false
+      |)""".replace("\\t", "\t")
 
     """foo(
       |"foo",
       |"bar",
       |false)""" ==>
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false
-      |)"""
+      |\t"foo",
+      |\t"bar",
+      |\tfalse
+      |)""".replace("\\t", "\t")
 
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false)""" ==>
+      |\t"foo",
+      |\t"bar",
+      |\tfalse)""".replace("\\t", "\t") ==>
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false
-      |)"""
+      |\t"foo",
+      |\t"bar",
+      |\tfalse
+      |)""".replace("\\t", "\t")
   }
 
   {
@@ -107,27 +107,27 @@ class IndentWithTabsTest extends AbstractFormatterTest {
       |beta = "bar",
       |gamma = false)""" ==>
     """foo(
-      |	alpha = "foo",
-      |	beta = "bar",
-      |	gamma = false)"""
+      |\talpha = "foo",
+      |\tbeta = "bar",
+      |\tgamma = false)""".replace("\\t", "\t")
 
     """foo(
       |"foo",
       |"bar",
       |false)""" ==>
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false)"""
+      |\t"foo",
+      |\t"bar",
+      |\tfalse)""".replace("\\t", "\t")
 
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false)""" ==>
+      |\t"foo",
+      |\t"bar",
+      |\tfalse)""".replace("\\t", "\t") ==>
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false)"""
+      |\t"foo",
+      |\t"bar",
+      |\tfalse)""".replace("\\t", "\t")
   }
 
   {
@@ -141,9 +141,9 @@ class IndentWithTabsTest extends AbstractFormatterTest {
       |gamma = false
       |)""" ==>
     """foo(
-      |	alpha = "foo",
-      |	beta = "bar",
-      |	gamma = false)"""
+      |\talpha = "foo",
+      |\tbeta = "bar",
+      |\tgamma = false)""".replace("\\t", "\t")
 
     """foo(
       |"foo",
@@ -151,21 +151,20 @@ class IndentWithTabsTest extends AbstractFormatterTest {
       |false
       |)""" ==>
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false)"""
+      |\t"foo",
+      |\t"bar",
+      |\tfalse)""".replace("\\t", "\t")
 
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false
-      |)""" ==>
+      |\t"foo",
+      |\t"bar",
+      |\tfalse
+      |)""".replace("\\t", "\t") ==>
     """foo(
-      |	"foo",
-      |	"bar",
-      |	false)"""
+      |\t"foo",
+      |\t"bar",
+      |\tfalse)""".replace("\\t", "\t")
   }
-
 
   override val debug = false
 
