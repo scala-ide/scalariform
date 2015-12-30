@@ -21,7 +21,7 @@ object ScalariformBuild extends Build {
       |Using 1.7 to build requires setting SBT to use JDK 1.7 or higher -- if SBT is
       |booting on JDK 1.6, you will get a javax.swing related compilation error.""".stripMargin
 
-  lazy val commonSettings = Defaults.defaultConfigs ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
+  lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++ SbtScalariform.defaultScalariformSettings ++ sonatypeSettings ++ Seq(
     organization := "org.scalariform",
     profileName := "org.scalariform",
     version := "0.2.0-SNAPSHOT",
