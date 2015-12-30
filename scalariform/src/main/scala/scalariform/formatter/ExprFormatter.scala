@@ -448,6 +448,24 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult ++= format(body)(bodyFormatterState)
 
     // TODO: Simplified version of elseClause formatting
+    for (CatchClause(catchToken, catchBlockOrExpr) ← catchClauseOption) {
+      if (formattingPreferences(CompactControlReadability) && bodyIsABlock && containsNewline(body))
+        formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
+      else if (hiddenPredecessors(catchToken).containsNewline && !(bodyIsABlock && containsNewline(body)))
+        formatResult = formatResult.before(catchToken, formatterState.currentIndentLevelInstruction)
+
+      catchBlockOrExpr match {
+        case Left(catchBlock) ⇒
+          formatResult = formatResult.before(catchBlock.firstToken, CompactEnsuringGap)
+          formatResult ++= format(catchBlock)
+        case Right(catchExpr) ⇒
+          val indentCatchExpr = hiddenPredecessors(catchExpr.firstToken).containsNewline
+          val instruction = if (indentCatchExpr) formatterState.nextIndentLevelInstruction else CompactEnsuringGap
+          formatResult = formatResult.before(catchExpr.firstToken, instruction)
+          val catchExprFormatterState = if (indentCatchExpr) formatterState.indent else formatterState
+          formatResult ++= format(catchExpr)(catchExprFormatterState)
+      }
+    }
 
     // TODO: See elseClause formatting
     for ((finallyToken, finallyBody) ← finallyClauseOption) {
