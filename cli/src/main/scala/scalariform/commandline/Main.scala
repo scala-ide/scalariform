@@ -129,7 +129,10 @@ object Main {
       errors ::= "Cannot specify files when using --stdin"
 
     if (files.isEmpty && !stdin)
-      errors ::= "Must specify a file or use --stdin (run with --help for full options)"
+      if (recurse)
+        errors ::= "No scala files found in directory or no directory specified"
+      else
+        errors ::= "Must specify a file or use --stdin (run with --help for full options)"
 
     if (forceOutput && !stdout && !stdin)
       errors ::= "--forceOutput can only be used with --stdout or --stdin"
