@@ -1149,7 +1149,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       val secondArgument = firstTwoArguments.tail.head
       val firstArgument = firstTwoArguments.head
       if (hiddenPredecessors(secondArgument.firstToken).containsNewline) {
-        formatResult ++= formatResult.before(firstArgument.firstToken, paramFormatterState.nextIndentLevelInstruction)
+        formatResult ++=
+          formatResult.before(firstArgument.firstToken, paramFormatterState.indent(paramIndent).currentIndentLevelInstruction)
       }
     }
 
