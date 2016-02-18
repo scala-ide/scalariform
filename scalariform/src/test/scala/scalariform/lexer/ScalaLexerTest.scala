@@ -129,6 +129,8 @@ class ScalaLexerTest extends FlatSpec with ShouldMatchers {
 
     """ s"$this" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, THIS, STRING_LITERAL, WS)
 
+    """ s"$_" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, USCORE, STRING_LITERAL, WS)
+
     <t>s""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
     <t>s"""""""""</t>.text producesTokens (INTERPOLATION_ID, STRING_LITERAL)
     <t>s""" $foo """</t>.text producesTokens (INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL)

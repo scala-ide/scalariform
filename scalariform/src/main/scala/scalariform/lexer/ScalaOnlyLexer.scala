@@ -238,6 +238,9 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       if (ch == '$') {
         nextChar()
         getStringPart(multiLine)
+      } else if (ch == '_') {
+        token(STRING_PART)
+        stringInterpolationMode.interpolationVariable = true
       } else if (ch == '{') {
         token(STRING_PART)
         switchToScalaMode()
