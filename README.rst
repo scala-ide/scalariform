@@ -81,9 +81,7 @@ Integration with Emacs/ENSIME
 
 "`ENSIME`_ uses the Scalariform library to format Scala sources. Type C-c C-v f to format the current buffer."
 
-  http://aemon.com/file_dump/ensime_manual.html#tth_sEc4.8
-
-.. _ENSIME: http://github.com/aemoncannon/ensime
+.. _ENSIME: http://github.com/ensime/ensime-server
 
 Integration with jEdit
 ----------------------
