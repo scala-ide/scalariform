@@ -100,8 +100,8 @@ class CommentFormatterTest extends AbstractFormatterTest {
     |"""
 
   """/**
-    | * Trailing whitespace on this line and the line below should be stripped.   
-    | *    
+    | * Trailing whitespace on this line and the line below should be stripped.\u0020\u0020
+    | *\u0020\u0020\u0020\u0020
     | */
     |""" ==>
   """/**
@@ -110,15 +110,15 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */
     |"""
 
-  """// Trailing whitespace in single-line comments should be stripped.   
-    |//  
+  """// Trailing whitespace in single-line comments should be stripped.\u0020\u0020
+    |//\u0020\u0020
     |""" ==>
   """// Trailing whitespace in single-line comments should be stripped.
     |//
     |"""
 
   """/* Normal multi-line comment.
-    | * Trailing whitespace here should be stripped.   
+    | * Trailing whitespace here should be stripped.\u0020\u0020
     | */
     |""" ==>
   """/* Normal multi-line comment.
@@ -126,7 +126,7 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */
     |"""
 
-  """/* 
+  """/*\u0020
     |   Comment with trailing whitespace above.
     |   Indent should be preserved, whitespace trimmed.
     |   Visible separation (space below) should be added.
