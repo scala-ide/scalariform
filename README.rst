@@ -482,6 +482,13 @@ If ``false``, start the comment body on a separate line below the opening delimi
    * element of the given list.
    */
 
+newlineAtEndOfFile
+~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+If ``true``, newlines will be added at the end of all formatted files.
+
 placeScaladocAsterisksBeneathSecondAsterisk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

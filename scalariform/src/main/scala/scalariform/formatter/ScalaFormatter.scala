@@ -40,7 +40,12 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     var result = format(topStats)
     for (firstStat ← topStats.firstStatOpt)
       result = result.before(firstStat.firstToken, EnsureNewlineAndIndent(0))
-    result
+
+    if (formattingPreferences(NewlineAtEndOfFile)) {
+      result.before(compilationUnit.eofToken, EnsureNewlineAndIndent(0))
+    } else {
+      result
+    }
   }
 
   /**
