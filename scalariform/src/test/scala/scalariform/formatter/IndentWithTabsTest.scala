@@ -128,6 +128,21 @@ class IndentWithTabsTest extends AbstractFormatterTest {
       |\t"foo",
       |\t"bar",
       |\tfalse)""".replace("\\t", "\t")
+
+    """sequence(
+      |authors.grouped(100).map(batch =>
+      |Object.get[List[SomeType]](
+      |Foo / "bar" / "baz" / "qux"
+      |)
+      |).toList
+      |).map(_.flatten)""" ==>
+    """sequence(
+      |\tauthors.grouped(100).map(batch =>
+      |\t\tObject.get[List[SomeType]](
+      |\t\t\tFoo / "bar" / "baz" / "qux"
+      |\t\t)
+      |\t).toList
+      |).map(_.flatten)""".replace("\\t", "\t")
   }
 
   {

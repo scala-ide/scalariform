@@ -116,11 +116,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr
             case (_, elem) if element.firstTokenOption exists { firstToken ⇒ newlineBefore(firstToken) && !(Set(COMMA, COLON) contains firstToken.tokenType) } ⇒
               val isNestedArgument = elem match {
-                case Argument(Expr(CallExpr(_, _, _, moreArgs, _) :: tail)) if moreArgs.isEmpty ⇒ false
+                case Argument(Expr(CallExpr(None, _, _, moreArgs, _) :: tail)) if moreArgs.isEmpty ⇒ false
                 case Argument(Expr(EqualsExpr(_, _, Expr(headExpr :: innerTail)) :: tail)) ⇒ headExpr match {
                   case CallExpr(children, _, _, moreArgs, _) ⇒ moreArgs.nonEmpty || headExpr.tokens.exists(tk => hiddenPredecessors(tk).containsNewline)
-                  case MatchExpr(_, _, _)                    ⇒ true
-                  case _                                     ⇒ false
+                  case _                                     ⇒ headExpr.tokens.exists(tk => hiddenPredecessors(tk).containsNewline)
                 }
                 case _ ⇒ true
               }
