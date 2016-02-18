@@ -1,6 +1,5 @@
 package scalariform.lexer
 
-import scalariform.utils.Range
 import scalariform.utils.Utils._
 import scalariform.utils.TextEdit
 import scalariform.utils.TextEditProcessor

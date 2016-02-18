@@ -1,14 +1,12 @@
 package scalariform.lexer
 
-import scalariform.utils.Utils
-
 object NoHiddenTokens extends HiddenTokens(Nil)
 
 case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken] {
 
   def removeInitialWhitespace = new HiddenTokens(tokens.dropWhile(_.isInstanceOf[Whitespace]))
 
-  def iterator: Iterator[HiddenToken] = tokens.iterator
+  override def iterator: Iterator[HiddenToken] = tokens.iterator
 
   val comments: List[Comment] = tokens collect { case comment: Comment ⇒ comment }
 

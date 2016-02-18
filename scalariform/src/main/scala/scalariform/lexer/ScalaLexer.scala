@@ -1,13 +1,8 @@
 package scalariform.lexer
 
-import java.io.File
-import scala.collection.mutable.{ Queue, ListBuffer }
-import scala.io.Source
-import scala.math.min
 import scala.xml.parsing.TokenTests
 import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.Tokens._
-import scalariform.utils.Utils
 import scalariform._
 
 class ScalaLexer(
@@ -176,7 +171,7 @@ class ScalaLexer(
       nextChar()
   }
 
-  def next(): Token = {
+  override def next(): Token = {
     if (isXmlMode)
       fetchXmlToken()
     else if (isScalaMode)
@@ -190,7 +185,7 @@ class ScalaLexer(
     builtToken
   }
 
-  def hasNext = !eofTokenEmitted
+  override def hasNext = !eofTokenEmitted
 
   private def fetchStringInterpolationToken() {
     if (stringInterpolationMode.interpolationVariable) {
