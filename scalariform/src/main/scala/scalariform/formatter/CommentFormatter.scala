@@ -34,7 +34,7 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
   private def pruneEmptyFinal(lines: List[String]) = pruneEmptyInitial(lines.reverse).reverse
 
-  def formatComment(comment: HiddenToken, indentLevel: Int): String =
+  def formatScaladocComment(comment: HiddenToken, indentLevel: Int): String =
     if (comment.rawText contains '\n') {
       val sb = new StringBuilder
       val (start, rawLines) = getLines(comment.rawText)
@@ -64,4 +64,8 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
     } else
       comment.rawText
 
+  /** Formats a non-Scaladoc comment by trimming trailing whitespace from each line. */
+  def formatNonScaladocComment(comment: HiddenToken, indentLevel: Int): String = {
+    comment.rawText.replaceAll("""\s+(\r?\n)""", "$1")
+  }
 }

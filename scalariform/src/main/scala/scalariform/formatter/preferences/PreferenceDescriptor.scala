@@ -94,7 +94,8 @@ object AllPreferences {
     PreserveSpaceBeforeArguments, AlignParameters, AlignArguments, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis, DanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
-    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, DoubleIndentMethodDeclaration, SpacesAroundMultiImports
+    CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, DoubleIndentMethodDeclaration, SpacesAroundMultiImports,
+    NewlineAtEndOfFile
   )
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] =
@@ -248,5 +249,11 @@ case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenc
 case object SpacesAroundMultiImports extends BooleanPreferenceDescriptor {
   val key = "spacesAroundMultiImports"
   val description = "Place spaces around multi imports (import a.{ b, c, d }"
+  val defaultValue = false
+}
+
+case object NewlineAtEndOfFile extends BooleanPreferenceDescriptor {
+  val key = "newlineAtEndOfFile"
+  val description = "Add a newline at the end of all files"
   val defaultValue = false
 }
