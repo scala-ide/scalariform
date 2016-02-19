@@ -20,21 +20,45 @@ class NewlineAtEndOfFileFormatterTest extends AbstractFormatterTest {
   // No newline; should have one added.
   """import foo.bar
   |
-  |class Foo {
+  |class SettingOn {
   |}""" ==>
   """import foo.bar
   |
-  |class Foo {
+  |class SettingOn {
   |}
   |"""
 
   // Has newline; should stay the same.
   """import foo.bar
-  |class Foo {
+  |class SettingOn {
   |}
   |""" ==>
   """import foo.bar
-  |class Foo {
+  |class SettingOn {
+  |}
+  |"""
+  }
+
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(NewlineAtEndOfFile, false)
+
+  // No newline; should stay the same.
+  """import foo.bar
+  |
+  |class SettingOff {
+  |}""" ==>
+  """import foo.bar
+  |
+  |class SettingOff {
+  |}"""
+
+  // Has newline; should stay the same (preference off doesn't strip newlines that exist).
+  """import foo.bar
+  |class SettingOff {
+  |}
+  |""" ==>
+  """import foo.bar
+  |class SettingOff {
   |}
   |"""
   }
