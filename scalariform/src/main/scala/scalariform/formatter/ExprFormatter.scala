@@ -934,7 +934,8 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     val FunDefOrDcl(_, _, typeParamClauseOpt, paramClauses, returnTypeOpt, funBodyOpt, _) = funDefOrDcl
     for (typeParamClause ← typeParamClauseOpt)
       formatResult ++= format(typeParamClause.contents)
-    formatResult ++= formatParamClauses(paramClauses)
+    val doubleIndentParams = formattingPreferences(DoubleIndentMethodDeclaration)
+    formatResult ++= formatParamClauses(paramClauses, doubleIndentParams)
     for ((colon, type_) ← returnTypeOpt)
       formatResult ++= format(type_)
     for (funBody ← funBodyOpt) {
