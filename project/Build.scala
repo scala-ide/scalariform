@@ -36,7 +36,8 @@ object ScalariformBuild extends Build {
         "-Ywarn-unused"
       )
       case _ => Seq()
-    })
+    }),
+    credentials += Credentials(Path.userHome / ".m2" / "credentials")
   )
 
   lazy val subprojectSettings = commonSettings ++ Seq(
@@ -113,7 +114,7 @@ object ScalariformBuild extends Build {
 
   def pomExtraXml =
     <inceptionYear>2010</inceptionYear>
-    <url>http://github.com/mdr/scalariform</url>
+    <url>http://github.com/scala-ide/scalariform</url>
     <licenses>
       <license>
         <name>MIT License</name>
@@ -122,10 +123,15 @@ object ScalariformBuild extends Build {
       </license>
     </licenses>
     <scm>
-      <url>git@github.com:daniel-trinh/scalariform.git</url>
-      <connection>scm:git:git@github.com:daniel-trinh/scalariform</connection>
+      <url>git@github.com:scala-ide/scalariform.git</url>
+      <connection>scm:git:git@github.com:scala-ide/scalariform</connection>
     </scm>
     <developers>
+      <developer>
+        <id>scala-ide</id>
+        <name>Scala IDE</name>
+        <url>https://github.com/scala-ide/</url>
+      </developer>
       <developer>
         <id>mdr</id>
         <name>Matt Russell</name>
