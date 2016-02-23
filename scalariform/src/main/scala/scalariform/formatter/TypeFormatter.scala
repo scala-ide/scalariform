@@ -31,6 +31,9 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       else if (element.isInstanceOf[VarargsTypeElement]) {
         val instruction = if (Chars.isOperatorPart(previousElement.lastToken.text.last)) CompactEnsuringGap else Compact
         formatResult = formatResult.before(element.firstToken, instruction)
+      } else if (element.lastToken.tokenType == Tokens.COLON && element.tokens.tail.headOption.isEmpty) {
+        // Type class - [A : B]. Ensure a gap.
+        formatResult = formatResult.before(element.lastToken, CompactEnsuringGap)
       }
       //      else if (previousElement.isInstanceOf[CallByNameTypeElement])
       //  formatResult = formatResult.before(element.firstToken, Compact)

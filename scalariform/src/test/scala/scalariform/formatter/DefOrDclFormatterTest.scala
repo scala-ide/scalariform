@@ -104,6 +104,35 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   """private[a] sealed trait B"""
 
   {
+  // Typeclass formatting should not be affected by the SpaceBeforeColon setting.
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, false)
+
+  """class Foo[A : B]() {}""" ==>
+  """class Foo[A : B]() {}"""
+
+  """def foo[A : B]()""" ==>
+  """def foo[A : B]()"""
+
+  """def foo[A: B :C]()""" ==>
+  """def foo[A : B : C]()"""
+
+  }
+  {
+  // Typeclass formatting should not be affected by the SpaceBeforeColon setting.
+  implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)
+
+  """class Foo[A : B]() {}""" ==>
+  """class Foo[A : B]() {}"""
+
+  """def foo[A : B]()""" ==>
+  """def foo[A : B]()"""
+
+  """def foo[A: B :C]()""" ==>
+  """def foo[A : B : C]()"""
+
+  }
+
+  {
 
   implicit val formattingPreferences =
     FormattingPreferences
