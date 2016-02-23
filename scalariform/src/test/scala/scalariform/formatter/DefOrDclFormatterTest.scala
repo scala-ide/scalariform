@@ -103,9 +103,28 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
     |sealed trait B""" ==>
   """private[a] sealed trait B"""
 
+  """class Foo[A : B]() {}""" ==>
+  """class Foo[A: B]() {}"""
+
+  """def foo[A : B]()""" ==>
+  """def foo[A: B]()"""
+
+  """def foo[A: B :C]()""" ==>
+  """def foo[A: B: C]()"""
+
+  {
+  // SpaceBeforeColon should add a space for the context colon (for backwards-compatibility).
+  implicit val formattingPreferences =
+    FormattingPreferences.setPreference(SpaceBeforeColon, true).setPreference(SpaceBeforeContextColon, false)
+
+  """class Foo[A : B]() {}""" ==>
+  """class Foo[A : B]() {}"""
+  }
+
   {
   // Typeclass formatting should not be affected by the SpaceBeforeColon setting.
-  implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, false)
+  implicit val formattingPreferences =
+    FormattingPreferences.setPreference(SpaceBeforeColon, false).setPreference(SpaceBeforeContextColon, true)
 
   """class Foo[A : B]() {}""" ==>
   """class Foo[A : B]() {}"""
@@ -119,7 +138,8 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   }
   {
   // Typeclass formatting should not be affected by the SpaceBeforeColon setting.
-  implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)
+  implicit val formattingPreferences =
+    FormattingPreferences.setPreference(SpaceBeforeColon, true).setPreference(SpaceBeforeContextColon, true)
 
   """class Foo[A : B]() {}""" ==>
   """class Foo[A : B]() {}"""

@@ -90,7 +90,7 @@ trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
 
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(
-    RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
+    RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, SpaceBeforeContextColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, AlignArguments, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
     AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis, DanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
@@ -119,6 +119,12 @@ case object IndentSpaces extends IntegerPreferenceDescriptor {
 case object SpaceBeforeColon extends BooleanPreferenceDescriptor {
   val key = "spaceBeforeColon"
   val description = "Add a space before colons"
+  val defaultValue = false
+}
+
+case object SpaceBeforeContextColon extends BooleanPreferenceDescriptor {
+  val key = "spaceBeforeContextColon"
+  val description = "Add a space before colons in context bounds"
   val defaultValue = false
 }
 
