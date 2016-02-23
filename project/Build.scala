@@ -16,7 +16,7 @@ object ScalariformBuild extends Build {
     scalaVersion := "2.11.7",
     crossScalaVersions := Seq(
       "2.11.7",
-      "2.10.6",
+      "2.10.6"
     ),
     exportJars := true, // Needed for cli oneJar
     scalacOptions ++= (scalaBinaryVersion.value match {
