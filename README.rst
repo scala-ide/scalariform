@@ -48,9 +48,7 @@ You can copy this to a location in your path and execute it as follows: ::
 Integration with sbt
 --------------------
 
-A version for sbt >= 0.13.x has been written by Peter Vlugter: https://github.com/daniel-trinh/sbt-scalariform
-
-Please see https://github.com/sbt/sbt-scalariform for older versions of sbt.
+A plugin for SBT is available at https://github.com/sbt/sbt-scalariform.
 
 Usage within a project
 ----------------------
