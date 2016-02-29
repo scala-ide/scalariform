@@ -678,7 +678,7 @@ If ``false``,:
 spacesAroundMultiImports
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default: ``false``
+Default: ``true``
 
 Whether or not to add spaces around multi-imports.
 For example, if ``false``, then:
@@ -695,11 +695,7 @@ If ``true``, then:
   import a.{ b, c, d }
   import foo.{ bar => baz }
 
-Older versions of `Scalariform` used ``true``,
-but the standard Scala formatting requires ``false``.
-
-See the examples given in "Chapter 13 - Packages and Imports.", page 244 of *Programming in Scala*
-2nd ed. (2010) by Odersky, Spoon and Venners.
+Compatibility note: Versions 0.1.6 & 0.1.7 of `Scalariform` used ``false``.
 
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~
