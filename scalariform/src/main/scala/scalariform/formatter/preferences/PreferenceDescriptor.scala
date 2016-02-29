@@ -91,8 +91,9 @@ trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(
     RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
-    PreserveSpaceBeforeArguments, AlignParameters, AlignArguments, DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks,
-    AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis, DanglingCloseParenthesis,
+    PreserveSpaceBeforeArguments, AlignParameters, FirstParameterOnNewline, AlignArguments, FirstArgumentOnNewline,
+    DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks, AlignSingleLineCaseStatements,
+    AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis, DanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
     CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, DoubleIndentMethodDeclaration, SpacesAroundMultiImports,
     NewlineAtEndOfFile
@@ -141,10 +142,22 @@ case object AlignParameters extends BooleanPreferenceDescriptor {
   val defaultValue = false
 }
 
+case object FirstParameterOnNewline extends IntentPreferenceDescriptor {
+  val key = "firstParameterOnNewline"
+  val description = "Places the first parameter in function or class definitions on a new line"
+  val defaultValue = Force
+}
+
 case object AlignArguments extends BooleanPreferenceDescriptor {
   val key = "alignArguments"
   val description = "Align method arguments on different lines in the same column"
   val defaultValue = false
+}
+
+case object FirstArgumentOnNewline extends IntentPreferenceDescriptor {
+  val key = "firstArgumentOnNewline"
+  val description = "Places the first argument to functions calls on a new line"
+  val defaultValue = Force
 }
 
 case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
