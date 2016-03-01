@@ -296,8 +296,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |    def open(): Unit
     |    def close(): Unit
     |  },
-    |  o: Int
-    |)"""
+    |  o: Int)"""
 
   """class A(
     |n: Int, m: {def foo(): Int
@@ -314,8 +313,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  m: {
     |    def foo(): Int
     |    def bar(a: String): Int
-    |  }
-    |)"""
+    |  })"""
 
 {
    implicit val formattingPreferences = FormattingPreferences.
@@ -328,16 +326,14 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |abc: Boolean = true): Int""" ==>
   """def a(
     |  a :   Int     = 1,
-    |  abc : Boolean = true
-    |) : Int"""
+    |  abc : Boolean = true) : Int"""
 
   """def a(
     |a: Option[Either[Int]] = 1,
     |abc: Boolean = true): Int""" ==>
   """def a(
     |  a :   Option[ Either[ Int ] ] = 1,
-    |  abc : Boolean                 = true
-    |) : Int"""
+    |  abc : Boolean                 = true) : Int"""
 }
 
 {
@@ -417,14 +413,14 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  messageType: Message.Value = Message.Question,
     |  icon:        Icon          = EmptyIcon,
     |  entries:     Seq[A]        = Nil,
-    |  initial:     A
-    |): Option[A]"""
+    |  initial:     A): Option[A]"""
 
     // Formats function types correctly
   """private def executeWithinClient[T](
     |crawlerConfig: String => JsValue = Fancy.function,
     |f: HttpCrawlerClient => T,
-    |port: Int = SpecHelper.port): T""" ==>
+    |port: Int = SpecHelper.port
+    |): T""" ==>
   """private def executeWithinClient[T](
     |  crawlerConfig: String => JsValue      = Fancy.function,
     |  f:             HttpCrawlerClient => T,
@@ -434,7 +430,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     // By name parameters have correct spacing
   """def a(
     |  p1: => (SomeLongByNameParam => SomeShorterParam) = Null,
-    |  param2: SomeShorterParam = Null): A""" ==>
+    |  param2: SomeShorterParam = Null
+    |): A""" ==>
   """def a(
     |  p1:     => (SomeLongByNameParam => SomeShorterParam) = Null,
     |  param2: SomeShorterParam                             = Null
@@ -442,7 +439,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
 
     // Formats parameterized types correctly
     """def A(complicatedType: Option[B  ,C,      D[E, F,G]] = None,
-      | simpleType: String = ""): B""" ==>
+      | simpleType: String = ""
+      |): B""" ==>
     """def A(
       |  complicatedType: Option[B, C, D[E, F, G]] = None,
       |  simpleType:      String                   = ""
@@ -451,7 +449,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
   """case class Spacing(param: Int = 1,
     |paramTwo: Int = 2,
-    |paramThree: String = "3")""" ==>
+    |paramThree: String = "3"
+    |)""" ==>
   """case class Spacing(
     |  param:      Int    = 1,
     |  paramTwo:   Int    = 2,
@@ -473,8 +472,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |    val test: Int
     |  },
     |  paramFour: Option[String] = Some("One"),
-    |  paramFive: Any            = Nothing
-    |)"""
+    |  paramFive: Any            = Nothing)"""
 
     // Groups and formats consecutive single line parameters (newlines)
   """case class Spacing(
@@ -482,7 +480,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |paramTwo: Int = 2,
     |
     |paramFour: Option[String] = Some("One"),
-    |paramFive: Any = Nothing)""" ==>
+    |paramFive: Any = Nothing
+    |)""" ==>
   """case class Spacing(
     |  param:    Int = 1,
     |  paramTwo: Int = 2,
@@ -495,7 +494,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
   """class SomeClass(
     |parameterOne: Int = 1,
     |val parameterTwo: Option[String] = None,
-    |three: String = "three")(
+    |three: String = "three"
+    |)(
     |intermediate: Int
     |)(
     |implicit val four: Int,
@@ -511,8 +511,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  implicit
     |  val four: Int,
     |  five:     String,
-    |  six:      Boolean
-    |)"""
+    |  six:      Boolean)"""
 
    // Handles annotations, modifiers, and comments
   """def extraStuff(
@@ -524,8 +523,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  // comment 1
     |  @Annotated paramOne:                                                               Int         = 1, // comment 2
     |  /* comment 3 */ private val modifiedTwo:                                           String      = "two",
-    |  @Annotated2("complicatedAnnotation")@A3("Another") protected annotatedAndModified: Option[Int] = Some(3)
-    |)"""
+    |  @Annotated2("complicatedAnnotation")@A3("Another") protected annotatedAndModified: Option[Int] = Some(3))"""
 
   """class A(n: Int,
     |z: { val m
@@ -537,8 +535,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |    val m
     |    val n
     |  },
-    |  m: Int
-    |)"""
+    |  m: Int)"""
 
   """class A(m: Int,
     |n: {
@@ -556,8 +553,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  },
     |  o: Int = {
     |    42
-    |  }
-    |)"""
+    |  })"""
 
   """class A(n: {
     | def close(): Unit
@@ -569,8 +565,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |    def close(): Unit
     |    def open(): Unit
     |  },
-    |  m: Int
-    |)"""
+    |  m: Int)"""
 
   """class A(
     |implicit n: {
@@ -582,8 +577,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  n: {
     |    def x: Int
     |    def y: Int
-    |  }
-    |)"""
+    |  })"""
 
   """class A(n: {
     |def x: Int
@@ -597,10 +591,9 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |})""" ==>
   """class A(
     |  a: Int,
-    |  b: Int
-    |)(c: {
-    |    val d: Int
-    |  })"""
+    |  b: Int)(c: {
+    |            val d: Int
+    |          })"""
 
   }
 
@@ -609,8 +602,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |})""" ==>
   """class A(
     |  a: Int,
-    |  b: Int
-    |)(c: {
+    |  b: Int)(c: {
     |  val d: Int
     |})"""
 
@@ -625,8 +617,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |    with Serializable""" ==>
     """class Person(
       |  name: String,
-      |  age: Int
-      |)
+      |  age: Int)
       |    extends Entity
       |    with Logging
       |    with Identifiable
@@ -639,8 +630,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |}""" ==>
     """class Person(
       |    name: String,
-      |    age: Int
-      |) {
+      |    age: Int) {
       |  def firstMethod = 42
       |}"""
 
@@ -667,8 +657,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |}""" ==>
     """class Person(
       |  name: String,
-      |  age: Int
-      |)
+      |  age: Int)
       |    extends Entity {
       |  def method() = 42
       |}"""

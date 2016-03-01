@@ -27,7 +27,8 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |beta = bar match {
       |  case _ => "bar"
       |},
-      |gamma = false)""" ==>
+      |gamma = false
+      |)""" ==>
     """foo(
       |  alpha = "foo",
       |  beta = bar match {
@@ -41,7 +42,8 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |beta = bar(
       |a = 1
       |),
-      |gamma = false)""" ==>
+      |gamma = false
+      |)""" ==>
     """foo(
       |  alpha = "foo",
       |  beta = bar(

@@ -53,20 +53,17 @@ class DoubleIndentMethodFormatterTest extends AbstractFormatterTest {
   """def foo(
     |  a: String)""" ==>
   """def foo(
-    |    a: String
-    |)"""
+    |    a: String)"""
 
-  // TODO: Broken until https://github.com/scala-ide/scalariform/issues/187 is fixed.
   """def foo(a: String,
     |  b: String)""" =/=>
   """def foo(
     |    a: String,
-    |    b: String
-    |)"""
+    |    b: String)"""
 
-  // TODO: Broken until https://github.com/scala-ide/scalariform/issues/187 is fixed.
   """def foo(a: String,
-    |      b: String)""" =/=>
+    |      b: String
+    |)""" =/=>
   """def foo(
     |    a: String,
     |    b: String
@@ -82,8 +79,7 @@ class DoubleIndentMethodFormatterTest extends AbstractFormatterTest {
     |      b: String)""" ==>
   """def foo(
     |    a: String,
-    |    b: String
-    |)"""
+    |    b: String)"""
   }
 
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
