@@ -69,6 +69,6 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
   /** Formats a non-Scaladoc comment by trimming trailing whitespace from each line. */
   def formatNonScaladocComment(comment: HiddenToken, indentLevel: Int): String = {
-    comment.rawText.replaceAll("""\s+(\r?\n)""", "$1")
+    comment.rawText.replaceAll("""[ \t]+(\r?\n)""", "$1")
   }
 }
