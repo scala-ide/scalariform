@@ -124,7 +124,7 @@ class ScalaParser(tokens: Array[Token]) {
   private def isIdent: Boolean = isIdent(currentTokenType)
 
   private def isIdent(tokenType: TokenType) = tokenType match {
-    case VARID | OTHERID | PLUS | MINUS | RARROW | STAR | PIPE | TILDE | EXCLAMATION ⇒ true
+    case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION ⇒ true
     case _ ⇒ false
   }
 

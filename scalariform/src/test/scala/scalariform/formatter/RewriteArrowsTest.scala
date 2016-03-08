@@ -10,7 +10,9 @@ class RewriteArrowsTest extends AbstractExpressionFormatterTest {
 
     "(a: Int) => 3" ==> "(a: Int) ⇒ 3"
     "for (i <- 1 to 10) yield i" ==> "for (i ← 1 to 10) yield i"
-    "cache += k -> f(k)" ==> "cache += k → f(k)"
+    // We don't rewrite RARROW anymore since it can be, and is, used as a
+    // normal identifier.
+    "cache += k -> f(k)" ==> "cache += k -> f(k)"
   }
 
   override val debug = false
