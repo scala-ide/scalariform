@@ -1573,7 +1573,7 @@ class ScalaParser(tokens: Array[Token]) {
     if (LBRACE)
       Some(templateBody().copy(newlineOpt = newLineOpt))
     else if (LPAREN)
-      throw new ScalaParserException("traits or objects may not have parametsrs")
+      throw new ScalaParserException("traits or objects may not have parameters")
     else
       None
   }
