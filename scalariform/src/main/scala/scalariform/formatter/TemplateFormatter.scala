@@ -1,9 +1,8 @@
 package scalariform.formatter
 
-import scalariform.lexer.Token
-
-import scalariform.parser._
 import scalariform.formatter.preferences._
+import scalariform.lexer.Token
+import scalariform.parser._
 
 trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with ExprFormatter with ScalaFormatter ⇒
 
@@ -30,15 +29,11 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     } {
       if (annotations.size > 0)
         formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)
-      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration) &&
-        !templateInheritanceSectionOpt.exists { section ⇒ containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline } &&
-        templateBodyOption.exists(containsNewline(_))
+      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration)
       formatResult ++= formatParamClauses(paramClauses, doubleIndentParams)
     }
     for (TemplateInheritanceSection(extendsOrSubtype, earlyDefsOpt, templateParentsOpt) ← templateInheritanceSectionOpt) {
-      val doubleIndentTemplateInheritance = formattingPreferences(DoubleIndentClassDeclaration) &&
-        (templateBodyOption.exists(containsNewline(_)) || paramClausesOpt.exists(containsNewline(_)))
-      val inheritanceIndent = if (doubleIndentTemplateInheritance) 2 else 1
+      val inheritanceIndent = 1
       var currentFormatterState = formatterState
       if (hiddenPredecessors(extendsOrSubtype).containsNewline) {
         currentFormatterState = formatterState.indent(inheritanceIndent)
