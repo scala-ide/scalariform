@@ -609,17 +609,34 @@ spaceBeforeColon
 
 Default: ``false``
 
-Whether to ensure a space before colon. For example, if ``false``, then:
+Whether to ensure a space before all single colons. For example, if ``false``, then:
 
 .. code:: scala
 
-  def add(a: Int, b: Int): Int = a + b
+  def add[T: Numeric](a: T, b: T): Int = implictly[Numeric[T]].plus(a, b)
 
 If ``true``, then:
 
 .. code:: scala
 
-  def add(a : Int, b : Int) : Int = a + b
+  def add[T : Numeric](a : T, b : T): Int = implictly[Numeric[T]].plus(a, b)
+
+spaceBeforeContextColon
+~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Whether to ensure a space before colons in context bounds (the typeclass pattern). For example, if ``false``, then:
+
+.. code:: scala
+
+  def newArray[T: ClassManifest](n: Int) = new Array[T](n)
+
+If ``true``, then:
+
+.. code:: scala
+
+  def newArray[T : ClassManifest](n: Int) = new Array[T](n)
 
 spaceInsideBrackets
 ~~~~~~~~~~~~~~~~~~~
