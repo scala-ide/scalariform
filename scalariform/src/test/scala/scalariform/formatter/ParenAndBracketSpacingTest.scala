@@ -27,28 +27,27 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |beta = bar match {
       |  case _ => "bar"
       |},
-      |gamma = false)""" ==>
+      |gamma = false
+      |)""" ==>
     """foo(
       |  alpha = "foo",
       |  beta = bar match {
       |    case _ => "bar"
       |  },
-      |  gamma = false
-      |)"""
+      |  gamma = false)"""
 
     """foo(
       |alpha = "foo",
       |beta = bar(
       |a = 1
       |),
-      |gamma = false)""" ==>
+      |gamma = false
+      |)""" ==>
     """foo(
       |  alpha = "foo",
       |  beta = bar(
-      |    a = 1
-      |  ),
-      |  gamma = false
-      |)"""
+      |    a = 1),
+      |  gamma = false)"""
 
     """foo(
       |arg = bar(
@@ -57,9 +56,7 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |)""" ==>
     """foo(
       |  arg = bar(
-      |    baz = "a"
-      |  ).xyz
-      |)"""
+      |    baz = "a").xyz)"""
   }
 
   {
