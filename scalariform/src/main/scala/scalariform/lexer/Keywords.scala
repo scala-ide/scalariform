@@ -51,7 +51,6 @@ object Keywords {
     "=" -> EQUALS,
     "=>" -> ARROW,
     "<-" -> LARROW,
-    "->" -> RARROW,
     "<:" -> SUBTYPE,
     "<%" -> VIEWBOUND,
     ">:" -> SUPERTYPE,

@@ -125,9 +125,6 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
         } else if (ch == '\u2190') {
           nextChar()
           token(LARROW)
-        } else if (ch == '\u2192') {
-          nextChar()
-          token(RARROW)
         } else if (Character.isUnicodeIdentifierStart(ch)) {
           nextChar()
           getIdentRest()
