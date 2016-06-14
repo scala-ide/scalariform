@@ -201,7 +201,7 @@ case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor
 case object DanglingCloseParenthesis extends IntentPreferenceDescriptor {
   val key = "danglingCloseParenthesis"
   val description = "Put a newline before a ')' in an argument expression"
-  val defaultValue = Preserve
+  val defaultValue = Prevent
 }
 
 case object SpaceInsideParentheses extends BooleanPreferenceDescriptor {

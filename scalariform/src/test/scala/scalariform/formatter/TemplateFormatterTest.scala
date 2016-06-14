@@ -99,8 +99,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |      case b =>
     |        val c = { d: Int => 1 }
     |        1.toString
-    |    }
-    |  )
+    |    })
     |}"""
 
   """class C1492 {
@@ -350,15 +349,13 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     """def A(
       |  a:   A ⇒ B = null,
       |  bee: ⇒ B   = null,
-      |  c:   B ⇒ C = null
-      |): D"""
+      |  c:   B ⇒ C = null): D"""
 
   """class a(
      |  b: Int
      |)""" ==>
    """class a(
-     |  b: Int
-     |)"""
+     |  b: Int)"""
 
    """class a(
      |  a: String = "",
@@ -424,8 +421,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
   """private def executeWithinClient[T](
     |  crawlerConfig: String => JsValue      = Fancy.function,
     |  f:             HttpCrawlerClient => T,
-    |  port:          Int                    = SpecHelper.port
-    |): T"""
+    |  port:          Int                    = SpecHelper.port): T"""
 
     // By name parameters have correct spacing
   """def a(
@@ -434,8 +430,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |): A""" ==>
   """def a(
     |  p1:     => (SomeLongByNameParam => SomeShorterParam) = Null,
-    |  param2: SomeShorterParam                             = Null
-    |): A"""
+    |  param2: SomeShorterParam                             = Null): A"""
 
     // Formats parameterized types correctly
     """def A(complicatedType: Option[B  ,C,      D[E, F,G]] = None,
@@ -443,8 +438,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |): B""" ==>
     """def A(
       |  complicatedType: Option[B, C, D[E, F, G]] = None,
-      |  simpleType:      String                   = ""
-      |): B"""
+      |  simpleType:      String                   = ""): B"""
 
     // Param gets placed onto a new line due to current limitations of existing IntertokenFormatInstructions
   """case class Spacing(param: Int = 1,
@@ -454,8 +448,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
   """case class Spacing(
     |  param:      Int    = 1,
     |  paramTwo:   Int    = 2,
-    |  paramThree: String = "3"
-    |)"""
+    |  paramThree: String = "3")"""
 
     // Groups and formats consecutive single line parameters (multi line params)
   """case class Spacing(param: Int = 1,
@@ -487,8 +480,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  paramTwo: Int = 2,
     |
     |  paramFour: Option[String] = Some("One"),
-    |  paramFive: Any            = Nothing
-    |)"""
+    |  paramFive: Any            = Nothing)"""
 
     // Aligns implicits and curried parameters properly
   """class SomeClass(
@@ -504,10 +496,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
   """class SomeClass(
     |  parameterOne:     Int            = 1,
     |  val parameterTwo: Option[String] = None,
-    |  three:            String         = "three"
-    |)(
-    |  intermediate: Int
-    |)(
+    |  three:            String         = "three")(
+    |  intermediate: Int)(
     |  implicit
     |  val four: Int,
     |  five:     String,

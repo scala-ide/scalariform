@@ -311,8 +311,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |if (b) c
     |)""" ==>
   """a(
-    |  if (b) c
-    |)"""
+    |  if (b) c)"""
 
   """a(
     |if (b)
@@ -408,8 +407,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |)""" ==>
   """(
     |  42,
-    |  46
-    |)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
+    |  46)""" // I prefer no initial indent for tuples, although you could argue it should be consistent with ParenExprs
 
   """a(b,
     |c => {
@@ -444,8 +442,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """Book(
     |  name = "Name",
     |  author = "Author",
-    |  rating = 5
-    |)"""
+    |  rating = 5)"""
 
   """foobar(
     |(1,2),
@@ -686,9 +683,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |  label("label"),
      |  popupMenu(
      |    viewer( // TODO
-     |    )
-     |  )
-     |)"""
+     |    )))"""
 
    """a(b)
      |.c(d)
@@ -743,8 +738,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |   i => List.range(1, i) map (j => (i, j))
      |)""" ==>
    """List.range(1, r) flatMap (
-     |  i => List.range(1, i) map (j => (i, j))
-     |)"""
+     |  i => List.range(1, i) map (j => (i, j)))"""
 
    """a map {
      |  b =>
@@ -799,12 +793,10 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
   """a(
     |  b,
     |  c,
-    |  d
-    |)(
+    |  d)(
     |  e,
     |  f,
-    |  g
-    |)"""
+    |  g)"""
 
   {
     implicit val formattingPreferences = FormattingPreferences.setPreference(AlignArguments, true)
@@ -856,14 +848,11 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
            |    zzz(
            |      a,
            |      b,
-           |      c
-           |    )
-           |  ),
+           |      c)),
            |  c(firstGroupOne(x)),
            |  d,
            |  e,
-           |  f
-           |)"""
+           |  f)"""
 
        """o.manyArguments(
          |  abc = 0,
@@ -879,8 +868,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
          |  abcTwo,
          |  abcThree = 3,
          |  abcFour  = 4,
-         |  abcFive  = 3
-         |)"""
+         |  abcFive  = 3)"""
 
        """Nested1(abcccc = 1,
          |  abc2     = 2,
@@ -889,8 +877,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
        """Nested1(
          |  abcccc   = 1,
          |  abc2     = 2,
-         |  abcThree = 3
-         |)"""
+         |  abcThree = 3)"""
 
        """o.grouped(
          |  firstGroupOne = 1,
@@ -910,8 +897,7 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
          |  secondGroup2   = "Two",
          |
          |  thirdGroupOne = 3,
-         |  thirdGroup2   = Three(3)
-         |)"""
+         |  thirdGroup2   = Three(3))"""
 
       """multiClause(
          |  arg1 = 1,
@@ -924,13 +910,10 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
          |)""" ==>
       """multiClause(
          |  arg1      = 1,
-         |  argument2 = 2
-         |)(
+         |  argument2 = 2)(
          |  args3 = 3,
-         |  arg4  = 4
-         |)(
-         |  arg5 = 5
-         |)"""
+         |  arg4  = 4)(
+         |  arg5 = 5)"""
 
    """a(
       |b = c
@@ -940,11 +923,9 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
       |)(
       |d)""" ==>
       """a(
-        |  b = c
-        |)(
+        |  b = c)(
         |  c,
-        |  d
-        |)(
+        |  d)(
         |  d)"""
 
    """Nested0(
@@ -961,14 +942,11 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
        |  arg1 = Nested1(
        |    abcccc   = 1,
        |    abc2     = 2,
-       |    abcThree = 3
-       |  ),
+       |    abcThree = 3),
        |  NestedTwo(
        |    abcccc   = 1,
        |    abc2     = 2,
-       |    abcThree = 3
-       |  )
-       |)"""
+       |    abcThree = 3))"""
 }
   override val debug = false
 }

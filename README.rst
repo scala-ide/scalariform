@@ -549,7 +549,7 @@ Otherwise, if ``false``, spaces before arguments will always be removed.
 danglingCloseParenthesis
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default: ``Preserve``
+Default: ``Prevent``
 
 If ``Force``, any closing parentheses will be set to dangle. For example:
 

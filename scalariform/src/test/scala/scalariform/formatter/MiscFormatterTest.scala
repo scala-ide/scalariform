@@ -10,8 +10,7 @@ class MiscFormatterTest extends AbstractFormatterTest {
     |)""" ==>
   """class Foo(
     |  bar: String,
-    |  baz: String
-    |)"""
+    |  baz: String)"""
 
   """class Foo(
     |  bar: String,
