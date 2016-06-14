@@ -644,6 +644,18 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |  def firstMethod = 42
       |}"""
 
+    // Test that first arguments are put on the next line correctly.
+    """class Person(name: String,
+      |    age: Int) {
+      |  def firstMethod = 42
+      |}""" ==>
+    """class Person(
+      |    name: String,
+      |    age: Int
+      |) {
+      |  def firstMethod = 42
+      |}"""
+
   """class Person(name: String, age: Int, birthdate: Date, astrologicalSign: String, shoeSize: Int, favoriteColor: java.awt.Color)
     |extends Entity
     |with Logging
