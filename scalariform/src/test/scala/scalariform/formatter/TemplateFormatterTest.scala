@@ -631,8 +631,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |}""" ==>
     """class Person(
       |    name: String,
-      |    age: Int
-      |) {
+      |    age: Int) {
       |  def firstMethod = 42
       |}"""
 

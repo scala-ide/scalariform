@@ -55,17 +55,15 @@ class DoubleIndentMethodFormatterTest extends AbstractFormatterTest {
   """def foo(
     |    a: String)"""
 
-  // TODO: Broken until https://github.com/scala-ide/scalariform/issues/187 is fixed.
   """def foo(a: String,
-    |  b: String)""" =/=>
+    |  b: String)""" ==>
   """def foo(
     |    a: String,
     |    b: String)"""
 
-  // TODO: Broken until https://github.com/scala-ide/scalariform/issues/187 is fixed.
   """def foo(a: String,
     |      b: String
-    |)""" =/=>
+    |)""" ==>
   """def foo(
     |    a: String,
     |    b: String)"""
