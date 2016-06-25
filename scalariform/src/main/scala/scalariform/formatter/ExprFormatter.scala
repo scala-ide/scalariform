@@ -957,6 +957,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         formatResult = formatResult.before(firstPostAnnotationToken, instruction)
       }
     }
+    // Ensure spacing after any modifiers. If the last modifier is simply a newline, skip the gap,
+    // as this will already cause a space to be added.
+    // TODO: Update the `Modifier` parsing to handle newlines more gracefully, instead of putting
+    // them in a dummy `SimpleModifier`.
+    if (modifiers.nonEmpty && !modifiers.last.firstToken.tokenType.isNewline) {
+      formatResult = formatResult.before(defOrDcl.firstToken, CompactEnsuringGap)
+    }
     formatResult ++= format(defOrDcl)
     formatResult
   }
