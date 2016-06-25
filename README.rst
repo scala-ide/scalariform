@@ -174,13 +174,12 @@ If ``true``, then:
 
 .. code:: scala
 
-  class Person(
-    name:             String,
-    age:              Int            = 24,
-    birthdate:        Date,
-    astrologicalSign: String         = "libra",
-    shoeSize:         Int,
-    favoriteColor:    java.awt.Color
+  class Person(name:             String,
+               age:              Int            = 24,
+               birthdate:        Date,
+               astrologicalSign: String         = "libra",
+               shoeSize:         Int,
+               favoriteColor:    java.awt.Color
   )
 
 This will also place the "implicit" keyword in parameters on its own line, whenever
@@ -207,6 +206,51 @@ If ``true``, then:
 
 This option is disabled if ``indentWithTabs`` is ``true``.
 
+firstParameterOnNewline
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``Force``
+
+Whether or not to place the first parameter for multi-line method or constructor definition on its own line.
+
+If ``Force``, first parameters will be on a new line:
+
+.. code:: scala
+
+  abstract class Person(
+    name: Int,
+    age: String
+  ) {
+    def livesIn(
+      city: String,
+      state: String
+    ): Boolean
+  }
+
+If ``Prevent``, first parameters will be on the definition line:
+
+.. code:: scala
+
+  abstract class Person(name: Int,
+    age: String
+  ) {
+    def livesIn(city: String,
+      state: String
+    ): Boolean
+  }
+
+If ``Preserve``, first parameters will stay where they are:
+
+.. code:: scala
+
+  abstract class Person(name: Int,
+    age: String
+  ) {
+    def livesIn(
+      city: String,
+      state: String
+    ): Boolean
+  }
 
 alignArguments
 ~~~~~~~~~~~~~~
@@ -229,15 +273,59 @@ If ``true``, then:
 
 .. code:: scala
 
-  Cake(
-    candles        = 10,
-    frostingFlavor = Vanilla,
-    layerFlavor    = Chocolate,
-    iceCream       = true
+  Cake(candles        = 10,
+       frostingFlavor = Vanilla,
+       layerFlavor    = Chocolate,
+       iceCream       = true
   )
 
 This option is disabled if ``indentWithTabs`` is ``true``.
 
+firstArgumentOnNewline
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``Force``
+
+Whether or not to place the first argument of multi-line function calls on its own line.
+
+If ``Force``, first arguments will be on a new line:
+
+.. code:: scala
+
+  foo(
+    1,
+    2
+  )
+
+  bar(
+    3,
+    4
+  )
+
+If ``Prevent``, first arguments will be on function call line:
+
+.. code:: scala
+
+  foo(1,
+    2
+  )
+
+  bar(3,
+    4
+  )
+
+If ``Preserve``, first arguments will stay where they are:
+
+.. code:: scala
+
+  foo(
+    1,
+    2
+  )
+
+  bar(3,
+    4
+  )
 
 alignSingleLineCaseStatements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
