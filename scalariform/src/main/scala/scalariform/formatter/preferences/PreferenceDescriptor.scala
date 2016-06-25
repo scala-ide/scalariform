@@ -90,7 +90,7 @@ trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
 
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(
-    RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, CompactStringConcatenation,
+    RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, SpaceBeforeContextColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, FirstParameterOnNewline, AlignArguments, FirstArgumentOnNewline,
     DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks, AlignSingleLineCaseStatements,
     AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis, DanglingCloseParenthesis,
@@ -121,6 +121,12 @@ case object IndentSpaces extends IntegerPreferenceDescriptor {
 case object SpaceBeforeColon extends BooleanPreferenceDescriptor {
   val key = "spaceBeforeColon"
   val description = "Add a space before colons"
+  val defaultValue = false
+}
+
+case object SpaceBeforeContextColon extends BooleanPreferenceDescriptor {
+  val key = "spaceBeforeContextColon"
+  val description = "Add a space before colons in context bounds"
   val defaultValue = false
 }
 
@@ -214,7 +220,7 @@ case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor
 case object DanglingCloseParenthesis extends IntentPreferenceDescriptor {
   val key = "danglingCloseParenthesis"
   val description = "Put a newline before a ')' in an argument expression"
-  val defaultValue = Force
+  val defaultValue = Prevent
 }
 
 case object SpaceInsideParentheses extends BooleanPreferenceDescriptor {
@@ -262,7 +268,7 @@ case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenc
 case object SpacesAroundMultiImports extends BooleanPreferenceDescriptor {
   val key = "spacesAroundMultiImports"
   val description = "Place spaces around multi imports (import a.{ b, c, d }"
-  val defaultValue = false
+  val defaultValue = true
 }
 
 case object NewlineAtEndOfFile extends BooleanPreferenceDescriptor {

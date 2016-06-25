@@ -3,7 +3,6 @@ package scalariform.commandline
 import java.io.File
 import java.util.{ ArrayList, Collection }
 import scala.collection.JavaConversions._
-import scala.collection.mutable.Buffer
 
 import org.apache.commons.io._
 import org.apache.commons.io.filefilter._

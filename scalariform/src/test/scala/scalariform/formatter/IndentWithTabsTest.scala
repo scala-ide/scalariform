@@ -48,8 +48,7 @@ class IndentWithTabsTest extends AbstractFormatterTest {
   """foo(
     |\talpha = "foo",
     |\tbeta = "bar",
-    |\tgamma = false
-    |)""".replace("\\t", "\t")
+    |\tgamma = false)""".replace("\\t", "\t")
 
   """foo(
     |"foo",
@@ -58,8 +57,7 @@ class IndentWithTabsTest extends AbstractFormatterTest {
   """foo(
     |\t"foo",
     |\t"bar",
-    |\tfalse
-    |)""".replace("\\t", "\t")
+    |\tfalse)""".replace("\\t", "\t")
 
   {
     implicit val formattingPreferences = FormattingPreferences
@@ -114,11 +112,13 @@ class IndentWithTabsTest extends AbstractFormatterTest {
     """foo(
       |"foo",
       |"bar",
-      |false)""" ==>
+      |false
+      |)""" ==>
     """foo(
       |\t"foo",
       |\t"bar",
-      |\tfalse)""".replace("\\t", "\t")
+      |\tfalse
+      |)""".replace("\\t", "\t")
 
     """foo(
       |\t"foo",

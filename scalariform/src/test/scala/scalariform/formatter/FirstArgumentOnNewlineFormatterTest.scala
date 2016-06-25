@@ -10,14 +10,12 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
   """foo(a,
     |    b)""" ==>
   """foo(a,
-    |  b
-    |)"""
+    |  b)"""
 
   """foo(a = 1,
     |    bb=2)""" ==>
   """foo(a = 1,
-    |  bb = 2
-    |)"""
+    |  bb = 2)"""
   }
 
   {
@@ -26,22 +24,19 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
   """foo(a,
     |    b)""" ==>
   """foo(a,
-    |  b
-    |)"""
+    |  b)"""
 
   """foo(
     |  a,
     |    b)""" ==>
   """foo(
     |  a,
-    |  b
-    |)"""
+    |  b)"""
 
   """foo(a = 1,
     |    bb = 2)""" ==>
   """foo(a = 1,
-    |  bb = 2
-    |)"""
+    |  bb = 2)"""
   }
 
   {
@@ -51,15 +46,13 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
     |    b)""" ==>
   """foo(
     |  a,
-    |  b
-    |)"""
+    |  b)"""
 
   """foo(a = 1,
     |    bb=2)""" ==>
   """foo(
     |  a = 1,
-    |  bb = 2
-    |)"""
+    |  bb = 2)"""
   }
 
   {
@@ -72,16 +65,14 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
     |ccc=3)""" ==>
   """foo(a   = 1,
     |    bb  = 2,
-    |    ccc = 3
-    |)"""
+    |    ccc = 3)"""
 
   """foo(a,
     |    bb,
     |ccc)""" ==>
   """foo(a,
     |    bb,
-    |    ccc
-    |)"""
+    |    ccc)"""
 
   // Parameters on the next line should also be aligned properly.
   """foo(
@@ -91,8 +82,7 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
   """foo(
     |  a   = 1,
     |  bb  = 2,
-    |  ccc = 3
-    |)"""
+    |  ccc = 3)"""
 
   """foo(
     | a,
@@ -101,8 +91,7 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
   """foo(
     |  a,
     |  bb,
-    |  ccc
-    |)"""
+    |  ccc)"""
   }
 
   {
@@ -116,8 +105,7 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
     | ccc=3)""" ==>
   """foo(a   = 1,
     |    bb  = 2,
-    |    ccc = 3
-    |)"""
+    |    ccc = 3)"""
 
   """foo(
     | a,
@@ -125,8 +113,7 @@ class FirstArgumentOnNewlineFormatterTest extends AbstractExpressionFormatterTes
     |ccc)""" ==>
   """foo(a,
     |    bb,
-    |    ccc
-    |)"""
+    |    ccc)"""
   }
 
   //  format: ON

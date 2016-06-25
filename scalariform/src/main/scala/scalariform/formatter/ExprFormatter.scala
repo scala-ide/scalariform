@@ -1215,7 +1215,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     if (multilineArguments) {
       formattingPreferences(FirstParameterOnNewline) match {
         case Force =>
-          formatResult ++= formatResult.before(firstParamOption.get.firstToken, paramFormatterState.nextIndentLevelInstruction)
+          formatResult ++= formatResult.before(
+            firstParamOption.get.firstToken,
+            paramFormatterState.indent(paramIndent).currentIndentLevelInstruction
+          )
         case Prevent =>
           formatResult ++= formatResult.before(firstParamOption.get.firstToken, Compact)
         case Preserve => // no-op.

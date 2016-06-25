@@ -12,30 +12,26 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |  b: String
     |)""" ==>
   """class A(a: Int,
-    |  b: String
-    |)"""
+    |  b: String)"""
 
   """class A(
     |  c: Int,
     |  d: String
     |)""" ==>
   """class A(c: Int,
-    |  d: String
-    |)"""
+    |  d: String)"""
 
   """def foo(a: Int,
     |    b: String): Unit = {}""" ==>
   """def foo(a: Int,
-    |  b: String
-    |): Unit = {}"""
+    |  b: String): Unit = {}"""
 
   """def foo(
     |  a: Int,
     |  b: String
     |): Unit = {}""" ==>
   """def foo(a: Int,
-    |  b: String
-    |): Unit = {}"""
+    |  b: String): Unit = {}"""
   }
 
   {
@@ -45,8 +41,7 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |  b: String
     |)""" ==>
   """class A(a: Int,
-    |  b: String
-    |)"""
+    |  b: String)"""
 
   """class A(
     |  a: Int,
@@ -54,14 +49,12 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |)""" ==>
   """class A(
     |  a: Int,
-    |  b: String
-    |)"""
+    |  b: String)"""
 
   """def foo(a: Int,
     |    b: String): Unit = {}""" ==>
   """def foo(a: Int,
-    |  b: String
-    |): Unit = {}"""
+    |  b: String): Unit = {}"""
 
   """def foo(
     |  a: Int,
@@ -69,8 +62,7 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |): Unit = {}""" ==>
   """def foo(
     |  a: Int,
-    |  b: String
-    |): Unit = {}"""
+    |  b: String): Unit = {}"""
   }
 
   {
@@ -81,8 +73,7 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |)""" ==>
   """class A(
     |  a: Int,
-    |  b: String
-    |)"""
+    |  b: String)"""
 
   """class A(
     |  a: Int,
@@ -90,23 +81,20 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |)""" ==>
   """class A(
     |  a: Int,
-    |  b: String
-    |)"""
+    |  b: String)"""
 
   """def foo(a: Int,
     |    b: String): Unit = {}""" ==>
   """def foo(
     |  a: Int,
-    |  b: String
-    |): Unit = {}"""
+    |  b: String): Unit = {}"""
 
   """def foo(
     |a: Int,
     |    b: String): Unit = {}""" ==>
   """def foo(
     |  a: Int,
-    |  b: String
-    |): Unit = {}"""
+    |  b: String): Unit = {}"""
   }
 
   {
@@ -119,8 +107,7 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     |c: String): Unit = {}""" ==>
   """def foo(a: Int,
     |        b: String,
-    |        c: String
-    |): Unit = {}"""
+    |        c: String): Unit = {}"""
 
   // Parameters on the next line should also be aligned properly.
   """def foo(
@@ -130,8 +117,7 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
   """def foo(
     |  a: Int,
     |  b: String,
-    |  c: String
-    |): Unit = {}"""
+    |  c: String): Unit = {}"""
   }
 
   {
@@ -145,8 +131,7 @@ class FirstParameterOnNewlineFormatterTest extends AbstractFormatterTest {
     | c: String): Unit = {}""" ==>
   """def foo(a: Int,
     |        b: String,
-    |        c: String
-    |): Unit = {}"""
+    |        c: String): Unit = {}"""
   }
 
   //  format: ON

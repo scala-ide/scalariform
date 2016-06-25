@@ -31,6 +31,14 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       else if (element.isInstanceOf[VarargsTypeElement]) {
         val instruction = if (Chars.isOperatorPart(previousElement.lastToken.text.last)) CompactEnsuringGap else Compact
         formatResult = formatResult.before(element.firstToken, instruction)
+      } else if (element.lastToken.tokenType == Tokens.COLON &&
+        element.tokens.tail.isEmpty &&
+        formattingPreferences(SpaceBeforeContextColon)) {
+        // Type class - [A : B]. Ensure a gap.
+        // TODO: If we are OK breaking backwards-compatibility, it would be better to move the
+        // SpaceBeforeContextColon check here, so that the SpaceBeforeColon setting would only
+        // apply to colons outside of type parameters.
+        formatResult = formatResult.before(element.lastToken, CompactEnsuringGap)
       }
       //      else if (previousElement.isInstanceOf[CallByNameTypeElement])
       //  formatResult = formatResult.before(element.firstToken, Compact)

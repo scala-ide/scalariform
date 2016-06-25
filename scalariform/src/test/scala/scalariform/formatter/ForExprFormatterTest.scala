@@ -137,15 +137,13 @@ class ForExprFormatterTest extends AbstractExpressionFormatterTest {
     |yield n)""" ==>
   """Some(
     |  for (n <- 1 to 10)
-    |    yield n
-    |)"""
+    |    yield n)"""
 
   """Some(
     |for (n <- 1 to 10)
     |proc())""" ==>
   """Some(
     |  for (n <- 1 to 10)
-    |    proc()
-    |)"""
+    |    proc())"""
 
 }

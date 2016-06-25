@@ -1,9 +1,6 @@
 Scalariform
 ===========
 
-.. image:: https://travis-ci.org/daniel-trinh/scalariform.png?branch=master
-   :target: https://travis-ci.org/daniel-trinh/scalariform
-
 Scalariform is a code formatter for Scala. It's available as a
 library, a stand-alone command line tool, or via integrations with
 various editors and build tools (listed below).
@@ -43,7 +40,7 @@ sbt will build one jar with all the dependencies and put it in ::
 
 You can copy this to a location in your path and execute it as follows: ::
 
-   java -jar /home/me/bin/cli-assembly-$scalariform_version.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +preserveDanglingCloseParenthesis +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
+   java -jar /home/me/bin/cli-assembly-$scalariform_version.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
 
 Integration with sbt
 --------------------
@@ -55,7 +52,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.2.0"
+    "org.scalariform" %% "scalariform" % "0.1.8"
 
 Integration with Eclipse
 ------------------------
@@ -133,11 +130,11 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gq`` command by adding
 the following to ``.vimrc`` ::
 
-  au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +preserveDanglingCloseParenthesis\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
+  au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
 
 Or, if you don't like escaping spaces, you can set up a mapping: ::
 
-    map ,st :%!java -jar /home/me/bin/scalariform.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +preserveDanglingCloseParenthesis +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdin --stdout <CR>
+    map ,st :%!java -jar /home/me/bin/scalariform.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdin --stdout <CR>
 
 You can create your own executable scalariform.jar by following the instructions at the top of this file, in "Packaging an executable JAR."
 
@@ -637,7 +634,7 @@ Otherwise, if ``false``, spaces before arguments will always be removed.
 danglingCloseParenthesis
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default: ``Force``
+Default: ``Prevent``
 
 If ``Force``, any closing parentheses will be set to dangle. For example:
 
@@ -700,17 +697,34 @@ spaceBeforeColon
 
 Default: ``false``
 
-Whether to ensure a space before colon. For example, if ``false``, then:
+Whether to ensure a space before all single colons. For example, if ``false``, then:
 
 .. code:: scala
 
-  def add(a: Int, b: Int): Int = a + b
+  def add[T: Numeric](a: T, b: T): Int = implictly[Numeric[T]].plus(a, b)
 
 If ``true``, then:
 
 .. code:: scala
 
-  def add(a : Int, b : Int) : Int = a + b
+  def add[T : Numeric](a : T, b : T): Int = implictly[Numeric[T]].plus(a, b)
+
+spaceBeforeContextColon
+~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+Whether to ensure a space before colons in context bounds (the typeclass pattern). For example, if ``false``, then:
+
+.. code:: scala
+
+  def newArray[T: ClassManifest](n: Int) = new Array[T](n)
+
+If ``true``, then:
+
+.. code:: scala
+
+  def newArray[T : ClassManifest](n: Int) = new Array[T](n)
 
 spaceInsideBrackets
 ~~~~~~~~~~~~~~~~~~~
@@ -766,7 +780,7 @@ If ``false``,:
 spacesAroundMultiImports
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default: ``false``
+Default: ``true``
 
 Whether or not to add spaces around multi-imports.
 For example, if ``false``, then:
@@ -783,11 +797,7 @@ If ``true``, then:
   import a.{ b, c, d }
   import foo.{ bar => baz }
 
-Older versions of `Scalariform` used ``true``,
-but the standard Scala formatting requires ``false``.
-
-See the examples given in "Chapter 13 - Packages and Imports.", page 244 of *Programming in Scala*
-2nd ed. (2010) by Odersky, Spoon and Venners.
+Compatibility note: Versions 0.1.6 & 0.1.7 of `Scalariform` used ``false``.
 
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~

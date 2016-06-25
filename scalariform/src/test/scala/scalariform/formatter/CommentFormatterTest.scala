@@ -128,12 +128,16 @@ class CommentFormatterTest extends AbstractFormatterTest {
 
   """/*\u0020
     |   Comment with trailing whitespace above.
-    |   Indent should be preserved, whitespace trimmed.
+    |
+    |   Indent should be preserved, whitespace trimmed, blank lines preserved.
+    |
     |   Visible separation (space below) should be added.
     | */""" ==>
   """/*
     |   Comment with trailing whitespace above.
-    |   Indent should be preserved, whitespace trimmed.
+    |
+    |   Indent should be preserved, whitespace trimmed, blank lines preserved.
+    |
     |   Visible separation (space below) should be added.
     | */ """
 
