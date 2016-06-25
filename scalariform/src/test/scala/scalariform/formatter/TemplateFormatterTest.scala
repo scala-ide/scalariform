@@ -49,6 +49,9 @@ class TemplateFormatterTest extends AbstractFormatterTest {
 """@A@B(c = "d")abstract class E [F]@G()private(val h: I) (implicit j: K) extends{} with L(2) with M{}""" ==>
 """@A @B(c = "d") abstract class E[F] @G() private (val h: I)(implicit j: K) extends {} with L(2) with M {}"""
 
+"""class Foo {private[Foo]type Bar=String}""" ==>
+  """class Foo { private[Foo] type Bar = String }"""
+
 """@A/*a*/@B
    |/*b*/class E""" =/=>
 """@A/*a*/
