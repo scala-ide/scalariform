@@ -127,14 +127,12 @@ Use with Vim
 ------------
 
 While there is no specific Vim integration at present, you can use
-Scalariform as an external formatter for the ``gq`` command by adding
+Scalariform as an external formatter for the ``gg=G`` command by adding
 the following to ``.vimrc`` ::
-
+  
   au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
+  au BufEnter *.scala setl equalprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
 
-Or, if you don't like escaping spaces, you can set up a mapping: ::
-
-    map ,st :%!java -jar /home/me/bin/scalariform.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdin --stdout <CR>
 
 You can create your own executable scalariform.jar by following the instructions at the top of this file, in "Packaging an executable JAR."
 
