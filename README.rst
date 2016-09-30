@@ -433,7 +433,7 @@ doubleIndentClassDeclaration
 Default: ``false``
 
 With this set to ``true``, class (and trait / object) declarations
-will be formatted as recommended_ by the Scala Style Guide.
+will be formatted as recommended_ by the Scala Style Guide. That is,
 if the declaration section spans multiple lines, it will be formatted
 so that either the parameter section or the inheritance section is
 doubly indented. This provides a visual distinction from the members
