@@ -173,8 +173,8 @@ case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
   val defaultValue = false
 }
 
-case object MultilineConstructorArgumentsDeclaration extends BooleanPreferenceDescriptor {
-  val key = "MultilineConstructorArgumentsDeclaration"
+case object DoubleIndentConstructorArguments extends BooleanPreferenceDescriptor {
+  val key = "doubleIndentConstructorArguments"
   val description = "Class (and trait / object) declarations will be formatted as recommended by the Scala Style Guide"
   val defaultValue = false
 }

@@ -3,7 +3,7 @@ package scalariform.formatter
 import scalariform.formatter.preferences._
 import scalariform.parser._
 
-class MultilineConstructorArgumentsDeclarationTest extends AbstractFormatterTest {
+class DoubleIndentConstructorArgumentsTest extends AbstractFormatterTest {
   override val debug = false
 
   def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
@@ -12,7 +12,7 @@ class MultilineConstructorArgumentsDeclarationTest extends AbstractFormatterTest
 
   def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
 
-  implicit val formattingPreferences = FormattingPreferences.setPreference(MultilineConstructorArgumentsDeclaration, true)
+  implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentConstructorArguments, true)
   """class Person(
     |  name: String,
     |  age: Int)

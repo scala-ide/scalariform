@@ -34,11 +34,11 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
         !templateInheritanceSectionOpt.exists { section ⇒
           containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline
         } &&
-        templateBodyOption.exists(containsNewline(_))) || formattingPreferences(MultilineConstructorArgumentsDeclaration)
+        templateBodyOption.exists(containsNewline(_))) || formattingPreferences(DoubleIndentConstructorArguments)
       formatResult ++= formatParamClauses(paramClauses, doubleIndentParams)
     }
     for (TemplateInheritanceSection(extendsOrSubtype, earlyDefsOpt, templateParentsOpt) ← templateInheritanceSectionOpt) {
-      val doubleIndentTemplateInheritance = !formattingPreferences(MultilineConstructorArgumentsDeclaration) &&
+      val doubleIndentTemplateInheritance = !formattingPreferences(DoubleIndentConstructorArguments) &&
         formattingPreferences(DoubleIndentClassDeclaration) &&
         (templateBodyOption.exists(containsNewline(_)) || paramClausesOpt.exists(containsNewline(_)))
       val inheritanceIndent = if (doubleIndentTemplateInheritance) 2 else 1

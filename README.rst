@@ -433,8 +433,11 @@ doubleIndentClassDeclaration
 Default: ``false``
 
 With this set to ``true``, class (and trait / object) declarations
-which span multiple lines, it will be formatted so that either the
-the inheritance section is doubly indented.
+will be formatted as recommended_ by the Scala Style Guide.
+if the declaration section spans multiple lines, it will be formatted
+so that either the parameter section or the inheritance section is
+doubly indented. This provides a visual distinction from the members
+of the class. For example:
 
 .. code:: scala
 
@@ -452,8 +455,10 @@ the inheritance section is doubly indented.
     def firstMethod = ...
   }
 
-multilineConstructorArgumentsDeclaration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This setting will be overridden by ``doubleIndentConstructorArguments``.
+
+doubleIndentConstructorArguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Default: ``false``
 
