@@ -166,7 +166,7 @@ case object FirstArgumentOnNewline extends IntentPreferenceDescriptor {
   val defaultValue = Force
 }
 
-@deprecated("This has been dropped in favor of MultilineConstrucmtorArgumentsDeclaration.", since = "0.1.5")
+@deprecated("This has been dropped in favor of DoubleIndentConstructorArguments.", since = "0.1.5")
 case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
   val key = "doubleIndentClassDeclaration"
   val description = "Double indent either a class's parameters or its inheritance list"
