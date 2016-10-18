@@ -67,7 +67,7 @@ lazy val subprojectSettings = commonSettings :+ (
 
 def scala2_11Dependencies = Def.setting {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 11)) => Seq(
+    case Some((2, major)) if major >= 11 => Seq(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
     )
