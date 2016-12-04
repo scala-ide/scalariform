@@ -1,11 +1,11 @@
 package scalariform.lexer
 
 import scalariform._
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FlatSpec, Matchers}
+
 import scalariform.utils.Utils._
 
-class RedundantSemicolonDetectorTest extends FlatSpec with ShouldMatchers {
+class RedundantSemicolonDetectorTest extends FlatSpec with Matchers {
 
   implicit def stringToCheckable(s: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION) =
     new { def check() = checkSemis(s, scalaVersion) }; // Expected redundant semicolons are indicated with <;>

@@ -2,16 +2,15 @@ package scalariform.lexer
 
 import scalariform._
 import scalariform.lexer.Tokens._
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
  * Test full tokeniser, including newline inferencing.
  */
-class NewlineInferencerTest extends FlatSpec with ShouldMatchers {
+class NewlineInferencerTest extends FlatSpec with Matchers {
 
   implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) =
-    new TestString(s, forgiveErrors, scalaVersion);
+    new TestString(s, forgiveErrors, scalaVersion)
 
   // See issue #60
   """

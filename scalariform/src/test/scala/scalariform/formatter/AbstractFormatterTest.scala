@@ -1,14 +1,14 @@
 package scalariform.formatter
 
+import org.scalatest.exceptions.{TestFailedException, TestPendingException}
+
 import scalariform.lexer._
 import scalariform.formatter.preferences._
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.TestFailedException
-import org.scalatest.TestPendingException
+import org.scalatest.{FlatSpec, Matchers}
+
 import scalariform.ScalaVersions
 
-abstract class AbstractFormatterTest extends FlatSpec with ShouldMatchers with SpecificFormatter {
+abstract class AbstractFormatterTest extends FlatSpec with Matchers with SpecificFormatter {
 
   def prettyPrint(s: String): String =
     //s.replaceAll("\n", "↵\n").replaceAll("\t", "↦" ).replaceAll(" ", "▵")
