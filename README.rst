@@ -148,6 +148,17 @@ See Mads Jensen's Scala TextMate bundle:
 
 Reformat using Ctrl-Shift-H.
 
+
+Integration with Sublime Text 2
+-------------------------------
+
+See Christopher Swenson's Sublime Text 2 plug-in.
+
+  https://github.com/swenson/sublime_scala_format
+
+It reformats all Scala files on save.
+
+
 Use with Vim
 ------------
 
