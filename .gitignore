@@ -17,4 +17,4 @@ docs/build
 .settings
 nohup.out
 .history
-.cache
+.cache*
