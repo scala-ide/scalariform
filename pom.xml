@@ -9,25 +9,19 @@
 
   <!-- scm configuration is require to extract the github hash-->
   <scm>
-    <connection>scm:git://github.com/mdr/scalariform.git</connection>
-    <url>https://github.com/mdr/scalariform</url>
+    <connection>scm:git://github.com/scala-ide/scalariform.git</connection>
+    <url>https://github.com/scala-ide/scalariform</url>
   </scm>
 
   <properties>
-    <tycho.version>0.18.1</tycho.version>
+    <tycho.version>0.21.0</tycho.version>
     <scala.version>2.10.2</scala.version>
     <encoding>UTF-8</encoding>
-    <maven.version>3.0.4</maven.version>
     <scala.binary.version>2.11</scala.binary.version>
-    <scala.xml.version>1.0.2</scala.xml.version>
-    <scala.parser-combinators.version>1.0.1</scala.parser-combinators.version>
+    <scala.xml.version>1.0.5</scala.xml.version>
+    <scala.parser-combinators.version>1.0.4</scala.parser-combinators.version>
     <version.suffix>2_10</version.suffix>
   </properties>
-
-  <prerequisites>
-    <maven>${maven.version}</maven>
-  </prerequisites>
-
 
   <modules>
     <module>scalariform</module>
@@ -87,7 +81,7 @@
           <format>'${version.suffix}-'yyyyMMddHHmm'-${buildNumber}'</format>
           <archiveSite>true</archiveSite>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
@@ -112,9 +106,9 @@
   </build>
   <repositories>
     <repository>
-      <id>kepler</id>
+      <id>neon</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/kepler</url>
+      <url>http://download.eclipse.org/releases/neon</url>
     </repository>
     <repository>
       <id>sonatype.release</id>
@@ -143,6 +137,25 @@
       <properties>
         <scala.version>2.11.0-SNAPSHOT</scala.version>
         <version.suffix>2_11</version.suffix>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-xml_${scala.binary.version}</artifactId>
+          <version>${scala.xml.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
+          <version>${scala.parser-combinators.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>scala-2.12.x</id>
+      <properties>
+        <scala.version>2.12.1</scala.version>
+        <version.suffix>2_12</version.suffix>
       </properties>
       <dependencies>
         <dependency>

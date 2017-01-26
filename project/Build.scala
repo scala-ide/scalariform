@@ -6,13 +6,14 @@ import com.typesafe.sbteclipse.core.EclipsePlugin._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
+import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 object ScalariformBuild extends Build {
 
   lazy val commonSettings = Defaults.defaultSettings ++ SbtScalariform.defaultScalariformSettings ++ Seq(
     organization := "org.scalariform",
     version := "0.1.5-SNAPSHOT",
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.12.1",
     crossScalaVersions := Seq(
       //      "2.11.0-M2",
       "2.10.0", "2.10.1",
@@ -25,41 +26,59 @@ object ScalariformBuild extends Build {
     EclipseKeys.eclipseOutput := Some("bin"))
 
   lazy val subprojectSettings = commonSettings ++ Seq(
-    ScalariformKeys.preferences <<= baseDirectory.apply(getScalariformPreferences))
+    ScalariformKeys.preferences := baseDirectory.apply(getScalariformPreferences).value)
 
   def getScalariformPreferences(dir: File) =
     PreferencesImporterExporter.loadPreferences((dir / ".." / "formatterPreferences.properties").getPath)
 
+  /*
   lazy val root: Project = Project("root", file("."), settings = commonSettings ++ Seq(
     publish := (),
     publishLocal := ())) aggregate (scalariform, cli, misc)
+  */
 
   def getScalaTestDependency(scalaVersion: String) = scalaVersion match {
     case "2.8.0"  ⇒ "org.scalatest" %% "scalatest" % "1.3.1.RC2" % "test"
     case "2.10.0" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     case "2.10.1" ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     case "2.9.3"  ⇒ "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    case v if v startsWith "2.12" => "org.scalatest" %% "scalatest" % "3.0.1" % "test"
     case _        ⇒ "org.scalatest" %% "scalatest" % "1.7.2" % "test"
   }
 
-  lazy val scalariform: Project = Project("scalariform", file("scalariform"), settings =
-    subprojectSettings ++ sbtbuildinfo.Plugin.buildInfoSettings ++ eclipseSettings ++
+  def scala2_11Dependencies = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, major)) if major >= 11 => Seq(
+        "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+      )
+      case _ => Nil
+    }
+  }
+
+  lazy val scalariform: Project = project enablePlugins(sbtbuildinfo.BuildInfoPlugin) settings(
+    subprojectSettings ++ eclipseSettings ++
       Seq(
         libraryDependencies <<= (scalaVersion, libraryDependencies) { (sv, deps) ⇒ deps :+ getScalaTestDependency(sv) },
+        libraryDependencies ++= scala2_11Dependencies.value,
         pomExtra := pomExtraXml,
         publishMavenStyle := true,
         publishArtifact in Test := false,
         pomIncludeRepository := { _ ⇒ false },
-        sbtbuildinfo.Plugin.buildInfoKeys := Seq[sbtbuildinfo.Plugin.BuildInfoKey](version),
-        sbtbuildinfo.Plugin.buildInfoPackage := "scalariform",
-        sourceGenerators in Compile <+= sbtbuildinfo.Plugin.buildInfo,
-        EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed,
-        publishTo <<= isSnapshot(getPublishToRepo)))
+        buildInfoKeys := Seq[BuildInfoKey](version),
+        buildInfoPackage := "scalariform",
+        publishTo := getPublishToRepo.value,
+        EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed
+      ))
 
-  def getPublishToRepo(isSnapshot: Boolean) =
-    if (isSnapshot) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-    else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+  def getPublishToRepo = Def.setting {
+    if (isSnapshot.value)
+      Some(Opts.resolver.sonatypeSnapshots)
+    else
+      Some(Opts.resolver.sonatypeStaging)
+  }
 
+  /*
   lazy val cli = Project("cli", file("cli"), settings = subprojectSettings ++ SbtOneJar.oneJarSettings ++
     Seq(
       libraryDependencies += "commons-io" % "commons-io" % "1.4",
@@ -76,6 +95,7 @@ object ScalariformBuild extends Build {
       publish := (),
       publishLocal := (),
       mainClass in (Compile, run) := Some("scalariform.gui.Main"))) dependsOn (scalariform, cli)
+  */
 
   def pomExtraXml =
     <inceptionYear>2010</inceptionYear>
