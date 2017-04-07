@@ -166,9 +166,16 @@ case object FirstArgumentOnNewline extends IntentPreferenceDescriptor {
   val defaultValue = Force
 }
 
+@deprecated("This has been dropped in favor of DoubleIndentConstructorArguments.", since = "0.1.5")
 case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
   val key = "doubleIndentClassDeclaration"
   val description = "Double indent either a class's parameters or its inheritance list"
+  val defaultValue = false
+}
+
+case object DoubleIndentConstructorArguments extends BooleanPreferenceDescriptor {
+  val key = "doubleIndentConstructorArguments"
+  val description = "Class (and trait / object) declarations will be formatted as recommended by the Scala Style Guide"
   val defaultValue = false
 }
 

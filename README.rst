@@ -478,6 +478,34 @@ of the class. For example:
     def firstMethod = ...
   }
 
+This setting will be overridden by ``doubleIndentConstructorArguments``.
+
+doubleIndentConstructorArguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+With this set to ``true``, class (and trait / object) declarations
+will be formatted as recommended_ by the Scala Style Guide. That is,
+if the declaration section spans multiple lines, it will be formatted
+so that the parameter section is doubly indented. This provides a visual
+distinction between the constructor arguments & the extensions. For example:
+
+.. code:: scala
+
+  class Person(
+      name: String,
+      age: Int,
+      birthdate: Date,
+      astrologicalSign: String,
+      shoeSize: Int,
+      favoriteColor: java.awt.Color)
+    extends Entity
+    with Logging
+    with Identifiable
+    with Serializable {
+  }
+
 Or:
 
 .. code:: scala

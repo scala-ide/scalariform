@@ -30,13 +30,16 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     } {
       if (annotations.size > 0)
         formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)
-      val doubleIndentParams = formattingPreferences(DoubleIndentClassDeclaration) &&
-        !templateInheritanceSectionOpt.exists { section ⇒ containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline } &&
-        templateBodyOption.exists(containsNewline(_))
+      val doubleIndentParams = (formattingPreferences(DoubleIndentClassDeclaration) &&
+        !templateInheritanceSectionOpt.exists { section ⇒
+          containsNewline(section) || hiddenPredecessors(section.firstToken).containsNewline
+        } &&
+        templateBodyOption.exists(containsNewline(_))) || formattingPreferences(DoubleIndentConstructorArguments)
       formatResult ++= formatParamClauses(paramClauses, doubleIndentParams)
     }
     for (TemplateInheritanceSection(extendsOrSubtype, earlyDefsOpt, templateParentsOpt) ← templateInheritanceSectionOpt) {
-      val doubleIndentTemplateInheritance = formattingPreferences(DoubleIndentClassDeclaration) &&
+      val doubleIndentTemplateInheritance = !formattingPreferences(DoubleIndentConstructorArguments) &&
+        formattingPreferences(DoubleIndentClassDeclaration) &&
         (templateBodyOption.exists(containsNewline(_)) || paramClausesOpt.exists(containsNewline(_)))
       val inheritanceIndent = if (doubleIndentTemplateInheritance) 2 else 1
       var currentFormatterState = formatterState
