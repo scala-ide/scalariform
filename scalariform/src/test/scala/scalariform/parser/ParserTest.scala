@@ -1,23 +1,21 @@
 package scalariform.parser
 
 import scalariform.lexer._
-
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FlatSpec, Matchers}
 
 // format: +preserveSpaceBeforeArguments
-class ParserTest extends FlatSpec with ShouldMatchers {
+class ParserTest extends FlatSpec with Matchers {
 
   "Parser" should "throw a parse exception" in {
-    evaluating { parseExpression("for {x <- b if }") } should produce[ScalaParserException]
+    an [ScalaParserException] should be thrownBy parseExpression("for {x <- b if }")
   }
 
   "Parser" should "throw a parse exception for empty match " in {
-    evaluating { parseExpression("a match { }") } should produce[ScalaParserException]
+    an [ScalaParserException] should be thrownBy parseExpression("a match { }")
   }
 
   "Parser" should "produce a parse exception on a trailing close brace" in {
-    evaluating { parseCompilationUnit("class A{}}") } should produce[ScalaParserException]
+    an [ScalaParserException] should be thrownBy parseCompilationUnit("class A{}}")
   }
 
   "Parser" should "not throw an exception" in {
@@ -37,7 +35,7 @@ class ParserTest extends FlatSpec with ShouldMatchers {
   }
 
   "Parser" should "throw a parse exception in bad package blocks" in {
-    evaluating { parseCompilationUnit("package a {} package b {}") } should produce[ScalaParserException]
+    an [ScalaParserException] should be thrownBy parseCompilationUnit("package a {} package b {}")
   }
 
   // issue #44

@@ -1461,6 +1461,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         nextToken()
       case LBRACE ⇒
         xmlEmbeddedScala(isPattern)
+      case _ ⇒
+        throw new ScalaParserException("Expected XML attribute name or left brace: " + currentToken)
     }
   }
 

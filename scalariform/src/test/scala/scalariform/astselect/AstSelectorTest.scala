@@ -1,12 +1,11 @@
 package scalariform.astselect
 
 import org.scalatest._
-import org.scalatest.matchers._
 import scalariform.utils.Range
 import scalariform.ScalaVersions
 
 // format: OFF
-class AstSelectorTest extends FlatSpec with ShouldMatchers {
+class AstSelectorTest extends FlatSpec with Matchers {
 
   // Legend:
   //
