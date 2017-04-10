@@ -3,7 +3,7 @@ import scalariform.formatter.preferences._
 
 lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     SbtScalariform.defaultScalariformSettings ++ Seq(
-  organization := "org.scalariform",
+  organization := "com.github.machaval",
   sonatypeProfileName := organization.value,
   scalaVersion := crossScalaVersions.value.head,
   crossScalaVersions := Seq(
@@ -124,13 +124,14 @@ lazy val cli = (project
 )
 
 lazy val root = (project in file(".")
+  settings(publishSettings("root"))
   settings(commonSettings)
   aggregate(scalariform, cli)
 )
 
 def pomExtraXml =
   <inceptionYear>2010</inceptionYear>
-  <url>https://github.com/scala-ide/scalariform</url>
+  <url>https://github.com/machaval/scalariform</url>
   <licenses>
     <license>
       <name>MIT License</name>
@@ -139,10 +140,15 @@ def pomExtraXml =
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:scala-ide/scalariform.git</url>
-    <connection>scm:git:git@github.com:scala-ide/scalariform</connection>
+    <url>git@github.com:machaval/scalariform.git</url>
+    <connection>scm:git:git@github.com:machaval/scalariform</connection>
   </scm>
   <developers>
+    <developer>
+      <id>machaval</id>
+      <name>Mariano de Achaval</name>
+      <url>https://github.com/machaval/</url>
+    </developer>
     <developer>
       <id>scala-ide</id>
       <name>Scala IDE</name>
