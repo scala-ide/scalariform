@@ -7,12 +7,17 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
   sonatypeProfileName := organization.value,
   scalaVersion := crossScalaVersions.value.head,
   crossScalaVersions := Seq(
-    "2.12.0",
-    "2.11.8",
+    "2.12.2",
+    "2.11.11",
     "2.10.6"
   ),
   exportJars := true, // Needed for cli oneJar
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, 12)) => Seq(
+      "-Xlint:-unused,_", "-Ywarn-unused:imports",
+      "-language:postfixOps", "-language:implicitConversions",
+      "-deprecation", "-feature"
+    )
     case Some((2, major)) if major >= 11 =>
       scalac2_10Options ++ scalac2_11Options
     case _ =>
@@ -69,8 +74,8 @@ lazy val subprojectSettings = commonSettings :+ (
 def scala2_11Dependencies = Def.setting {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, major)) if major >= 11 => Seq(
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6"
     )
     case _ => Nil
   }
