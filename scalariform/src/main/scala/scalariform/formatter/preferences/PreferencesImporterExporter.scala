@@ -1,7 +1,7 @@
 package scalariform.formatter.preferences
 
 import java.util.Properties
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scalariform.utils.Utils._
 import java.io.IOException
 
@@ -22,7 +22,7 @@ object PreferencesImporterExporter {
       }
 
     for {
-      key @ (dummy: String) ← properties.propertyNames
+      key @ (dummy: String) ← properties.propertyNames.asScala
       descriptor ← AllPreferences.preferencesByKey.get(key)
       valueString = properties.getProperty(key)
     } setPreference(descriptor, valueString)
