@@ -40,7 +40,7 @@ sbt will build one jar with all the dependencies and put it in ::
 
 You can copy this to a location in your path and execute it as follows: ::
 
-   java -jar /home/me/bin/cli-assembly-$scalariform_version.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentClassDeclaration +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
+   java -jar /home/me/bin/cli-assembly-$scalariform_version.jar -f -q +compactControlReadability +alignParameters +alignSingleLineCaseStatements +doubleIndentConstructorArguments +rewriteArrowSymbols +preserveSpaceBeforeArguments --stdout ~/myproject/src/main/scala/Stuff.scala > Stuff.scala
 
 Integration with sbt
 --------------------
@@ -155,8 +155,8 @@ While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gg=G`` command by adding
 the following to ``.vimrc`` ::
   
-  au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
-  au BufEnter *.scala setl equalprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
+  au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentConstructorArguments\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
+  au BufEnter *.scala setl equalprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentConstructorArguments\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
 
 
 You can create your own executable scalariform.jar by following the instructions at the top of this file, in "Packaging an executable JAR."
@@ -449,36 +449,6 @@ The Scala Style Guide recommends_ that operators, "should `always` be
 invoked using infix notation with spaces separated the target".
 
 .. _recommends: http://docs.scala-lang.org/style/method-invocation.html#symbolic-methodsoperators
-
-doubleIndentClassDeclaration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Default: ``false``
-
-With this set to ``true``, class (and trait / object) declarations
-will be formatted as recommended_ by the Scala Style Guide. That is,
-if the declaration section spans multiple lines, it will be formatted
-so that either the parameter section or the inheritance section is
-doubly indented. This provides a visual distinction from the members
-of the class. For example:
-
-.. code:: scala
-
-  class Person(
-    name: String,
-    age: Int,
-    birthdate: Date,
-    astrologicalSign: String,
-    shoeSize: Int,
-    favoriteColor: java.awt.Color)
-      extends Entity
-      with Logging
-      with Identifiable
-      with Serializable {
-    def firstMethod = ...
-  }
-
-This setting will be overridden by ``doubleIndentConstructorArguments``.
 
 doubleIndentConstructorArguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -864,7 +834,7 @@ Preference                                  Value     Default?
 =========================================== ========= =========
 alignParameters                             ``false``
 compactStringConcatenation                  ``false``
-doubleIndentClassDeclaration                ``true``    No
+doubleIndentConstructorArguments            ``true``    No
 indentSpaces                                ``2``
 placeScaladocAsterisksBeneathSecondAsterisk ``true``    No
 preserveSpaceBeforeArguments                ``false``
