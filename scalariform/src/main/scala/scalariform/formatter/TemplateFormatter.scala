@@ -39,7 +39,6 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     }
     for (TemplateInheritanceSection(extendsOrSubtype, earlyDefsOpt, templateParentsOpt) ← templateInheritanceSectionOpt) {
       val doubleIndentTemplateInheritance = !formattingPreferences(DoubleIndentConstructorArguments) &&
-        formattingPreferences(DoubleIndentConstructorArguments) &&
         (templateBodyOption.exists(containsNewline(_)) || paramClausesOpt.exists(containsNewline(_)))
       val inheritanceIndent = if (doubleIndentTemplateInheritance) 2 else 1
       var currentFormatterState = formatterState
