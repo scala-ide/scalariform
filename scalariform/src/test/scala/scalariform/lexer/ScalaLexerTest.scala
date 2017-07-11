@@ -2,10 +2,9 @@ package scalariform.lexer
 
 import scalariform._
 import scalariform.lexer.Tokens._
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FlatSpec, Matchers}
 
-class ScalaLexerTest extends FlatSpec with ShouldMatchers {
+class ScalaLexerTest extends FlatSpec with Matchers {
 
   implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) =
     new TestString(s, forgiveErrors, scalaVersion)
@@ -242,9 +241,9 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   "-5 max(2)" producesTokens (MINUS, INTEGER_LITERAL, WS, VARID, LPAREN, INTEGER_LITERAL, RPAREN)
 
   "Lexer" should "throw a lexer exception" in {
-    evaluating { ScalaLexer.rawTokenise("\"\"\"") } should produce[ScalaLexerException]
-    evaluating { ScalaLexer.rawTokenise("<?") } should produce[ScalaLexerException]
-    evaluating { ScalaLexer.rawTokenise("<xml:unparsed>") } should produce[ScalaLexerException]
+    an [ScalaLexerException] should be thrownBy ScalaLexer.rawTokenise("\"\"\"")
+    an [ScalaLexerException] should be thrownBy ScalaLexer.rawTokenise("<?")
+    an [ScalaLexerException] should be thrownBy ScalaLexer.rawTokenise("<xml:unparsed>")
   }
 
   {

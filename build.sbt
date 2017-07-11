@@ -7,11 +7,17 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
   sonatypeProfileName := organization.value,
   scalaVersion := crossScalaVersions.value.head,
   crossScalaVersions := Seq(
-    "2.11.8",
+    "2.12.2",
+    "2.11.11",
     "2.10.6"
   ),
   exportJars := true, // Needed for cli oneJar
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, 12)) => Seq(
+      "-Xlint:-unused,_", "-Ywarn-unused:imports",
+      "-language:postfixOps", "-language:implicitConversions",
+      "-deprecation", "-feature"
+    )
     case Some((2, major)) if major >= 11 =>
       scalac2_10Options ++ scalac2_11Options
     case _ =>
@@ -68,8 +74,8 @@ lazy val subprojectSettings = commonSettings :+ (
 def scala2_11Dependencies = Def.setting {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, major)) if major >= 11 => Seq(
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6"
     )
     case _ => Nil
   }
@@ -81,7 +87,7 @@ lazy val scalariform = (project
   settings(publishSettings("scalariform"))
   settings(
     libraryDependencies ++= scala2_11Dependencies.value,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     // sbt doesn't automatically load the content of the MANIFST.MF file, therefore
     // we have to do it here by ourselves Furthermore, the version format in the
     // MANIFEST.MF is `x.y.z.qualifier` but we need to replace the `qualifier` part
@@ -123,6 +129,7 @@ lazy val cli = (project
 )
 
 lazy val root = (project in file(".")
+  settings(publishSettings("root"))
   settings(commonSettings)
   aggregate(scalariform, cli)
 )
@@ -156,5 +163,10 @@ def pomExtraXml =
       <id>daniel-trinh</id>
       <name>Daniel Trinh</name>
       <url>https://github.com/daniel-trinh/</url>
+    </developer>
+    <developer>
+      <id>machaval</id>
+      <name>Mariano de Achaval</name>
+      <url>https://github.com/machaval/</url>
     </developer>
   </developers>

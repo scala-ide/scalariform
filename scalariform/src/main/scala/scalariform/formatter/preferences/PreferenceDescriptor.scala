@@ -92,8 +92,8 @@ object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(
     RewriteArrowSymbols, IndentSpaces, SpaceBeforeColon, SpaceBeforeContextColon, CompactStringConcatenation,
     PreserveSpaceBeforeArguments, AlignParameters, FirstParameterOnNewline, AlignArguments, FirstArgumentOnNewline,
-    DoubleIndentClassDeclaration, FormatXml, IndentPackageBlocks, AlignSingleLineCaseStatements,
-    AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, PreserveDanglingCloseParenthesis, DanglingCloseParenthesis,
+    DoubleIndentConstructorArguments, FormatXml, IndentPackageBlocks, AlignSingleLineCaseStatements,
+    AlignSingleLineCaseStatements.MaxArrowIndent, IndentLocalDefs, DanglingCloseParenthesis,
     SpaceInsideParentheses, SpaceInsideBrackets, SpacesWithinPatternBinders, MultilineScaladocCommentsStartOnFirstLine, IndentWithTabs,
     CompactControlReadability, PlaceScaladocAsterisksBeneathSecondAsterisk, DoubleIndentMethodDeclaration, SpacesAroundMultiImports,
     NewlineAtEndOfFile
@@ -166,9 +166,9 @@ case object FirstArgumentOnNewline extends IntentPreferenceDescriptor {
   val defaultValue = Force
 }
 
-case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
-  val key = "doubleIndentClassDeclaration"
-  val description = "Double indent either a class's parameters or its inheritance list"
+case object DoubleIndentConstructorArguments extends BooleanPreferenceDescriptor {
+  val key = "doubleIndentConstructorArguments"
+  val description = "Class (and trait / object) declarations will be formatted as recommended by the Scala Style Guide"
   val defaultValue = false
 }
 
@@ -207,13 +207,6 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
 case object IndentLocalDefs extends BooleanPreferenceDescriptor {
   val key = "indentLocalDefs"
   val description = "Indent local defs an extra level"
-  val defaultValue = false
-}
-
-@deprecated("This has been dropped in favor of DanglingCloseParenthesis.", since = "0.1.5")
-case object PreserveDanglingCloseParenthesis extends BooleanPreferenceDescriptor {
-  val key = "preserveDanglingCloseParenthesis"
-  val description = "Allow a newline before a ')' in an argument expression"
   val defaultValue = false
 }
 

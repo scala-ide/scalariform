@@ -1,12 +1,10 @@
 package scalariform.parser
 
 import scalariform.lexer._
-
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FlatSpec, Matchers}
 
 // format: +preserveSpaceBeforeArguments
-class ScalaParserTest extends FlatSpec with ShouldMatchers {
+class ScalaParserTest extends FlatSpec with Matchers {
 
   "Parser" should "not throw exception" in {
     //    parseExpression("class X")

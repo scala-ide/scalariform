@@ -1,11 +1,11 @@
 package scalariform.formatter
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FlatSpec, Matchers}
+
 import FormatterDirectiveParser.getDirectives
 
 // format: +preserveSpaceBeforeArguments
-class FormatterDirectiveParserTest extends FlatSpec with ShouldMatchers {
+class FormatterDirectiveParserTest extends FlatSpec with Matchers {
 
   it should "parse formatter ON/OFF instructions" in {
     "format: ON " ==> ToggleFormatting(true)

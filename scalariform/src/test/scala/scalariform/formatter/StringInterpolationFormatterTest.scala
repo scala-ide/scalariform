@@ -12,9 +12,9 @@ class StringInterpolationFormatterTest extends AbstractExpressionFormatterTest {
   """s"my name is ?{bob}"""".replace('?', '$') ==> """s"my name is ?{bob}"""".replace('?', '$')
   """s"my name is ?{ person.name }"""".replace('?', '$') ==> """s"my name is ?{person.name}"""".replace('?', '$')
 
-  """s"my name is ${
+  f"""s"my name is $${
     |bob}"""" ==>
-  """s"my name is ${
+  f"""s"my name is $${
     |  bob
     |}""""
 

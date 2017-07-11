@@ -600,7 +600,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |})"""
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentClassDeclaration, true)
+    implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentConstructorArguments, true)
     """class Person(
       |  name: String,
       |  age: Int)
@@ -609,12 +609,12 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |    with Identifiable
       |    with Serializable""" ==>
     """class Person(
-      |  name: String,
-      |  age: Int)
-      |    extends Entity
-      |    with Logging
-      |    with Identifiable
-      |    with Serializable"""
+      |    name: String,
+      |    age: Int)
+      |  extends Entity
+      |  with Logging
+      |  with Identifiable
+      |  with Serializable"""
 
     """class Person(
       |    name: String,
@@ -646,10 +646,10 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |def firstMethod = 42
     |}""" ==>
   """class Person(name: String, age: Int, birthdate: Date, astrologicalSign: String, shoeSize: Int, favoriteColor: java.awt.Color)
-    |    extends Entity
-    |    with Logging
-    |    with Identifiable
-    |    with Serializable {
+    |  extends Entity
+    |  with Logging
+    |  with Identifiable
+    |  with Serializable {
     |  def firstMethod = 42
     |}"""
 
@@ -660,9 +660,9 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
       |def method() = 42
       |}""" ==>
     """class Person(
-      |  name: String,
-      |  age: Int)
-      |    extends Entity {
+      |    name: String,
+      |    age: Int)
+      |  extends Entity {
       |  def method() = 42
       |}"""
 
@@ -672,8 +672,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |println("d")
     |}""" ==>
   """trait A
-    |    extends B
-    |    with C {
+    |  extends B
+    |  with C {
     |  println("d")
     |}"""
 

@@ -110,7 +110,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     for ((previousElementOption, element, nextElementOption) ← Utils.withPreviousAndNext(exprElements)) {
       previousElementOption match {
         case Some(previousElement) ⇒
-          val instructionOption = condOpt(previousElement, element) {
+          val instructionOption = condOpt((previousElement, element)) {
             case (PrefixExprElement(_), _) ⇒ if (Chars.isOperatorPart(element.firstToken.text(0))) CompactEnsuringGap else Compact
             case (Argument(_), _) ⇒ Compact
             case (_, _: ArgumentExprs) if formattingPreferences(PreserveSpaceBeforeArguments) ⇒ CompactPreservingGap // TODO: Probably not needed now with CallExpr

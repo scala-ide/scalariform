@@ -78,9 +78,9 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       case '\'' ⇒
         nextChar()
         if (isIdentifierStart(ch))
-          charLitOr(getIdentRest)
+          charLitOr(() => getIdentRest)
         else if (isOperatorPart(ch) && (ch != '\\'))
-          charLitOr(getOperatorRest)
+          charLitOr(() => getOperatorRest)
         else {
           getLitChar()
           if (ch == '\'' || forgiveErrors) {

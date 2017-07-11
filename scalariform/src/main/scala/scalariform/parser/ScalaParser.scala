@@ -1810,6 +1810,8 @@ class ScalaParser(tokens: Array[Token]) {
         Left(nextToken())
       case LBRACE ⇒
         Right(xmlEmbeddedScala(isPattern))
+      case _ ⇒
+        throw new ScalaParserException("Expected XML attribute name or left brace: " + currentToken)
     }
     XmlAttribute(name, whitespaceOption, equals, whitespaceOption2, valueOrEmbeddedScala)
   }

@@ -2,7 +2,7 @@ package scalariform.commandline
 
 import java.io.File
 import java.util.{ ArrayList, Collection }
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 import org.apache.commons.io._
 import org.apache.commons.io.filefilter._
@@ -14,7 +14,7 @@ object ScalaFileWalker extends DirectoryWalker(TrueFileFilter.INSTANCE, FileFilt
   def findScalaFiles(path: File): List[File] = {
     val results = new ArrayList[File]
     walk(path, results)
-    results.toList
+    results.asScala.toList
   }
 
   override protected def handleFile(file: File, depth: Int, results: Collection[_]) {
