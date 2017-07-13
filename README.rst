@@ -492,6 +492,36 @@ Or:
 
 .. _recommended: http://docs.scala-lang.org/style/declarations.html#classes
 
+doubleIndentClassDeclaration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+With this set to ``true`` and ``doubleIndentConstructorArguments`` set to ``false``,
+class (and trait / object) declarations that span multiple lines will be formatted so
+that the inheritance section is doubly indented. This provides a visual distinction
+from the members of the class. For example:
+
+.. code:: scala
+
+  class Person(
+    name: String,
+    age: Int,
+    birthdate: Date,
+    astrologicalSign: String,
+    shoeSize: Int,
+    favoriteColor: java.awt.Color)
+      extends Entity
+      with Logging
+      with Identifiable
+      with Serializable {
+    def firstMethod = ...
+  }
+
+Note: ``doubleIndentConstructorArguments`` style formatting is recommended_ by the Scala Style Guide.
+
+.. _recommended: http://docs.scala-lang.org/style/declarations.html#classes
+
 doubleIndentMethodDeclaration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
