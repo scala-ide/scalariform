@@ -21,7 +21,16 @@ trait HasHiddenTokenInfo {
   def newlineBefore(node: AstNode): Boolean = newlineBefore(node.firstToken)
 }
 
-abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatter with AnnotationFormatter with ExprFormatter with HasHiddenTokenInfo with TemplateFormatter with XmlFormatter with CaseClauseFormatter with CommentFormatter {
+abstract class ScalaFormatter
+  extends HasFormattingPreferences
+  with TypeFormatter
+  with AnnotationFormatter
+  with ExprFormatter
+  with HasHiddenTokenInfo
+  with TemplateFormatter
+  with XmlFormatter
+  with CaseClauseFormatter
+  with CommentFormatter {
 
   val newlineSequence: String
 
@@ -82,10 +91,23 @@ abstract class ScalaFormatter extends HasFormattingPreferences with TypeFormatte
     var suspendFormatting = false
     var edits: List[TextEdit] = Nil // Stored in reverse
 
-    def printableFormattingInstruction(previousTokenOpt: Option[Token], token: Token) =
-      predecessorFormatting.get(token) orElse
-        previousTokenOpt.map(defaultFormattingInstruction(_, token)) getOrElse
-        (if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */ else Compact)
+    def printableFormattingInstruction(previousTokenOpt: Option[Token], token: Token) = {
+      val isGaplessAssignment =
+        predecessorFormatting.get(token) match { // avoid `foreach(_.id= ...)` gapless assignment (see MutateTest.scala)
+          case Some(PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _)))) if token.tokenType == EQUALS => true
+          case _ => false
+        }
+      val maybeInstruction =
+        if (isGaplessAssignment) Some(CompactEnsuringGap)
+        else
+          predecessorFormatting.get(token).orElse(
+            previousTokenOpt.map(defaultFormattingInstruction(_, token))
+          )
+      maybeInstruction.getOrElse(
+        if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */
+        else Compact
+      )
+    }
 
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
       val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
