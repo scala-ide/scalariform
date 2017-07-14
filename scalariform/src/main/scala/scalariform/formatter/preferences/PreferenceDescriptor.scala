@@ -153,6 +153,7 @@ case object DoubleIndentConstructorArguments extends BooleanPreferenceDescriptor
   val defaultValue = false
 }
 
+@deprecated("This has been dropped in favor of DoubleIndentConstructorArguments.", since = "0.2.0")
 case object DoubleIndentClassDeclaration extends BooleanPreferenceDescriptor {
   val key = "doubleIndentClassDeclaration"
   val description = "Double indent a class's inheritance list (only applies when DoubleIndentConstructorArguments is set to false)"
