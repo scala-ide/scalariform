@@ -1,3 +1,28 @@
+0.2.0 (11/July/17)
+
+* Added alignArguments
+* Added compactControlReadability
+* Added doubleIndentConstructorArguments
+* Added doubleIndentMethodDeclaration
+* Added firstArgumentOnNewline
+* Added firstParameterOnNewline
+* Added indentWithTabs
+* Added multilineScaladocCommentsStartOnFirstLine
+* Added newlineAtEndOfFile
+* Added placeScaladocAsterisksBeneathSecondAsterisk
+* Added spaceBeforeContextColon
+* Added lexer support for string extractors with wildcards (#144)
+* Added support for Scala 2.12
+* Added support for ScalaTest 3.0
+* FIX: multi-line indentation in more than call and match expressions (#143)
+* FIX: line-wrapping of class parameters when using DoubleIndentClassDeclaration (#187)
+* FIX: comment formatter to retain blank lines in multiline comments (#208)
+* Default danglingCloseParenthesis to Prevent (#200)
+* Default spacesAroundMultiImports to true (#198)
+* Remove RARROW TokenType (#210)
+* Deprecated PreserveDanglingCloseParenthesis replaced with DanglingCloseParenthesis
+* Deprecated DoubleIndentClassDeclaration replaced with DoubleIndentConstructorArguments
+
 0.1.8 (7/December/15)
 * FIX: broken indentation in multiline argument lists. (issue #85)
 * Added backwards compatible dangling parenthesis via DanglingCloseParenthesis (issue #79, #29)
