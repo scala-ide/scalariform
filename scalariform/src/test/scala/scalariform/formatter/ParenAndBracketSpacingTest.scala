@@ -80,6 +80,21 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
       |  "bar",
       |  false
       |)"""
+
+    // TODO find out why parens based sub expressions do not dangle
+
+    """foo(
+      |alpha = "foo",
+      |beta = collection.map { x =>
+      |  x
+      |}
+      )""" ==>
+    """foo(
+      |  alpha = "foo",
+      |  beta = collection.map { x =>
+      |    x
+      |  }
+      |)"""
   }
 
   {
