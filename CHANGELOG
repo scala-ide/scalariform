@@ -1,3 +1,11 @@
+0.2.1 (14/July/17)
+
+* FIX: Revert removal of DoubleIndentClassDeclaration which was erroneously marked as having been deprecated since scalariform 0.1.5 (in reality the deprecation occurred in 0.2.0-snapshot)
+* FIX: avoid `foreach(_.id= ...)` gapless assignment
+* Added include all settings and their default values in `formatterPreferences.properties` (now effectively scalaform's reference.conf)
+* Added test for sub expression with DanglingCloseParenthesis -> Force
+* Cleanup readme
+
 0.2.0 (11/July/17)
 
 * Added alignArguments
