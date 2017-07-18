@@ -131,25 +131,25 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
 
 case object CompactControlReadability extends BooleanPreferenceDescriptor {
   val key = "compactControlReadability"
-  val description = "Enable Compact Control Readability style"
+  val description = "Compact Control Readability style"
   val defaultValue = false
 }
 
 case object CompactStringConcatenation extends BooleanPreferenceDescriptor {
   val key = "compactStringConcatenation"
-  val description = "Omit spaces when formatting a '+' operator on String literals"
+  val description = "Compact spaces when formatting a '+' operator on String literals"
   val defaultValue = false
 }
 
 case object DanglingCloseParenthesis extends IntentPreferenceDescriptor {
   val key = "danglingCloseParenthesis"
-  val description = "Put a newline before a ')' in an argument expression"
+  val description = "Dangling closing ')' in an argument expression on a new line"
   val defaultValue = Prevent
 }
 
 case object DoubleIndentConstructorArguments extends BooleanPreferenceDescriptor {
   val key = "doubleIndentConstructorArguments"
-  val description = "Class (and trait / object) declarations will be formatted as recommended by the Scala Style Guide"
+  val description = "Double indent constructor arguments, if they span multiple lines"
   val defaultValue = false
 }
 
@@ -168,13 +168,13 @@ case object DoubleIndentMethodDeclaration extends BooleanPreferenceDescriptor {
 
 case object FirstArgumentOnNewline extends IntentPreferenceDescriptor {
   val key = "firstArgumentOnNewline"
-  val description = "Places the first argument to functions calls on a new line"
+  val description = "First argument to functions calls on a new line"
   val defaultValue = Force
 }
 
 case object FirstParameterOnNewline extends IntentPreferenceDescriptor {
   val key = "firstParameterOnNewline"
-  val description = "Places the first parameter in function or class definitions on a new line"
+  val description = "First parameter in function or class definitions on a new line"
   val defaultValue = Force
 }
 
@@ -217,7 +217,7 @@ case object MultilineScaladocCommentsStartOnFirstLine extends BooleanPreferenceD
 
 case object NewlineAtEndOfFile extends BooleanPreferenceDescriptor {
   val key = "newlineAtEndOfFile"
-  val description = "Add a newline at the end of all files"
+  val description = "Newline at the end of all files"
   val defaultValue = false
 }
 
@@ -241,36 +241,36 @@ case object RewriteArrowSymbols extends BooleanPreferenceDescriptor {
 
 case object SpaceBeforeColon extends BooleanPreferenceDescriptor {
   val key = "spaceBeforeColon"
-  val description = "Add a space before colons"
+  val description = "Space before colons"
   val defaultValue = false
 }
 
 case object SpaceBeforeContextColon extends BooleanPreferenceDescriptor {
   val key = "spaceBeforeContextColon"
-  val description = "Add a space before colons in context bounds"
+  val description = "Space before colons in context bounds"
   val defaultValue = false
 }
 
 case object SpaceInsideBrackets extends BooleanPreferenceDescriptor {
   val key = "spaceInsideBrackets"
-  val description = "Require a space after '[' and before ']'"
+  val description = "Space after '[' and before ']'"
   val defaultValue = false
 }
 
 case object SpaceInsideParentheses extends BooleanPreferenceDescriptor {
   val key = "spaceInsideParentheses"
-  val description = "Require a space after '(' and before ')'"
+  val description = "Space after '(' and before ')'"
   val defaultValue = false
 }
 
 case object SpacesAroundMultiImports extends BooleanPreferenceDescriptor {
   val key = "spacesAroundMultiImports"
-  val description = "Place spaces around multi imports (import a.{ b, c, d }"
+  val description = "Spaces around multi imports (import a.{ b, c, d }"
   val defaultValue = true
 }
 
 case object SpacesWithinPatternBinders extends BooleanPreferenceDescriptor {
   val key = "spacesWithinPatternBinders"
-  val description = "Add a space around the @ token in pattern binders"
+  val description = "Spaces around the @ token in pattern binders"
   val defaultValue = true
 }
