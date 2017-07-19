@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scalariform
 Bundle-SymbolicName: scalariform
-Bundle-Version: 0.2.0.qualifier
+Bundle-Version: 0.2.2
 Require-Bundle: org.scala-lang.scala-library,
  org.scala-lang.modules.scala-xml
 Bundle-ClassPath: .
@@ -13,4 +13,4 @@ Export-Package: scalariform,
  scalariform.lexer,
  scalariform.parser,
  scalariform.utils
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
