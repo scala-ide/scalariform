@@ -52,7 +52,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.2.1"
+    "org.scalariform" %% "scalariform" % "0.2.2"
 
 Integration with Eclipse
 ------------------------
@@ -70,6 +70,11 @@ To set preferences, go to either
 
 - Window -> Preferences -> Scala -> Editor -> Formatter
 - Project -> Properties -> Scala Formatter
+
+From the formatter preference window you can import/export existing preferences.
+See the `reference.conf`_ for a listing of all available preferences and their defaults.
+
+.. _reference.conf: https://github.com/scala-ide/scalariform/blob/master/formatterPreferences.properties
 
 Integration with Emacs/ENSIME
 -----------------------------
@@ -132,7 +137,7 @@ Usage (Gradle 2.1 and above)::
     alignParameters = true
     alignSingleLineCaseStatements = true
   }
-  
+
   formatAllScala
 
 See `the documentation`_ for further usage examples.
@@ -159,7 +164,9 @@ the following to ``.vimrc`` ::
   au BufEnter *.scala setl equalprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentConstructorArguments\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
 
 
-You can create your own executable scalariform.jar by following the instructions at the top of this file, in "Packaging an executable JAR."
+Download scalariform.jar from the `latest release`_
+
+.. _latest release: https://github.com/scala-ide/scalariform/releases/latest
 
 Command line tool
 -----------------
@@ -396,7 +403,7 @@ becomes:
 If ``Preserve``, scalariform will try to match what unformatted source code is already doing per parenthesis,
 either forcing or preventing.
 
-doubleIndentClassDeclaration
+~~doubleIndentClassDeclaration~~ (Deprecated, use `doubleIndentConstructorArguments`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Default: ``false``

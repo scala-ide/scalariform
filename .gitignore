@@ -1,20 +1,8 @@
 target/
+!scalariform.update/target/
 lib_managed/
 src_managed/
-project/boot/
 bin/
-.scala_dependencies
-core/target/
-core/lib_managed/
-core/src_managed/
-gui/target/
-gui/lib_managed/
-gui/src_managed/
-corpusscan/target/
-corpusscan/lib_managed/
-corpusscan/src_managed/
-docs/build
-nohup.out
 .history
 .cache
 .idea/
@@ -22,3 +10,4 @@ nohup.out
 .classpath
 .project
 .cache*
+*~
