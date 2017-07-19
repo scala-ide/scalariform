@@ -1,3 +1,9 @@
+0.2.2 (19/July/17)
+
+* Added IDE friendly preference descriptors
+* Added Maven components for generating Eclipse update site
+* Uploaded generated Eclipse update site
+
 0.2.1 (14/July/17)
 
 * FIX: Revert removal of DoubleIndentClassDeclaration which was erroneously marked as having been deprecated since scalariform 0.1.5 (in reality the deprecation occurred in 0.2.0-snapshot)
