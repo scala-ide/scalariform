@@ -1,4 +1,5 @@
 target/
+!scalariform.update/target/
 lib_managed/
 src_managed/
 bin/
