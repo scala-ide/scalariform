@@ -1,3 +1,7 @@
+0.2.3 (10/August/17)
+
+* Updated to Scala 2.12.3
+
 0.2.2 (19/July/17)
 
 * Added IDE friendly preference descriptors
