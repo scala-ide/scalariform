@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.scalariform</groupId>
   <artifactId>scalariform.parent</artifactId>
-  <version>0.2.2</version>
+  <version>0.2.3</version>
   <packaging>pom</packaging>
 
   <!-- scm configuration is require to extract the github hash-->
@@ -16,7 +16,7 @@
   <properties>
     <encoding>UTF-8</encoding>
     <tycho.version>0.24.0</tycho.version>
-    <scala.version>2.12.2</scala.version>
+    <scala.version>2.12.3</scala.version>
     <scala.xml.version>1.0.6</scala.xml.version>
     <scala.parser-combinators.version>1.0.6</scala.parser-combinators.version>
     <scala.version.suffix>2_12</scala.version.suffix>
@@ -162,7 +162,7 @@
     <profile>
       <id>scala-2.12.x</id>
       <properties>
-        <scala.version>2.12.2</scala.version>
+        <scala.version>2.12.3</scala.version>
         <version.suffix>2.12</version.suffix>
       </properties>
       <dependencies>

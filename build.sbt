@@ -2,32 +2,31 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
 lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
-    SbtScalariform.defaultScalariformSettings ++ Seq(
-  organization := "org.scalariform",
-  sonatypeProfileName := organization.value,
-  scalaVersion := crossScalaVersions.value.head,
-  crossScalaVersions := Seq(
-    "2.12.2",
-    "2.11.11",
-    "2.10.6"
-  ),
-  exportJars := true, // Needed for cli oneJar
-  scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 12)) => Seq(
-      "-Xlint:-unused,_", "-Ywarn-unused:imports",
-      "-language:postfixOps", "-language:implicitConversions",
-      "-deprecation", "-feature"
-    )
-    case Some((2, major)) if major >= 11 =>
-      scalac2_10Options ++ scalac2_11Options
-    case _ =>
-      scalac2_10Options
-  }),
-  credentials ++= {
-    val creds = Path.userHome / ".m2" / "credentials"
-    if (creds.exists) Seq(Credentials(creds)) else Nil
-  }
-)
+  SbtScalariform.defaultScalariformSettings ++ Seq(
+    organization := "org.scalariform",
+    sonatypeProfileName := organization.value,
+    scalaVersion := crossScalaVersions.value.head,
+    crossScalaVersions := Seq(
+      "2.12.3",
+      "2.11.11",
+      "2.10.6"
+    ),
+    scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) => Seq(
+        "-Xlint:-unused,_", "-Ywarn-unused:imports",
+        "-language:postfixOps", "-language:implicitConversions",
+        "-deprecation", "-feature"
+      )
+      case Some((2, major)) if major >= 11 =>
+        scalac2_10Options ++ scalac2_11Options
+      case _ =>
+        scalac2_10Options
+    }),
+    credentials ++= {
+      val creds = Path.userHome / ".m2" / "credentials"
+      if (creds.exists) Seq(Credentials(creds)) else Nil
+    }
+  )
 
 def scalac2_10Options = Seq(
   "-encoding", "UTF-8",
@@ -168,5 +167,10 @@ def pomExtraXml =
       <id>machaval</id>
       <name>Mariano de Achaval</name>
       <url>https://github.com/machaval/</url>
+    </developer>
+    <developer>
+      <id>godenji</id>
+      <name>N.S. Cutler</name>
+      <url>https://github.com/godenji/</url>
     </developer>
   </developers>
