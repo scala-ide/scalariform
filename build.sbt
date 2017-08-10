@@ -169,4 +169,9 @@ def pomExtraXml =
       <name>Mariano de Achaval</name>
       <url>https://github.com/machaval/</url>
     </developer>
+    <developer>
+      <id>godenji</id>
+      <name>N.S. Cutler</name>
+      <url>https://github.com/godenji/</url>
+    </developer>
   </developers>
