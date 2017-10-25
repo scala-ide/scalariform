@@ -116,8 +116,11 @@ abstract class ScalaFormatter
         if (suspendFormatting)
           builder.append(token.rawText)
         else {
-          val basicFormattingInstruction = inferredNewlineFormatting.get(token) getOrElse
-            defaultNewlineFormattingInstruction(previousTokenOption, token, nextTokenOption)
+          val basicFormattingInstruction =
+            handleNewlineFormatting(
+              previousTokenOption, token, nextTokenOption, tokens, tokenIndentMap,
+              inferredNewlineFormatting.get(token)
+            )
           val formattingInstruction =
             if (nextTokenOption.exists { _.tokenType == EOF } && basicFormattingInstruction.isInstanceOf[EnsureNewlineAndIndent])
               EnsureNewlineAndIndent(0) // Adjustment for end of input when using non-zero initial indent
@@ -346,13 +349,90 @@ abstract class ScalaFormatter
   }
   implicit def stringBuilder2stringBuilderExtra(builder: StringBuilder): StringBuilderExtra = new StringBuilderExtra(builder)
 
+  private lazy val allowParamGroupsOnNewlines = formattingPreferences(AllowParamGroupsOnNewlines)
+  private lazy val indentSpacesNum = formattingPreferences(IndentSpaces)
+
+  private def handleNewlineFormatting(
+    previousTokenOption: Option[Token],
+    token: Token,
+    nextTokenOption: Option[Token],
+    tokens: List[Token],
+    tokenIndentMap: Map[Token, Int],
+    maybeNewlineFormat: Option[IntertokenFormatInstruction]
+  ): IntertokenFormatInstruction = {
+
+    def defaultNewline() = defaultNewlineFormattingInstruction(
+      previousTokenOption, token, nextTokenOption
+    )
+
+    if(!allowParamGroupsOnNewlines) maybeNewlineFormat.getOrElse(defaultNewline())
+    else {
+      // add support for newline param groups:
+      //
+      // def launchTheMisslesWithFeeling
+      //   [R <: Role, U <: User]
+      //   (role: R, user: U)
+      //   (implicit t: Timer)
+      val maybeIndentLevel = nextTokenOption.map(_.tokenType) match {
+        case
+          Some(LPAREN) | Some(LBRACKET) if (
+            token.tokenType == NEWLINE && maybeNewlineFormat.isEmpty &&
+            !previousTokenOption.exists(_.tokenType == RBRACE) // exclude `}` followed by `(`
+          ) =>
+
+          // backtrack through tokens to find first open brace/newline delimiter
+          val tokenGroup = tokens.splitAt(tokens.indexOf(token))._1
+          val delimiterToken = Utils.withPreviousAndNext(tokenGroup).reverse.find { case (prev, curr, next) =>
+            val tt = curr.tokenType
+            tt == LBRACE || tt == NEWLINES || (tt == NEWLINE &&
+              // keep backtracking if newline plus `[`, `(`, or `]`
+              !next.exists(n => Set(LBRACKET, LPAREN).exists(_ == n.tokenType)) &&
+              !prev.exists(_.tokenType == RBRACKET) // e.g. private[this]
+            )
+          }.map(_._2)
+
+          // first token after delimiter has indent level of param group's parent
+          delimiterToken.flatMap{ x =>
+            val indentToken = tokenGroup(tokenGroup.indexOf(x) + 1)
+            tokenIndentMap.get(indentToken)
+          }.
+          // top-level definition, use first token's indent level
+          orElse(
+            tokenGroup.headOption.flatMap(tokenIndentMap.get)
+          )
+        case _ => None
+      }
+
+      def calcIndent(i: Int) = (
+        i / indentSpacesNum + 1
+      )
+
+      maybeNewlineFormat match {
+        case Some(t: EnsureNewlineAndIndent) => // apply new indent level
+          maybeIndentLevel.map( x => t.copy(indentLevel = calcIndent(x))).getOrElse(t)
+        case Some(t) => t
+        case None =>
+          maybeIndentLevel.map { num =>
+            EnsureNewlineAndIndent(calcIndent(num))
+          }.
+          getOrElse(defaultNewline())
+      }
+    }
+  }
+
+  private def isDeclarationStart(tokenType: Option[TokenType]) = {
+    tokenType.exists(
+      Set(CASE, CLASS, TRAIT, OBJECT, DEF, VAL, VAR, TYPE, ABSTRACT, FINAL, SEALED, OVERRIDE, IMPLICIT, LAZY)
+    )
+  }
+
   private def defaultNewlineFormattingInstruction(previousTokenOption: Option[Token], token: Token, nextTokenOption: Option[Token]): IntertokenFormatInstruction = {
     val previousTypeOption = previousTokenOption map { _.tokenType }
     val nextTypeOption = nextTokenOption map { _.tokenType }
     val result =
       if (previousTypeOption == Some(TYPE))
         CompactEnsuringGap
-      else if (previousTypeOption == Some(RBRACKET) && nextTypeOption.exists(Set(CASE, CLASS, TRAIT, OBJECT, DEF, VAL, VAR, TYPE, ABSTRACT, FINAL, SEALED, OVERRIDE, IMPLICIT, LAZY)))
+      else if (previousTypeOption == Some(RBRACKET) && isDeclarationStart(nextTypeOption))
         CompactEnsuringGap
       else if (nextTypeOption == Some(LBRACE))
         CompactEnsuringGap
