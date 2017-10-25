@@ -1,9 +1,9 @@
 package scalariform.lexer
 
+import scala.language.reflectiveCalls
 import scalariform._
-import org.scalatest.{FlatSpec, Matchers}
-
 import scalariform.utils.Utils._
+import org.scalatest.{FlatSpec, Matchers}
 
 class RedundantSemicolonDetectorTest extends FlatSpec with Matchers {
 
