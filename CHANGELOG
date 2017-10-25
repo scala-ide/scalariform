@@ -1,3 +1,9 @@
+0.2.4 (25/October/17)
+
+* Updated to Scala 2.12.4
+* Updated to Sbt 1.0.2
+* Added support for multiline param groups (fixes #77)
+
 0.2.3 (10/August/17)
 
 * Updated to Scala 2.12.3

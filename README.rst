@@ -52,7 +52,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.2.3"
+    "org.scalariform" %% "scalariform" % "0.2.4"
 
 Integration with Eclipse
 ------------------------
@@ -297,7 +297,7 @@ alignSingleLineCaseStatements.maxArrowIndent
 
 Default: ``40``
 
-When ``alignSingleLineCaseStatements`` is ``true``, this is a limit on
+When ``alignSingleLineCaseStatements`` is ``true`` there is a limit on
 the number of spaces that can be inserted before an arrow to align it
 with other case statements. This can be used to avoid very large gaps,
 e.g.:
@@ -308,6 +308,21 @@ e.g.:
     case Some(wibble, wobble) if wibble + wibble > wobble * wibble => 1
     case ccc                                                       => 2
   }
+
+allowParamGroupsOnNewlines
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``false``
+
+When ``allowParamGroupsOnNewlines`` is ``true`` the default behavior of collapsing
+param groups into a single line is disabled. This allows for the following formatting style:
+
+.. code:: scala
+
+  def foo[T]
+    (a: A)
+    (b: B)
+    (implicit t: T)
 
 compactControlReadability
 ~~~~~~~~~~~~~~~~~~~~~~~~~

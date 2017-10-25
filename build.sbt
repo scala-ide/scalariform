@@ -1,13 +1,16 @@
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences._
 
+import scala.sys.process._
+import sbt.io.Using
+
 lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
-  SbtScalariform.defaultScalariformSettings ++ Seq(
+  Seq(
     organization := "org.scalariform",
     sonatypeProfileName := organization.value,
     scalaVersion := crossScalaVersions.value.head,
     crossScalaVersions := Seq(
-      "2.12.3",
+      "2.12.4",
       "2.11.11",
       "2.10.6"
     ),
@@ -120,7 +123,7 @@ lazy val cli = (project
     mainClass in assembly := Some("scalariform.commandline.Main"),
     artifact in (Compile, assembly) := {
       val art = (artifact in (Compile, assembly)).value
-      art.copy(`classifier` = Some("assembly"))
+      art.withClassifier(Some("assembly"))
     }
   )
   settings(addArtifact(artifact in (Compile, assembly), assembly))

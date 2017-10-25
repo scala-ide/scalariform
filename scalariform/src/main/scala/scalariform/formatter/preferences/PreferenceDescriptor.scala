@@ -91,9 +91,9 @@ trait IntegerPreferenceDescriptor extends PreferenceDescriptor[Int] {
 object AllPreferences {
   val preferences: List[PreferenceDescriptor[_]] = List(
     AlignArguments, AlignParameters, AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent,
-    CompactControlReadability, CompactStringConcatenation, DanglingCloseParenthesis, DoubleIndentClassDeclaration,
-    DoubleIndentConstructorArguments, DoubleIndentMethodDeclaration, FirstArgumentOnNewline, FirstParameterOnNewline,
-    FormatXml, IndentLocalDefs, IndentPackageBlocks, IndentSpaces, IndentWithTabs, MultilineScaladocCommentsStartOnFirstLine,
+    AllowParamGroupsOnNewlines, CompactControlReadability, CompactStringConcatenation, DanglingCloseParenthesis,
+    DoubleIndentClassDeclaration, DoubleIndentConstructorArguments, DoubleIndentMethodDeclaration, FirstArgumentOnNewline,
+    FirstParameterOnNewline, FormatXml, IndentLocalDefs, IndentPackageBlocks, IndentSpaces, IndentWithTabs, MultilineScaladocCommentsStartOnFirstLine,
     NewlineAtEndOfFile, PlaceScaladocAsterisksBeneathSecondAsterisk, PreserveSpaceBeforeArguments, RewriteArrowSymbols,
     SpaceBeforeColon, SpaceBeforeContextColon, SpaceInsideBrackets, SpaceInsideParentheses, SpacesAroundMultiImports, SpacesWithinPatternBinders
   )
@@ -127,6 +127,12 @@ case object AlignSingleLineCaseStatements extends BooleanPreferenceDescriptor {
     val preferenceType = IntegerPreference(1, 100)
     val defaultValue = 40
   }
+}
+
+case object AllowParamGroupsOnNewlines extends BooleanPreferenceDescriptor {
+  val key = "allowParamGroupsOnNewlines"
+  val description = "Allow class/method param groups to be separated by newlines"
+  val defaultValue = false
 }
 
 case object CompactControlReadability extends BooleanPreferenceDescriptor {
