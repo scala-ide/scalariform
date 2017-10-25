@@ -2,7 +2,7 @@
 <feature
       id="scalariform.feature"
       label="Scalariform"
-      version="0.2.3">
+      version="0.2.4">
 
    <description>
       Scala Code formatter
