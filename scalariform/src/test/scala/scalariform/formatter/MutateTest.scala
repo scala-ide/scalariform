@@ -21,6 +21,9 @@ class MutateTest extends AbstractFormatterTest {
     |  maybeHtmlNode.foreach(_.outerHTML = block.toString)
     |}"""
 
+  """val assignment = foo.foreach(bar.baz = _)""" ==>
+  """val assignment = foo.foreach(bar.baz = _)"""
+
 //  format: ON
 
   override val debug = false
