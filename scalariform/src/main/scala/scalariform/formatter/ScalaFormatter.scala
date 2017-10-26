@@ -91,17 +91,19 @@ abstract class ScalaFormatter
     var suspendFormatting = false
     var edits: List[TextEdit] = Nil // Stored in reverse
 
-    def printableFormattingInstruction(previousTokenOpt: Option[Token], token: Token) = {
+    def printableFormattingInstruction(previousTokenOption: Option[Token], token: Token, nextTokenOption: Option[Token]) = {
+      val maybePredecessorFormatting = predecessorFormatting.get(token)
       val isGaplessAssignment =
-        predecessorFormatting.get(token) match { // avoid `foreach(_.id= ...)` gapless assignment (see MutateTest.scala)
-          case Some(PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _)))) if token.tokenType == EQUALS => true
-          case _ => false
+        // avoid `foreach(_.id= ..)` and `foreach(foo= _)` gapless assignment (see MutateTest.scala)
+        maybePredecessorFormatting exists {
+          case x @ PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _))) => token.tokenType == EQUALS
+          case _ => token.tokenType == EQUALS && nextTokenOption.exists(_.tokenType == USCORE)
         }
       val maybeInstruction =
         if (isGaplessAssignment) Some(CompactEnsuringGap)
         else
-          predecessorFormatting.get(token).orElse(
-            previousTokenOpt.map(defaultFormattingInstruction(_, token))
+          maybePredecessorFormatting.orElse(
+            previousTokenOption.map(defaultFormattingInstruction(_, token))
           )
       maybeInstruction.getOrElse(
         if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */
@@ -128,7 +130,7 @@ abstract class ScalaFormatter
               basicFormattingInstruction
           val nextTokenUnindents = nextTokenOption exists { _.tokenType == RBRACE }
           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
-            !printableFormattingInstruction(Some(token), nextToken).isInstanceOf[EnsureNewlineAndIndent]
+            !printableFormattingInstruction(Some(token), nextToken, None).isInstanceOf[EnsureNewlineAndIndent]
           }
           edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents,
             includeBufferBeforeNextToken, previousTokenIsPrintable, tokenIndentMap).toList
@@ -140,7 +142,7 @@ abstract class ScalaFormatter
           tokenIndentMap += (token -> builder.currentColumn)
           builder.append(token.rawText)
         } else {
-          val formattingInstruction = printableFormattingInstruction(previousTokenOption, token)
+          val formattingInstruction = printableFormattingInstruction(previousTokenOption, token, nextTokenOption)
           val nextTokenUnindents = token.tokenType == RBRACE
           val includeBufferBeforeNextToken = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
