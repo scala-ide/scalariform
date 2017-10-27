@@ -93,9 +93,10 @@ object AllPreferences {
     AlignArguments, AlignParameters, AlignSingleLineCaseStatements, AlignSingleLineCaseStatements.MaxArrowIndent,
     AllowParamGroupsOnNewlines, CompactControlReadability, CompactStringConcatenation, DanglingCloseParenthesis,
     DoubleIndentClassDeclaration, DoubleIndentConstructorArguments, DoubleIndentMethodDeclaration, FirstArgumentOnNewline,
-    FirstParameterOnNewline, FormatXml, IndentLocalDefs, IndentPackageBlocks, IndentSpaces, IndentWithTabs, MultilineScaladocCommentsStartOnFirstLine,
-    NewlineAtEndOfFile, PlaceScaladocAsterisksBeneathSecondAsterisk, PreserveSpaceBeforeArguments, RewriteArrowSymbols,
-    SpaceBeforeColon, SpaceBeforeContextColon, SpaceInsideBrackets, SpaceInsideParentheses, SpacesAroundMultiImports, SpacesWithinPatternBinders
+    FirstParameterOnNewline, FormatXml, IndentLocalDefs, IndentPackageBlocks, IndentSpaces, IndentWithTabs,
+    MultilineScaladocCommentsStartOnFirstLine, NewlineAtEndOfFile, PlaceScaladocAsterisksBeneathSecondAsterisk,
+    PreserveSpaceBeforeArguments, RewriteArrowSymbols, SingleCasePatternOnNewline, SpaceBeforeColon,
+    SpaceBeforeContextColon, SpaceInsideBrackets, SpaceInsideParentheses, SpacesAroundMultiImports, SpacesWithinPatternBinders
   )
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] =
@@ -243,6 +244,12 @@ case object RewriteArrowSymbols extends BooleanPreferenceDescriptor {
   val key = "rewriteArrowSymbols"
   val description = "Replace arrow tokens with unicode equivalents: => with ⇒, and <- with ←"
   val defaultValue = false
+}
+
+case object SingleCasePatternOnNewline extends BooleanPreferenceDescriptor {
+  val key = "singleCasePatternOnNewline"
+  val description = "Single case in pattern match block on a new line"
+  val defaultValue = true
 }
 
 case object SpaceBeforeColon extends BooleanPreferenceDescriptor {

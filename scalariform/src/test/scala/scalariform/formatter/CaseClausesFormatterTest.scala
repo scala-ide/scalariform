@@ -84,6 +84,48 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |    d
     |}"""
 
+  {
+  implicit val formattingPreferences = FormattingPreferences.setPreference(
+    SingleCasePatternOnNewline, false
+  )
+    """a match { case a => b; c;
+      |d }""" ==>
+    """a match { case a =>
+      |  b; c;
+      |  d
+      |}"""
+
+    """a match { case b =>
+      |val c = d
+      |case e =>
+      |}""" ==>
+    """a match {
+      |  case b =>
+      |    val c = d
+      |  case e =>
+      |}"""
+
+    """list.foreach { case (key, value) =>
+      |val boo = 1
+      |boo
+      |}""" ==>
+    """list.foreach { case (key, value) =>
+      |  val boo = 1
+      |  boo
+      |}"""
+
+    """list.foreach {
+      |case (key, value) =>
+      |val boo = 1
+      |boo
+      |}""" ==>
+    """list.foreach {
+      |  case (key, value) =>
+      |    val boo = 1
+      |    boo
+      |}"""
+  }
+
   "a match { case b => ; c }" ==> "a match { case b => ; c }"
 
   // See issue #60

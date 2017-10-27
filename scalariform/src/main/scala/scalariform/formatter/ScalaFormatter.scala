@@ -91,26 +91,6 @@ abstract class ScalaFormatter
     var suspendFormatting = false
     var edits: List[TextEdit] = Nil // Stored in reverse
 
-    def printableFormattingInstruction(previousTokenOption: Option[Token], token: Token, nextTokenOption: Option[Token]) = {
-      val maybePredecessorFormatting = predecessorFormatting.get(token)
-      val isGaplessAssignment =
-        // avoid `foreach(_.id= ..)` and `foreach(foo= _)` gapless assignment (see MutateTest.scala)
-        maybePredecessorFormatting exists {
-          case x @ PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _))) => token.tokenType == EQUALS
-          case _ => token.tokenType == EQUALS && nextTokenOption.exists(_.tokenType == USCORE)
-        }
-      val maybeInstruction =
-        if (isGaplessAssignment) Some(CompactEnsuringGap)
-        else
-          maybePredecessorFormatting.orElse(
-            previousTokenOption.map(defaultFormattingInstruction(_, token))
-          )
-      maybeInstruction.getOrElse(
-        if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */
-        else Compact
-      )
-    }
-
     for ((previousTokenOption, token, nextTokenOption) ← Utils.withPreviousAndNext(tokens)) {
       val previousTokenIsPrintable = previousTokenOption exists { !isInferredNewline(_) }
       if (isInferredNewline(token)) {
@@ -130,7 +110,9 @@ abstract class ScalaFormatter
               basicFormattingInstruction
           val nextTokenUnindents = nextTokenOption exists { _.tokenType == RBRACE }
           val includeBufferBeforeNextToken = nextTokenOption exists { nextToken ⇒
-            !printableFormattingInstruction(Some(token), nextToken, None).isInstanceOf[EnsureNewlineAndIndent]
+            !printableFormattingInstruction(
+              Some(token), nextToken, None, predecessorFormatting
+            ).isInstanceOf[EnsureNewlineAndIndent]
           }
           edits :::= writeHiddenTokens(builder, inferredNewlines(token), formattingInstruction, nextTokenUnindents,
             includeBufferBeforeNextToken, previousTokenIsPrintable, tokenIndentMap).toList
@@ -142,7 +124,10 @@ abstract class ScalaFormatter
           tokenIndentMap += (token -> builder.currentColumn)
           builder.append(token.rawText)
         } else {
-          val formattingInstruction = printableFormattingInstruction(previousTokenOption, token, nextTokenOption)
+          val formattingInstruction =
+            printableFormattingInstruction(
+              previousTokenOption, token, nextTokenOption, predecessorFormatting
+            )
           val nextTokenUnindents = token.tokenType == RBRACE
           val includeBufferBeforeNextToken = true // <-- i.e. current token
           val hiddenTokens = hiddenPredecessors(token)
@@ -442,6 +427,31 @@ abstract class ScalaFormatter
         Compact
     // println("defaultNewlineFormattingInstruction(" + previousTokenOption + ", " + token + ", " + nextTokenOption + ") = " + result)
     result
+  }
+
+  private def printableFormattingInstruction(
+    previousTokenOption: Option[Token],
+    token: Token,
+    nextTokenOption: Option[Token],
+    predecessorFormatting: Map[Token, IntertokenFormatInstruction]): IntertokenFormatInstruction = {
+
+    val maybePredecessorFormatting = predecessorFormatting.get(token)
+    val isGaplessAssignment =
+      maybePredecessorFormatting match {
+        // `foreach(_.id= ..)`
+        case x @ Some(PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _)))) => token.tokenType == EQUALS
+        // `foreach(foo= _)`
+        case _ => token.tokenType == EQUALS && nextTokenOption.exists(_.tokenType == USCORE)
+      }
+    val maybeInstruction =
+      if(isGaplessAssignment) Some(CompactEnsuringGap)
+      else maybePredecessorFormatting.orElse(
+        previousTokenOption.map(defaultFormattingInstruction(_, token))
+      )
+    maybeInstruction.getOrElse(
+        if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */
+        else Compact
+      )
   }
 
   private def defaultFormattingInstruction(token1: Token, token2: Token): IntertokenFormatInstruction = {
