@@ -18,6 +18,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
 
     var formatResult: FormatResult = NoFormatResult
     var isFirstCaseClause = true
+    val hasSingleCaseClause = clauseGroups.size == 1
 
     // We have to decide whether to indent the hidden tokens before the CASE token (or possibly a preceding
     // NEWLINE token from a prior case block).
@@ -35,7 +36,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
 
     def formatSingleCaseClause(caseClause: CaseClause) {
       handleCaseIndent(caseClause)
-      formatResult ++= formatCaseClause(caseClause)
+      formatResult ++= formatCaseClause(caseClause, None, hasSingleCaseClause)
       isFirstCaseClause = false
     }
 
@@ -46,7 +47,9 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
             for (caseClause @ CaseClause(casePattern, statSeq) ← caseClauses) {
               handleCaseIndent(caseClause)
               val arrowInstruction = PlaceAtColumn(formatterState.indentLevel, largestCasePatternLength + 1)
-              formatResult ++= formatCaseClause(caseClause, Some(arrowInstruction))
+              formatResult ++= formatCaseClause(
+                caseClause, Some(arrowInstruction), hasSingleCaseClause
+              )
               isFirstCaseClause = false
             }
           } else {
@@ -104,22 +107,55 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
     formatResult
   }
 
-  private def formatCaseClause(caseClause: CaseClause, arrowInstructionOpt: Option[PlaceAtColumn] = None)(implicit formatterState: FormatterState): FormatResult = {
+  private def formatCaseClause(
+    caseClause: CaseClause,
+    arrowInstructionOpt: Option[PlaceAtColumn],
+    hasSingleCaseClause: Boolean
+  )(implicit formatterState: FormatterState): FormatResult = {
+
     val CaseClause(casePattern, statSeq) = caseClause
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= formatCasePattern(casePattern, arrowInstructionOpt)
+    val hasNewline = caseClause.casePattern.caseToken.associatedWhitespaceAndComments.containsNewline
+    val singleCaseWithoutNewline = (
+      hasSingleCaseClause && !hasNewline && !formattingPreferences(SingleCasePatternOnNewline)
+    )
     val singleExpr =
       cond(statSeq.firstStatOpt) { case Some(Expr(_)) ⇒ true } &&
         cond(statSeq.otherStats) { case Nil | List((_, None)) ⇒ true }
     val indentBlock =
       statSeq.firstTokenOption.isDefined && newlineBefore(statSeq) ||
         containsNewline(statSeq) && !singleExpr
-    if (indentBlock)
-      formatResult = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
+
+    def unindent(x: Map[Token, IntertokenFormatInstruction]) = x.map {
+      case (k, v @ EnsureNewlineAndIndent(indentLevel, relativeTo)) =>
+        k -> EnsureNewlineAndIndent(indentLevel - 1, relativeTo)
+      case x => x
+    }
+
+    if (indentBlock) {
+      val result = formatResult.before(statSeq.firstToken, formatterState.nextIndentLevelInstruction)
+      formatResult =
+        if(!singleCaseWithoutNewline) result
+        else
+          result.copy(
+            predecessorFormatting =
+              unindent(result.predecessorFormatting) + ( // unindent first token in case body
+                caseClause.casePattern.caseToken -> CompactEnsuringGap // remove `case` leading newline
+              )
+          )
+    }
 
     val stateForStatSeq = if (singleExpr && !indentBlock) formatterState else formatterState.indent
-    formatResult ++= format(statSeq)(stateForStatSeq)
-
+    formatResult ++= {
+      val result = format(statSeq)(stateForStatSeq)
+      if(!singleCaseWithoutNewline) result
+      else
+        result.copy( // unindent body tokens
+          predecessorFormatting = unindent(result.predecessorFormatting),
+          inferredNewlineFormatting = unindent(result.inferredNewlineFormatting)
+        )
+    }
     formatResult
   }
 

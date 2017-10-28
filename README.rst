@@ -52,7 +52,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.2.4"
+    "org.scalariform" %% "scalariform" % "0.2.5"
 
 Integration with Eclipse
 ------------------------
@@ -763,6 +763,20 @@ is formatted as:
   for (n ← 1 to 10) n % 2 match {
     case 0 ⇒ println("even")
     case 1 ⇒ println("odd")
+  }
+
+singleCasePatternOnNewline
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``true``
+
+When ``singleCasePatternOnNewline`` is ``false`` the default behavior of forcing
+a single case pattern onto a newline is disabled. This allows for the following formatting style:
+
+.. code:: scala
+
+  items.map { case (key, value) =>
+    (key, transform(value))
   }
 
 spaceBeforeColon

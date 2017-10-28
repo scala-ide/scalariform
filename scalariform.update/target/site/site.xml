@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
   <description name="Scalariform Update Site" 
-    url="https://github.com/scala-ide/scalariform/tree/0.2.4/scalariform.update/target/site">
+    url="https://github.com/scala-ide/scalariform/tree/0.2.5/scalariform.update/target/site">
       Scalariform Update Site
    </description>
-   <feature url="features/scalariform.feature_0.2.4.jar" version="0.2.4" id="scalariform.feature">
+   <feature url="features/scalariform.feature_0.2.5.jar" version="0.2.5" id="scalariform.feature">
       <category name="Scala"/>
    </feature>
    <category-def name="Scala" label="Scala"/>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scalariform
 Bundle-SymbolicName: scalariform
-Bundle-Version: 0.2.4
+Bundle-Version: 0.2.5
 Require-Bundle: org.scala-lang.scala-library,
  org.scala-lang.modules.scala-xml
 Bundle-ClassPath: .
