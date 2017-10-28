@@ -1,3 +1,7 @@
+0.2.5 (27/October/17)
+
+* Added support for single case pattern without forced newline (fixes #29)
+
 0.2.4 (25/October/17)
 
 * Updated to Scala 2.12.4
