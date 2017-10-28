@@ -8,6 +8,6 @@
   <parent>
     <artifactId>scalariform.parent</artifactId>
     <groupId>org.scalariform</groupId>
-    <version>0.2.4</version>
+    <version>0.2.5</version>
   </parent>
 </project>
