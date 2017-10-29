@@ -1,3 +1,7 @@
+0.2.6 (29/October/17)
+
+* Removed OSGi configuration, no longer needed for Scala-IDE (PR #258 by @sschaef)
+
 0.2.5 (27/October/17)
 
 * Added support for single case pattern without forced newline (fixes #29)
