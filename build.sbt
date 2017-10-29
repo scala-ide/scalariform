@@ -91,20 +91,29 @@ lazy val scalariform = (project
     libraryDependencies ++= scala2_11Dependencies.value,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     // sbt doesn't automatically load the content of the MANIFST.MF file, therefore
-    // we have to do it here by ourselves Furthermore, the version format in the
-    // MANIFEST.MF is `x.y.z.qualifier` but we need to replace the `qualifier` part
-    // with a unique identifier otherwise OSGi can't find out which nightly build
-    // is newest and therefore not all caches are updated with the correct version
-    // of a nightly.
+    // we have to do it here by ourselves. Furthermore, the version format in the
+    // MANIFEST.MF is `version.qualifier`, which means that we have to replace
+    // `version` by the actual version and `qualifier` with a unique identifier
+    // otherwise OSGi can't find out which nightly build is newest and therefore
+    // not all caches are updated with the correct version of a nightly.
     packageOptions in Compile in packageBin += {
-      val m = Using.fileInputStream(file("scalariform/META-INF/MANIFEST.MF")) { in =>
+      val m = Using.fileInputStream(new java.io.File("MANIFEST.MF.prototype")) { in =>
         val manifest = new java.util.jar.Manifest(in)
         val attr = manifest.getMainAttributes
         val key = "Bundle-Version"
         val versionSuffix = scalaBinaryVersion.value.replace('.', '_')
+        // get the version but get rid of "-SNAPSHOT" suffix if it exists
+        val v = {
+          val v = version.value
+          val i = v.lastIndexOf('-')
+          if (i > 0)
+            v.substring(0, i)
+          else
+            v
+        }
         val date = new java.text.SimpleDateFormat("yyyyMMddHHmm").format(new java.util.Date)
         val sha = "git rev-parse --short HEAD".!!.trim
-        attr.putValue(key, attr.getValue(key).replace("qualifier", s"$versionSuffix-$date-$sha"))
+        attr.putValue(key, attr.getValue(key).replace("version.qualifier", s"$v.$versionSuffix-$date-$sha"))
         manifest
       }
       Package.JarManifest(m)
