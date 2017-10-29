@@ -1,8 +1,0 @@
-* FIX: Type formatter crash on multiline types
-* Track scalac parser -- allow trait-position parents to have parameter blocks
-* Sync changes to InferredSemicolonParser
-* FIX: Scaladoc formatting wasn't idempotent (issue #62)
-* Added "SpacesAroundMultiImports" option
-* Modified "AlignParameters" option to align by column -- see readme
-* Deprecated "PreserveDanglingCloseParenthesis" in favor of
-  automatic parentheses level detection.
