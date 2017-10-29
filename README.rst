@@ -52,7 +52,7 @@ Usage within a project
 
 Have a use for the scalariform source code directly? You can use it as a build dependency: ::
 
-    "org.scalariform" %% "scalariform" % "0.2.5"
+    "org.scalariform" %% "scalariform" % "0.2.6"
 
 Integration with Eclipse
 ------------------------

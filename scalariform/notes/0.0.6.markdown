@@ -1,9 +1,0 @@
-* Lexer performance tweaks
-* FIX: whitespace in XML end tags (e.g. `</a   >`)
-* Tweak multiline case clause indentation
-* FIX: indentation problem with xml in StatSeq
-* Disallow staircase expression breaks before commas and colons
-* FIX: incorrect indentation within multiple param clauses
-* Improved formatting for case blocks
-* Command line tool learned `--encoding=` option 
-* FIX: honour previously-ignored formatXml preference

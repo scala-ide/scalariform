@@ -1,6 +1,0 @@
-* FIX: Bug in parser prevented DOT characters inside type parameters (issue #44)
-* Newline no longer added for each function in `=> => =>` scenarios (issue #45)
-* Update build to sbt 0.13.7 and update java version validation (PR #42)
-* Rewrite -> into → when RewriteArrowSymbols is on (issue #34)
-* Sync maven build with sbt build (PR #22)
-* Add support for Scala 2.12 in the maven build (PR #20)

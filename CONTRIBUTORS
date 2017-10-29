@@ -1,4 +1,8 @@
-Scalariform is maintained by Matt Russell (https://github.com/mdr/scalariform).
+Scalariform was created by Matt Russell (https://github.com/mdr/scalariform)
+
+The library is maintained by N.S. Cutler (https://github.com/godenji)
+
+For the full list of contributors please visit (https://github.com/scala-ide/scalariform/graphs/contributors)
 
 * A command line option to read a list of files was contributed by Olivier Michallat (https://github.com/olim7t).
 * The Maven formatter plugin was written by Adam Crain (https://github.com/jadamcrain).
