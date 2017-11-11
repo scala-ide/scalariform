@@ -167,7 +167,8 @@ class ScalaParser(tokens: Array[Token]) {
     while (separator && continue) {
       val separatorToken = nextToken()
       val la = lookahead(1)
-      if (trailingOK && (la == NEWLINE || la == NEWLINES)) {
+      val la2 = lookahead(2)
+      if (trailingOK && (la == NEWLINE || la == NEWLINES) && la2 == RPAREN) {
         continue = false
       } else {
         val nextPart = part
