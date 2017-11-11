@@ -160,19 +160,25 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isStatSep: Boolean = isStatSep(currentTokenType)
 
-  private def tokenSeparated[T](separator: TokenType, sepFirst: Boolean, part: ⇒ T): (Option[T], List[(Token, T)]) = {
+  private def tokenSeparated[T](separator: TokenType, sepFirst: Boolean, part: ⇒ T, trailingOK: Boolean = false): (Option[T], List[(Token, T)]) = {
     val ts = new ListBuffer[(Token, T)]
     val firstOpt = if (sepFirst) None else Some(part)
-    while (separator) {
+    var continue = true
+    while (separator && continue) {
       val separatorToken = nextToken()
-      val nextPart = part
-      ts += ((separatorToken, nextPart))
+      val la = lookahead(1)
+      if (trailingOK && (la == NEWLINE || la == NEWLINES)) {
+        continue = false
+      } else {
+        val nextPart = part
+        ts += ((separatorToken, nextPart))
+      }
     }
     (firstOpt, ts.toList)
   }
 
   private def commaSeparated[T](part: ⇒ T) =
-    tokenSeparated(COMMA, sepFirst = false, part = part) match { case (firstOpt, rest) ⇒ (firstOpt.get, rest) }
+    tokenSeparated(COMMA, sepFirst = false, part = part, trailingOK = true) match { case (firstOpt, rest) ⇒ (firstOpt.get, rest) }
 
   private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, sepFirst = true, part = part)._2
   private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, sepFirst = true, part = part)._2
