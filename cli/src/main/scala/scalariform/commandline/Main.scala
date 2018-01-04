@@ -12,7 +12,7 @@ import scalariform.Utils._
 
 object Main {
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     sys.exit(if (process(args)) 1 else 0)
   }
 
@@ -39,16 +39,16 @@ object Main {
       showUsage = true
     }
 
-    val encoding: String = arguments.collect {
-      case Encoding(encoding) ⇒ encoding
-    }.headOption.getOrElse(System getProperty "file.encoding")
+    val encoding: String = arguments.collectFirst {
+      case Encoding(e) ⇒ e
+    }.getOrElse(System getProperty "file.encoding")
 
     try
       Charset.forName(encoding)
     catch {
-      case e: UnsupportedCharsetException ⇒
+      case _: UnsupportedCharsetException ⇒
         errors ::= "Unsupported encoding " + encoding
-      case e: IllegalCharsetNameException ⇒
+      case _: IllegalCharsetNameException ⇒
         errors ::= "Illegal encoding " + encoding
     }
 
@@ -64,7 +64,7 @@ object Main {
         }
     }
 
-    val preferenceOptions = (for (p @ PreferenceOption(_, _) ← arguments) yield p)
+    val preferenceOptions = for (p @ PreferenceOption(_, _) ← arguments) yield p
 
     for (PreferenceOption(key, _) ← preferenceOptions if !(AllPreferences.preferencesByKey contains key)) {
       errors ::= "Unrecognised preference: " + key
@@ -74,14 +74,14 @@ object Main {
     if (errors.isEmpty) {
 
       preferences = preferenceOptions.foldLeft(preferences) {
-        case (preferences, PreferenceOption(key, valueString)) ⇒
+        case (p, PreferenceOption(key, valueString)) ⇒
           val descriptor = AllPreferences.preferencesByKey(key)
           def processDescriptor[T](descriptor: PreferenceDescriptor[T]) = {
             descriptor.preferenceType.parseValue(valueString) match {
-              case Right(value) ⇒ preferences.setPreference(descriptor, value)
+              case Right(value) ⇒ p.setPreference(descriptor, value)
               case Left(error) ⇒
                 errors ::= "Could not parse value for preference " + key + ", " + error
-                preferences
+                p
             }
           }
           processDescriptor(descriptor)
@@ -92,7 +92,7 @@ object Main {
 
     def getFiles(): List[File] = {
       var files: List[File] = Nil
-      def addFile(fileName: String) {
+      def addFile(fileName: String): Unit = {
         val file = new File(fileName)
         if (!file.exists)
           errors ::= "No such file " + file
@@ -140,7 +140,7 @@ object Main {
     if (forceOutput && files.size > 1)
       errors ::= "Cannot use --forceOutput with multiple files"
 
-    if (!errors.isEmpty) {
+    if (errors.nonEmpty) {
       for (error ← errors.reverse)
         System.err.println("Error: " + error)
       if (showUsage)
@@ -148,11 +148,11 @@ object Main {
       return true
     }
 
-    def log(s: String) = if (!quiet && !stdout && !stdin) println(s)
+    def log(s: String): Unit = if (!quiet && !stdout && !stdin) println(s)
 
-    val scalaVersion = arguments.collect {
-      case ScalaVersion(scalaVersion) ⇒ scalaVersion
-    }.headOption.getOrElse(ScalaVersions.DEFAULT_VERSION)
+    val scalaVersion = arguments.collectFirst {
+      case ScalaVersion(sv) ⇒ sv
+    }.getOrElse(ScalaVersions.DEFAULT_VERSION)
 
     log("Assuming source is Scala " + scalaVersion)
 
@@ -166,7 +166,7 @@ object Main {
       try
         Some(ScalaFormatter.format(s, preferences, scalaVersion = scalaVersion))
       catch {
-        case e: ScalaParserException ⇒ None
+        case _: ScalaParserException ⇒ None
       }
 
     if (test)
@@ -293,7 +293,7 @@ object Main {
   private case object NotFormattedCorrectly extends FormatResult
   private case object DidNotParse extends FormatResult
 
-  private def printUsage() {
+  private def printUsage(): Unit = {
     println("Usage: scalariform [options] [files...]")
     println()
     println("Options:")

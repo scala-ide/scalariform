@@ -1,14 +1,14 @@
 package scalariform.parser
 
+import scala.PartialFunction._
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
-import PartialFunction._
 
 object InferredSemicolonScalaParser {
 
   def findSemicolons(tokens: Array[Token]): Set[Token] = {
     val parser = new InferredSemicolonScalaParser(tokens)
-    parser.safeParse(parser.compilationUnitOrScript)
+    parser.safeParse(parser.compilationUnitOrScript())
     parser.inferredSemicolons
   }
 
@@ -21,9 +21,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private val forgiving = true
 
   def safeParse[T](production: ⇒ T): Option[T] =
-    try Some(production) catch { case e: ScalaParserException ⇒ None }
+    try Some(production) catch { case _: ScalaParserException ⇒ None }
 
-  def compilationUnitOrScript() {
+  def compilationUnitOrScript(): Unit = {
     val originalPos = pos
     try {
       compilationUnit()
@@ -33,19 +33,19 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         if (logging) println("Rewinding to try alternative: " + currentToken)
         try {
           scriptBody()
-        } catch { case e2: ScalaParserException ⇒ throw e }
+        } catch { case _: ScalaParserException ⇒ throw e }
     }
   }
 
   require(tokens.nonEmpty) // at least EOF
 
-  private def inParens[T](body: ⇒ T) {
+  private def inParens[T](body: ⇒ T): Unit = {
     accept(LPAREN)
     body
     accept(RPAREN)
   }
 
-  private def inBraces[T](body: ⇒ T) {
+  private def inBraces[T](body: ⇒ T): Unit = {
     accept(LBRACE)
     body
     accept(RBRACE)
@@ -57,20 +57,20 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     else
       body
 
-  private def inBrackets[T](body: ⇒ T) {
+  private def inBrackets[T](body: ⇒ T): Unit = {
     accept(LBRACKET)
     body
     accept(RBRACKET)
   }
 
-  private def makeParens[T](body: ⇒ T) = inParens { if (RPAREN) None else Some(body) }
+  private def makeParens[T](body: ⇒ T): Unit = inParens { if (RPAREN) None else Some(body) }
 
-  private def scriptBody() {
+  private def scriptBody(): Unit = {
     templateStats()
     accept(EOF)
   }
 
-  private def templateStats() = {
+  private def templateStats(): Unit = {
     templateStatSeq()
   }
 
@@ -90,7 +90,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     case _ ⇒ accept(SEMI)
   }
 
-  private def acceptStatSepOpt() = if (!isStatSeqEnd) acceptStatSep
+  private def acceptStatSepOpt() = if (!isStatSeqEnd) acceptStatSep()
 
   private def isModifier = currentTokenType match {
     case ABSTRACT | FINAL | SEALED | PRIVATE |
@@ -166,7 +166,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isStatSep: Boolean = isStatSep(currentTokenType)
 
-  private def tokenSeparated[T](separator: TokenType, sepFirst: Boolean, part: ⇒ T) {
+  private def tokenSeparated[T](separator: TokenType, sepFirst: Boolean, part: ⇒ T): Unit = {
     if (sepFirst) () else part
     while (separator) {
       nextToken()
@@ -174,18 +174,18 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def commaSeparated[T](part: ⇒ T) =
-    tokenSeparated(COMMA, false, part)
+  private def commaSeparated[T](part: ⇒ T): Unit =
+    tokenSeparated(COMMA, sepFirst = false, part = part)
 
-  private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, true, part)
-  private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, true, part)
+  private def caseSeparated[T](part: ⇒ T): Unit = tokenSeparated(CASE, sepFirst = true, part = part)
+  private def readAnnots[T](part: ⇒ T): Unit = tokenSeparated(AT, sepFirst = true, part = part)
 
   trait PatternContextSensitive {
 
-    def argType()
-    def functionArgType()
+    def argType(): Unit
+    def functionArgType(): Unit
 
-    private def tupleInfixType() {
+    private def tupleInfixType(): Unit = {
       nextToken()
       if (RPAREN) {
         nextToken()
@@ -206,9 +206,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     }
 
-    private def makeExistentialTypeTree() = refinement()
+    private def makeExistentialTypeTree(): Unit = refinement()
 
-    def typ() {
+    def typ(): Unit = {
       if (LPAREN) tupleInfixType()
       else infixType()
 
@@ -223,16 +223,16 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     }
 
-    def typeArgs() = {
+    def typeArgs(): Unit = {
       inBrackets(types())
     }
 
-    def annotType() = {
+    def annotType(): Unit = {
       simpleType()
       annotTypeRest()
     }
 
-    def simpleType() = {
+    def simpleType(): Unit = {
       currentTokenType match {
         case LPAREN ⇒
           inParens(types())
@@ -250,7 +250,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       ident()
     }
 
-    private def simpleTypeRest() {
+    private def simpleTypeRest(): Unit =
       currentTokenType match {
         case HASH ⇒
           typeProjection()
@@ -259,11 +259,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           typeArgs()
           simpleTypeRest()
         case _ ⇒
-          Nil
       }
-    }
 
-    def compoundType() = {
+    def compoundType(): Option[Unit] = {
       if (LBRACE) None else Some(annotType())
       compoundTypeRest()
     }
@@ -277,7 +275,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       if (LBRACE) Some(refinement()) else None
     }
 
-    def infixTypeRest() {
+    def infixTypeRest(): Unit =
       if (isIdent && !STAR) {
         val identToken = currentToken
         InfixTypeConstructor(ident())
@@ -288,19 +286,17 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         } else {
           infixType()
         }
-      } else
-        Nil
-    }
+      }
 
-    def infixType() = {
+    def infixType(): Unit = {
       compoundType()
       infixTypeRest()
     }
 
-    private def types() =
+    private def types(): Unit =
       commaSeparated(argType())
 
-    private def functionTypes() =
+    private def functionTypes(): Unit =
       commaSeparated(functionArgType())
 
   }
@@ -313,7 +309,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def selector() = ident()
 
-  private def pathC(thisOK: Boolean, typeOK: Boolean) {
+  private def pathC(thisOK: Boolean, typeOK: Boolean): Unit = {
     if (THIS) {
       nextToken()
       if (!thisOK || DOT) {
@@ -354,9 +350,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def path(thisOK: Boolean, typeOK: Boolean) = pathC(thisOK, typeOK)
+  private def path(thisOK: Boolean, typeOK: Boolean): Unit = pathC(thisOK, typeOK)
 
-  private def selectors(delme: String, typeOK: Boolean) {
+  private def selectors(delme: String, typeOK: Boolean): Unit = {
     if (typeOK && TYPE)
       nextToken()
     else {
@@ -368,13 +364,13 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def mixinQualifierOpt() {
-    if (LBRACKET) inBrackets(ident)
+  private def mixinQualifierOpt(): Unit = {
+    if (LBRACKET) inBrackets(ident())
   }
 
-  private def stableId() = path(thisOK = false, typeOK = false)
+  private def stableId(): Unit = path(thisOK = false, typeOK = false)
 
-  private def qualId() = {
+  private def qualId(): Unit = {
     ident()
     if (DOT) {
       nextToken()
@@ -395,7 +391,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     else
       throw new ScalaParserException("illegal literal: " + currentToken)
 
-  private def interpolatedString(inPattern: Boolean) {
+  private def interpolatedString(inPattern: Boolean): Unit = {
     nextToken()
     while (STRING_PART) {
       nextToken()
@@ -415,7 +411,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     nextToken()
   }
 
-  private def newLineOpt() { if (NEWLINE) nextToken() }
+  private def newLineOpt(): Unit = { if (NEWLINE) nextToken() }
 
   private def newLinesOpt() = if (NEWLINE || NEWLINES) nextToken()
 
@@ -431,22 +427,22 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     else
       None
 
-  private def typedOpt() =
+  private def typedOpt(): Unit =
     if (COLON) {
       nextToken()
       typ()
     }
 
-  private def typeOrInfixType(location: Location) =
+  private def typeOrInfixType(location: Location): Unit =
     if (location == Local)
       typ()
     else
       startInfixType()
 
-  private def annotTypeRest() =
+  private def annotTypeRest(): Unit =
     annotations(skipNewLines = false)
 
-  private def wildcardType() = {
+  private def wildcardType(): Unit = {
     typeBounds()
   }
 
@@ -461,15 +457,15 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def statement(location: Location) = expr(location)
+  private def statement(location: Location): Unit = expr(location)
 
-  def expr() { expr(Local) }
+  def expr(): Unit = { expr(Local) }
 
-  private def expr(location: Location) {
+  private def expr(location: Location): Unit = {
     expr0(location)
   }
 
-  private def expr0(location: Location) {
+  private def expr0(location: Location): Unit = {
     currentTokenType match {
       case IF ⇒
         nextToken()
@@ -488,7 +484,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           case LBRACE ⇒
             inBraces(block())
           case LPAREN ⇒ inParens(expr())
-          case _      ⇒ expr
+          case _      ⇒ expr()
         }
         if (!CATCH)
           None
@@ -581,7 +577,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def implicitClosure(location: Location) {
+  private def implicitClosure(location: Location): Unit = {
     ident()
     if (COLON) {
       nextToken()
@@ -591,7 +587,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     if (location != InBlock) expr() else block()
   }
 
-  private def postfixExpr() {
+  private def postfixExpr(): Unit = {
     prefixExpr()
     while (isIdent) {
       ident()
@@ -602,7 +598,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def prefixExpr() {
+  private def prefixExpr(): Unit = {
     if (isUnaryOp) {
       val isMinus = MINUS
       ident()
@@ -615,7 +611,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       simpleExpr()
   }
 
-  private def simpleExpr() {
+  private def simpleExpr(): Unit = {
     var canApply = true
     if (isLiteral) literal()
     else currentTokenType match {
@@ -626,7 +622,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case USCORE ⇒
         nextToken()
       case LPAREN ⇒
-        makeParens(commaSeparated(expr))
+        makeParens(commaSeparated(expr()))
       case LBRACE ⇒
         canApply = false
         blockExpr()
@@ -640,7 +636,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     simpleExprRest(canApply)
   }
 
-  private def simpleExprRest(canApply: Boolean) {
+  private def simpleExprRest(canApply: Boolean): Unit = {
     if (canApply)
       newLineOptWhenFollowedBy(LBRACE)
     currentTokenType match {
@@ -663,9 +659,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def argumentExprs() {
-    def argument() = expr()
-    def args() = commaSeparated(argument())
+  private def argumentExprs(): Unit = {
+    def argument(): Unit = expr()
+    def args(): Unit = commaSeparated(argument())
     currentTokenType match {
       case LBRACE ⇒ blockExpr()
       case LPAREN ⇒
@@ -674,21 +670,22 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def multipleArgumentExprs() {
-    if (!LPAREN) Nil
-    else { argumentExprs(); multipleArgumentExprs() }
-  }
+  private def multipleArgumentExprs(): Unit =
+    if (LPAREN) {
+      argumentExprs()
+      multipleArgumentExprs()
+    }
 
-  private def blockExpr() {
+  private def blockExpr(): Unit = {
     inBraces {
       if (justCase) caseClauses()
       else block()
     }
   }
 
-  private def block() { blockStatSeq() }
+  private def block(): Unit = { blockStatSeq() }
 
-  private def caseClauses() {
+  private def caseClauses(): Unit = {
     caseSeparated {
       (pattern(), guard(), caseBlock())
     }
@@ -697,19 +694,19 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     //      accept(CASE)
   }
 
-  private def caseBlock() {
+  private def caseBlock(): Unit = {
     accept(ARROW)
     block()
   }
 
-  private def guard() {
+  private def guard(): Unit = {
     if (IF) {
       nextToken()
       postfixExpr()
     }
   }
 
-  private def enumerators() {
+  private def enumerators(): Unit = {
     val newStyle = !VAL
     generator(eqOK = false)
     while (isStatSep) {
@@ -724,7 +721,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def generator(eqOK: Boolean) {
+  private def generator(eqOK: Boolean): Unit = {
     if (VAL) nextToken()
     noSeq.pattern1()
     if (EQUALS && eqOK) nextToken() else accept(LARROW)
@@ -738,9 +735,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
     def isXML: Boolean = false
 
-    def functionArgType() = argType()
+    def functionArgType(): Unit = argType()
 
-    def argType() {
+    def argType(): Unit = {
       currentTokenType match {
         case USCORE ⇒
           nextToken()
@@ -752,11 +749,11 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     }
 
-    def patterns() {
+    def patterns(): Unit = {
       commaSeparated(pattern())
     }
 
-    def pattern() { // Scalac now uses a loop() method, but this is still OK:
+    def pattern(): Unit = { // Scalac now uses a loop() method, but this is still OK:
       pattern1()
       if (PIPE)
         while (PIPE) {
@@ -765,7 +762,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         }
     }
 
-    def pattern1() {
+    def pattern1(): Unit = {
       pattern2()
       if (COLON) {
         nextToken()
@@ -773,7 +770,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     }
 
-    def pattern2() {
+    def pattern2(): Unit = {
       pattern3()
       if (AT) {
         // TODO: Compare Parsers.scala
@@ -784,7 +781,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     }
 
-    def pattern3() {
+    def pattern3(): Unit = {
       val firstToken = currentToken
       val secondToken = InferredSemicolonScalaParser.this(pos + 1)
       simplePattern()
@@ -809,7 +806,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       }
     }
 
-    def simplePattern() {
+    def simplePattern(): Unit = {
       currentTokenType match {
         case VARID | OTHERID | PLUS | MINUS | STAR | PIPE | TILDE | EXCLAMATION | THIS ⇒
           val nameIsMinus: Boolean = MINUS // TODO  case Ident(name) if name == nme.MINUS =>
@@ -825,7 +822,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case CHARACTER_LITERAL | INTEGER_LITERAL | FLOATING_POINT_LITERAL | STRING_LITERAL | SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
           literal(inPattern = true)
         case LPAREN ⇒
-          makeParens(noSeq.patterns)
+          makeParens(noSeq.patterns())
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
           xmlLiteralPattern()
         case _ ⇒
@@ -836,8 +833,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   }
 
   object outPattern extends PatternContextSensitive {
-    def argType() = typ()
-    def functionArgType() = paramType()
+    def argType(): Unit = typ()
+    def functionArgType(): Unit = paramType()
   }
 
   object seqOK extends SeqContextSensitive {
@@ -854,18 +851,18 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     override val isXML = true
   }
 
-  def typ() = outPattern.typ()
-  def startInfixType() = outPattern.infixType()
-  def startAnnotType() = outPattern.annotType()
-  def exprTypeArgs() = outPattern.typeArgs()
-  def exprSimpleType() = outPattern.simpleType()
+  def typ(): Unit = outPattern.typ()
+  def startInfixType(): Unit = outPattern.infixType()
+  def startAnnotType(): Unit = outPattern.annotType()
+  def exprTypeArgs(): Unit = outPattern.typeArgs()
+  def exprSimpleType(): Unit = outPattern.simpleType()
 
-  def pattern() = noSeq.pattern()
-  def patterns() = noSeq.patterns()
-  def seqPatterns() = seqOK.patterns()
-  def xmlSeqPatterns() = xmlSeqOK.patterns()
+  def pattern(): Unit = noSeq.pattern()
+  def patterns(): Unit = noSeq.patterns()
+  def seqPatterns(): Unit = seqOK.patterns()
+  def xmlSeqPatterns(): Unit = xmlSeqOK.patterns()
 
-  private def argumentPatterns() = {
+  private def argumentPatterns(): Unit = {
     inParens { if (RPAREN) Nil else seqPatterns() }
   }
 
@@ -889,8 +886,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def modifiers() {
-    def loop() {
+  private def modifiers(): Unit = {
+    def loop(): Unit = {
       currentTokenType match {
         case PRIVATE | PROTECTED ⇒
           nextToken()
@@ -908,35 +905,34 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     loop()
   }
 
-  private def localModifiers() {
+  private def localModifiers(): Unit =
     if (isLocalModifier) {
       nextToken()
       localModifiers()
-    } else Nil
-  }
+    }
 
-  private def annotations(skipNewLines: Boolean) {
+  private def annotations(skipNewLines: Boolean): Unit = {
     readAnnots {
       annotationExpr()
       if (skipNewLines) newLineOpt() else None
     }
   }
 
-  private def constructorAnnotations() =
+  private def constructorAnnotations(): Unit =
     readAnnots {
       exprSimpleType()
       argumentExprs()
     }
 
-  private def annotationExpr() {
+  private def annotationExpr(): Unit = {
     exprSimpleType()
     if (LPAREN) multipleArgumentExprs()
   }
 
-  private def paramClauses() {
+  private def paramClauses(): Unit = {
     var implicitmod = false
 
-    def param() {
+    def param(): Unit = {
       annotations(skipNewLines = false)
       val ownerIsTypeName = true // TODO: if (owner.isTypeName)
       if (ownerIsTypeName) {
@@ -957,7 +953,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
 
     // Differs from nsc in that we've pulled in lparen/rparen
-    def paramClause() {
+    def paramClause(): Unit = {
       accept(LPAREN)
       if (RPAREN) {
         accept(RPAREN)
@@ -991,8 +987,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def typeParamClauseOpt(allowVariance: Boolean) {
-    def typeParam() {
+  private def typeParamClauseOpt(allowVariance: Boolean): Unit = {
+    def typeParam(): Unit = {
       if (allowVariance && isIdent) { // TODO: condition
         if (PLUS)
           nextToken()
@@ -1018,25 +1014,25 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def typeBounds() {
+  private def typeBounds(): Unit = {
     bound(SUPERTYPE)
     bound(SUBTYPE)
   }
 
-  private def bound(tokenType: TokenType) {
+  private def bound(tokenType: TokenType): Unit = {
     if (tokenType) {
       nextToken()
       typ()
     }
   }
 
-  private def importClause() {
+  private def importClause(): Unit = {
     accept(IMPORT)
     commaSeparated(importExpr())
   }
 
-  private def importExpr() {
-    def thisDotted() {
+  private def importExpr(): Unit = {
+    def thisDotted(): Unit = {
       nextToken()
       accept(DOT)
       selector()
@@ -1050,7 +1046,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         accept(DOT)
         if (THIS) thisDotted()
     }
-    def loop() {
+    def loop(): Unit = {
       currentTokenType match {
         case USCORE ⇒
           nextToken()
@@ -1067,7 +1063,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     loop()
   }
 
-  private def importSelectors() {
+  private def importSelectors(): Unit = {
     inBraces(commaSeparated(importSelector()))
   }
 
@@ -1075,7 +1071,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     if (USCORE) nextToken()
     else ident()
 
-  private def importSelector() {
+  private def importSelector(): Unit = {
     wildcardOrIdent()
     currentTokenType match {
       case ARROW ⇒
@@ -1085,7 +1081,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def defOrDcl(localDef: Boolean = false) = currentTokenType match {
+  private def defOrDcl(localDef: Boolean = false): Unit = currentTokenType match {
     case VAL  ⇒ patDefOrDcl()
     case VAR  ⇒ patDefOrDcl()
     case DEF  ⇒ funDefOrDcl(localDef)
@@ -1093,13 +1089,13 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     case _    ⇒ tmplDef()
   }
 
-  def nonLocalDefOrDcl() {
+  def nonLocalDefOrDcl(): Unit = {
     annotations(skipNewLines = true)
     modifiers()
     defOrDcl()
   }
 
-  private def patDefOrDcl() {
+  private def patDefOrDcl(): Unit = {
     nextToken()
     commaSeparated(noSeq.pattern2())
     typedOpt()
@@ -1114,7 +1110,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def funDefOrDcl(localDef: Boolean) {
+  private def funDefOrDcl(localDef: Boolean): Unit = {
     accept(DEF)
     if (THIS) {
       nextToken()
@@ -1133,7 +1129,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def funDefRest() {
+  private def funDefRest(): Unit = {
     typeParamClauseOpt(allowVariance = false)
     paramClauses()
     newLineOptWhenFollowedBy(LBRACE)
@@ -1156,14 +1152,14 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def constrExpr() {
+  private def constrExpr(): Unit = {
     if (LBRACE)
       constrBlock()
     else
       selfInvocation()
   }
 
-  private def selfInvocation() {
+  private def selfInvocation(): Unit = {
     accept(THIS)
     newLineOptWhenFollowedBy(LBRACE)
     argumentExprs()
@@ -1174,7 +1170,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def constrBlock() {
+  private def constrBlock(): Unit = {
     accept(LBRACE)
     selfInvocation()
     if (isStatSep) {
@@ -1184,7 +1180,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(RBRACE)
   }
 
-  private def typeDefOrDcl() {
+  private def typeDefOrDcl(): Unit = {
     accept(TYPE)
     newLinesOpt()
     ident()
@@ -1200,13 +1196,13 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def topLevelTmplDef() {
+  private def topLevelTmplDef(): Unit = {
     annotations(skipNewLines = true)
     modifiers()
     tmplDef()
   }
 
-  private def tmplDef() {
+  private def tmplDef(): Unit = {
     currentTokenType match {
       case TRAIT                          ⇒ classDef()
       case CLASS                          ⇒ classDef()
@@ -1217,7 +1213,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def classDef() {
+  private def classDef(): Unit = {
     if (CASE)
       nextToken() // We use two tokens whereas nsc uses CASEOBJECT
     val isTrait: Boolean = TRAIT
@@ -1234,7 +1230,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     templateOpt(isTrait)
   }
 
-  private def objectDef() {
+  private def objectDef(): Unit = {
     if (CASE)
       nextToken() // We use two tokens whereas nsc uses CASEOBJECT
     accept(OBJECT)
@@ -1242,8 +1238,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     templateOpt(isTrait = false)
   }
 
-  private def templateParents() {
-    def readAppliedParent() {
+  private def templateParents(): Unit = {
+    def readAppliedParent(): Unit = {
       startAnnotType()
       if (LPAREN)
         multipleArgumentExprs()
@@ -1255,7 +1251,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def template() {
+  private def template(): Unit = {
     newLineOptWhenFollowedBy(LBRACE)
     if (LBRACE) {
       templateBody()
@@ -1270,7 +1266,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def templateOpt(isTrait: Boolean) {
+  private def templateOpt(isTrait: Boolean): Unit = {
     if (EXTENDS || SUBTYPE && isTrait) {
       nextToken()
       template()
@@ -1280,11 +1276,11 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def templateBody() {
+  private def templateBody(): Unit = {
     inBraces(templateStatSeq())
   }
 
-  private def templateBodyOpt() {
+  private def templateBodyOpt(): Unit = {
     newLineOptWhenFollowedBy(LBRACE)
     if (LBRACE)
       templateBody()
@@ -1294,16 +1290,16 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       None
   }
 
-  private def refinement() {
+  private def refinement(): Unit = {
     inBraces(refineStatSeq())
   }
 
-  private def packaging() {
+  private def packaging(): Unit = {
     pkgQualId()
     inBraces(topStatSeq())
   }
 
-  private def topStatSeq() {
+  private def topStatSeq(): Unit = {
     while (!isStatSeqEnd) {
       currentTokenType match {
         case PACKAGE ⇒
@@ -1327,7 +1323,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def templateStatSeq() {
+  private def templateStatSeq(): Unit = {
 
     if (isExprIntro) {
       expr(InTemplate)
@@ -1354,7 +1350,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def refineStatSeq() {
+  private def refineStatSeq(): Unit = {
     while (!isStatSeqEnd) {
       if (isDclIntro)
         defOrDcl()
@@ -1366,7 +1362,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def localDef() {
+  private def localDef(): Unit = {
     annotations(skipNewLines = true)
     localModifiers()
     // val modifierCondition = true // TODO: !!!!
@@ -1374,7 +1370,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     or(defOrDcl(localDef = true), tmplDef())
   }
 
-  private def blockStatSeq() {
+  private def blockStatSeq(): Unit = {
     while (!isStatSeqEnd && !justCase) {
       if (IMPORT) {
         importClause()
@@ -1400,8 +1396,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  def compilationUnit() {
-    def topstats() {
+  def compilationUnit(): Unit = {
+    def topstats(): Unit = {
       while (SEMI)
         nextToken()
 
@@ -1434,7 +1430,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(EOF)
   }
 
-  private def xmlStartTag(isPattern: Boolean) {
+  private def xmlStartTag(isPattern: Boolean): Unit = {
     accept(XML_START_OPEN)
     accept(XML_NAME)
     while (!XML_TAG_CLOSE) {
@@ -1451,7 +1447,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(XML_TAG_CLOSE)
   }
 
-  private def xmlAttribute(isPattern: Boolean) {
+  private def xmlAttribute(isPattern: Boolean): Unit = {
     accept(XML_NAME)
     nextTokenIf(XML_WHITESPACE)
     accept(XML_ATTR_EQ)
@@ -1466,7 +1462,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def xmlEmptyElement(isPattern: Boolean) {
+  private def xmlEmptyElement(isPattern: Boolean): Unit = {
     accept(XML_START_OPEN)
     accept(XML_NAME)
     while (!XML_EMPTY_CLOSE) {
@@ -1483,7 +1479,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     accept(XML_EMPTY_CLOSE)
   }
 
-  private def xmlEmbeddedScala(isPattern: Boolean) {
+  private def xmlEmbeddedScala(isPattern: Boolean): Unit = {
     if (isPattern) {
       accept(LBRACE)
       xmlSeqPatterns()
@@ -1492,14 +1488,14 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       blockExpr()
   }
 
-  private def xmlEndTag() {
+  private def xmlEndTag(): Unit = {
     accept(XML_END_OPEN)
     accept(XML_NAME)
     nextTokenIf(XML_WHITESPACE)
     accept(XML_TAG_CLOSE)
   }
 
-  private def xmlNonEmptyElement(isPattern: Boolean) {
+  private def xmlNonEmptyElement(isPattern: Boolean): Unit = {
     xmlStartTag(isPattern)
     while (!XML_END_OPEN) {
       currentTokenType match {
@@ -1516,23 +1512,11 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     xmlEndTag()
   }
 
-  private def xmlElement(isPattern: Boolean) {
+  private def xmlElement(isPattern: Boolean): Unit = {
     or(xmlNonEmptyElement(isPattern), xmlEmptyElement(isPattern))
   }
 
-  private def xml(isPattern: Boolean) {
-    def xmlContent() {
-      currentTokenType match {
-        case XML_START_OPEN             ⇒ xmlElement(isPattern)
-        case XML_PCDATA                 ⇒ XmlPCDATA(nextToken())
-        case XML_COMMENT                ⇒ XmlComment(nextToken())
-        case XML_CDATA                  ⇒ XmlCDATA(nextToken())
-        case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
-        case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
-        case _                          ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
-      }
-      xmlContent()
-    }
+  private def xml(isPattern: Boolean): Unit = {
     while (XML_START_OPEN || XML_PCDATA) {
       if (XML_START_OPEN)
         xmlElement(isPattern)
@@ -1541,9 +1525,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     }
   }
 
-  private def xmlLiteral() = xml(isPattern = false)
+  private def xmlLiteral(): Unit = xml(isPattern = false)
 
-  private def xmlLiteralPattern() = xml(isPattern = true)
+  private def xmlLiteralPattern(): Unit = xml(isPattern = true)
 
   private var pos = 0
 
@@ -1585,7 +1569,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private def isVariableName(name: String): Boolean = {
     val first = name(0)
-    ((first.isLower && first.isLetter) || first == '_')
+    (first.isLower && first.isLetter) || first == '_'
   }
 
   private def optional[T](p: ⇒ T): Option[T] =
@@ -1596,7 +1580,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     try {
       p1
     } catch {
-      case e: ScalaParserException ⇒
+      case _: ScalaParserException ⇒
         pos = originalPos
         if (logging) println("Rewinding to try alternative: " + currentToken)
         p2

@@ -1,10 +1,10 @@
 package scalariform.parser
 
+import scala.PartialFunction._
+import scala.collection.mutable.ListBuffer
+import scalariform.ScalaVersions
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
-import scalariform.ScalaVersions
-import scala.collection.mutable.ListBuffer
-import scala.PartialFunction._
 
 class ScalaParser(tokens: Array[Token]) {
 
@@ -15,7 +15,7 @@ class ScalaParser(tokens: Array[Token]) {
   import ScalaParser._
 
   def safeParse[T](production: ⇒ T): Option[T] =
-    try Some(production) catch { case e: ScalaParserException ⇒ None }
+    try Some(production) catch { case _: ScalaParserException ⇒ None }
 
   def compilationUnitOrScript(): CompilationUnit = {
     val originalPos = pos
@@ -27,7 +27,7 @@ class ScalaParser(tokens: Array[Token]) {
         if (logging) println("Rewinding to try alternative: " + currentToken)
         try {
           scriptBody()
-        } catch { case e2: ScalaParserException ⇒ throw e }
+        } catch { case _: ScalaParserException ⇒ throw e }
     }
   }
 
@@ -80,7 +80,7 @@ class ScalaParser(tokens: Array[Token]) {
       throw new ScalaParserException("Expected token " + tokenType + " but got " + currentToken)
 
   private def acceptStatSep(): Token = currentTokenType match {
-    case NEWLINE | NEWLINES ⇒ nextToken
+    case NEWLINE | NEWLINES ⇒ nextToken()
     case _                  ⇒ accept(SEMI)
   }
 
@@ -172,10 +172,10 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def commaSeparated[T](part: ⇒ T) =
-    tokenSeparated(COMMA, false, part) match { case (firstOpt, rest) ⇒ (firstOpt.get, rest) }
+    tokenSeparated(COMMA, sepFirst = false, part = part) match { case (firstOpt, rest) ⇒ (firstOpt.get, rest) }
 
-  private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, true, part)._2
-  private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, true, part)._2
+  private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, sepFirst = true, part = part)._2
+  private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, sepFirst = true, part = part)._2
 
   trait PatternContextSensitive {
 
@@ -402,7 +402,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def mixinQualifierOpt(): Option[TypeExprElement] =
-    if (LBRACKET) Some(TypeExprElement(typeElementFlatten3(inBrackets(ident)))) else None
+    if (LBRACKET) Some(TypeExprElement(typeElementFlatten3(inBrackets(ident())))) else None
 
   private def stableId(): List[Token] = path(thisOK = false, typeOK = false)
 
@@ -536,7 +536,7 @@ class ScalaParser(tokens: Array[Token]) {
             val (lbrace, block_, rbrace) = inBraces(block())
             makeExpr(BlockExpr(lbrace, Right(block_), rbrace))
           case LPAREN ⇒ makeExpr(inParens(expr()))
-          case _      ⇒ expr
+          case _      ⇒ expr()
         }
         val catchClauseOption: Option[CatchClause] =
           if (!CATCH)
@@ -702,9 +702,10 @@ class ScalaParser(tokens: Array[Token]) {
   private def isRightAssociative(token: Token) = token.text.endsWith(":")
 
   private object NestedInfixExpr {
-    def unapply(infixExpr: InfixExpr) = condOpt(infixExpr) {
-      case InfixExpr(List(InfixExpr(x, op1, newLineOpt1, y)), op2, newLineOpt2, z) ⇒ (x, op1, newLineOpt1, y, op2, newLineOpt2, z)
-    }
+    def unapply(infixExpr: InfixExpr): Option[(List[ExprElement], Token, Option[Token], List[ExprElement], Token, Option[Token], List[ExprElement])] =
+      condOpt(infixExpr) {
+        case InfixExpr(List(InfixExpr(x, op1, newLineOpt1, y)), op2, newLineOpt2, z) ⇒ (x, op1, newLineOpt1, y, op2, newLineOpt2, z)
+      }
   }
 
   private def performRotationsForPrecedence(infixExpr: InfixExpr): InfixExpr = infixExpr match {
@@ -742,7 +743,7 @@ class ScalaParser(tokens: Array[Token]) {
       val unaryId = PrefixExprElement(ident())
       if (isMinus && isNumericLit) {
         val literal_ = literal()
-        simpleExprRest(exprElementFlatten2((unaryId, literal_)), true)
+        simpleExprRest(exprElementFlatten2((unaryId, literal_)), canApply = true)
       } else
         List(Expr(exprElementFlatten2((unaryId, simpleExpr()))))
     } else
@@ -762,7 +763,7 @@ class ScalaParser(tokens: Array[Token]) {
         case USCORE ⇒
           exprElementFlatten2(nextToken())
         case LPAREN ⇒
-          val (lparen, parenBody, rparen) = makeParens(commaSeparated(expr))
+          val (lparen, parenBody, rparen) = makeParens(commaSeparated(expr()))
           exprElementFlatten2(ParenExpr(lparen, exprElementFlatten2(parenBody), rparen))
         case LBRACE ⇒
           canApply = false
@@ -913,7 +914,7 @@ class ScalaParser(tokens: Array[Token]) {
 
     def isXML: Boolean = false
 
-    def functionArgType() = argType()
+    def functionArgType(): List[TypeElement] = argType()
 
     def argType(): List[TypeElement] = currentTokenType match {
       case USCORE ⇒
@@ -1018,7 +1019,7 @@ class ScalaParser(tokens: Array[Token]) {
           SYMBOL_LITERAL | TRUE | FALSE | NULL ⇒
           exprElementFlatten2(literal(inPattern = true))
         case LPAREN ⇒
-          val (lparen, patterns_, rparen) = makeParens(noSeq.patterns)
+          val (lparen, patterns_, rparen) = makeParens(noSeq.patterns())
           exprElementFlatten2((lparen, patterns_, rparen))
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
           exprElementFlatten2(xmlLiteralPattern())
@@ -1048,16 +1049,16 @@ class ScalaParser(tokens: Array[Token]) {
     override val isXML = true
   }
 
-  def typ() = outPattern.typ()
-  def startInfixType() = outPattern.infixType()
-  def startAnnotType() = outPattern.annotType()
-  def exprTypeArgs() = outPattern.typeArgs()
-  def exprSimpleType() = outPattern.simpleType()
+  def typ(): Type = outPattern.typ()
+  def startInfixType(): List[TypeElement] = outPattern.infixType()
+  def startAnnotType(): List[TypeElement] = outPattern.annotType()
+  def exprTypeArgs(): List[TypeElement] = outPattern.typeArgs()
+  def exprSimpleType(): List[TypeElement] = outPattern.simpleType()
 
-  def pattern() = noSeq.pattern()
-  def patterns() = noSeq.patterns()
-  def seqPatterns() = seqOK.patterns()
-  def xmlSeqPatterns() = xmlSeqOK.patterns()
+  def pattern(): Expr = noSeq.pattern()
+  def patterns(): List[ExprElement] = noSeq.patterns()
+  def seqPatterns(): List[ExprElement] = seqOK.patterns()
+  def xmlSeqPatterns(): List[ExprElement] = xmlSeqOK.patterns()
 
   private def argumentPatterns(): List[ExprElement] = {
     val (lparen, patterns_, rparen) = inParens { if (RPAREN) Nil else seqPatterns() }
@@ -1089,7 +1090,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def modifiers(): List[Modifier] = {
     val modifiers = ListBuffer[Modifier]()
-    def loop() {
+    def loop(): Unit = {
       currentTokenType match {
         case PRIVATE | PROTECTED ⇒
           val privateOrProtected = nextToken()
@@ -1349,7 +1350,7 @@ class ScalaParser(tokens: Array[Token]) {
       Some((equalsToken, clause))
     } else
       None
-    PatDefOrDcl(valOrVarToken, pattern_, otherPatterns.toList, typedOpt_, equalsClauseOption)
+    PatDefOrDcl(valOrVarToken, pattern_, otherPatterns, typedOpt_, equalsClauseOption)
   }
 
   private def funDefOrDcl(localDef: Boolean): FunDefOrDcl = {
@@ -1769,7 +1770,8 @@ class ScalaParser(tokens: Array[Token]) {
       if (initialSemis.isEmpty)
         otherStatSeq
       else {
-        val otherStats = (initialSemis.init.toList.map((_, None)) :+ ((initialSemis.last, otherStatSeq.firstStatOpt))) ++ otherStatSeq.otherStats
+        val otherStats = (initialSemis.init.toList.map((_, Option.empty[Stat])) :+
+          ((initialSemis.last, otherStatSeq.firstStatOpt))) ++ otherStatSeq.otherStats
         StatSeq(selfReferenceOpt = None, firstStatOpt = None, otherStats = otherStats)
       }
     }
@@ -1946,7 +1948,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isVariableName(name: String): Boolean = {
     val first = name(0)
-    ((first.isLower && first.isLetter) || first == '_')
+    (first.isLower && first.isLetter) || first == '_'
   }
 
   private def optional[T](p: ⇒ T): Option[T] =
@@ -1957,7 +1959,7 @@ class ScalaParser(tokens: Array[Token]) {
     try {
       p1
     } catch {
-      case e: ScalaParserException ⇒
+      case _: ScalaParserException ⇒
         pos = originalPos
         if (logging) println("Rewinding to try alternative: " + currentToken)
         p2
@@ -1983,13 +1985,13 @@ object ScalaParser {
    */
   def parse(text: String, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): Option[AstNode] = {
     val parser = new ScalaParser(ScalaLexer.tokenise(text, scalaVersion = scalaVersion).toArray)
-    parser.safeParse(parser.compilationUnitOrScript)
+    parser.safeParse(parser.compilationUnitOrScript())
   }
 
   trait ExprElementFlattenable { def elements: List[ExprElement] }
   case class ExprElements(elements: List[ExprElement]) extends ExprElementFlattenable
-  def exprElementFlatten[T <% ExprElementFlattenable]: (T ⇒ List[ExprElement]) = t ⇒ { exprElementFlatten2(t) }
-  def exprElementFlatten2[T <% ExprElementFlattenable](t: T): List[ExprElement] = groupGeneralTokens(t.elements)
+  def exprElementFlatten[T](implicit flat: T => ExprElementFlattenable): (T ⇒ List[ExprElement]) = t ⇒ { exprElementFlatten2(t) }
+  def exprElementFlatten2[T](t: T)(implicit flat: T => ExprElementFlattenable): List[ExprElement] = groupGeneralTokens(t.elements)
   def groupGeneralTokens(xs: List[ExprElement]): List[ExprElement] = {
     val eq = (x: ExprElement, y: ExprElement) ⇒ (x, y) match {
       case (GeneralTokens(_), GeneralTokens(_)) ⇒ true
@@ -2015,39 +2017,39 @@ object ScalaParser {
   implicit def listOfTokenToExprFlattenable(tokens: List[Token]): ExprElementFlattenable = GeneralTokens(tokens)
   implicit def exprToExprFlattenable(expr: Expr): ExprElementFlattenable = expr.contents
   implicit def exprElementToExprFlattenable(exprElement: ExprElement): ExprElementFlattenable = ExprElements(List(exprElement))
-  implicit def ordinaryPairToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable](pair: (A, B)): ExprElementFlattenable =
+  implicit def ordinaryPairToExprFlattenable[A, B](pair: (A, B))(implicit flatA: A => ExprElementFlattenable, flatB: B => ExprElementFlattenable): ExprElementFlattenable =
     ExprElements(pair._1.elements ::: pair._2.elements)
-  implicit def tripleToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable, C <% ExprElementFlattenable](triple: (A, B, C)): ExprElementFlattenable =
+  implicit def tripleToExprFlattenable[A, B, C](triple: (A, B, C))(implicit flatA: A => ExprElementFlattenable, flatB: B => ExprElementFlattenable, flatC: C => ExprElementFlattenable): ExprElementFlattenable =
     ExprElements(triple._1.elements ::: triple._2.elements ::: triple._3.elements)
-  implicit def eitherToExprFlattenable[A <% ExprElementFlattenable, B <% ExprElementFlattenable](either: Either[A, B]): ExprElementFlattenable = ExprElements(either match {
+  implicit def eitherToExprFlattenable[A, B](either: Either[A, B])(implicit flatA: A => ExprElementFlattenable, flatB: B => ExprElementFlattenable): ExprElementFlattenable = ExprElements(either match {
     case Left(x)  ⇒ x.elements
     case Right(x) ⇒ x.elements
   })
-  implicit def optionToExprFlattenable[T <% ExprElementFlattenable](option: Option[T]): ExprElementFlattenable = option.toList
-  implicit def listToExprFlattenable[T <% ExprElementFlattenable](list: List[T]): ExprElementFlattenable = ExprElements(list flatMap { _.elements })
-  implicit def vectorToExprFlattenable[T <% ExprElementFlattenable](vector: Vector[T]): ExprElementFlattenable = ExprElements(vector.toList flatMap { _.elements })
+  implicit def optionToExprFlattenable[T](option: Option[T])(implicit flat: T => ExprElementFlattenable): ExprElementFlattenable = option.toList
+  implicit def listToExprFlattenable[T](list: List[T])(implicit flat: T => ExprElementFlattenable): ExprElementFlattenable = ExprElements(list flatMap { _.elements })
+  implicit def vectorToExprFlattenable[T](vector: Vector[T])(implicit flat: T => ExprElementFlattenable): ExprElementFlattenable = ExprElements(vector.toList flatMap { _.elements })
 
   def makeExpr(flattenables: ExprElementFlattenable*): Expr =
     Expr(flattenables.toList flatMap { _.elements })
 
   trait TypeElementFlattenable { def elements: List[TypeElement] }
-  case class TypeElements(val elements: List[TypeElement]) extends TypeElementFlattenable
-  def typeElementFlatten[T <% TypeElementFlattenable]: (T ⇒ List[TypeElement]) = _.elements
-  def typeElementFlatten2[T <% TypeElementFlattenable](t: T): List[TypeElement] = t.elements
+  case class TypeElements(elements: List[TypeElement]) extends TypeElementFlattenable
+  def typeElementFlatten[T](implicit flat: T => TypeElementFlattenable): (T ⇒ List[TypeElement]) = _.elements
+  def typeElementFlatten2[T](t: T)(implicit flat: T => TypeElementFlattenable): List[TypeElement] = t.elements
   def typeElementFlatten3(flattenables: TypeElementFlattenable*): List[TypeElement] = flattenables.toList flatMap { _.elements }
   implicit def tokenToTypeFlattenable(token: Token): TypeElementFlattenable = GeneralTokens(List(token))
   implicit def listOfTokenToTypeFlattenable(tokens: List[Token]): TypeElementFlattenable = GeneralTokens(tokens)
   implicit def typeElementToTypeFlattenable(typeElement: TypeElement): TypeElementFlattenable = TypeElements(List(typeElement))
-  implicit def eitherToTypeFlattenable[A <% TypeElementFlattenable, B <% TypeElementFlattenable](either: Either[A, B]): TypeElementFlattenable = TypeElements(either match {
+  implicit def eitherToTypeFlattenable[A, B](either: Either[A, B])(implicit flatA: A => TypeElementFlattenable, flatB: B => TypeElementFlattenable): TypeElementFlattenable = TypeElements(either match {
     case Left(x)  ⇒ x.elements
     case Right(x) ⇒ x.elements
   })
-  implicit def pairToTypeFlattenable[A <% TypeElementFlattenable, B <% TypeElementFlattenable](pair: (A, B)): TypeElementFlattenable =
+  implicit def pairToTypeFlattenable[A, B](pair: (A, B))(implicit flatA: A => TypeElementFlattenable, flatB: B => TypeElementFlattenable): TypeElementFlattenable =
     TypeElements(pair._1.elements ::: pair._2.elements)
-  implicit def tripleToTypeFlattenable[A <% TypeElementFlattenable, B <% TypeElementFlattenable, C <% TypeElementFlattenable](triple: (A, B, C)): TypeElementFlattenable =
+  implicit def tripleToTypeFlattenable[A, B, C](triple: (A, B, C))(implicit flatA: A => TypeElementFlattenable, flatB: B => TypeElementFlattenable, flatC: C => TypeElementFlattenable): TypeElementFlattenable =
     TypeElements(triple._1.elements ::: triple._2.elements ::: triple._3.elements)
-  implicit def optionToTypeFlattenable[T <% TypeElementFlattenable](option: Option[T]): TypeElementFlattenable = option.toList
-  implicit def listToTypeFlattenable[T <% TypeElementFlattenable](list: List[T]): TypeElementFlattenable = TypeElements(list flatMap { _.elements })
+  implicit def optionToTypeFlattenable[T](option: Option[T])(implicit flat: T => TypeElementFlattenable): TypeElementFlattenable = option.toList
+  implicit def listToTypeFlattenable[T](list: List[T])(implicit flat: T => TypeElementFlattenable): TypeElementFlattenable = TypeElements(list flatMap { _.elements })
 
 }
 

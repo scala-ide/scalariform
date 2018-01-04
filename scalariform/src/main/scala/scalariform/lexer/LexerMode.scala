@@ -6,7 +6,7 @@ class ScalaMode extends LexerMode {
 
   private var braceNestLevel: Int = 0
 
-  def nestBrace() { braceNestLevel += 1 }
+  def nestBrace(): Unit = { braceNestLevel += 1 }
 
   def unnestBrace(): Int = {
     braceNestLevel -= 1
@@ -23,14 +23,14 @@ class XmlMode extends LexerMode {
 
   private var tagNestLevel: Int = 0
 
-  def nestTag() { tagNestLevel += 1 }
+  def nestTag(): Unit = { tagNestLevel += 1 }
 
   def unnestTag(): Int = {
     tagNestLevel -= 1
     tagNestLevel
   }
 
-  def nestingLevel = tagNestLevel
+  def nestingLevel: Int = tagNestLevel
 
 }
 

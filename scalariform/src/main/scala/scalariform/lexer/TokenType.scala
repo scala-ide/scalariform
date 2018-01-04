@@ -2,16 +2,16 @@ package scalariform.lexer
 
 case class TokenType(name: String, isXml: Boolean = false) {
 
-  def isNewline = this == Tokens.NEWLINE || this == Tokens.NEWLINES
+  def isNewline: Boolean = this == Tokens.NEWLINE || this == Tokens.NEWLINES
 
-  def isKeyword = Tokens.KEYWORDS contains this
+  def isKeyword: Boolean = Tokens.KEYWORDS contains this
 
-  def isComment = Tokens.COMMENTS contains this
+  def isComment: Boolean = Tokens.COMMENTS contains this
 
-  def isId = Tokens.IDS contains this
+  def isId: Boolean = Tokens.IDS contains this
 
-  def isLiteral = Tokens.LITERALS contains this
+  def isLiteral: Boolean = Tokens.LITERALS contains this
 
-  override lazy val toString = name
+  override lazy val toString: String = name
 
 }

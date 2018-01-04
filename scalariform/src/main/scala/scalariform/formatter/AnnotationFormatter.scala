@@ -1,7 +1,7 @@
 package scalariform.formatter
 
-import scalariform.parser._
 import scalariform.formatter.preferences._
+import scalariform.parser._
 
 trait AnnotationFormatter { self: HasFormattingPreferences with TypeFormatter with ExprFormatter ⇒
 

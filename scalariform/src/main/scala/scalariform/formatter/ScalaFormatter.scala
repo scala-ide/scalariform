@@ -1,12 +1,12 @@
 package scalariform.formatter
 
+import scala.PartialFunction._
+import scalariform.ScalaVersions
+import scalariform.formatter.preferences._
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils._
-import scalariform.formatter.preferences._
-import PartialFunction._
-import scalariform.ScalaVersions
 
 trait HasHiddenTokenInfo {
 
@@ -157,7 +157,7 @@ abstract class ScalaFormatter
     tokenIndentMap:               Map[Token, Int],
     positionHintOption:           Option[Int]                 = None
   ): Option[TextEdit] = {
-    def writeIntertokenCompact() {
+    def writeIntertokenCompact(): Unit = {
       val comments = hiddenTokens.comments
       for ((previousCommentOption, comment, nextCommentOption) ← Utils.withPreviousAndNext(comments)) {
         val needGapBetweenThisAndPrevious = cond(previousCommentOption) {
@@ -191,7 +191,7 @@ abstract class ScalaFormatter
         else
           writeIntertokenCompact()
       case CompactPreservingGap ⇒
-        if (allWhitespace && !hiddenTokens.isEmpty)
+        if (allWhitespace && hiddenTokens.nonEmpty)
           builder.append(" ")
         else
           writeIntertokenCompact()
@@ -231,7 +231,7 @@ abstract class ScalaFormatter
                   case Some(SingleLineComment(_)) ⇒ math.min(1, newlineCount)
                   case _                          ⇒ math.min(2, newlineCount)
                 }
-                for (i ← 1 to newlinesToWrite)
+                for (_ ← 1 to newlinesToWrite)
                   builder.newline()
             }
             if (nextOpt.isEmpty) {
@@ -273,10 +273,10 @@ abstract class ScalaFormatter
 
   class StringBuilderExtra(builder: StringBuilder) {
 
-    def indent(indentLevel: Int, baseIndentOption: Option[Int] = None) = {
+    def indent(indentLevel: Int, baseIndentOption: Option[Int] = None): StringBuilder = {
       for {
         baseIndent ← baseIndentOption
-        n ← 1 to baseIndent
+        _ ← 1 to baseIndent
       } builder.append(" ")
       val indentChars = formattingPreferences.indentStyle.indent(indentLevel)
       builder.append(indentChars)
@@ -285,37 +285,37 @@ abstract class ScalaFormatter
 
     def write(token: Token, replacementOption: Option[String] = None): Option[TextEdit] = {
       val rewriteArrows = formattingPreferences(RewriteArrowSymbols)
-      val actualReplacementOption = replacementOption orElse (condOpt(token.tokenType) {
+      val actualReplacementOption = replacementOption orElse condOpt(token.tokenType) {
         case ARROW if rewriteArrows  ⇒ "⇒"
         case LARROW if rewriteArrows ⇒ "←"
         case EOF                     ⇒ ""
-      })
+      }
       builder.append(actualReplacementOption getOrElse token.rawText)
       actualReplacementOption map { replaceEdit(token, _) }
     }
 
-    def write(hiddenToken: HiddenToken) = {
+    def write(hiddenToken: HiddenToken): StringBuilder = {
       builder.append(hiddenToken.token.rawText)
       builder
     }
 
-    def newline() = {
+    def newline(): StringBuilder = {
       builder.append(newlineSequence)
       builder
     }
 
-    def atBeginningOfLine = builder.isEmpty || lastChar == '\n'
+    def atBeginningOfLine: Boolean = builder.isEmpty || lastChar == '\n'
 
     private def lastChar = builder(builder.length - 1)
 
-    def currentColumn = {
+    def currentColumn: Int = {
       var pos = builder.length - 1
       while (pos >= 0 && builder(pos) != '\n')
         pos -= 1
       builder.length - pos - 1
     }
 
-    def currentIndent = {
+    def currentIndent: String = {
       val lineStart = builder.length - currentColumn
       var pos = lineStart
       while (pos < builder.length && builder(pos).isWhitespace)
@@ -323,15 +323,15 @@ abstract class ScalaFormatter
       builder.substring(lineStart, pos)
     }
 
-    def lastCharacter = if (builder.length == 0) None else Some(lastChar)
+    def lastCharacter: Option[Char] = if (builder.isEmpty) None else Some(lastChar)
 
-    def ensureAtBeginningOfLine() = {
+    def ensureAtBeginningOfLine(): StringBuilder = {
       if (!atBeginningOfLine)
         newline()
       builder
     }
 
-    def atVisibleCharacter = builder.length > 0 && !Character.isWhitespace(lastChar)
+    def atVisibleCharacter: Boolean = builder.nonEmpty && !Character.isWhitespace(lastChar)
 
   }
   implicit def stringBuilder2stringBuilderExtra(builder: StringBuilder): StringBuilderExtra = new StringBuilderExtra(builder)
@@ -341,18 +341,18 @@ abstract class ScalaFormatter
 
   private def handleNewlineFormatting(
     previousTokenOption: Option[Token],
-    token: Token,
-    nextTokenOption: Option[Token],
-    tokens: List[Token],
-    tokenIndentMap: Map[Token, Int],
-    maybeNewlineFormat: Option[IntertokenFormatInstruction]
+    token:               Token,
+    nextTokenOption:     Option[Token],
+    tokens:              List[Token],
+    tokenIndentMap:      Map[Token, Int],
+    maybeNewlineFormat:  Option[IntertokenFormatInstruction]
   ): IntertokenFormatInstruction = {
 
     def defaultNewline() = defaultNewlineFormattingInstruction(
       previousTokenOption, token, nextTokenOption
     )
 
-    if(!allowParamGroupsOnNewlines) maybeNewlineFormat.getOrElse(defaultNewline())
+    if (!allowParamGroupsOnNewlines) maybeNewlineFormat.getOrElse(defaultNewline())
     else {
       // add support for newline param groups:
       //
@@ -361,48 +361,45 @@ abstract class ScalaFormatter
       //   (role: R, user: U)
       //   (implicit t: Timer)
       val maybeIndentLevel = nextTokenOption.map(_.tokenType) match {
-        case
-          Some(LPAREN) | Some(LBRACKET) if (
-            token.tokenType == NEWLINE && maybeNewlineFormat.isEmpty &&
-            !previousTokenOption.exists(_.tokenType == RBRACE) // exclude `}` followed by `(`
-          ) =>
+        case Some(LPAREN) | Some(LBRACKET) if token.tokenType == NEWLINE && maybeNewlineFormat.isEmpty &&
+          !previousTokenOption.exists(_.tokenType == RBRACE) // exclude `}` followed by `(`
+          =>
 
           // backtrack through tokens to find first open brace/newline delimiter
           val tokenGroup = tokens.splitAt(tokens.indexOf(token))._1
-          val delimiterToken = Utils.withPreviousAndNext(tokenGroup).reverse.find { case (prev, curr, next) =>
-            val tt = curr.tokenType
-            tt == LBRACE || tt == NEWLINES || (tt == NEWLINE &&
-              // keep backtracking if newline plus `[`, `(`, or `]`
-              !next.exists(n => Set(LBRACKET, LPAREN).exists(_ == n.tokenType)) &&
-              !prev.exists(_.tokenType == RBRACKET) // e.g. private[this]
-            )
+          val delimiterToken = Utils.withPreviousAndNext(tokenGroup).reverse.find {
+            case (prev, curr, next) =>
+              val tt = curr.tokenType
+              tt == LBRACE || tt == NEWLINES || (tt == NEWLINE &&
+                // keep backtracking if newline plus `[`, `(`, or `]`
+                !next.exists(n => Set(LBRACKET, LPAREN).contains(n.tokenType)) &&
+                !prev.exists(_.tokenType == RBRACKET) // e.g. private[this]
+              )
           }.map(_._2)
 
           // first token after delimiter has indent level of param group's parent
-          delimiterToken.flatMap{ x =>
+          delimiterToken.flatMap { x =>
             val indentToken = tokenGroup(tokenGroup.indexOf(x) + 1)
             tokenIndentMap.get(indentToken)
           }.
-          // top-level definition, use first token's indent level
-          orElse(
-            tokenGroup.headOption.flatMap(tokenIndentMap.get)
-          )
+            // top-level definition, use first token's indent level
+            orElse(
+              tokenGroup.headOption.flatMap(tokenIndentMap.get)
+            )
         case _ => None
       }
 
-      def calcIndent(i: Int) = (
-        i / indentSpacesNum + 1
-      )
+      def calcIndent(i: Int) = i / indentSpacesNum + 1
 
       maybeNewlineFormat match {
         case Some(t: EnsureNewlineAndIndent) => // apply new indent level
-          maybeIndentLevel.map( x => t.copy(indentLevel = calcIndent(x))).getOrElse(t)
+          maybeIndentLevel.map(x => t.copy(indentLevel = calcIndent(x))).getOrElse(t)
         case Some(t) => t
         case None =>
           maybeIndentLevel.map { num =>
             EnsureNewlineAndIndent(calcIndent(num))
           }.
-          getOrElse(defaultNewline())
+            getOrElse(defaultNewline())
       }
     }
   }
@@ -430,28 +427,29 @@ abstract class ScalaFormatter
   }
 
   private def printableFormattingInstruction(
-    previousTokenOption: Option[Token],
-    token: Token,
-    nextTokenOption: Option[Token],
-    predecessorFormatting: Map[Token, IntertokenFormatInstruction]): IntertokenFormatInstruction = {
+    previousTokenOption:   Option[Token],
+    token:                 Token,
+    nextTokenOption:       Option[Token],
+    predecessorFormatting: Map[Token, IntertokenFormatInstruction]
+  ): IntertokenFormatInstruction = {
 
     val maybePredecessorFormatting = predecessorFormatting.get(token)
     val isGaplessAssignment =
       maybePredecessorFormatting match {
         // `foreach(_.id= ..)`
-        case x @ Some(PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _)))) => token.tokenType == EQUALS
+        case Some(PlaceAtColumn(_, _, Some(Token(USCORE, _, _, _)))) => token.tokenType == EQUALS
         // `foreach(foo= _)`
         case _ => token.tokenType == EQUALS && nextTokenOption.exists(_.tokenType == USCORE)
       }
     val maybeInstruction =
-      if(isGaplessAssignment) Some(CompactEnsuringGap)
+      if (isGaplessAssignment) Some(CompactEnsuringGap)
       else maybePredecessorFormatting.orElse(
         previousTokenOption.map(defaultFormattingInstruction(_, token))
       )
     maybeInstruction.getOrElse(
-        if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */
-        else Compact
-      )
+      if (token.tokenType == EOF) EnsureNewlineAndIndent(0) /* <-- to allow formatting of files with just a scaladoc comment */
+      else Compact
+    )
   }
 
   private def defaultFormattingInstruction(token1: Token, token2: Token): IntertokenFormatInstruction = {
@@ -595,9 +593,9 @@ object ScalaFormatter {
 
       type Result = CompilationUnit
 
-      def parse(parser: ScalaParser) = parser.compilationUnitOrScript()
+      def parse(parser: ScalaParser): CompilationUnit = parser.compilationUnitOrScript()
 
-      def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = initialIndentLevel))
+      def format(formatter: ScalaFormatter, result: Result): FormatResult = formatter.format(result)(FormatterState(indentLevel = initialIndentLevel))
 
     }
     val (edits, _) = specificFormatter.fullFormat(source, scalaVersion = scalaVersion)(formattingPreferences)

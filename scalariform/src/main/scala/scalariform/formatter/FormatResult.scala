@@ -14,28 +14,28 @@ case class FormatResult(
   xmlRewrites:               Map[Token, String]
 ) {
 
-  def replaceXml(token: Token, replacement: String) = {
+  def replaceXml(token: Token, replacement: String): FormatResult = {
     require(token.tokenType.isXml)
     copy(xmlRewrites = xmlRewrites + (token -> replacement))
   }
 
-  def before(token: Token, formatInstruction: IntertokenFormatInstruction) = {
+  def before(token: Token, formatInstruction: IntertokenFormatInstruction): FormatResult = {
     require(!token.isNewline, " cannot do 'before' formatting for NEWLINE* tokens: " + token + ", " + formatInstruction)
     copy(predecessorFormatting = predecessorFormatting + (token -> formatInstruction))
   }
 
-  def formatNewline(token: Token, formatInstruction: IntertokenFormatInstruction) = {
+  def formatNewline(token: Token, formatInstruction: IntertokenFormatInstruction): FormatResult = {
     require(token.isNewline, " cannot do 'newline' formatting for non-NEWLINE tokens: " + token + ", " + formatInstruction)
     copy(inferredNewlineFormatting = inferredNewlineFormatting + (token -> formatInstruction))
   }
 
-  def formatNewlineOrOrdinary(token: Token, formatInstruction: IntertokenFormatInstruction) =
+  def formatNewlineOrOrdinary(token: Token, formatInstruction: IntertokenFormatInstruction): FormatResult =
     if (token.isNewline) formatNewline(token, formatInstruction)
     else before(token, formatInstruction)
 
   def tokenWillHaveNewline(token: Token): Boolean = {
     val hasNewlineInstruction = predecessorFormatting.get(token) map {
-      PartialFunction.cond(_) { case newlineInstruction: EnsureNewlineAndIndent ⇒ true }
+      PartialFunction.cond(_) { case _: EnsureNewlineAndIndent ⇒ true }
     }
     hasNewlineInstruction.getOrElse(false)
   }
@@ -47,7 +47,7 @@ case class FormatResult(
       this.xmlRewrites ++ other.xmlRewrites
     )
 
-  def ++(other: FormatResult) = mergeWith(other)
+  def ++(other: FormatResult): FormatResult = mergeWith(other)
 }
 
 object NoFormatResult extends FormatResult(Map(), Map(), Map())

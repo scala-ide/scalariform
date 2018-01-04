@@ -1,10 +1,10 @@
 package scalariform.astselect
 
+import scala.util.control.Exception._
+import scalariform.ScalaVersions
 import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils.Range
-import scala.util.control.Exception._
-import scalariform.ScalaVersions
 
 object AstSelector {
 
@@ -58,7 +58,7 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
 
   private val compilationUnitOpt: Option[CompilationUnit] = {
     val parser = new ScalaParser(tokens.toArray)
-    parser.safeParse(parser.compilationUnitOrScript)
+    parser.safeParse(parser.compilationUnitOrScript())
   }
 
   private val allTokens: List[Token] = tokens.flatMap { token ⇒
@@ -183,7 +183,7 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
     nodeStack match {
       case List(_: BlockExpr, _: MatchExpr, _*)   ⇒ false
       case List(_: BlockExpr, _: ProcFunBody, _*) ⇒ false
-      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass.asInstanceOf[Class[_ <: AstNode]])
+      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass)
       case Nil                                    ⇒ false
     }
 

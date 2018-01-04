@@ -1,9 +1,9 @@
 package scalariform.formatter
 
+import scalariform.formatter.preferences._
+import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils._
-import scalariform.lexer._
-import scalariform.formatter.preferences._
 
 trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with ScalaFormatter ⇒
 
@@ -110,7 +110,7 @@ trait XmlFormatter { self: HasFormattingPreferences with ExprFormatter with Scal
     var firstNonWhitespace = true
     for (previousAndThis ← Utils.pairWithPrevious(contents)) {
       previousAndThis match {
-        case (_, XmlPCDATA(token @ Token(_, Trimmed(prefix, infix, suffix), _, _))) ⇒
+        case (_, XmlPCDATA(token @ Token(_, Trimmed(_, infix, _), _, _))) ⇒
           if (infix == "") {
             if (multiline)
               formatResult = formatResult.replaceXml(token, "")

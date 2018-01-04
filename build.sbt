@@ -11,8 +11,8 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     scalaVersion := crossScalaVersions.value.head,
     crossScalaVersions := Seq(
       "2.12.4",
-      "2.11.11",
-      "2.10.6"
+      "2.11.12",
+      "2.10.7"
     ),
     scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) => Seq(
@@ -68,7 +68,7 @@ def getPublishToRepo = Def.setting {
     Some(Opts.resolver.sonatypeStaging)
 }
 
-lazy val subprojectSettings = commonSettings :+ (
+def subprojectSettings(projectName: String) = commonSettings ++ Seq(
   ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences(
     (baseDirectory.value / ".." / "formatterPreferences.properties").getPath)
 )
@@ -85,11 +85,11 @@ def scala2_11Dependencies = Def.setting {
 
 lazy val scalariform = (project
   enablePlugins(BuildInfoPlugin)
-  settings(subprojectSettings)
+  settings(subprojectSettings("scalariform"))
   settings(publishSettings("scalariform"))
   settings(
     libraryDependencies ++= scala2_11Dependencies.value,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test",
     // sbt doesn't automatically load the content of the MANIFST.MF file, therefore
     // we have to do it here by ourselves. Furthermore, the version format in the
     // MANIFEST.MF is `version.qualifier`, which means that we have to replace
@@ -118,13 +118,14 @@ lazy val scalariform = (project
       }
       Package.JarManifest(m)
     },
-    testOptions in Test += Tests.Argument("-oI")
+    testOptions in Test += Tests.Argument("-oI"),
+    mimaPreviousArtifacts := Set(organization.value %% "scalariform" % "0.2.6")
   )
 )
 
 lazy val cli = (project
   enablePlugins(BuildInfoPlugin)
-  settings(subprojectSettings)
+  settings(subprojectSettings("cli"))
   settings(publishSettings("cli"))
   settings(
     libraryDependencies += "commons-io" % "commons-io" % "1.4",

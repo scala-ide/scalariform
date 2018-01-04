@@ -1,9 +1,9 @@
 package scalariform.lexer
 
 import scala.xml.parsing.TokenTests
+import scalariform._
 import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.Tokens._
-import scalariform._
 
 class ScalaLexer(
   protected val reader:        IUnicodeEscapeReader,
@@ -34,7 +34,7 @@ class ScalaLexer(
   /**
    * Is the current character the result of a unicode escape?
    */
-  protected def isUnicodeEscape = unicodeEscapesBuffer(bufferStart).isDefined
+  protected def isUnicodeEscape: Boolean = unicodeEscapesBuffer(bufferStart).isDefined
 
   // ------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ class ScalaLexer(
    */
   private var untilEof = if (reader.isEof) 0 else -1
 
-  protected def eof = untilEof == 0
+  protected def eof: Boolean = untilEof == 0
 
   private var eofTokenEmitted = false
 
@@ -87,13 +87,13 @@ class ScalaLexer(
   /**
    * Get the character at the given lookahead from the current position.
    */
-  protected def ch(lookahead: Int) = {
-    for (n ← 1 to lookahead + 1 - charsInBuffer)
+  protected def ch(lookahead: Int): Char = {
+    for (_ ← 1 to lookahead + 1 - charsInBuffer)
       bufferOneCharacter()
     charBuffer((bufferStart + lookahead) & BUFFER_MASK)
   }
 
-  private def bufferOneCharacter() {
+  private def bufferOneCharacter(): Unit = {
     charBuffer(bufferEnd) = reader.read()
     unicodeEscapesBuffer(bufferEnd) = reader.unicodeEscapeOpt
     bufferEnd = (bufferEnd + 1) & BUFFER_MASK
@@ -104,7 +104,7 @@ class ScalaLexer(
   /**
    * Accept the current character and advance to the next.
    */
-  protected def nextChar() {
+  protected def nextChar(): Unit = {
     if (bufferEnd == bufferStart)
       bufferOneCharacter()
     lastCh = charBuffer(bufferStart)
@@ -125,7 +125,7 @@ class ScalaLexer(
   /**
    * Mark the end of a token of the given type.
    */
-  protected def token(tokenType: TokenType) {
+  protected def token(tokenType: TokenType): Unit = {
     //    require(tokenType == EOF || tokenLength > 0)
     finaliseTokenData()
     builtToken = Token(tokenType, tokenText, tokenOffset, rawText)
@@ -135,7 +135,7 @@ class ScalaLexer(
     resetTokenData()
   }
 
-  private def resetTokenData() {
+  private def resetTokenData(): Unit = {
     rawText = null
     tokenText = null
     tokenOffset = stopIndex + 1
@@ -143,7 +143,7 @@ class ScalaLexer(
     seenUnicodeEscape = false
   }
 
-  private def finaliseTokenData() {
+  private def finaliseTokenData(): Unit = {
     if (tokenText == null) {
       stopIndex = math.min(tokenOffset + tokenLength - 1, reader.text.length - 1) // min protects against overeager consumption past EOF
       rawText = reader.text.substring(tokenOffset, stopIndex + 1)
@@ -165,7 +165,7 @@ class ScalaLexer(
   protected def lookaheadIs(s: String): Boolean =
     s.zipWithIndex forall { case (c, index) ⇒ ch(index) == c }
 
-  protected def munch(s: String) {
+  protected def munch(s: String): Unit = {
     //    require(lookaheadIs(s))
     for (_ ← 1 to s.length)
       nextChar()
@@ -185,9 +185,9 @@ class ScalaLexer(
     builtToken
   }
 
-  override def hasNext = !eofTokenEmitted
+  override def hasNext: Boolean = !eofTokenEmitted
 
-  private def fetchStringInterpolationToken() {
+  private def fetchStringInterpolationToken(): Unit = {
     if (stringInterpolationMode.interpolationVariable) {
       stringInterpolationMode.interpolationVariable = false
       do {

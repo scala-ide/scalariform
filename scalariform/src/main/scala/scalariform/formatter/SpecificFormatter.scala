@@ -1,11 +1,11 @@
 package scalariform.formatter
 
+import scalariform.ScalaVersions
+import scalariform.formatter.preferences._
 import scalariform.lexer.Tokens._
 import scalariform.lexer._
 import scalariform.parser._
 import scalariform.utils._
-import scalariform.formatter.preferences._
-import scalariform.ScalaVersions
 
 trait SpecificFormatter {
 
@@ -68,7 +68,7 @@ trait SpecificFormatter {
 
       val formattingPreferences: IFormattingPreferences = actualFormattingPreferences
 
-      val newlineSequence = newlineSequence_
+      val newlineSequence: String = newlineSequence_
 
     }
 

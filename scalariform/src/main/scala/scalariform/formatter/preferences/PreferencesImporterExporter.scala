@@ -1,9 +1,10 @@
 package scalariform.formatter.preferences
 
+import java.io.IOException
 import java.util.Properties
+
 import scala.collection.JavaConverters._
 import scalariform.utils.Utils._
-import java.io.IOException
 
 object PreferencesImporterExporter {
 
@@ -15,9 +16,9 @@ object PreferencesImporterExporter {
 
     var preferences = FormattingPreferences()
 
-    def setPreference[T](preferenceDescriptor: PreferenceDescriptor[T], valueString: String) =
+    def setPreference[T](preferenceDescriptor: PreferenceDescriptor[T], valueString: String): Unit =
       preferenceDescriptor.preferenceType.parseValue(valueString) match {
-        case Left(error)  ⇒
+        case Left(_)      ⇒
         case Right(value) ⇒ preferences = preferences.setPreference(preferenceDescriptor, value)
       }
 
@@ -47,7 +48,7 @@ object PreferencesImporterExporter {
   }
 
   @throws(classOf[IOException])
-  def savePreferences(path: String, preferences: IFormattingPreferences) {
+  def savePreferences(path: String, preferences: IFormattingPreferences): Unit = {
     val properties = asProperties(preferences)
     withFileOutputStream(path) { stream ⇒
       properties.store(stream, "Scalariform formatter preferences")

@@ -1,9 +1,9 @@
 package scalariform.lexer
 
+import scala.PartialFunction.cond
 import scala.annotation._
 import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.Tokens._
-import scala.PartialFunction.cond
 
 /**
  * Lexer implementation for XML literals and patterns
@@ -22,9 +22,9 @@ trait XmlLexer { self: ScalaLexer ⇒
     }
   }
 
-  protected def fetchXmlToken() {
+  protected def fetchXmlToken(): Unit = {
     (ch: @switch) match {
-      case '<' ⇒ {
+      case '<' ⇒
         if (ch(1) == '/') {
           nextChar()
           nextChar()
@@ -61,9 +61,8 @@ trait XmlLexer { self: ScalaLexer ⇒
           xmlMode.isTagMode = true
           xmlMode.tagState = InStartTag
         }
-        // xmlMode.nestTag()
-      }
-      case '/' ⇒ {
+      // xmlMode.nestTag()
+      case '/' ⇒
         if (tagMode) {
           if (ch(1) == '>') {
             nextChar()
@@ -77,7 +76,6 @@ trait XmlLexer { self: ScalaLexer ⇒
             getXmlCharData()
         } else
           getXmlCharData()
-      }
       case '>' ⇒
         if (tagMode) {
           nextChar()
@@ -85,11 +83,10 @@ trait XmlLexer { self: ScalaLexer ⇒
           xmlMode.isTagMode = false
           xmlMode.tagState match {
             case InStartTag ⇒ xmlMode.nestTag()
-            case InEndTag ⇒ {
+            case InEndTag ⇒
               val nestingLevel = xmlMode.unnestTag()
               if (nestingLevel == 0 && !moreXmlToCome)
                 popMode()
-            }
             case Normal ⇒ throw new AssertionError("shouldn't reach here")
           }
         } else
@@ -116,7 +113,7 @@ trait XmlLexer { self: ScalaLexer ⇒
         }
       case '{' ⇒
         if (ch(1) != '{')
-          switchToScalaModeAndFetchToken
+          switchToScalaModeAndFetchToken()
         else
           getXmlCharData() // TODO: tagMode?
       case SU ⇒ token(EOF)
@@ -134,7 +131,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     }
   }
 
-  private def getXmlCDATA() {
+  private def getXmlCDATA(): Unit = {
     munch("<![CDATA[")
     var continue = true
     while (continue) {
@@ -152,7 +149,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     token(XML_CDATA)
   }
 
-  private def getXmlComment() {
+  private def getXmlComment(): Unit = {
     munch("<!--")
     var continue = true
     while (continue) {
@@ -171,7 +168,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     token(XML_COMMENT)
   }
 
-  private def getXmlCharData() {
+  private def getXmlCharData(): Unit = {
     var continue = true
     while (continue) {
       if (ch == SU || ch == '<')
@@ -188,7 +185,7 @@ trait XmlLexer { self: ScalaLexer ⇒
   }
 
   // S
-  private def getXmlSpace() {
+  private def getXmlSpace(): Unit = {
     require(isSpace(ch))
     nextChar()
     while (ch != SU && isSpace(ch))
@@ -196,7 +193,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     token(XML_WHITESPACE)
   }
 
-  private def getXmlName() {
+  private def getXmlName(): Unit = {
     require(isNameStart(ch))
     nextChar()
     while (ch != SU && isNameChar(ch))
@@ -205,7 +202,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     token(XML_NAME)
   }
 
-  private def getXmlAttributeValue(quote: Char) {
+  private def getXmlAttributeValue(quote: Char): Unit = {
     require(quote == '\'' || quote == '\"')
     require(ch == quote)
     nextChar()
@@ -224,7 +221,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     token(XML_ATTR_VALUE)
   }
 
-  private def getXmlUnparsed() {
+  private def getXmlUnparsed(): Unit = {
     munch("<xml:unparsed")
     var continue = true
     while (continue) {
@@ -242,7 +239,7 @@ trait XmlLexer { self: ScalaLexer ⇒
     token(XML_UNPARSED)
   }
 
-  private def getXmlProcessingInstruction() {
+  private def getXmlProcessingInstruction(): Unit = {
     munch("<?")
     var continue = true
     while (continue) {

@@ -4,7 +4,7 @@ object NoHiddenTokens extends HiddenTokens(Nil)
 
 case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken] {
 
-  def removeInitialWhitespace = new HiddenTokens(tokens.dropWhile(_.isInstanceOf[Whitespace]))
+  def removeInitialWhitespace = HiddenTokens(tokens.dropWhile(_.isInstanceOf[Whitespace]))
 
   override def iterator: Iterator[HiddenToken] = tokens.iterator
 
@@ -14,13 +14,13 @@ case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken]
 
   val whitespaces: List[Whitespace] = tokens collect { case whitespace @ Whitespace(_) ⇒ whitespace }
 
-  def firstTokenOption = tokens.headOption
+  def firstTokenOption: Option[HiddenToken] = tokens.headOption
 
-  def lastTokenOption = tokens.lastOption
+  def lastTokenOption: Option[HiddenToken] = tokens.lastOption
 
-  def containsNewline = text contains '\n'
+  def containsNewline: Boolean = text contains '\n'
 
-  def containsComment = comments.nonEmpty
+  def containsComment: Boolean = comments.nonEmpty
 
   def containsUnicodeEscape: Boolean = {
     for (token ← tokens if token.token.containsUnicodeEscape)
@@ -33,12 +33,12 @@ case class HiddenTokens(tokens: List[HiddenToken]) extends Iterable[HiddenToken]
     for (token ← tokens) sb.append(token.text)
     sb.toString
   }
-  lazy val rawText = tokens.map(_.token.rawText).mkString
+  lazy val rawText: String = tokens.map(_.token.rawText).mkString
 
-  def rawTokens = tokens.map(_.token)
+  def rawTokens: List[Token] = tokens.map(_.token)
 
-  def offset = tokens.head.token.offset
+  def offset: Int = tokens.head.token.offset
 
-  def lastCharacterOffset = tokens.last.token.lastCharacterOffset
+  def lastCharacterOffset: Int = tokens.last.token.lastCharacterOffset
 
 }

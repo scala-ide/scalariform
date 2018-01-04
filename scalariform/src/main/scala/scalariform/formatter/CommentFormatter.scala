@@ -1,8 +1,8 @@
 package scalariform.formatter
 
-import scalariform.lexer._
-import scalariform.formatter.preferences._
 import scala.annotation.tailrec
+import scalariform.formatter.preferences._
+import scalariform.lexer._
 
 trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
 
@@ -12,7 +12,7 @@ trait CommentFormatter { self: HasFormattingPreferences with ScalaFormatter ⇒
     val (contents, _) = rest.splitAt(rest.length - "*/".length)
     val firstLine :: otherLines = contents.split("""\r?\n([ \t]*(\*(?!/))?)?""", Integer.MAX_VALUE).toList
     val initialSpaces = firstLine takeWhile (_.isWhitespace)
-    val adjustedLines = dropInitialSpaces(firstLine, initialSpaces.size) :: (otherLines map { dropInitialSpaces(_, afterStarSpaces) })
+    val adjustedLines = dropInitialSpaces(firstLine, initialSpaces.length) :: (otherLines map { dropInitialSpaces(_, afterStarSpaces) })
     //    val adjustedLines map { line ⇒ if (line startsWith "*/") "*" + line else line }
     (start, adjustedLines)
   }

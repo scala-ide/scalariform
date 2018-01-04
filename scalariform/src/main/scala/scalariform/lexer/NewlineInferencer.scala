@@ -28,7 +28,7 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
    */
   private var regionMarkerStack: List[TokenType] = Nil
 
-  def hasNext = nextToken != null || tokenToEmitNextTime != null
+  def hasNext: Boolean = nextToken != null || tokenToEmitNextTime != null
 
   def next(): Token = {
     val token =
@@ -48,7 +48,7 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
    * Multiple statements are allowed immediately inside "{..}" regions, but disallowed immediately inside "[..]", "(..)"
    * and "case ... =>" regions.
    */
-  private def updateRegionStack(tokenType: TokenType, nextToken: Token) =
+  private def updateRegionStack(tokenType: TokenType, nextToken: Token): Unit =
     tokenType match {
       case LBRACE ⇒
         regionMarkerStack ::= RBRACE
@@ -61,7 +61,7 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
         // "case class" and "case object" are excluded from the usual "case .. =>" region.
         if (followingTokenType != CLASS && followingTokenType != OBJECT)
           regionMarkerStack ::= ARROW
-      case tokenType if regionMarkerStack.headOption == Some(tokenType) ⇒
+      case _ if regionMarkerStack.headOption == Some(tokenType) ⇒
         regionMarkerStack = regionMarkerStack.tail
       case _ ⇒
     }
@@ -105,7 +105,7 @@ class NewlineInferencer(delegate: WhitespaceAndCommentsGrouper) extends Iterator
     else if (regionMarkerStack.nonEmpty && regionMarkerStack.head != RBRACE)
       false
     else
-      return previousToken != null && (TOKENS_WHICH_CAN_END_A_STATEMENT contains previousToken.tokenType)
+      previousToken != null && (TOKENS_WHICH_CAN_END_A_STATEMENT contains previousToken.tokenType)
   }
 
   private def containsBlankLine(s: String): Boolean = {
