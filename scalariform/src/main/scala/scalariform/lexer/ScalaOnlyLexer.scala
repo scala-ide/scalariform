@@ -1,11 +1,11 @@
 package scalariform.lexer
 
 import scala.annotation._
+import scalariform._
 import scalariform.lexer.CharConstants.SU
 import scalariform.lexer.Chars._
 import scalariform.lexer.Tokens._
 import scalariform.utils.Utils
-import scalariform._
 
 /**
  * Lexer implementation for non-XML Scala
@@ -16,7 +16,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
 
   private var possibleInterpolationId = false
 
-  protected def fetchScalaToken() {
+  protected def fetchScalaToken(): Unit = {
     (ch: @switch) match {
       case ' ' | '\t' | '\n' | '\r' /* TODO: | FF */ ⇒
         nextChar()
@@ -78,9 +78,9 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       case '\'' ⇒
         nextChar()
         if (isIdentifierStart(ch))
-          charLitOr(() => getIdentRest)
+          charLitOr(() => getIdentRest())
         else if (isOperatorPart(ch) && (ch != '\\'))
-          charLitOr(() => getOperatorRest)
+          charLitOr(() => getOperatorRest())
         else {
           getLitChar()
           if (ch == '\'' || forgiveErrors) {
@@ -148,15 +148,15 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       token(WS)
   }
 
-  private def getStringLit() {
+  private def getStringLit(): Unit = {
     getStringLitOrBackquotedIdent(delimiter = '"', errorMsg = "unclosed string literal", tokenType = STRING_LITERAL)
   }
 
-  private def getBackquotedIdent() {
+  private def getBackquotedIdent(): Unit = {
     getStringLitOrBackquotedIdent(delimiter = '`', errorMsg = "unclosed quoted identifer", tokenType = VARID, errorMsgOnEmpty = Some("empty quoted identifier"))
   }
 
-  private def getStringLitOrBackquotedIdent(delimiter: Char, errorMsg: String, tokenType: TokenType, errorMsgOnEmpty: Option[String] = None) {
+  private def getStringLitOrBackquotedIdent(delimiter: Char, errorMsg: String, tokenType: TokenType, errorMsgOnEmpty: Option[String] = None): Unit = {
     //    require(ch == delimiter)
     nextChar()
     @tailrec
@@ -177,7 +177,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     scanForClosingQuotes(firstTime = true)
   }
 
-  private def getLitChar() {
+  private def getLitChar(): Unit = {
     if (ch == '\\') {
       nextChar()
       if ('0' <= ch && ch <= '7') {
@@ -196,11 +196,11 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       nextChar()
   }
 
-  private def getMultiLineStringLit() {
+  private def getMultiLineStringLit(): Unit = {
     munch("\"\"\"")
 
     @tailrec
-    def scanForClosingTripleQuotes() {
+    def scanForClosingTripleQuotes(): Unit = {
       if (lookaheadIs("\"\"\"")) {
         munch("\"\"\"")
         while (ch == '\"') { nextChar() }
@@ -216,7 +216,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
   }
 
   @tailrec
-  final protected def getStringPart(multiLine: Boolean) {
+  final protected def getStringPart(multiLine: Boolean): Unit = {
     if (ch == '"') {
       if (multiLine) {
         nextChar()
@@ -322,7 +322,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
       if (isSpecial(ch)) { nextChar(); getOperatorRest() } else finishNamed()
   }
 
-  private def getIdentOrOperatorRest() {
+  private def getIdentOrOperatorRest(): Unit = {
     if (isIdentifierPart(ch))
       getIdentRest()
     else ch match {
@@ -339,7 +339,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     }
   }
 
-  private def finishNamed() {
+  private def finishNamed(): Unit = {
     val tokenType =
       if (processingSymbol)
         SYMBOL_LITERAL
@@ -352,7 +352,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     token(tokenType)
   }
 
-  private def getSingleLineComment() {
+  private def getSingleLineComment(): Unit = {
     //    require(ch == '/')
     nextChar()
     //    require(ch == '/')
@@ -376,20 +376,20 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     consumeUntilNewline()
   }
 
-  private def getMultilineComment() {
+  private def getMultilineComment(): Unit = {
     munch("/*")
 
     @tailrec
-    def consumeUntilSplatSlash(nesting: Int) {
+    def consumeUntilSplatSlash(nesting: Int): Unit = {
       if (nesting == 0)
         token(MULTILINE_COMMENT)
       else
         (ch: @switch) match {
-          case '*' if (ch(1) == '/') ⇒
+          case '*' if ch(1) == '/' ⇒
             nextChar()
             nextChar()
             consumeUntilSplatSlash(nesting - 1)
-          case '/' if (ch(1) == '*') ⇒
+          case '/' if ch(1) == '*' ⇒
             nextChar()
             nextChar()
             consumeUntilSplatSlash(nesting + 1)
@@ -404,7 +404,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     consumeUntilSplatSlash(nesting = 1)
   }
 
-  private def getFraction() {
+  private def getFraction(): Unit = {
     while ('0' <= ch && ch <= '9') { nextChar() }
     if (ch == 'e' || ch == 'E') {
       nextChar()
@@ -418,7 +418,7 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     token(FLOATING_POINT_LITERAL)
   }
 
-  private def getHexNumber() {
+  private def getHexNumber(): Unit = {
     //    require(ch == '0')
     nextChar()
     //    require(ch == 'x' || ch == 'X')
@@ -435,15 +435,15 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
     munchHexDigits()
   }
 
-  private def getNumber(base: Int) {
-    def isDigit(c: Char) = if (c == SU) false else (Character isDigit c)
+  private def getNumber(base: Int): Unit = {
+    def isDigit(c: Char) = if (c == SU) false else Character isDigit c
     val base1 = if (base < 10) 10 else base
 
     // read 8,9's even if format is octal, produce a malformed number error afterwards.
     while (Utils.digit2int(ch, base1) >= 0)
       nextChar()
 
-    def restOfUncertainToken() = {
+    def restOfUncertainToken(): Unit = {
       def isEfd = ch match {
         case 'e' | 'E' | 'f' | 'F' | 'd' | 'D' ⇒ true
         case _                                 ⇒ false
@@ -506,12 +506,12 @@ private[lexer] trait ScalaOnlyLexer { self: ScalaLexer ⇒
 
   }
 
-  private def checkNoLetter() {
+  private def checkNoLetter(): Unit = {
     if (isIdentifierPart(ch) && ch >= ' ' && !forgiveErrors)
       throw new ScalaLexerException("Invalid literal number: " + ch)
   }
 
-  private def charLitOr(op: () ⇒ Unit) {
+  private def charLitOr(op: () ⇒ Unit): Unit = {
     nextChar()
     if (ch == '\'') {
       nextChar()

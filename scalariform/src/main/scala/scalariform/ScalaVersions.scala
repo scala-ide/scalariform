@@ -1,8 +1,8 @@
 package scalariform
 
+import scala.math.Ordering
 import scala.util.Properties
 import scalariform.utils.Utils._
-import scala.math.Ordering
 
 object ScalaVersion {
 
@@ -27,21 +27,21 @@ case class ScalaVersion(major: Int, minor: Int, extra: String = "") extends Orde
 
   private def majorMinor = (major, minor)
 
-  def compare(that: ScalaVersion) = Ordering[(Int, Int)].compare(this.majorMinor, that.majorMinor)
+  def compare(that: ScalaVersion): Int = Ordering[(Int, Int)].compare(this.majorMinor, that.majorMinor)
 
-  override def toString = major + "." + minor + "." + extra
+  override def toString: String = major + "." + minor + "." + extra
 
 }
 
 object ScalaVersions {
 
-  val Scala_2_11 = ScalaVersion.parse("2.11.0").get
-  val Scala_2_10 = ScalaVersion.parse("2.10.0").get
-  val Scala_2_9 = ScalaVersion.parse("2.9.2").get
-  val Scala_2_8 = ScalaVersion.parse("2.8.1").get
+  val Scala_2_11: ScalaVersion = ScalaVersion.parse("2.11.0").get
+  val Scala_2_10: ScalaVersion = ScalaVersion.parse("2.10.0").get
+  val Scala_2_9: ScalaVersion = ScalaVersion.parse("2.9.2").get
+  val Scala_2_8: ScalaVersion = ScalaVersion.parse("2.8.1").get
 
-  lazy val DEFAULT_VERSION = Properties.scalaPropOrElse("version.number", "2.9.2")
+  lazy val DEFAULT_VERSION: String = Properties.scalaPropOrElse("version.number", "2.9.2")
 
-  lazy val DEFAULT = ScalaVersion.parse(DEFAULT_VERSION).get
+  lazy val DEFAULT: ScalaVersion = ScalaVersion.parse(DEFAULT_VERSION).get
 
 }

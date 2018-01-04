@@ -1,10 +1,8 @@
 package scalariform.formatter
 
-import scalariform.lexer.Token
-import scalariform.parser._
-import scalariform.lexer.Tokens
 import scalariform.formatter.preferences._
-import scalariform.lexer.Chars
+import scalariform.lexer.{ Chars, Token, Tokens }
+import scalariform.parser._
 
 trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter with ExprFormatter with ScalaFormatter ⇒
 
@@ -54,8 +52,8 @@ trait TypeFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       case annotation @ Annotation(_, _, _, _) ⇒ format(annotation)
       case TypeParamClause(contents)           ⇒ format(contents)
       case TypeParam(contents)                 ⇒ format(contents)
-      case VarianceTypeElement(id)             ⇒ NoFormatResult
-      case VarargsTypeElement(star)            ⇒ NoFormatResult
+      case VarianceTypeElement(_)              ⇒ NoFormatResult
+      case VarargsTypeElement(_)               ⇒ NoFormatResult
       case _                                   ⇒ NoFormatResult
     }
   }

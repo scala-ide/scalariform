@@ -17,13 +17,13 @@ case class Token(tokenType: TokenType, text: String, offset: Int, rawText: Strin
 
   def associatedWhitespaceAndComments: HiddenTokens = associatedWhitespaceAndComments_
 
-  def length = rawText.length
+  def length: Int = rawText.length
 
   def range = Range(offset, length)
 
-  def lastCharacterOffset = offset + length - 1
+  def lastCharacterOffset: Int = offset + length - 1
 
-  def isScalaDocComment = tokenType == MULTILINE_COMMENT && text.startsWith("/**") && text != "/**/"
+  def isScalaDocComment: Boolean = tokenType == MULTILINE_COMMENT && text.startsWith("/**") && text != "/**/"
 
-  def isNewline = tokenType.isNewline
+  def isNewline: Boolean = tokenType.isNewline
 }

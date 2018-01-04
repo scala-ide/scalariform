@@ -1,7 +1,7 @@
 package scalariform.lexer
 
-import scalariform.lexer.Tokens._
 import scala.util.parsing.input._
+import scalariform.lexer.Tokens._
 
 class ScalaLexerReader(val tokens: List[Token]) extends Reader[Token] {
 
@@ -21,7 +21,7 @@ class ScalaLexerReader(val tokens: List[Token]) extends Reader[Token] {
 
     protected def lineContents: String = token.rawText
 
-    override def longString = lineContents
+    override def longString: String = lineContents
 
   }
 

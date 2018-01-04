@@ -1,9 +1,8 @@
 package scalariform.lexer
 
-import scalariform.utils.Utils._
-import scalariform.utils.TextEdit
-import scalariform.utils.TextEditProcessor
 import scalariform.ScalaVersions
+import scalariform.utils.{ TextEdit, TextEditProcessor }
+import scalariform.utils.Utils._
 
 object RedundantSemicolonDetector {
 

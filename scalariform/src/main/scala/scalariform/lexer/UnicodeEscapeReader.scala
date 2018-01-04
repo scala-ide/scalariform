@@ -35,9 +35,9 @@ trait IUnicodeEscapeReader extends Iterator[Char] {
    */
   def unicodeEscapeOpt: Option[String]
 
-  def next() = read()
+  def next(): Char = read()
 
-  def hasNext = !isEof
+  def hasNext: Boolean = !isEof
 
   /**
    * Return a clone of this reader initialised to the current state
@@ -65,7 +65,7 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) exte
     reader
   }
 
-  def isEof = pos >= text.length
+  def isEof: Boolean = pos >= text.length
 
   @throws(classOf[ScalaLexerException])
   def read(): Char = {
@@ -111,7 +111,7 @@ class UnicodeEscapeReader(val text: String, forgiveErrors: Boolean = false) exte
     do sb.append(consumeNextCharacter())
     while (nextChar == 'u')
 
-    for (n ← 1 to 4)
+    for (_ ← 1 to 4)
       sb.append(consumeNextCharacter())
 
     sb.toString
@@ -149,7 +149,7 @@ class NoUnicodeEscapeReader(val text: String) extends IUnicodeEscapeReader {
 
   private var pos = 0
 
-  def copy = {
+  def copy: NoUnicodeEscapeReader = {
     val reader = new NoUnicodeEscapeReader(text)
     reader.pos = pos
     reader

@@ -1,7 +1,7 @@
 package scalariform.lexer
 
-import scalariform.lexer.Tokens._
 import scala.collection.mutable.ListBuffer
+import scalariform.lexer.Tokens._
 
 class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[Token] {
 
@@ -11,13 +11,13 @@ class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[Token] {
 
   private var hiddenTokens: HiddenTokens = _
 
-  def getHiddenTokens = hiddenTokens
+  def getHiddenTokens: HiddenTokens = hiddenTokens
 
-  def hasNext = !ended
+  def hasNext: Boolean = !ended
 
   private[lexer] def text = lexer.text
 
-  def next() = {
+  def next(): Token = {
     require(hasNext)
     hiddenTokens = readHiddenTokens()
     val resultToken = nextToken
@@ -34,7 +34,7 @@ class WhitespaceAndCommentsGrouper(lexer: ScalaLexer) extends Iterator[Token] {
       hiddenTokens += makeHiddenToken(nextToken)
       nextToken = lexer.next()
     }
-    new HiddenTokens(hiddenTokens.toList)
+    HiddenTokens(hiddenTokens.toList)
   }
 
   private def isCommentOrWhitespace(token: Token) = token.tokenType match {

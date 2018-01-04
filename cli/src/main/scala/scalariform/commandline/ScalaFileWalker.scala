@@ -1,7 +1,7 @@
 package scalariform.commandline
 
 import java.io.File
-import java.util.{ArrayList, Collection}
+import java.util.{ ArrayList, Collection }
 import scala.collection.JavaConverters._
 
 import org.apache.commons.io._

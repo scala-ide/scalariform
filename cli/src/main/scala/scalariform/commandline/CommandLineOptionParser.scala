@@ -3,49 +3,50 @@ package scalariform.commandline
 import scala.util.parsing.combinator._
 
 class CommandLineOptionParser extends RegexParsers {
+  type Arg = Parser[CommandLineArgument]
 
-  lazy val option: Parser[CommandLineArgument] =
+  lazy val option: Arg =
     phrase(help) | phrase(version) | phrase(scalaVersion) | phrase(stdin) | phrase(stdout) | phrase(recurse) |
       phrase(test) | phrase(forceOutput) | phrase(quiet) | phrase(fileList) | phrase(encoding) | phrase(toggle) |
       phrase(preferenceFile) | phrase(preferenceOption) | phrase(badOption)
 
-  lazy val test = ("--test" | "-t") ^^^ Test
+  lazy val test: Parser[Test.type] = ("--test" | "-t") ^^^ Test
 
-  lazy val forceOutput = ("--forceOutput" | "-f") ^^^ ForceOutput
+  lazy val forceOutput: Arg = ("--forceOutput" | "-f") ^^^ ForceOutput
 
-  lazy val stdout = "--stdout" ^^^ Stdout
+  lazy val stdout: Arg = "--stdout" ^^^ Stdout
 
-  lazy val stdin = "--stdin" ^^^ Stdin
+  lazy val stdin: Arg = "--stdin" ^^^ Stdin
 
-  lazy val quiet = ("--quiet" | "-q") ^^^ Quiet
+  lazy val quiet: Arg = ("--quiet" | "-q") ^^^ Quiet
 
-  lazy val recurse = ("--recurse" | "-r") ^^^ Recurse
+  lazy val recurse: Arg = ("--recurse" | "-r") ^^^ Recurse
 
-  lazy val help = ("--help" | "-help" | "-h") ^^^ Help
+  lazy val help: Arg = ("--help" | "-help" | "-h") ^^^ Help
 
-  lazy val version = ("--version" | "-version") ^^^ Version
+  lazy val version: Arg = ("--version" | "-version") ^^^ Version
 
-  lazy val scalaVersion = ("--scalaVersion=" | "-s=") ~> """(\d|\.)+""".r ^^ ScalaVersion
+  lazy val scalaVersion: Arg = ("--scalaVersion=" | "-s=") ~> """(\d|\.)+""".r ^^ ScalaVersion
 
-  lazy val fileList = ("--fileList=" | "-l=") ~> ".+".r ^^ FileList
+  lazy val fileList: Arg = ("--fileList=" | "-l=") ~> ".+".r ^^ FileList
 
-  lazy val encoding = "--encoding=" ~> ".+".r ^^ Encoding
+  lazy val encoding: Arg = "--encoding=" ~> ".+".r ^^ Encoding
 
-  lazy val toggle = plusOrMinus ~ preferenceKey ^^ { case onOrOff ~ key ⇒ PreferenceOption(key, onOrOff.toString) }
+  lazy val toggle: Arg = plusOrMinus ~ preferenceKey ^^ { case onOrOff ~ key ⇒ PreferenceOption(key, onOrOff.toString) }
 
-  lazy val plusOrMinus = "+" ^^^ true | "-" ^^^ false
+  lazy val plusOrMinus: Parser[Boolean] = "+" ^^^ true | "-" ^^^ false
 
-  lazy val preferenceFile = ("--preferenceFile=" | "-p=") ~> ".+".r ^^ PreferenceFile
+  lazy val preferenceFile: Arg = ("--preferenceFile=" | "-p=") ~> ".+".r ^^ PreferenceFile
 
-  lazy val preferenceOption = ("-" ~> preferenceKey <~ "=") ~ """(\w|\.)+""".r ^^ {
+  lazy val preferenceOption: Arg = ("-" ~> preferenceKey <~ "=") ~ """(\w|\.)+""".r ^^ {
     case (key ~ value) ⇒ PreferenceOption(key, value)
   }
 
   lazy val preferenceKey: Parser[String] = """[a-zA-Z.]+""".r
 
-  lazy val badOption = guard(plusOrMinus) ~> ".*".r ^^ BadOption
+  lazy val badOption: Arg = guard(plusOrMinus) ~> ".*".r ^^ BadOption
 
-  def getArgument(s: String) = parse(option, s) getOrElse FileName(s)
+  def getArgument(s: String): CommandLineArgument = parse(option, s) getOrElse FileName(s)
 }
 
 sealed trait CommandLineArgument

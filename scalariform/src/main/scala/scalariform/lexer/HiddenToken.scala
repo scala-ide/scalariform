@@ -2,11 +2,11 @@ package scalariform.lexer
 
 abstract sealed class HiddenToken(val token: Token) {
 
-  lazy val newlineful = token.text contains '\n'
+  lazy val newlineful: Boolean = token.text contains '\n'
 
-  def text = token.text
+  def text: String = token.text
 
-  def rawText = token.rawText
+  def rawText: String = token.rawText
 
 }
 

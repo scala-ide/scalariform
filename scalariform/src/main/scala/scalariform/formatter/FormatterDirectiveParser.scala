@@ -1,16 +1,17 @@
 package scalariform.formatter
+
 import scala.util.parsing.combinator._
 
 class FormatterDirectiveParser extends JavaTokenParsers {
 
+  val plusOrMinus: Parser[Boolean] = "+" ^^^ true | "-" ^^^ false
+
+  val toggle: Parser[ToggleOption] = plusOrMinus ~ ident ^^ { case onOrOff ~ optionName ⇒ ToggleOption(onOrOff, optionName) }
+
   val directives: Parser[List[FormatterDirective]] = "format:" ~>
     ("ON" ^^^ List(ToggleFormatting(true)) | "OFF" ^^^ List(ToggleFormatting(false)) | repsep(toggle, ","))
 
-  val plusOrMinus = "+" ^^^ true | "-" ^^^ false
-
-  val toggle = plusOrMinus ~ ident ^^ { case onOrOff ~ optionName ⇒ ToggleOption(onOrOff, optionName) }
-
-  def getDirectives(s: String) = parse(directives, s) getOrElse Nil
+  def getDirectives(s: String): List[FormatterDirective] = parse(directives, s) getOrElse Nil
 }
 
 object FormatterDirectiveParser {

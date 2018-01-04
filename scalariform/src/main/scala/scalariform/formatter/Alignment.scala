@@ -1,7 +1,8 @@
 package scalariform.formatter
 
+import java.lang.Math._
+
 import scalariform.parser._
-import Math._
 
 // For now, this is just a place to store alignment related functionality.
 // TOOD: refactor duplicate behavior in here
@@ -30,9 +31,8 @@ object Alignment {
     largestIdLength: Int
   ) {
 
-    def prepend(equalsExpr: EqualsExpr, length: Int) = {
+    def prepend(equalsExpr: EqualsExpr, length: Int) =
       ConsecutiveSingleLineEqualsExprs(equalsExpr :: equalsExprs, max(length, largestIdLength))
-    }
   }
 
   case class ConsecutiveSingleLineCaseClauses(
@@ -43,7 +43,7 @@ object Alignment {
     def prepend(clause: CaseClause, length: Int) =
       ConsecutiveSingleLineCaseClauses(clause :: clauses, max(length, largestCasePatternLength), min(length, smallestCasePatternLength))
 
-    def patternLengthRange = largestCasePatternLength - smallestCasePatternLength
+    def patternLengthRange: Int = largestCasePatternLength - smallestCasePatternLength
 
   }
 

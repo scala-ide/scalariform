@@ -1,9 +1,8 @@
 package scalariform.formatter
 
-import scalariform.lexer.Token
-
-import scalariform.parser._
 import scalariform.formatter.preferences._
+import scalariform.lexer.Token
+import scalariform.parser._
 
 trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatter with HasHiddenTokenInfo with TypeFormatter with ExprFormatter with ScalaFormatter ⇒
 
@@ -19,8 +18,8 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     }
 
     for {
-      accessModifier ← accessModifierOpt
-      astNode ← (paramClausesOpt orElse templateInheritanceSectionOpt orElse templateBodyOption)
+      _ ← accessModifierOpt
+      astNode ← paramClausesOpt orElse templateInheritanceSectionOpt orElse templateBodyOption
       firstToken ← astNode.firstTokenOption
     } formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)
 
@@ -28,7 +27,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
       paramClauses ← paramClausesOpt
       firstToken ← paramClauses.firstTokenOption
     } {
-      if (annotations.size > 0)
+      if (annotations.nonEmpty)
         formatResult = formatResult.formatNewlineOrOrdinary(firstToken, CompactEnsuringGap)
       val doubleIndentParams = (formattingPreferences(DoubleIndentConstructorArguments) &&
         !templateInheritanceSectionOpt.exists { section ⇒
@@ -47,7 +46,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
         currentFormatterState = formatterState.indent(inheritanceIndent)
         formatResult = formatResult.before(extendsOrSubtype, currentFormatterState.currentIndentLevelInstruction)
       }
-      for (EarlyDefs(earlyBody: TemplateBody, withOpt) ← earlyDefsOpt)
+      for (EarlyDefs(earlyBody: TemplateBody, _) ← earlyDefsOpt)
         formatResult ++= format(earlyBody)(currentFormatterState)
 
       for (templateParents ← templateParentsOpt) {
@@ -94,14 +93,14 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     val Template(earlyDefsOpt, templateParentsOpt, templateBodyOpt) = template
     var formatResult: FormatResult = NoFormatResult
 
-    for (EarlyDefs(earlyBody, withOpt) ← earlyDefsOpt)
+    for (EarlyDefs(earlyBody, _) ← earlyDefsOpt)
       formatResult ++= format(earlyBody)
 
     for (templateParents ← templateParentsOpt)
       formatResult ++= format(templateParents)
 
     // TODO: Copy and paste from above
-    for (templateBody @ TemplateBody(newlineOpt, lbrace, statSeq, rbrace) ← templateBodyOpt) {
+    for (TemplateBody(newlineOpt, lbrace, statSeq, rbrace) ← templateBodyOpt) {
       newlineOpt match {
         case Some(newline) ⇒
           formatResult = formatResult.formatNewline(newline, CompactEnsuringGap)
@@ -126,7 +125,7 @@ trait TemplateFormatter { self: HasFormattingPreferences with AnnotationFormatte
     // TODO: Unify with TmplDef code
 
     val currentFormatterState = formatterState
-    for ((withToken, type_, argumentExprss2) ← withTypes) {
+    for ((_, type_, argumentExprss2) ← withTypes) {
       formatResult ++= format(type_)(currentFormatterState)
       for (argumentExprs2 ← argumentExprss2)
         formatResult ++= format(argumentExprs2)(currentFormatterState)._1

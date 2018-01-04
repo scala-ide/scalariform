@@ -22,7 +22,7 @@ case object Prevent extends Intent
 
 case object IntentPreference extends PreferenceType[Intent] {
 
-  def parseValue(s: String) =
+  def parseValue(s: String): Either[String, Intent] =
     s.toLowerCase match {
       case "preserve" ⇒ Right(Preserve)
       case "force"    ⇒ Right(Force)
@@ -33,7 +33,7 @@ case object IntentPreference extends PreferenceType[Intent] {
 
 case object BooleanPreference extends PreferenceType[Boolean] {
 
-  def parseValue(s: String) =
+  def parseValue(s: String): Either[String, Boolean] =
     s.toLowerCase match {
       case "true"  ⇒ Right(true)
       case "false" ⇒ Right(false)
@@ -46,7 +46,7 @@ case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int] {
 
   require(min <= max)
 
-  def parseValue(s: String) =
+  def parseValue(s: String): Either[String, Int] =
     try {
       val n = Integer.parseInt(s)
       if (n < min)
@@ -56,7 +56,7 @@ case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int] {
       else
         Right(n)
     } catch {
-      case e: NumberFormatException ⇒ Left("Could not parse as integer: " + s)
+      case _: NumberFormatException ⇒ Left("Could not parse as integer: " + s)
     }
 }
 
@@ -74,13 +74,13 @@ trait PreferenceDescriptor[T] {
 
 trait IntentPreferenceDescriptor extends PreferenceDescriptor[Intent] {
 
-  val preferenceType = IntentPreference
+  val preferenceType: IntentPreference.type = IntentPreference
 
 }
 
 trait BooleanPreferenceDescriptor extends PreferenceDescriptor[Boolean] {
 
-  val preferenceType = BooleanPreference
+  val preferenceType: BooleanPreference.type = BooleanPreference
 
 }
 
@@ -151,7 +151,7 @@ case object CompactStringConcatenation extends BooleanPreferenceDescriptor {
 case object DanglingCloseParenthesis extends IntentPreferenceDescriptor {
   val key = "danglingCloseParenthesis"
   val description = "Dangling closing ')' in an argument expression on a new line"
-  val defaultValue = Prevent
+  val defaultValue: Prevent.type = Prevent
 }
 
 case object DoubleIndentConstructorArguments extends BooleanPreferenceDescriptor {
@@ -176,13 +176,13 @@ case object DoubleIndentMethodDeclaration extends BooleanPreferenceDescriptor {
 case object FirstArgumentOnNewline extends IntentPreferenceDescriptor {
   val key = "firstArgumentOnNewline"
   val description = "First argument to functions calls on a new line"
-  val defaultValue = Force
+  val defaultValue: Force.type = Force
 }
 
 case object FirstParameterOnNewline extends IntentPreferenceDescriptor {
   val key = "firstParameterOnNewline"
   val description = "First parameter in function or class definitions on a new line"
-  val defaultValue = Force
+  val defaultValue: Force.type = Force
 }
 
 case object FormatXml extends BooleanPreferenceDescriptor {
