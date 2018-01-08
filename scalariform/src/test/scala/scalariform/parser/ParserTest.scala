@@ -48,6 +48,11 @@ class ParserTest extends FlatSpec with Matchers {
     """)
   }
 
+  // issue #265
+  "Parser" should "handle deep complex expressions" in {
+    parseExpression("o.p(a" + (",a" * 3000) + ")")
+  }
+
   private def parser(s: String) = new ScalaParser(ScalaLexer.tokenise(s).toArray)
   private def parseExpression(s: String) = parser(s).expr
   private def parseCompilationUnit(s: String) = parser(s).compilationUnit
