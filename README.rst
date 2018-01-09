@@ -95,29 +95,9 @@ Run Plugins -> scalaSidekickPlugin -> Format Scala File
 Integration with Maven
 ----------------------
 
-There is a Maven plugin to run Scalariform contributed by `Adam
-Crain`_ on scala-tools.
+There is `scalariform-maven-plugin`_ compatible with Scalariform 0.2.x.
 
-.. _Adam Crain: https://github.com/jadamcrain
-
-Usage::
-
-  <plugin>
-    <groupId>org.scalariform</groupId>
-    <artifactId>scalariform-maven-plugin</artifactId>
-    <version>0.1.4</version>
-    <executions>
-      <execution>
-        <phase>process-sources</phase>
-        <goals>
-          <goal>format</goal>
-        </goals>
-        <configuration>
-          <rewriteArrowSymbols>true</rewriteArrowSymbols>
-        </configuration>
-      </execution>
-    </executions>
-  </plugin>
+.. _scalariform-maven-plugin: https://github.com/tashoyan/scalariform-maven-plugin
 
 Integration with Gradle
 -----------------------
