@@ -3,6 +3,7 @@ package scalariform.utils
 import java.io.FileOutputStream
 import java.io.FileInputStream
 import java.io.IOException
+import scala.collection.mutable.ListBuffer
 
 object Utils {
 
@@ -31,14 +32,20 @@ object Utils {
     }
   }
 
-  def groupBy[A](eq: (A, A) ⇒ Boolean, lst: List[A]): List[List[A]] =
-    lst match {
-      case Nil ⇒ Nil
-      case (x :: xs) ⇒ {
-        val (ys, zs) = xs span { eq(x, _) }
-        (x :: ys) :: groupBy(eq, zs)
+  def groupBy[A](eq: (A, A) ⇒ Boolean, lst: List[A]): List[List[A]] = {
+    val result = ListBuffer[List[A]]()
+    @annotation.tailrec def loop(cursor: List[A]): Unit =
+      cursor match {
+        case Nil ⇒
+        case (x :: xs) ⇒ {
+          val (ys, zs) = xs span { eq(x, _) }
+          result += x :: ys
+          loop(zs)
+        }
       }
-    }
+    loop(lst)
+    result.toList
+  }
 
   // File ------------------
 
