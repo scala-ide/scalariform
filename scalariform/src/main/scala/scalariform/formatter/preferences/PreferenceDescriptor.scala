@@ -94,9 +94,10 @@ object AllPreferences {
     AllowParamGroupsOnNewlines, CompactControlReadability, CompactStringConcatenation, DanglingCloseParenthesis,
     DoubleIndentClassDeclaration, DoubleIndentConstructorArguments, DoubleIndentMethodDeclaration, FirstArgumentOnNewline,
     FirstParameterOnNewline, FormatXml, IndentLocalDefs, IndentPackageBlocks, IndentSpaces, IndentWithTabs,
-    MultilineScaladocCommentsStartOnFirstLine, NewlineAtEndOfFile, PlaceScaladocAsterisksBeneathSecondAsterisk,
-    PreserveSpaceBeforeArguments, RewriteArrowSymbols, SingleCasePatternOnNewline, SpaceBeforeColon,
-    SpaceBeforeContextColon, SpaceInsideBrackets, SpaceInsideParentheses, SpacesAroundMultiImports, SpacesWithinPatternBinders
+    MultilineScaladocCommentsStartOnFirstLine, NewlineAtEndOfFile, NewlinesAtNestedAnonymousFunctions,
+    PlaceScaladocAsterisksBeneathSecondAsterisk, PreserveSpaceBeforeArguments, RewriteArrowSymbols, SingleCasePatternOnNewline,
+    SpaceBeforeColon, SpaceBeforeContextColon, SpaceInsideBrackets, SpaceInsideParentheses, SpacesAroundMultiImports,
+    SpacesWithinPatternBinders
   )
 
   val preferencesByKey: Map[String, PreferenceDescriptor[_]] =
@@ -226,6 +227,12 @@ case object NewlineAtEndOfFile extends BooleanPreferenceDescriptor {
   val key = "newlineAtEndOfFile"
   val description = "Newline at the end of all files"
   val defaultValue = false
+}
+
+case object NewlinesAtNestedAnonymousFunctions extends IntentPreferenceDescriptor {
+  val key = "newlinesAtNestedAnonymousFunctions"
+  val description = "When there are nested anonymous functions, add a newline after arrow at each nesting level"
+  val defaultValue: Prevent.type = Prevent
 }
 
 case object PlaceScaladocAsterisksBeneathSecondAsterisk extends BooleanPreferenceDescriptor {
