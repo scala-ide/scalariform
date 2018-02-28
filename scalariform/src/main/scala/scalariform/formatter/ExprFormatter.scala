@@ -845,8 +845,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     var formatResult: FormatResult = NoFormatResult
 
     val (instruction, subStatState) =
-      if (hasNestedAnonymousFunction(body))
+      if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Prevent)
         (CompactEnsuringGap, formatterState.indent(-1))
+      else if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Force)
+        (EnsureNewlineAndIndent(1, Some(parentBlock.firstToken)), formatterState.indent)
       else if (hiddenPredecessors(parameters.head.firstToken).containsNewline)
         (indentedInstruction, formatterState.indent)
       else
@@ -855,18 +857,23 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
     formatResult = formatResult.before(parentBlock.firstToken, instruction)
     formatResult ++= format(parameters)
 
+    var bodyState = subStatState
+
     for (firstToken ← body.firstTokenOption) {
-      val instruction =
-        if (hasNestedAnonymousFunction(body))
-          CompactEnsuringGap
+      val (instruction, newState) =
+        if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Prevent)
+          (CompactEnsuringGap, subStatState)
+        else if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Preserve && !hiddenPredecessors(firstToken).containsNewline)
+          (CompactEnsuringGap, subStatState.indent(-1))
         else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(body))
-          statFormatterState(body.firstStatOpt)(subStatState).currentIndentLevelInstruction
+          (statFormatterState(body.firstStatOpt)(subStatState).currentIndentLevelInstruction, subStatState)
         else
-          CompactEnsuringGap
+          (CompactEnsuringGap, subStatState)
       formatResult = formatResult.before(firstToken, instruction)
+      bodyState = newState
     }
 
-    formatResult ++= format(body)(subStatState)
+    formatResult ++= format(body)(bodyState)
 
     formatResult
   }
