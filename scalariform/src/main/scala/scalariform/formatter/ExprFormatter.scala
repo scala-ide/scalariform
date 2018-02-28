@@ -825,7 +825,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   private def formatMultilineBlock(statSeq: StatSeq)(indentedInstruction: IntertokenFormatInstruction)(implicit formatterState: FormatterState): FormatResult = {
     if (statSeq.firstTokenOption.isDefined) {
       val formatResult = asAnonymousFunction(statSeq)
-        .map(af => formatAnonymousFunction(af, statSeq)(indentedInstruction))
+        .map(af ⇒ formatAnonymousFunction(af, statSeq)(indentedInstruction))
         .getOrElse {
           val instruction = statSeq.selfReferenceOpt match {
             case Some((selfReference, _)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
@@ -844,10 +844,13 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     var formatResult: FormatResult = NoFormatResult
 
+    val hasNestedAnonymousFunction = asAnonymousFunction(body).isDefined
+    val newlinePolicy = formattingPreferences(NewlinesAtNestedAnonymousFunctions)
+
     val (instruction, subStatState) =
-      if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Prevent)
+      if (hasNestedAnonymousFunction && newlinePolicy == Prevent)
         (CompactEnsuringGap, formatterState.indent(-1))
-      else if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Force)
+      else if (hasNestedAnonymousFunction && newlinePolicy == Force)
         (EnsureNewlineAndIndent(1, Some(parentBlock.firstToken)), formatterState.indent)
       else if (hiddenPredecessors(parameters.head.firstToken).containsNewline)
         (indentedInstruction, formatterState.indent)
@@ -861,9 +864,9 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     for (firstToken ← body.firstTokenOption) {
       val (instruction, newState) =
-        if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Prevent)
+        if (hasNestedAnonymousFunction && newlinePolicy == Prevent)
           (CompactEnsuringGap, subStatState)
-        else if (hasNestedAnonymousFunction(body) && formattingPreferences(NewlinesAtNestedAnonymousFunctions) == Preserve && !hiddenPredecessors(firstToken).containsNewline)
+        else if (hasNestedAnonymousFunction && newlinePolicy == Preserve && !hiddenPredecessors(firstToken).containsNewline)
           (CompactEnsuringGap, subStatState.indent(-1))
         else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(body))
           (statFormatterState(body.firstStatOpt)(subStatState).currentIndentLevelInstruction, subStatState)
@@ -877,12 +880,6 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     formatResult
   }
-
-  private def hasNestedAnonymousFunction(subStatSeq: StatSeq): Boolean =
-    (for {
-      firstStat <- subStatSeq.firstStatOpt
-      head <- firstStat.immediateChildren.headOption
-    } yield head.isInstanceOf[AnonymousFunction]).getOrElse(false)
 
   private def asAnonymousFunction(subStatSeq: StatSeq): Option[AnonymousFunction] =
     for {
