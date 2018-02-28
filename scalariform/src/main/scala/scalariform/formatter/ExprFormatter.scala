@@ -840,35 +840,33 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def formatAnonymousFunction(anonymousFunction: AnonymousFunction, parentBlock: StatSeq)(indentedInstruction: IntertokenFormatInstruction)(implicit formatterState: FormatterState): FormatResult = {
-    import anonymousFunction.{ parameters => params, body => subStatSeq }
-    val indentedState = formatterState
-    val statSeq = parentBlock
+    import anonymousFunction.{ parameters, body }
 
     var formatResult: FormatResult = NoFormatResult
 
     val (instruction, subStatState) =
-      if (hasNestedAnonymousFunction(subStatSeq))
-        (CompactEnsuringGap, indentedState.indent(-1))
-      else if (hiddenPredecessors(params.head.firstToken).containsNewline)
-        (indentedInstruction, indentedState.indent)
+      if (hasNestedAnonymousFunction(body))
+        (CompactEnsuringGap, formatterState.indent(-1))
+      else if (hiddenPredecessors(parameters.head.firstToken).containsNewline)
+        (indentedInstruction, formatterState.indent)
       else
-        (CompactEnsuringGap, indentedState)
+        (CompactEnsuringGap, formatterState)
 
-    formatResult = formatResult.before(statSeq.firstToken, instruction)
-    formatResult ++= format(params)
+    formatResult = formatResult.before(parentBlock.firstToken, instruction)
+    formatResult ++= format(parameters)
 
-    for (firstToken ← subStatSeq.firstTokenOption) {
+    for (firstToken ← body.firstTokenOption) {
       val instruction =
-        if (hasNestedAnonymousFunction(subStatSeq))
+        if (hasNestedAnonymousFunction(body))
           CompactEnsuringGap
-        else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
-          statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
+        else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(body))
+          statFormatterState(body.firstStatOpt)(subStatState).currentIndentLevelInstruction
         else
           CompactEnsuringGap
       formatResult = formatResult.before(firstToken, instruction)
     }
 
-    formatResult ++= format(subStatSeq)(subStatState)
+    formatResult ++= format(body)(subStatState)
 
     formatResult
   }
