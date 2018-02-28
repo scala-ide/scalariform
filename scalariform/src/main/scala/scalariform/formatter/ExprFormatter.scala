@@ -829,33 +829,10 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     if (statSeq.firstTokenOption.isDefined) {
       statSeq.firstStatOpt match {
-        case Some(Expr(List(AnonymousFunction(params, _, subStatSeq)))) ⇒
-          def hasNestedAnonymousFunction(subStatSeq: StatSeq): Boolean =
-            (for {
-              firstStat <- subStatSeq.firstStatOpt
-              head <- firstStat.immediateChildren.headOption
-            } yield head.isInstanceOf[AnonymousFunction]).getOrElse(false)
+        case Some(Expr(List(af @ AnonymousFunction(params, _, subStatSeq)))) ⇒
 
-          val (instruction, subStatState) =
-            if (hasNestedAnonymousFunction(subStatSeq))
-              (CompactEnsuringGap, indentedState.indent(-1))
-            else if (hiddenPredecessors(params.head.firstToken).containsNewline)
-              (indentedInstruction, indentedState.indent)
-            else
-              (CompactEnsuringGap, indentedState)
-          formatResult = formatResult.before(statSeq.firstToken, instruction)
-          formatResult ++= format(params)
-          for (firstToken ← subStatSeq.firstTokenOption) {
-            val instruction =
-              if (hasNestedAnonymousFunction(subStatSeq))
-                CompactEnsuringGap
-              else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
-                statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
-              else
-                CompactEnsuringGap
-            formatResult = formatResult.before(firstToken, instruction)
-          }
-          formatResult ++= format(subStatSeq)(subStatState)
+          formatResult ++= formatAnonymousFunction(af, statSeq)(indentedInstruction)
+
         case _ ⇒
           val instruction = statSeq.selfReferenceOpt match {
             case Some((selfReference, _)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
@@ -870,6 +847,56 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     formatResult
   }
+
+  private def formatAnonymousFunction(anonymousFunction: AnonymousFunction, parentBlock: StatSeq)(indentedInstruction: IntertokenFormatInstruction)(implicit formatterState: FormatterState): FormatResult = {
+    import anonymousFunction.{ parameters => params, body => subStatSeq }
+    val indentedState = formatterState
+    val statSeq = parentBlock
+
+    var formatResult: FormatResult = NoFormatResult
+
+    val (instruction, subStatState) =
+      if (hasNestedAnonymousFunction(subStatSeq))
+        (CompactEnsuringGap, indentedState.indent(-1))
+      else if (hiddenPredecessors(params.head.firstToken).containsNewline)
+        (indentedInstruction, indentedState.indent)
+      else
+        (CompactEnsuringGap, indentedState)
+
+    formatResult = formatResult.before(statSeq.firstToken, instruction)
+    formatResult ++= format(params)
+
+    for (firstToken ← subStatSeq.firstTokenOption) {
+      val instruction =
+        if (hasNestedAnonymousFunction(subStatSeq))
+          CompactEnsuringGap
+        else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
+          statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
+        else
+          CompactEnsuringGap
+      formatResult = formatResult.before(firstToken, instruction)
+    }
+
+    formatResult ++= format(subStatSeq)(subStatState)
+
+    formatResult
+  }
+
+  private def hasNestedAnonymousFunction(subStatSeq: StatSeq): Boolean =
+    (for {
+      firstStat <- subStatSeq.firstStatOpt
+      head <- firstStat.immediateChildren.headOption
+    } yield head.isInstanceOf[AnonymousFunction]).getOrElse(false)
+
+  private def asAnonymousFunction(subStatSeq: StatSeq): Option[AnonymousFunction] =
+    for {
+      firstStat <- subStatSeq.firstStatOpt
+      head <- firstStat.immediateChildren.headOption
+      result <- head match {
+        case af: AnonymousFunction => Some(af)
+        case _                     => None
+      }
+    } yield result
 
   private def statFormatterState(statOpt: Option[Stat])(implicit formatterState: FormatterState) = statOpt match {
     case Some(FullDefOrDcl(_, _, FunDefOrDcl(_, _, _, _, _, _, /* localDef = */ true))) if formattingPreferences(IndentLocalDefs) ⇒
