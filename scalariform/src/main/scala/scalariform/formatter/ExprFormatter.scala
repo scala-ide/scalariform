@@ -814,48 +814,58 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
         if (singleLineBlock)
           formatResult ++= format(statSeq)(newFormatterState)
         else {
-          if (statSeq.firstTokenOption.isDefined) {
-            statSeq.firstStatOpt match {
-              case Some(Expr(List(AnonymousFunction(params, _, subStatSeq)))) ⇒
-                def hasNestedAnonymousFunction(subStatSeq: StatSeq): Boolean =
-                  (for {
-                    firstStat <- subStatSeq.firstStatOpt
-                    head <- firstStat.immediateChildren.headOption
-                  } yield head.isInstanceOf[AnonymousFunction]).getOrElse(false)
-
-                val (instruction, subStatState) =
-                  if (hasNestedAnonymousFunction(subStatSeq))
-                    (CompactEnsuringGap, indentedState.indent(-1))
-                  else if (hiddenPredecessors(params.head.firstToken).containsNewline)
-                    (indentedInstruction, indentedState.indent)
-                  else
-                    (CompactEnsuringGap, indentedState)
-                formatResult = formatResult.before(statSeq.firstToken, instruction)
-                formatResult ++= format(params)
-                for (firstToken ← subStatSeq.firstTokenOption) {
-                  val instruction =
-                    if (hasNestedAnonymousFunction(subStatSeq))
-                      CompactEnsuringGap
-                    else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
-                      statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
-                    else
-                      CompactEnsuringGap
-                  formatResult = formatResult.before(firstToken, instruction)
-                }
-                formatResult ++= format(subStatSeq)(subStatState)
-              case _ ⇒
-                val instruction = statSeq.selfReferenceOpt match {
-                  case Some((selfReference, _)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
-                    CompactEnsuringGap
-                  case _ ⇒
-                    statFormatterState(statSeq.firstStatOpt)(indentedState).currentIndentLevelInstruction
-                }
-                formatResult = formatResult.before(statSeq.firstToken, instruction)
-                formatResult ++= format(statSeq)(indentedState)
-            }
-          }
+          formatResult ++= formatMultilineBlock(statSeq)(indentedInstruction)(indentedState)
           formatResult = formatResult.before(rbrace, newFormatterState.currentIndentLevelInstruction)
         }
+    }
+
+    formatResult
+  }
+
+  private def formatMultilineBlock(statSeq: StatSeq)(indentedInstruction: IntertokenFormatInstruction)(implicit formatterState: FormatterState): FormatResult = {
+    var formatResult: FormatResult = NoFormatResult
+
+    val indentedState = formatterState
+
+    if (statSeq.firstTokenOption.isDefined) {
+      statSeq.firstStatOpt match {
+        case Some(Expr(List(AnonymousFunction(params, _, subStatSeq)))) ⇒
+          def hasNestedAnonymousFunction(subStatSeq: StatSeq): Boolean =
+            (for {
+              firstStat <- subStatSeq.firstStatOpt
+              head <- firstStat.immediateChildren.headOption
+            } yield head.isInstanceOf[AnonymousFunction]).getOrElse(false)
+
+          val (instruction, subStatState) =
+            if (hasNestedAnonymousFunction(subStatSeq))
+              (CompactEnsuringGap, indentedState.indent(-1))
+            else if (hiddenPredecessors(params.head.firstToken).containsNewline)
+              (indentedInstruction, indentedState.indent)
+            else
+              (CompactEnsuringGap, indentedState)
+          formatResult = formatResult.before(statSeq.firstToken, instruction)
+          formatResult ++= format(params)
+          for (firstToken ← subStatSeq.firstTokenOption) {
+            val instruction =
+              if (hasNestedAnonymousFunction(subStatSeq))
+                CompactEnsuringGap
+              else if (hiddenPredecessors(firstToken).containsNewline || containsNewline(subStatSeq))
+                statFormatterState(subStatSeq.firstStatOpt)(subStatState).currentIndentLevelInstruction
+              else
+                CompactEnsuringGap
+            formatResult = formatResult.before(firstToken, instruction)
+          }
+          formatResult ++= format(subStatSeq)(subStatState)
+        case _ ⇒
+          val instruction = statSeq.selfReferenceOpt match {
+            case Some((selfReference, _)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
+              CompactEnsuringGap
+            case _ ⇒
+              statFormatterState(statSeq.firstStatOpt)(indentedState).currentIndentLevelInstruction
+          }
+          formatResult = formatResult.before(statSeq.firstToken, instruction)
+          formatResult ++= format(statSeq)(indentedState)
+      }
     }
 
     formatResult
