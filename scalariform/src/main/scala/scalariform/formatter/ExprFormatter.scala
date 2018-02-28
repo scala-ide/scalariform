@@ -823,29 +823,20 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def formatMultilineBlock(statSeq: StatSeq)(indentedInstruction: IntertokenFormatInstruction)(implicit formatterState: FormatterState): FormatResult = {
-    var formatResult: FormatResult = NoFormatResult
-
-    val indentedState = formatterState
-
     if (statSeq.firstTokenOption.isDefined) {
-      statSeq.firstStatOpt match {
-        case Some(Expr(List(af @ AnonymousFunction(params, _, subStatSeq)))) ⇒
-
-          formatResult ++= formatAnonymousFunction(af, statSeq)(indentedInstruction)
-
-        case _ ⇒
+      val formatResult = asAnonymousFunction(statSeq)
+        .map(af => formatAnonymousFunction(af, statSeq)(indentedInstruction))
+        .getOrElse {
           val instruction = statSeq.selfReferenceOpt match {
             case Some((selfReference, _)) if !hiddenPredecessors(selfReference.firstToken).containsNewline ⇒
               CompactEnsuringGap
             case _ ⇒
-              statFormatterState(statSeq.firstStatOpt)(indentedState).currentIndentLevelInstruction
+              statFormatterState(statSeq.firstStatOpt).currentIndentLevelInstruction
           }
-          formatResult = formatResult.before(statSeq.firstToken, instruction)
-          formatResult ++= format(statSeq)(indentedState)
-      }
-    }
-
-    formatResult
+          NoFormatResult.before(statSeq.firstToken, instruction) ++ format(statSeq)
+        }
+      formatResult
+    } else NoFormatResult
   }
 
   private def formatAnonymousFunction(anonymousFunction: AnonymousFunction, parentBlock: StatSeq)(indentedInstruction: IntertokenFormatInstruction)(implicit formatterState: FormatterState): FormatResult = {
