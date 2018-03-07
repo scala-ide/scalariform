@@ -54,6 +54,24 @@ class NestedAnonymousFunctionsTest extends AbstractFormatterTest {
         |  "x"
         |}"""
   }
+
+  {
+    implicit val formattingPreferences = FormattingPreferences
+      .setPreference(NewlinesAtNestedAnonymousFunctions, Force)
+      .setPreference(PreserveSpaceBeforeArguments, true)
+      .setPreference(AlignParameters, true)
+      .setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(DanglingCloseParenthesis, Preserve)
+
+    """def foo() = Seq.tabulate[String => String](
+      |  5) { baz: Int => _ =>
+      |    baz.toString
+      |  }""" ==>
+      """def foo() = Seq.tabulate[String => String](5) { baz: Int =>
+        |  _ =>
+        |    baz.toString
+        |}"""
+  }
   //  format: ON
 
   override val debug = false
