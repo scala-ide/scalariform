@@ -1124,7 +1124,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
    *         Right stores an unalignable param.
    */
   private def groupParams(paramClause: ParamClause, alignParameters: Boolean)(implicit formatterState: FormatterState): List[EitherAlignableParam] = {
-    val ParamClause(_, implicitOption, firstParamOption, otherParamsWithComma, _) = paramClause
+    val ParamClause(_, implicitOption, firstParamOption, otherParamsWithComma, _, trailComa) = paramClause
 
     val otherParams = otherParamsWithComma.map { case (_, param) ⇒ param }
 
@@ -1193,7 +1193,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   private def formatParamClause(paramClause: ParamClause, doubleIndentParams: Boolean)(implicit formatterState: FormatterState): (FormatResult, FormatterState) = {
-    val ParamClause(_, implicitOption, firstParamOption, otherParams, rparen) = paramClause
+    val ParamClause(_, implicitOption, firstParamOption, otherParams, rparen, trailOpt) = paramClause
     val paramIndent = if (doubleIndentParams) 2 else 1
     val relativeToken = paramClause.tokens(1) // TODO
     var formatResult: FormatResult = NoFormatResult
@@ -1376,7 +1376,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
   }
 
   protected def format(import_ :ImportClause)(implicit formatterState: FormatterState): FormatResult = {
-    val ImportClause(_, importExpr, otherImportExprs) = import_
+    val ImportClause(_, importExpr, otherImportExprs, trailOpt) = import_
     var formatResult: FormatResult = NoFormatResult
     formatResult ++= format(importExpr)
     for ((_, otherImportExpr) ← otherImportExprs)

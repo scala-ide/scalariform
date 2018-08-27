@@ -160,26 +160,30 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def isStatSep: Boolean = isStatSep(currentTokenType)
 
-  private def tokenSeparated[T](separator: TokenType, sepFirst: Boolean, part: ⇒ T, trailingOK: Boolean = false): (Option[T], List[(Token, T)]) = {
+  private def tokenSeparated[T](separator: TokenType, sepFirst: Boolean, part: ⇒ T, trailingOK: Boolean = false): (Option[T], List[(Token, T)], Option[Token]) = {
     val ts = new ListBuffer[(Token, T)]
     val firstOpt = if (sepFirst) None else Some(part)
     var continue = true
-    while (separator && continue) {
+    var tailSep: Option[Token] = None
+    while (continue && separator) {
       val separatorToken = nextToken()
       val la = lookahead(1)
-      val la2 = lookahead(2)
-      if (trailingOK && (la == NEWLINE || la == NEWLINES) && la2 == RPAREN) {
+      if (trailingOK && (
+        (currentTokenType == RPAREN) ||
+        ((currentTokenType == NEWLINE || currentTokenType == NEWLINES) && la == RPAREN)
+      )) {
+        tailSep = Some(separatorToken)
         continue = false
       } else {
         val nextPart = part
         ts += ((separatorToken, nextPart))
       }
     }
-    (firstOpt, ts.toList)
+    (firstOpt, ts.toList, tailSep)
   }
 
-  private def commaSeparated[T](part: ⇒ T) =
-    tokenSeparated(COMMA, sepFirst = false, part = part, trailingOK = true) match { case (firstOpt, rest) ⇒ (firstOpt.get, rest) }
+  private def commaSeparated[T](part: ⇒ T): (T, List[(Token, T)], Option[Token]) =
+    tokenSeparated(COMMA, sepFirst = false, part = part, trailingOK = true) match { case (firstOpt, rest, tailSep) ⇒ (firstOpt.get, rest, tailSep) }
 
   private def caseSeparated[T](part: ⇒ T) = tokenSeparated(CASE, sepFirst = true, part = part)._2
   private def readAnnots[T](part: ⇒ T) = tokenSeparated(AT, sepFirst = true, part = part)._2
@@ -1181,7 +1185,7 @@ class ScalaParser(tokens: Array[Token]) {
       val lparen = accept(LPAREN)
       if (RPAREN) {
         val rparen = accept(RPAREN)
-        ParamClause(lparen, None, None, Nil, rparen)
+        ParamClause(lparen, None, None, Nil, rparen, None)
       } else {
         val implicitOption = if (IMPLICIT) {
           val implicitToken = nextToken()
@@ -1189,9 +1193,9 @@ class ScalaParser(tokens: Array[Token]) {
           Some(implicitToken)
         } else
           None
-        val (param_, otherParams) = commaSeparated(param())
+        val (param_, otherParams, trailOpt) = commaSeparated(param())
         val rparen = accept(RPAREN)
-        ParamClause(lparen, implicitOption, Some(param_), otherParams, rparen)
+        ParamClause(lparen, implicitOption, Some(param_), otherParams, rparen, trailOpt)
       }
     }
 
@@ -1267,8 +1271,8 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def importClause(): ImportClause = {
     val importToken = accept(IMPORT)
-    val (importExpr_, otherImportExprs) = commaSeparated(importExpr())
-    ImportClause(importToken, importExpr_, otherImportExprs)
+    val (importExpr_, otherImportExprs, trailOpt) = commaSeparated(importExpr())
+    ImportClause(importToken, importExpr_, otherImportExprs, trailOpt)
   }
 
   private def importExpr(): ImportExpr = {
@@ -1307,7 +1311,7 @@ class ScalaParser(tokens: Array[Token]) {
   }
 
   private def importSelectors(): ImportSelectors = {
-    val (lbrace, (firstImportSelector, otherImportSelectors), rbrace) = inBraces(commaSeparated(importSelector()))
+    val (lbrace, (firstImportSelector, otherImportSelectors, trailOpt), rbrace) = inBraces(commaSeparated(importSelector()))
     ImportSelectors(lbrace, firstImportSelector, otherImportSelectors, rbrace)
   }
 
@@ -1344,7 +1348,7 @@ class ScalaParser(tokens: Array[Token]) {
 
   private def patDefOrDcl(): PatDefOrDcl = {
     val valOrVarToken = nextToken()
-    val (pattern_, otherPatterns) = commaSeparated(noSeq.pattern2())
+    val (pattern_, otherPatterns, trailOpt) = commaSeparated(noSeq.pattern2())
     val typedOpt_ = typedOpt()
     val equalsClauseOption = if (EQUALS) { // TODO: Check cond
       val equalsToken = accept(EQUALS)
