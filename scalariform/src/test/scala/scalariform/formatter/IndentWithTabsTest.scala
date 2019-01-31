@@ -6,7 +6,8 @@ import scalariform.formatter.preferences._
 // format: OFF
 class IndentWithTabsTest extends AbstractFormatterTest {
 
-  implicit val formattingPreferences = FormattingPreferences.setPreference(IndentWithTabs, true)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(IndentWithTabs, true)
 
   """class A {
     |
@@ -60,7 +61,7 @@ class IndentWithTabsTest extends AbstractFormatterTest {
     |\tfalse)""".replace("\\t", "\t")
 
   {
-    implicit val formattingPreferences = FormattingPreferences
+    implicit val formattingPreferences: FormattingPreferences = FormattingPreferences
       .setPreference(IndentWithTabs, true)
       .setPreference(DanglingCloseParenthesis, Force)
 
@@ -96,7 +97,7 @@ class IndentWithTabsTest extends AbstractFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences
+    implicit val formattingPreferences: FormattingPreferences = FormattingPreferences
       .setPreference(IndentWithTabs, true)
       .setPreference(DanglingCloseParenthesis, Preserve)
 
@@ -146,7 +147,7 @@ class IndentWithTabsTest extends AbstractFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences
+    implicit val formattingPreferences: FormattingPreferences = FormattingPreferences
       .setPreference(IndentWithTabs, true)
       .setPreference(DanglingCloseParenthesis, Prevent)
 
@@ -185,8 +186,8 @@ class IndentWithTabsTest extends AbstractFormatterTest {
 
   type Result = CompilationUnit
 
-  def parse(parser: ScalaParser) = parser.compilationUnitOrScript
+  def parse(parser: ScalaParser): Result = parser.compilationUnitOrScript()
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
+  def format(formatter: ScalaFormatter, result: Result): FormatResult = formatter.format(result)(FormatterState())
 
 }

@@ -282,7 +282,7 @@ class AstSelectorTest extends FlatSpec with Matchers {
   */
 
   {
-    implicit val scalaVersion = "2.10.0"
+    implicit val scalaVersion: String = "2.10.0"
 
     """ s"my name is ?{person.name}." """.replace('?', '$') ~
     """                $$$$$$       " """ ~

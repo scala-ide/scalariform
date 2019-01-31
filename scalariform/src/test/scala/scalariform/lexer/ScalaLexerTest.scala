@@ -6,7 +6,8 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class ScalaLexerTest extends FlatSpec with Matchers {
 
-  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) =
+  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false,
+                                            scalaVersion: ScalaVersion = ScalaVersions.DEFAULT): TestString =
     new TestString(s, forgiveErrors, scalaVersion)
 
   "" producesTokens ()
@@ -99,26 +100,26 @@ class ScalaLexerTest extends FlatSpec with Matchers {
   "42.toString" producesTokens (INTEGER_LITERAL, DOT, VARID)
 
   {
-    implicit val scalaVersion = ScalaVersions.Scala_2_9
+    implicit val scalaVersion: ScalaVersion = ScalaVersions.Scala_2_9
     "5.f" producesTokens (FLOATING_POINT_LITERAL)
     "5.d" producesTokens (FLOATING_POINT_LITERAL)
     "5." producesTokens (FLOATING_POINT_LITERAL)
   }
 
   {
-    implicit val scalaVersion = ScalaVersions.Scala_2_11
+    implicit val scalaVersion: ScalaVersion = ScalaVersions.Scala_2_11
     "5.f" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5.d" producesTokens (INTEGER_LITERAL, DOT, VARID)
     "5." producesTokens (INTEGER_LITERAL, DOT)
   }
 
   {
-    implicit val scalaVersion = ScalaVersions.Scala_2_9
+    implicit val scalaVersion: ScalaVersion = ScalaVersions.Scala_2_9
     """ X s"" """ producesTokens (WS, VARID, WS, VARID, STRING_LITERAL, WS)
   }
 
   {
-    implicit val scalaVersion = ScalaVersions.Scala_2_10
+    implicit val scalaVersion: ScalaVersion = ScalaVersions.Scala_2_10
     """ X s"" """ producesTokens (WS, VARID, WS, INTERPOLATION_ID, STRING_LITERAL, WS)
     """ X s "$foo" """ producesTokens (WS, VARID, WS, VARID, WS, STRING_LITERAL, WS)
     """ s"$foo" """ producesTokens (WS, INTERPOLATION_ID, STRING_PART, VARID, STRING_LITERAL, WS)
@@ -247,7 +248,7 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
   }
 
   {
-    implicit val forgiveErrors = true
+    implicit val forgiveErrors: Boolean = true
 
     "\"\"\"" producesTokens (STRING_LITERAL)
     "'" producesTokens (CHARACTER_LITERAL)
@@ -261,11 +262,10 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
 
   class TestString(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) {
 
-    def producesTokens(toks: TokenType*)() {
+    def producesTokens(toks: TokenType*)(): Unit =
       check(s.stripMargin, toks.toList)
-    }
 
-    private def check(s: String, expectedTokens: List[TokenType]) {
+    private def check(s: String, expectedTokens: List[TokenType]): Unit =
       it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors + ", scalaVersion = " + scalaVersion) in {
         val actualTokens: List[Token] = ScalaLexer.rawTokenise(s, forgiveErrors, scalaVersion.toString)
         val actualTokenTypes = actualTokens.map(_.tokenType)
@@ -275,7 +275,6 @@ println("foo")""" producesTokens (VARID, LPAREN, STRING_LITERAL, RPAREN, WS, VAR
         require(actualTokenTypes.init == expectedTokens, "Tokens do not match. Expected " + expectedTokens + ", but was " + actualTokenTypes.init)
         require(s == reconstitutedSource, "tokens do not partition text correctly: " + s + " vs " + reconstitutedSource)
       }
-    }
 
   }
 

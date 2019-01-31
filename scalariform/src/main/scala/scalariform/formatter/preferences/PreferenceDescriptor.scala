@@ -50,9 +50,9 @@ case class IntegerPreference(min: Int, max: Int) extends PreferenceType[Int] {
     try {
       val n = Integer.parseInt(s)
       if (n < min)
-        Left(n + " is below minimum of " + min)
+        Left(n.toString + " is below minimum of " + min)
       else if (n > max)
-        Left(n + " is above maximum of " + max)
+        Left(n.toString + " is above maximum of " + max)
       else
         Right(n)
     } catch {

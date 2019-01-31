@@ -23,7 +23,7 @@ abstract class AbstractFormatterTest extends FlatSpec with Matchers with Specifi
 
     require(formattingPreferences != null)
 
-    def ==>(expectedRaw: String) {
+    def ==>(expectedRaw: String): Unit =
       it should ("format >>>" + prettyPrint(source) + "<<< as >>>" + prettyPrint(expectedRaw) + "<<< with preferences " + formattingPreferences + " in version " + scalaVersion) in {
         val expected = expectedRaw.stripMargin
         val actual = format(source, scalaVersion = scalaVersion)(formattingPreferences)
@@ -45,7 +45,6 @@ abstract class AbstractFormatterTest extends FlatSpec with Matchers with Specifi
           throw testFailedException("Idempotency token inconsistency:\n ---- One ---- \n" + afterTokens2 + "\n ---- Twice ---- \n" + afterTokens2 + "\n")
         }
       }
-    }
 
     def =/=>(expected: String): Because = {
       //println("Warning -- skipped test:\n" + source)
@@ -53,7 +52,7 @@ abstract class AbstractFormatterTest extends FlatSpec with Matchers with Specifi
     }
 
     class Because(expected: String) {
-      def because(reason: String) = {
+      def because(reason: String): Unit = {
         //println("because " + reason)
         it should ("format >>>" + prettyPrint(source) + "<<< as >>>" + prettyPrint(expected) + "<<<, but did not because " + reason) in {
           throw new TestPendingException

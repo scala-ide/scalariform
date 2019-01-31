@@ -14,12 +14,12 @@ case class TextEdit(position: Int, length: Int, replacement: String) {
 
   require(length >= 0)
 
-  override lazy val toString = {
+  override lazy val toString: String = {
     val replacementDisplay = replacement.replace("\n", """\n""").replace("\r", """\r""")
     getClass.getSimpleName + "(position = " + position + ", length = " + length + ", replacement = '" + replacementDisplay + "')"
   }
 
-  def shift(n: Int) = copy(position = position + n)
+  def shift(n: Int): TextEdit = copy(position = position + n)
 
 }
 

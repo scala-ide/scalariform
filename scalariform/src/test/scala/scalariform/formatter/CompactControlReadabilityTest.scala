@@ -5,7 +5,8 @@ import scalariform.formatter.preferences._
 // format: OFF
 class CompactControlReadabilityTest extends AbstractExpressionFormatterTest {
 
-  implicit val formattingPreferences = FormattingPreferences.setPreference(CompactControlReadability, true)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(CompactControlReadability, true)
 
   """if(a){
     |foo

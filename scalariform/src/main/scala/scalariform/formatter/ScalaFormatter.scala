@@ -554,7 +554,7 @@ abstract class ScalaFormatter
 object ScalaFormatter {
 
   // format: OFF
-  val ENSURE_SPACE_AFTER = Set(
+  val ENSURE_SPACE_AFTER: Set[TokenType] = Set(
     ABSTRACT, CASE, CATCH, CLASS, DEF,
     DO, ELSE, EXTENDS, FINAL,
     FINALLY, FOR, FORSOME, IF, IMPLICIT,
@@ -566,7 +566,7 @@ object ScalaFormatter {
     /* USCORE, */ COLON, EQUALS, ARROW, LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /* HASH, AT */
     LBRACE, SEMI)
 
-  val ENSURE_SPACE_BEFORE = Set(
+  val ENSURE_SPACE_BEFORE: Set[TokenType] = Set(
     ABSTRACT, CASE, CATCH, CLASS, DEF,
     /* DO, */  ELSE, EXTENDS, FINAL,
     FINALLY, /* FOR, */ FORSOME, /* IF, */ IMPLICIT,
@@ -589,7 +589,7 @@ object ScalaFormatter {
   @throws(classOf[ScalaParserException])
   def formatAsEdits(source: String, formattingPreferences: IFormattingPreferences = FormattingPreferences(), lineDelimiter: Option[String] = None,
                     initialIndentLevel: Int = 0, scalaVersion: String = ScalaVersions.DEFAULT_VERSION): List[TextEdit] = {
-    val specificFormatter = new SpecificFormatter {
+    val specificFormatter: SpecificFormatter = new SpecificFormatter {
 
       type Result = CompilationUnit
 

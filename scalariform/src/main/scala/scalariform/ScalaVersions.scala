@@ -29,7 +29,7 @@ case class ScalaVersion(major: Int, minor: Int, extra: String = "") extends Orde
 
   def compare(that: ScalaVersion): Int = Ordering[(Int, Int)].compare(this.majorMinor, that.majorMinor)
 
-  override def toString: String = major + "." + minor + "." + extra
+  override def toString: String = major.toString + "." + minor + "." + extra
 
 }
 

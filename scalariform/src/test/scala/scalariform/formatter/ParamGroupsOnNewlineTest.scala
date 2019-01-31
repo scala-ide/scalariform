@@ -7,7 +7,7 @@ import scalariform.formatter.preferences._
 class ParamGroupsOnNewlineTest extends AbstractFormatterTest {
 
   {
-    implicit val formattingPreferences = FormattingPreferences.
+    implicit val formattingPreferences: FormattingPreferences = FormattingPreferences.
       setPreference(AllowParamGroupsOnNewlines, true).
       setPreference(DanglingCloseParenthesis, Force)
 
@@ -162,10 +162,11 @@ class ParamGroupsOnNewlineTest extends AbstractFormatterTest {
 
   override val debug = false
 
-  def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
+  def parse(parser: ScalaParser): Result = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
+  def format(formatter: ScalaFormatter, result: Result): FormatResult =
+    formatter.format(result)(FormatterState(indentLevel = 0))
 
 }

@@ -85,7 +85,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(
+  implicit val formattingPreferences: FormattingPreferences = FormattingPreferences.setPreference(
     SingleCasePatternOnNewline, false
   )
     """a match { case a => b; c;
@@ -187,7 +187,8 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
 
   """a match {
     |  case b(c @ ~()) =>
@@ -201,7 +202,8 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   {
 
-  implicit val formattingPreferences = FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true)
 
   """a match {
     |case x => 1
@@ -285,7 +287,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   {
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true).setPreference(RewriteArrowSymbols, true)
 
   """a match {
@@ -300,7 +302,7 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   {
 
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences
       .setPreference(AlignSingleLineCaseStatements, true)
       .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 5)
@@ -354,7 +356,8 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
 
   """(a: @switch)  match {
     |case elem@Multi(values@_*) =>

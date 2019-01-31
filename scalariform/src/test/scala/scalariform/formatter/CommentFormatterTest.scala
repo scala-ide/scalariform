@@ -8,9 +8,9 @@ class CommentFormatterTest extends AbstractFormatterTest {
 
   type Result = CompilationUnit
 
-  def parse(parser: ScalaParser) = parser.scriptBody()
+  def parse(parser: ScalaParser): Result = parser.scriptBody()
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
+  def format(formatter: ScalaFormatter, result: Result): FormatResult = formatter.format(result)(FormatterState())
 
   override val debug = false
 
@@ -142,7 +142,8 @@ class CommentFormatterTest extends AbstractFormatterTest {
     | */ """
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
 
   """/** This method applies f to each
     | *  element of the given list.
@@ -175,7 +176,8 @@ class CommentFormatterTest extends AbstractFormatterTest {
   }
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
 
   """/** This method applies f to each
     | * element of the given list.
@@ -211,7 +213,7 @@ class CommentFormatterTest extends AbstractFormatterTest {
   }
 
   {
-  implicit val formattingPreferences = FormattingPreferences
+  implicit val formattingPreferences: FormattingPreferences = FormattingPreferences
     .setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
     .setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, true)
   """/** This method applies f to each

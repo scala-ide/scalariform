@@ -7,21 +7,21 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class RedundantSemicolonDetectorTest extends FlatSpec with Matchers {
 
-  implicit def stringToCheckable(s: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION) =
-    new { def check() = checkSemis(s, scalaVersion) }; // Expected redundant semicolons are indicated with <;>
+  implicit def stringToCheckable(s: String)(implicit scalaVersion: String = ScalaVersions.DEFAULT_VERSION): Any { def check(): Unit } =
+    new { def check(): Unit = checkSemis(s, scalaVersion) } // Expected redundant semicolons are indicated with <;>
 
   """
     class A {
       def foo = 42<;>
       def bar = 123; def baz = 1234
     }<;>
-  """.check();
+  """.check()
 
   """
     {
       println("Foo")<;>
     }
-  """.check();
+  """.check()
 
   """
     class A {
@@ -33,13 +33,13 @@ class RedundantSemicolonDetectorTest extends FlatSpec with Matchers {
   """.check()
 
   {
-    implicit val scalaVersion = "2.10.0";
+    implicit val scalaVersion: String = "2.10.0"
     """
       s"my name is ?{person.name<;>}"
-    """.replace('?', '$').check
+    """.replace('?', '$').check()
   }
 
-  private def checkSemis(encodedSource: String, scalaVersion: String) {
+  private def checkSemis(encodedSource: String, scalaVersion: String): Unit = {
     val ordinarySource = encodedSource.replace("<;>", ";")
     val semis = RedundantSemicolonDetector.findRedundantSemis(ordinarySource, scalaVersion)
     val encodedSourceAgain = semis.reverse.foldLeft(ordinarySource) { (s, semi) ⇒ replaceRange(s, semi.range, "<;>") }

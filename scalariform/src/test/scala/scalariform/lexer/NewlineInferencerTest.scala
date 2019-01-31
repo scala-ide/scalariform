@@ -9,7 +9,8 @@ import org.scalatest.{FlatSpec, Matchers}
  */
 class NewlineInferencerTest extends FlatSpec with Matchers {
 
-  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) =
+  implicit def string2TestString(s: String)(implicit forgiveErrors: Boolean = false,
+                                            scalaVersion: ScalaVersion = ScalaVersions.DEFAULT): TestString =
     new TestString(s, forgiveErrors, scalaVersion)
 
   // See issue #60
@@ -27,11 +28,10 @@ class NewlineInferencerTest extends FlatSpec with Matchers {
 
   class TestString(s: String, forgiveErrors: Boolean = false, scalaVersion: ScalaVersion = ScalaVersions.DEFAULT) {
 
-    def shouldProduceTokens(toks: TokenType*)() {
+    def shouldProduceTokens(toks: TokenType*)(): Unit =
       check(s.stripMargin, toks.toList)
-    }
 
-    private def check(s: String, expectedTokens: List[TokenType]) {
+    private def check(s: String, expectedTokens: List[TokenType]): Unit =
       it should ("tokenise >>>" + s + "<<< as >>>" + expectedTokens + "<<< forgiveErrors = " + forgiveErrors + ", scalaVersion = " + scalaVersion) in {
         val actualTokens: List[Token] = ScalaLexer.tokenise(s, forgiveErrors, scalaVersion.toString)
         val actualTokenTypes = actualTokens.map(_.tokenType)
@@ -39,7 +39,6 @@ class NewlineInferencerTest extends FlatSpec with Matchers {
         require(actualTokenTypes.count(_ == EOF) == 1, "There must only be one EOF token")
         require(actualTokenTypes.init == expectedTokens, "Tokens do not match. Expected " + expectedTokens + ", but was " + actualTokenTypes.init)
       }
-    }
 
   }
 
