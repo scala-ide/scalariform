@@ -300,7 +300,7 @@ case class ParamClauses(newlineOpt: Option[Token], paramClausesAndNewlines: List
   lazy val tokens: List[Token] = flatten(newlineOpt, paramClausesAndNewlines)
 }
 
-case class ParamClause(lparen: Token, implicitOption: Option[Token], firstParamOption: Option[Param], otherParams: List[(Token, Param)], rparen: Token) extends AstNode {
+case class ParamClause(lparen: Token, implicitOption: Option[Token], firstParamOption: Option[Param], otherParams: List[(Token, Param)], rparen: Token, trailComa: Option[Token]) extends AstNode {
   lazy val tokens: List[Token] = flatten(lparen, implicitOption, firstParamOption, otherParams, rparen)
 }
 
@@ -375,7 +375,7 @@ case class TemplateParents(typeAndArgs: (Type, List[ArgumentExprs]), withTypesAn
   lazy val tokens: List[Token] = flatten(typeAndArgs, withTypesAndArgs)
 }
 
-case class ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)]) extends AstNode with Stat {
+case class ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)], trailOpt: Option[Token]) extends AstNode with Stat {
   lazy val tokens: List[Token] = flatten(importToken, importExpr, otherImportExprs)
 }
 
