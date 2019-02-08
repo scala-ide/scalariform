@@ -1,3 +1,8 @@
+0.2.7 (8/February/19)
+
+* Added trailing comma support (PR #262 by @marekzebrowski])
+* Added support for Scala 2.13 (PR #272 by @Sciss)
+
 0.2.6 (29/October/17)
 
 * Removed OSGi configuration, no longer needed for Scala-IDE (PR #258 by @sschaef)
