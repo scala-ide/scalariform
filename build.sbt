@@ -45,9 +45,9 @@ def scalac2_10Options = Seq(
 
 def scalac2_11Options = Seq(
   "-deprecation:false",
+  "-Xlint",
   "-Xfatal-warnings",
-  "-Ywarn-unused-import",
-  "-Ywarn-unused"
+  "-Ywarn-unused-import"
 )
 
 def publishSettings(projectName: String) = Seq(

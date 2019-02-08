@@ -1,6 +1,5 @@
 package scalariform.formatter
 import scalariform.parser._
-import scalariform.formatter.preferences._
 
 // format: OFF
 class TrailingCommasTest extends AbstractFormatterTest {
