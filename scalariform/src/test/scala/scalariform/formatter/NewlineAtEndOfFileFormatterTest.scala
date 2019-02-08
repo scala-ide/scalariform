@@ -8,14 +8,16 @@ class NewlineAtEndOfFileFormatterTest extends AbstractFormatterTest {
   type Result = CompilationUnit
 
   // Must parse as a full script to verify the newline formatting.
-  def parse(parser: ScalaParser) = parser.scriptBody()
+  def parse(parser: ScalaParser): Result = parser.scriptBody()
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
+  def format(formatter: ScalaFormatter, result: Result): FormatResult =
+    formatter.format(result)(FormatterState())
 
   override val debug = false
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(NewlineAtEndOfFile, true)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(NewlineAtEndOfFile, true)
 
   // No newline; should have one added.
   """import foo.bar
@@ -40,7 +42,8 @@ class NewlineAtEndOfFileFormatterTest extends AbstractFormatterTest {
   }
 
   {
-  implicit val formattingPreferences = FormattingPreferences.setPreference(NewlineAtEndOfFile, false)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(NewlineAtEndOfFile, false)
 
   // No newline; should stay the same.
   """import foo.bar

@@ -241,7 +241,7 @@ class XmlExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |}"""
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(FormatXml, false)
+    implicit val formattingPreferences: FormattingPreferences = FormattingPreferences.setPreference(FormatXml, false)
 
     """<a>
       |b</a>""" ==>

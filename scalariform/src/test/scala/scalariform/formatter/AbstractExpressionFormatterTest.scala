@@ -6,8 +6,8 @@ abstract class AbstractExpressionFormatterTest extends AbstractFormatterTest {
 
   type Result = Expr
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
+  def format(formatter: ScalaFormatter, result: Result): FormatResult = formatter.format(result)(FormatterState())
 
-  def parse(parser: ScalaParser) = parser.expr()
+  def parse(parser: ScalaParser): Result = parser.expr()
 
 }

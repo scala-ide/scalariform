@@ -67,7 +67,8 @@ class TemplateFormatterTest extends AbstractFormatterTest {
 
 {
 
-implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, true)
+implicit val formattingPreferences: FormattingPreferences =
+  FormattingPreferences.setPreference(SpacesWithinPatternBinders, true)
 
 "@(Id@Field) class A" ==> "@(Id @Field) class A"
 
@@ -318,7 +319,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |  })"""
 
 {
-   implicit val formattingPreferences = FormattingPreferences.
+   implicit val formattingPreferences: FormattingPreferences = FormattingPreferences.
      setPreference(AlignParameters, true).
      setPreference(SpaceBeforeColon, true).
      setPreference(SpaceInsideBrackets, true)
@@ -339,7 +340,7 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
 }
 
 {
-   implicit val formattingPreferences = FormattingPreferences.
+   implicit val formattingPreferences: FormattingPreferences = FormattingPreferences.
      setPreference(AlignParameters, true).
      setPreference(RewriteArrowSymbols, true)
 
@@ -385,7 +386,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
 }
 
 {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignParameters, true)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(AlignParameters, true)
 
     // Make sure spacing in same line implicit parameters is preserved
     """class A[T](a: T)(implicit b: B)""" ==>
@@ -600,7 +602,8 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
     |})"""
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DoubleIndentClassDeclaration, true)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DoubleIndentClassDeclaration, true)
     """class Person(
       |  name: String,
       |  age: Int)
@@ -826,10 +829,11 @@ implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesW
 
   override val debug = false
 
-  def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
+  def parse(parser: ScalaParser): Result = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
+  def format(formatter: ScalaFormatter, result: Result): FormatResult =
+    formatter.format(result)(FormatterState(indentLevel = 0))
 
 }

@@ -17,8 +17,8 @@ class ScriptFormatterTest extends AbstractFormatterTest {
 
   type Result = CompilationUnit
 
-  def parse(parser: ScalaParser) = parser.scriptBody()
+  def parse(parser: ScalaParser): Result = parser.scriptBody()
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
+  def format(formatter: ScalaFormatter, result: Result): FormatResult = formatter.format(result)(FormatterState())
 
 }

@@ -114,7 +114,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   {
   // SpaceBeforeColon should add a space for the context colon (for backwards-compatibility).
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences.setPreference(SpaceBeforeColon, true).setPreference(SpaceBeforeContextColon, false)
 
   """class Foo[A : B]() {}""" ==>
@@ -123,7 +123,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   {
   // Typeclass formatting should not be affected by the SpaceBeforeColon setting.
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences.setPreference(SpaceBeforeColon, false).setPreference(SpaceBeforeContextColon, true)
 
   """class Foo[A : B]() {}""" ==>
@@ -138,7 +138,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   }
   {
   // Typeclass formatting should not be affected by the SpaceBeforeColon setting.
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences.setPreference(SpaceBeforeColon, true).setPreference(SpaceBeforeContextColon, true)
 
   """class Foo[A : B]() {}""" ==>
@@ -154,7 +154,7 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
 
   {
 
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences
       .setPreference(IndentLocalDefs, true)
 
@@ -207,7 +207,8 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
 
     """def foo(
       |  alpha: Int,
@@ -247,7 +248,8 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
 
     """private def foo(
       |  alpha: Int,
@@ -292,7 +294,8 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
 
     """private def foo(
       |  alpha: Int,
@@ -319,10 +322,11 @@ class DefOrDclFormatterTest extends AbstractFormatterTest {
   """def test(test: ^^ *)""" ==>
   """def test(test: ^^ *)"""
 
-  def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
+  def parse(parser: ScalaParser): Result = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
+  def format(formatter: ScalaFormatter, result: Result): FormatResult =
+    formatter.format(result)(FormatterState(indentLevel = 0))
 
 }

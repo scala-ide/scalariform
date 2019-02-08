@@ -10,7 +10,7 @@ class DoubleIndentMethodFormatterTest extends AbstractFormatterTest {
 
   {
 
-  implicit val formattingPreferences =
+  implicit val formattingPreferences: FormattingPreferences =
     FormattingPreferences.setPreference(DoubleIndentMethodDeclaration, true)
 
   // Test basic formatting for regressions.
@@ -81,9 +81,10 @@ class DoubleIndentMethodFormatterTest extends AbstractFormatterTest {
     |    b: String)"""
   }
 
-  def parse(parser: ScalaParser) = parser.nonLocalDefOrDcl()
+  def parse(parser: ScalaParser): Result = parser.nonLocalDefOrDcl()
 
   type Result = FullDefOrDcl
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
+  def format(formatter: ScalaFormatter, result: Result): FormatResult =
+    formatter.format(result)(FormatterState(indentLevel = 0))
 }

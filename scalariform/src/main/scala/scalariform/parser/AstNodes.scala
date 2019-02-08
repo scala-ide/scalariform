@@ -32,7 +32,9 @@ sealed trait AstNode extends Product {
       case Right(f) ⇒ f.tokens
     }
   }
-  protected implicit def tokenToFlattenable(token: Token): Flattenable = new Flattenable { val tokens = List(token) }
+  protected implicit def tokenToFlattenable(token: Token): Flattenable = new Flattenable {
+    val tokens: List[Token] = List(token)
+  }
 
   protected def flatten(flattenables: Flattenable*): List[Token] = flattenables.toList flatMap { _.tokens }
 

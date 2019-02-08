@@ -125,7 +125,7 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
       statSeq.firstTokenOption.isDefined && newlineBefore(statSeq) ||
         containsNewline(statSeq) && !singleExpr
 
-    def unindent(x: Map[Token, IntertokenFormatInstruction]) = x.map {
+    def unindent(x: Map[Token, IntertokenFormatInstruction]): Map[Token, IntertokenFormatInstruction] = x.map {
       case (k, EnsureNewlineAndIndent(indentLevel, relativeTo)) =>
         k -> EnsureNewlineAndIndent(indentLevel - 1, relativeTo)
       case z => z

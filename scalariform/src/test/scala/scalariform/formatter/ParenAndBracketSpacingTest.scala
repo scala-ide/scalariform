@@ -5,7 +5,8 @@ import scalariform.formatter.preferences._
 class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceInsideParentheses, true)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(SpaceInsideParentheses, true)
     "()" ==> "()"
     "(a: Int) => 3" ==> "( a: Int ) => 3"
     "(3)" ==> "( 3 )"
@@ -14,7 +15,8 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceInsideBrackets, true)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(SpaceInsideBrackets, true)
     "x: List[String]" ==> "x: List[ String ]"
     "foo[Bar](baz)" ==> "foo[ Bar ](baz)"
     "{ class A[B] { private[this] val bob } }" ==> "{ class A[ B ] { private[ this ] val bob } }"
@@ -60,7 +62,8 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DanglingCloseParenthesis, Force)
     """foo(
       |alpha = "foo",
       |beta = "bar",
@@ -98,7 +101,8 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DanglingCloseParenthesis, Preserve)
     """foo(
       |alpha = "foo",
       |beta = "bar",
@@ -141,7 +145,8 @@ class ParenAndBracketSpacingTest extends AbstractExpressionFormatterTest {
   }
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(DanglingCloseParenthesis, Prevent)
     """foo(
       |alpha = "foo",
       |beta = "bar",

@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
 
 object Utils {
 
-  implicit def string2PimpedString(s: String) = new PimpedString(s)
+  implicit def string2PimpedString(s: String): PimpedString = new PimpedString(s)
 
   class PimpedString(s: String) {
     def toIntOpt: Option[Int] = try Some(s.toInt) catch { case _: NumberFormatException ⇒ None }

@@ -10,9 +10,9 @@ class PackageFormatterTest extends AbstractFormatterTest {
 
   type Result = CompilationUnit
 
-  def parse(parser: ScalaParser) = parser.compilationUnit()
+  def parse(parser: ScalaParser): Result = parser.compilationUnit()
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState())
+  def format(formatter: ScalaFormatter, result: Result): FormatResult = formatter.format(result)(FormatterState())
 
   "" ==> ""
 
@@ -47,7 +47,8 @@ class PackageFormatterTest extends AbstractFormatterTest {
 
   {
 
-  implicit val formattingPreferences = FormattingPreferences.setPreference(IndentPackageBlocks, false)
+  implicit val formattingPreferences: FormattingPreferences =
+    FormattingPreferences.setPreference(IndentPackageBlocks, false)
 
   """package foo {
     |package bar {

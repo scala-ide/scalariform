@@ -115,7 +115,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |}"""
 
    {
-   implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+   implicit val formattingPreferences: FormattingPreferences =
+     FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
 
    """42 match  {
      |  case foo_ @Bar =>
@@ -192,7 +193,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
      |})"""
 
    {
-   implicit val formattingPreferences = FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
+   implicit val formattingPreferences: FormattingPreferences =
+     FormattingPreferences.setPreference(SpacesWithinPatternBinders, false)
 
    """b match {
      |case y@ <phone/> =>
@@ -354,7 +356,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
    "()" ==> "()"
 
    {
-     implicit val formattingPreferences = FormattingPreferences.setPreference(SpaceBeforeColon, true)
+     implicit val formattingPreferences: FormattingPreferences =
+       FormattingPreferences.setPreference(SpaceBeforeColon, true)
      "(a: Int) => 3" ==> "(a : Int) => 3"
    }
 
@@ -368,7 +371,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
    "_.a" ==> "_.a"
 
    {
-     implicit val formattingPreferences = FormattingPreferences.setPreference(CompactStringConcatenation, true)
+     implicit val formattingPreferences: FormattingPreferences =
+       FormattingPreferences.setPreference(CompactStringConcatenation, true)
      """"foo"+"bar"""" ==> """"foo"+"bar""""
      """"foo" + "bar"""" ==> """"foo"+"bar""""
      """foo + "bar"""" ==> """foo+"bar""""
@@ -637,7 +641,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
 
    {
 
-   implicit val formattingPreferences = FormattingPreferences.setPreference(PreserveSpaceBeforeArguments, true)
+   implicit val formattingPreferences: FormattingPreferences =
+     FormattingPreferences.setPreference(PreserveSpaceBeforeArguments, true)
 
    "getDirectives(source) should be (expectedDirectives)" ==>
    "getDirectives(source) should be (expectedDirectives)"
@@ -799,7 +804,8 @@ class MiscExpressionFormatterTest extends AbstractExpressionFormatterTest {
     |  g)"""
 
   {
-    implicit val formattingPreferences = FormattingPreferences.setPreference(AlignArguments, true)
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences.setPreference(AlignArguments, true)
 
        """Method(a, b, c)""" ==> """Method(a, b, c)"""
 

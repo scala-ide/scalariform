@@ -71,8 +71,9 @@ class TypeFormatterTest extends AbstractFormatterTest {
 
   type Result = Type
 
-  def parse(parser: ScalaParser) = parser.typ() // TODO: ensure EOF
+  def parse(parser: ScalaParser): Result = parser.typ() // TODO: ensure EOF
 
-  def format(formatter: ScalaFormatter, result: Result) = formatter.format(result)(FormatterState(indentLevel = 0))
+  def format(formatter: ScalaFormatter, result: Result): FormatResult =
+    formatter.format(result)(FormatterState(indentLevel = 0))
 
 }

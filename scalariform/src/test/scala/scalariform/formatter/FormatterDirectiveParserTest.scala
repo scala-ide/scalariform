@@ -28,9 +28,8 @@ class FormatterDirectiveParserTest extends FlatSpec with Matchers {
   implicit def string2FormatTest(s: String): FormatTest = FormatTest(s.stripMargin)
 
   case class FormatTest(source: String) {
-    def ==>(expectedDirectives: FormatterDirective*) {
+    def ==>(expectedDirectives: FormatterDirective*): Unit =
       getDirectives(source) should be (expectedDirectives)
-    }
   }
 
 }

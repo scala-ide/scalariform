@@ -147,7 +147,10 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
    */
   private def expandToEnclosingAst(node: AstNode, initialSelection: Range, enclosingNodes: List[AstNode]): Option[Range] = {
 
-    val nodeRange = adjustedNodeRange(node).getOrElse { return None }
+    val nodeRange = adjustedNodeRange(node) match {
+      case Some(r) => r
+      case None    => return None
+    }
 
     if (!nodeRange.contains(initialSelection)) { return None }
 
@@ -183,7 +186,7 @@ class AstSelector(source: String, scalaVersion: String = ScalaVersions.DEFAULT_V
     nodeStack match {
       case List(_: BlockExpr, _: MatchExpr, _*)   ⇒ false
       case List(_: BlockExpr, _: ProcFunBody, _*) ⇒ false
-      case List(node, _*)                         ⇒ !(nonSelectableAstNodes contains node.getClass)
+      case node :: _                              ⇒ !(nonSelectableAstNodes contains node.getClass)
       case Nil                                    ⇒ false
     }
 

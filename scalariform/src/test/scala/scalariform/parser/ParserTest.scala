@@ -54,7 +54,7 @@ class ParserTest extends FlatSpec with Matchers {
   }
 
   private def parser(s: String) = new ScalaParser(ScalaLexer.tokenise(s).toArray)
-  private def parseExpression(s: String) = parser(s).expr
-  private def parseCompilationUnit(s: String) = parser(s).compilationUnit
+  private def parseExpression(s: String) = parser(s).expr()
+  private def parseCompilationUnit(s: String) = parser(s).compilationUnit()
 
 }
