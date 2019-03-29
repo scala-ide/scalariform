@@ -10,7 +10,7 @@ class ScalaLexerTest extends FlatSpec with Matchers {
                                             scalaVersion: ScalaVersion = ScalaVersions.DEFAULT): TestString =
     new TestString(s, forgiveErrors, scalaVersion)
 
-  "" producesTokens ()
+  "" producesTokens (List.empty[TokenType]: _*)
 
   "println" producesTokens (VARID)
 
