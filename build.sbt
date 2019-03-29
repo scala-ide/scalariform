@@ -120,7 +120,7 @@ lazy val scalariform = (project
       Package.JarManifest(m)
     },
     testOptions in Test += Tests.Argument("-oI"),
-    mimaPreviousArtifacts := Set(organization.value %% "scalariform" % "0.2.6")
+    mimaPreviousArtifacts := Set(organization.value %% "scalariform" % "0.2.7")
   )
 )
 
