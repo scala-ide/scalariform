@@ -1,3 +1,7 @@
+0.2.8 (29/March/19)
+
+* Fix type mismatch between `Unit` and `TokenType` (PR #276 by @Philippus)
+
 0.2.7 (8/February/19)
 
 * Added trailing comma support (PR #262 by @marekzebrowski])
