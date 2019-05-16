@@ -287,3 +287,9 @@ case object SpacesWithinPatternBinders extends BooleanPreferenceDescriptor {
   val description = "Spaces around the @ token in pattern binders"
   val defaultValue = true
 }
+
+case object UseUnicodeArrows extends BooleanPreferenceDescriptor {
+  val key = "useUnicodeArrows"
+  val description = "Use unicode arrows if RewriteArrowSymbols is used. If true, replace => with ⇒, and <- with ←, if false the other way round."
+  val defaultValue = true
+}
