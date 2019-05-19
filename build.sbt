@@ -10,7 +10,7 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     sonatypeProfileName := organization.value,
     scalaVersion := crossScalaVersions.value.head,
     crossScalaVersions := Seq(
-      "2.13.0-RC1",
+      "2.13.0-RC2",
       "2.12.8",
       "2.11.12",
       "2.10.7"
@@ -92,7 +92,7 @@ lazy val scalariform = (project
   settings(publishSettings("scalariform"))
   settings(
     libraryDependencies ++= scala2_11Dependencies.value,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8-RC2" % Test,
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0-SNAP11" % Test,
     // sbt doesn't automatically load the content of the MANIFST.MF file, therefore
     // we have to do it here by ourselves. Furthermore, the version format in the
     // MANIFEST.MF is `version.qualifier`, which means that we have to replace
