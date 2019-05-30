@@ -1,3 +1,6 @@
+0.2.9 (unreleased)
+* Add new setting `UseUnicodeArrows` that allows to reverse the unicode arrow symbol replacement when set to false (in Scala 2.13 unicode arrows are deprecated)
+
 0.2.8 (29/March/19)
 
 * Fix type mismatch between `Unit` and `TokenType` (PR #276 by @Philippus)

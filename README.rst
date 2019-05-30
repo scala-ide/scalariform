@@ -139,7 +139,7 @@ Use with Vim
 While there is no specific Vim integration at present, you can use
 Scalariform as an external formatter for the ``gg=G`` command by adding
 the following to ``.vimrc`` ::
-  
+
   au BufEnter *.scala setl formatprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentConstructorArguments\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
   au BufEnter *.scala setl equalprg=java\ -jar\ /home/me/bin/scalariform.jar\ -f\ -q\ +compactControlReadability\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentConstructorArguments\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
 
@@ -727,7 +727,10 @@ rewriteArrowSymbols
 
 Default: ``false``
 
-Replace arrow tokens with their unicode equivalents: ``=>`` with ``⇒``, and ``<-`` with ``←``. For example:
+Replace arrow tokens uniformly, either as Unicode symbols or as ASCII, depending on the setting of
+``useUnicodeArrows``. Starting from Scala 2.13, unicode arrows are deprecated.
+
+For example, if ``useUnicodeArrows == true``:
 
 .. code:: scala
 
@@ -866,6 +869,30 @@ If ``false``,:
 
   case elem@Multi(values@_*) =>
 
+useUnicodeArrows
+~~~~~~~~~~~~~~~~
+
+Default: ``true``
+
+Controls the replacement of arrows if ``rewriteArrowSymbols == true``. To use unicode arrows in your codebase
+set to `true`, otherwise, set to false. For example, if ``useUnicodeArrows == false`` (and ``rewriteArrowSymbols == true``):
+
+.. code:: scala
+
+  for (n ← 1 to 10) n % 2 match {
+    case 0 ⇒ println("even")
+    case 1 ⇒ println("odd")
+  }
+
+is formatted as:
+
+.. code:: scala
+
+  for (n <- 1 to 10) n % 2 match {
+    case 0 => println("even")
+    case 1 => println("odd")
+  }
+
 Scala Style Guide
 ~~~~~~~~~~~~~~~~~
 
@@ -889,6 +916,7 @@ spaceBeforeColon                            ``false``
 spaceInsideBrackets                         ``false``
 spaceInsideParentheses                      ``false``
 spacesAroundMultiImports                    ``false``
+useUnicodeArrows                            ``true``
 =========================================== ========= =========
 
 Source Directives

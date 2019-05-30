@@ -285,9 +285,10 @@ abstract class ScalaFormatter
 
     def write(token: Token, replacementOption: Option[String] = None): Option[TextEdit] = {
       val rewriteArrows = formattingPreferences(RewriteArrowSymbols)
+      val useUnicodeArrows = formattingPreferences(UseUnicodeArrows)
       val actualReplacementOption = replacementOption orElse condOpt(token.tokenType) {
-        case ARROW if rewriteArrows  ⇒ "⇒"
-        case LARROW if rewriteArrows ⇒ "←"
+        case ARROW if rewriteArrows  ⇒ if (useUnicodeArrows) "⇒" else "=>"
+        case LARROW if rewriteArrows ⇒ if (useUnicodeArrows) "←" else "<-"
         case EOF                     ⇒ ""
       }
       builder.append(actualReplacementOption getOrElse token.rawText)

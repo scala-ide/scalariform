@@ -83,7 +83,12 @@ trait CaseClauseFormatter { self: HasFormattingPreferences with ExprFormatter wi
           if (formattedCasePattern.contains('\n') || (first && !clausesAreMultiline) || (!first && !newlineBeforeClause) || clauseBodyIsMultiline)
             Right(caseClause) :: otherClausesGrouped
           else {
-            val arrowAdjust = (if (formattingPreferences(RewriteArrowSymbols)) 1 else casePattern.arrow.length) + 1
+            val arrowAdjust = 1 + {
+              if (formattingPreferences(RewriteArrowSymbols))
+                if (formattingPreferences(UseUnicodeArrows)) 1
+                else 2
+              else casePattern.arrow.length
+            }
             val casePatternLength = formattedCasePattern.length - arrowAdjust
             otherClausesGrouped match {
               case Left(consecutiveSingleLineCaseClauses) :: otherGroups ⇒

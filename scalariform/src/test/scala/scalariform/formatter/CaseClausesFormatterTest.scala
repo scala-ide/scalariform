@@ -288,7 +288,10 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
 
   {
   implicit val formattingPreferences: FormattingPreferences =
-    FormattingPreferences.setPreference(AlignSingleLineCaseStatements, true).setPreference(RewriteArrowSymbols, true)
+    FormattingPreferences
+      .setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(RewriteArrowSymbols, true)
+      .setPreference(UseUnicodeArrows, true)
 
   """a match {
     |case b => 42
@@ -298,6 +301,24 @@ class CaseClausesFormatterTest extends AbstractExpressionFormatterTest {
     |  case b   ⇒ 42
     |  case ccc ⇒ 24
     |}"""
+  }
+
+  {
+    implicit val formattingPreferences: FormattingPreferences =
+      FormattingPreferences
+        .setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(RewriteArrowSymbols, true)
+        .setPreference(UseUnicodeArrows, false)
+
+
+    """a match {
+      |case b ⇒ 42
+      |  case ccc ⇒ 24
+      |}""" ==>
+    """a match {
+      |  case b   => 42
+      |  case ccc => 24
+      |}"""
   }
 
   {
