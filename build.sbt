@@ -10,7 +10,7 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     sonatypeProfileName := organization.value,
     scalaVersion := crossScalaVersions.value.head,
     crossScalaVersions := Seq(
-      "2.13.0-RC2",
+      "2.13.0-RC3",
       "2.12.8",
       "2.11.12",
       "2.10.7"
@@ -122,7 +122,7 @@ lazy val scalariform = (project
       Package.JarManifest(m)
     },
     testOptions in Test += Tests.Argument("-oI"),
-    mimaPreviousArtifacts := Set(organization.value %% "scalariform" % "0.2.7")
+    mimaPreviousArtifacts := Set(organization.value %% "scalariform" % "0.2.8")
   )
 )
 
