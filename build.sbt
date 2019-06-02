@@ -92,7 +92,7 @@ lazy val scalariform = (project
   settings(publishSettings("scalariform"))
   settings(
     libraryDependencies ++= scala2_11Dependencies.value,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0-SNAP11" % Test,
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0-SNAP12" % Test,
     // sbt doesn't automatically load the content of the MANIFST.MF file, therefore
     // we have to do it here by ourselves. Furthermore, the version format in the
     // MANIFEST.MF is `version.qualifier`, which means that we have to replace
