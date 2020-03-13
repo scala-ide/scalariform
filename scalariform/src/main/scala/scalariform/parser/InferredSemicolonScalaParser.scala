@@ -78,7 +78,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     if (currentTokenType == tokenType)
       nextToken()
     else
-      throw new ScalaParserException("Expected token " + tokenType + " but got " + currentToken)
+      throw new ScalaParserException("Expected token " + tokenType + " but got " + currentToken, line)
 
   var inferredSemicolons: Set[Token] = Set()
 
@@ -305,7 +305,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     if (isIdent)
       nextToken()
     else
-      throw new ScalaParserException("Expected identifier, but got " + currentToken)
+      throw new ScalaParserException("Expected identifier, but got " + currentToken, line)
 
   private def selector() = ident()
 
@@ -389,7 +389,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
       nextToken()
     else
-      throw new ScalaParserException("illegal literal: " + currentToken)
+      throw new ScalaParserException("illegal literal: " + currentToken, line)
 
   private def interpolatedString(inPattern: Boolean): Unit = {
     nextToken()
@@ -407,7 +407,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         expr()
     }
     if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
-      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken)
+      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken, line)
     nextToken()
   }
 
@@ -453,7 +453,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       accept(RPAREN)
     } else {
       accept(LPAREN)
-      throw new ScalaParserException("Straggling lparen thing")
+      throw new ScalaParserException("Straggling lparen thing", line)
     }
   }
 
@@ -631,7 +631,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         nextToken()
         template()
       case _ ⇒
-        throw new ScalaParserException("illegal start of simple expression: " + currentToken)
+        throw new ScalaParserException("illegal start of simple expression: " + currentToken, line)
     }
     simpleExprRest(canApply)
   }
@@ -826,7 +826,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
           xmlLiteralPattern()
         case _ ⇒
-          throw new ScalaParserException("illegal start of simple pattern: " + currentToken)
+          throw new ScalaParserException("illegal start of simple pattern: " + currentToken, line)
       }
     }
 
@@ -1192,7 +1192,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case SUPERTYPE | SUBTYPE | SEMI | NEWLINE | NEWLINES | COMMA | RBRACE | EOF /* <-- for Scalariform tests */ ⇒
         typeBounds()
       case _ ⇒
-        throw new ScalaParserException("`=', `>:', or `<:' expected, but got " + currentToken)
+        throw new ScalaParserException("`=', `>:', or `<:' expected, but got " + currentToken, line)
     }
   }
 
@@ -1209,7 +1209,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case CASE if lookahead(1) == CLASS  ⇒ classDef()
       case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken, line)
     }
   }
 
@@ -1285,7 +1285,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
     if (LBRACE)
       templateBody()
     else if (LPAREN)
-      throw new ScalaParserException("traits or objects may not have parameters")
+      throw new ScalaParserException("traits or objects may not have parameters", line)
     else
       None
   }
@@ -1314,7 +1314,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
           topLevelTmplDef()
         case _ ⇒
           if (!isStatSep)
-            throw new ScalaParserException("expected class or object definition")
+            throw new ScalaParserException("expected class or object definition", line)
           else
             None
       }
@@ -1343,7 +1343,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       else if (isDefIntro || isModifier || AT)
         Some(nonLocalDefOrDcl())
       else if (!isStatSep)
-        throw new ScalaParserException("illegal start of definition: " + currentToken)
+        throw new ScalaParserException("illegal start of definition: " + currentToken, line)
       else
         None
       acceptStatSepOpt()
@@ -1355,7 +1355,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       if (isDclIntro)
         defOrDcl()
       else if (!isStatSep)
-        throw new ScalaParserException("illegal start of definition: " + currentToken)
+        throw new ScalaParserException("illegal start of definition: " + currentToken, line)
 
       if (!RBRACE)
         acceptStatSep()
@@ -1392,7 +1392,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       } else if (isStatSep) {
         acceptStatSep() // <-- for inferred semi // nextToken()
       } else
-        throw new ScalaParserException("illegal start of statement: " + currentToken)
+        throw new ScalaParserException("illegal start of statement: " + currentToken, line)
     }
   }
 
@@ -1441,7 +1441,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case XML_TAG_CLOSE ⇒
         // End loop
         case _ ⇒
-          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken)
+          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken, line)
       }
     }
     accept(XML_TAG_CLOSE)
@@ -1458,7 +1458,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
       case LBRACE ⇒
         xmlEmbeddedScala(isPattern)
       case _ ⇒
-        throw new ScalaParserException("Expected XML attribute name or left brace: " + currentToken)
+        throw new ScalaParserException("Expected XML attribute name or left brace: " + currentToken, line)
     }
   }
 
@@ -1473,7 +1473,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case XML_EMPTY_CLOSE ⇒
         // End loop
         case _ ⇒
-          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken)
+          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken, line)
       }
     }
     accept(XML_EMPTY_CLOSE)
@@ -1506,7 +1506,7 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
         case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
         case LBRACE                     ⇒ xmlEmbeddedScala(isPattern)
-        case _                          ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
+        case _                          ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken, line)
       }
     }
     xmlEndTag()
@@ -1531,6 +1531,8 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
 
   private var pos = 0
 
+  private var line = 1
+
   private def currentToken: Token = this(pos)
 
   private def apply(pos: Int): Token =
@@ -1545,6 +1547,9 @@ class InferredSemicolonScalaParser(tokens: Array[Token]) {
   private def nextToken(): Token = {
     val token = currentToken
     pos += 1
+    val newLines = token.associatedWhitespaceAndComments.tokens
+      .foldLeft(0){(acc, t) => t.text.count(_ == '\n') + acc}
+    line += newLines
     if (logging)
       println("nextToken(): " + token + " --> " + currentToken)
     token
