@@ -77,7 +77,7 @@ class ScalaParser(tokens: Array[Token]) {
     if (currentTokenType == tokenType)
       nextToken()
     else
-      throw new ScalaParserException("Expected token " + tokenType + " but got " + currentToken)
+      throw new ScalaParserException("Expected token " + tokenType + " but got " + currentToken, line)
 
   private def acceptStatSep(): Token = currentTokenType match {
     case NEWLINE | NEWLINES ⇒ nextToken()
@@ -339,7 +339,7 @@ class ScalaParser(tokens: Array[Token]) {
     if (isIdent)
       nextToken()
     else
-      throw new ScalaParserException("Expected identifier, but got " + currentToken)
+      throw new ScalaParserException("Expected identifier, but got " + currentToken, line)
 
   private def selector(): Token = ident()
 
@@ -439,7 +439,7 @@ class ScalaParser(tokens: Array[Token]) {
     else if (CHARACTER_LITERAL || INTEGER_LITERAL || FLOATING_POINT_LITERAL || STRING_LITERAL || SYMBOL_LITERAL || TRUE || FALSE || NULL)
       exprElementFlatten2(nextToken())
     else
-      throw new ScalaParserException("illegal literal: " + currentToken)
+      throw new ScalaParserException("illegal literal: " + currentToken, line)
 
   private def interpolatedString(inPattern: Boolean): StringInterpolation = {
     val interpolationId = nextToken()
@@ -456,11 +456,11 @@ class ScalaParser(tokens: Array[Token]) {
         else if (THIS)
           makeExpr(nextToken())
         else
-          throw new ScalaParserException("Error in string interpolation: expected block, identifier or `this'")
+          throw new ScalaParserException("Error in string interpolation: expected block, identifier or `this'", line)
       stringPartsAndScala += ((stringPart, scalaSegment))
     }
     if (!STRING_LITERAL) // TODO: Can it be absent, as allowed by Scalac?
-      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken)
+      throw new ScalaParserException("Unexpected conclusion to string interpolation: " + currentToken, line)
     val terminalString = nextToken()
     StringInterpolation(interpolationId, stringPartsAndScala.toList, terminalString)
   }
@@ -511,7 +511,7 @@ class ScalaParser(tokens: Array[Token]) {
     } else {
       accept(LPAREN)
       // Seriously, WTF?
-      throw new ScalaParserException("Straggling lparen thing")
+      throw new ScalaParserException("Straggling lparen thing", line)
     }
   }
 
@@ -785,7 +785,7 @@ class ScalaParser(tokens: Array[Token]) {
           val template_ = template()
           List(New(newToken, template_))
         case _ ⇒
-          throw new ScalaParserException("illegal start of simple expression: " + currentToken)
+          throw new ScalaParserException("illegal start of simple expression: " + currentToken, line)
       }
     simpleExprRest(firstPart, canApply)
   }
@@ -1035,7 +1035,7 @@ class ScalaParser(tokens: Array[Token]) {
         case XML_START_OPEN | XML_COMMENT | XML_CDATA | XML_UNPARSED | XML_PROCESSING_INSTRUCTION ⇒
           exprElementFlatten2(xmlLiteralPattern())
         case _ ⇒
-          throw new ScalaParserException("illegal start of simple pattern: " + currentToken)
+          throw new ScalaParserException("illegal start of simple pattern: " + currentToken, line)
       }
     }
 
@@ -1460,7 +1460,7 @@ class ScalaParser(tokens: Array[Token]) {
         val typeBounds_ = typeBounds()
         Right(typeBounds_)
       case _ ⇒
-        throw new ScalaParserException("`=', `>:', or `<:' expected, but got " + currentToken)
+        throw new ScalaParserException("`=', `>:', or `<:' expected, but got " + currentToken, line)
     }
     TypeDefOrDcl(typeElementFlatten3(typeToken, newLinesOpt_, name, typeParamClauseOpt_, extraTypeDclStuff))
   }
@@ -1479,7 +1479,7 @@ class ScalaParser(tokens: Array[Token]) {
       case CASE if lookahead(1) == CLASS  ⇒ classDef()
       case OBJECT                         ⇒ objectDef()
       case CASE if lookahead(1) == OBJECT ⇒ objectDef()
-      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken)
+      case _                              ⇒ throw new ScalaParserException("expected start of definition, but was " + currentToken, line)
     }
   }
 
@@ -1585,7 +1585,7 @@ class ScalaParser(tokens: Array[Token]) {
     if (LBRACE)
       Some(templateBody().copy(newlineOpt = newLineOpt))
     else if (LPAREN)
-      throw new ScalaParserException("traits or objects may not have parameters")
+      throw new ScalaParserException("traits or objects may not have parameters", line)
     else
       None
   }
@@ -1618,7 +1618,7 @@ class ScalaParser(tokens: Array[Token]) {
           Some(topLevelTmplDef())
         case _ ⇒
           if (!isStatSep)
-            throw new ScalaParserException("expected class or object definition")
+            throw new ScalaParserException("expected class or object definition", line)
           else
             None
       }
@@ -1652,7 +1652,7 @@ class ScalaParser(tokens: Array[Token]) {
       else if (isDefIntro || isModifier || AT)
         Some(nonLocalDefOrDcl())
       else if (!isStatSep)
-        throw new ScalaParserException("illegal start of definition: " + currentToken)
+        throw new ScalaParserException("illegal start of definition: " + currentToken, line)
       else
         None
       val statSepOpt = acceptStatSepOpt()
@@ -1670,7 +1670,7 @@ class ScalaParser(tokens: Array[Token]) {
           val defOrDcl_ = defOrDcl()
           Some(FullDefOrDcl(annotations = Nil, modifiers = Nil, defOrDcl = defOrDcl_))
         } else if (!isStatSep)
-          throw new ScalaParserException("illegal start of definition: " + currentToken)
+          throw new ScalaParserException("illegal start of definition: " + currentToken, line)
         else
           None
       val statSepOpt = if (!RBRACE) Some(acceptStatSep()) else None
@@ -1716,7 +1716,7 @@ class ScalaParser(tokens: Array[Token]) {
         val statSep = nextToken()
         statAndStatSeps += ((None, Some(statSep)))
       } else
-        throw new ScalaParserException("illegal start of statement: " + currentToken)
+        throw new ScalaParserException("illegal start of statement: " + currentToken, line)
     }
     rearrangeStatsAndSeps(statAndStatSeps)
   }
@@ -1772,7 +1772,7 @@ class ScalaParser(tokens: Array[Token]) {
             val otherStatSeq = topStatSeq()
             val packageBlock = PackageBlock(packageToken, packageName, newLineOpt_, lbrace, packageBlockStats, rbrace)
             if (otherStatSeq.selfReferenceOpt.isDefined || otherStatSeq.firstStatOpt.isDefined)
-              throw new ScalaParserException("Illegal package blocks") // To avoid blowing up on -ve cases
+              throw new ScalaParserException("Illegal package blocks", line) // To avoid blowing up on -ve cases
             StatSeq(None, Some(packageBlock), otherStatSeq.otherStats)
           }
         }
@@ -1806,7 +1806,7 @@ class ScalaParser(tokens: Array[Token]) {
         case XML_TAG_CLOSE ⇒
         // End loop
         case _ ⇒
-          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken)
+          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken, line)
       }
     }
     val tagClose = accept(XML_TAG_CLOSE)
@@ -1824,7 +1824,7 @@ class ScalaParser(tokens: Array[Token]) {
       case LBRACE ⇒
         Right(xmlEmbeddedScala(isPattern))
       case _ ⇒
-        throw new ScalaParserException("Expected XML attribute name or left brace: " + currentToken)
+        throw new ScalaParserException("Expected XML attribute name or left brace: " + currentToken, line)
     }
     XmlAttribute(name, whitespaceOption, equals, whitespaceOption2, valueOrEmbeddedScala)
   }
@@ -1844,7 +1844,7 @@ class ScalaParser(tokens: Array[Token]) {
         case XML_EMPTY_CLOSE ⇒
         // End loop
         case _ ⇒
-          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken)
+          throw new ScalaParserException("Expected XML attribute or end of tag: " + currentToken, line)
       }
     }
     val emptyClose = accept(XML_EMPTY_CLOSE)
@@ -1881,7 +1881,7 @@ class ScalaParser(tokens: Array[Token]) {
         case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
         case LBRACE                     ⇒ xmlEmbeddedScala(isPattern)
-        case _                          ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken)
+        case _                          ⇒ throw new ScalaParserException("Unexpected token in XML: " + currentToken, line)
       }
       contents += content
     }
@@ -1902,7 +1902,7 @@ class ScalaParser(tokens: Array[Token]) {
         case XML_CDATA                  ⇒ XmlCDATA(nextToken())
         case XML_UNPARSED               ⇒ XmlUnparsed(nextToken())
         case XML_PROCESSING_INSTRUCTION ⇒ XmlProcessingInstruction(nextToken())
-        case _                          ⇒ throw new ScalaParserException("Expected XML: " + currentToken)
+        case _                          ⇒ throw new ScalaParserException("Expected XML: " + currentToken, line)
       }
     val first = xmlContent()
     val otherContents = ListBuffer[XmlContents]()
@@ -1921,6 +1921,8 @@ class ScalaParser(tokens: Array[Token]) {
   private def xmlLiteralPattern() = xml(isPattern = true)
 
   private var pos = 0
+  
+  private var line = 1
 
   private def currentToken: Token = this(pos)
 
@@ -1936,11 +1938,13 @@ class ScalaParser(tokens: Array[Token]) {
   private def nextToken(): Token = {
     val token = currentToken
     pos += 1
+    val newLines = token.associatedWhitespaceAndComments.tokens
+      .foldLeft(0){(acc, t) => t.text.count(_ == '\n') + acc}
+    line += newLines
     if (logging)
       println("nextToken(): " + token + " --> " + currentToken)
     token
   }
-
   private def lookahead(n: Int): TokenType = this(pos + n).tokenType
 
   private implicit def tokenType2Boolean(tokenType: TokenType): Boolean = currentTokenType == tokenType

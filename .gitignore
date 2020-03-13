@@ -8,3 +8,6 @@ bin/
 .project
 .cache*
 *~
+.bloop
+.metals
+metals.sbt

@@ -35,7 +35,24 @@ class ParserTest extends FlatSpec with Matchers {
   }
 
   "Parser" should "throw a parse exception in bad package blocks" in {
-    an [ScalaParserException] should be thrownBy parseCompilationUnit("package a {} package b {}")
+    (the [ScalaParserException] thrownBy parseCompilationUnit("package a {} package b {}")).line shouldBe 1
+  }
+
+  "Parser" should "indicate the line number" in {
+    (the [ScalaParserException] thrownBy parseCompilationUnit(
+      """class Trivial {
+           def method(): Unit = {)
+         }"""
+    )).line shouldBe 2
+
+    (the [ScalaParserException] thrownBy parseExpression(
+    """args(0) match {
+         case "blah" =>
+           val x = args(0)
+         case _ } // syntax error here
+           println("not blah")
+       }
+    """)).line shouldBe 4
   }
 
   // issue #44

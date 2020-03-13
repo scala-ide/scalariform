@@ -1,3 +1,3 @@
 package scalariform.parser
 
-class ScalaParserException(message: String) extends RuntimeException(message)
+class ScalaParserException(val message: String, val line: Int) extends RuntimeException(message)
