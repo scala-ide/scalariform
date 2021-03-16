@@ -10,8 +10,8 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     sonatypeProfileName := organization.value,
     scalaVersion := crossScalaVersions.value.head,
     crossScalaVersions := Seq(
-      "2.13.0",
-      "2.12.8",
+      "2.13.5",
+      "2.12.13",
       "2.11.12"
     ),
     scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
