@@ -12,8 +12,7 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     crossScalaVersions := Seq(
       "2.13.0",
       "2.12.8",
-      "2.11.12",
-      "2.10.7"
+      "2.11.12"
     ),
     scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, major)) if major >= 12 => Seq(
@@ -21,10 +20,8 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
         "-language:postfixOps", "-language:implicitConversions",
         "-deprecation", "-feature"
       )
-      case Some((2, major)) if major >= 11 =>
-        scalac2_10Options ++ scalac2_11Options
       case _ =>
-        scalac2_10Options
+        scalac2_11Options
     }),
     credentials ++= {
       val creds = Path.userHome / ".m2" / "credentials"
@@ -32,7 +29,7 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     }
   )
 
-def scalac2_10Options = Seq(
+def scalac2_11Options = Seq(
   "-encoding", "UTF-8",
   "-feature",
   "-language:_",
@@ -40,10 +37,7 @@ def scalac2_10Options = Seq(
   "-Xlint",
   "-Xfuture",
   "-Yno-adapted-args",
-  "-Ywarn-dead-code"
-)
-
-def scalac2_11Options = Seq(
+  "-Ywarn-dead-code",
   "-deprecation:false",
   "-Xlint",
   "-Xfatal-warnings",
@@ -76,13 +70,12 @@ def subprojectSettings(projectName: String) = commonSettings ++ Seq(
 
 def scala2_11Dependencies = Def.setting {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, major)) if major >= 11 =>
+    case Some((2, major)) =>
       val parserV = if (major == 11) "1.1.1" else "1.1.2" // cf https://github.com/scala/scala-parser-combinators/issues/197
       Seq(
         "org.scala-lang.modules" %% "scala-xml"                % "1.2.0",
         "org.scala-lang.modules" %% "scala-parser-combinators" % parserV
       )
-    case _ => Nil
   }
 }
 
