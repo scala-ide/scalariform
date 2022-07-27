@@ -10,10 +10,8 @@ lazy val commonSettings = inConfig(Test)(Defaults.testSettings) ++
     sonatypeProfileName := organization.value,
     scalaVersion := crossScalaVersions.value.head,
     crossScalaVersions := Seq(
-      "2.13.0",
-      "2.12.8",
-      "2.11.12",
-      "2.10.7"
+      "2.13.8",
+      "2.12.16",
     ),
     scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, major)) if major >= 12 => Seq(
@@ -74,25 +72,16 @@ def subprojectSettings(projectName: String) = commonSettings ++ Seq(
     (baseDirectory.value / ".." / "formatterPreferences.properties").getPath)
 )
 
-def scala2_11Dependencies = Def.setting {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, major)) if major >= 11 =>
-      val parserV = if (major == 11) "1.1.1" else "1.1.2" // cf https://github.com/scala/scala-parser-combinators/issues/197
-      Seq(
-        "org.scala-lang.modules" %% "scala-xml"                % "1.2.0",
-        "org.scala-lang.modules" %% "scala-parser-combinators" % parserV
-      )
-    case _ => Nil
-  }
-}
-
 lazy val scalariform = (project
   enablePlugins(BuildInfoPlugin)
   settings(subprojectSettings("scalariform"))
   settings(publishSettings("scalariform"))
   settings(
-    libraryDependencies ++= scala2_11Dependencies.value,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0-SNAP13" % Test,
+    libraryDependencies ++=       Seq(
+        "org.scala-lang.modules" %% "scala-xml"                % "2.1.0",
+        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
+      ),
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.4" % Test,
     // sbt doesn't automatically load the content of the MANIFST.MF file, therefore
     // we have to do it here by ourselves. Furthermore, the version format in the
     // MANIFEST.MF is `version.qualifier`, which means that we have to replace
