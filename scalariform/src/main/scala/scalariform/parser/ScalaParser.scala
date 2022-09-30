@@ -1322,10 +1322,10 @@ class ScalaParser(tokens: Array[Token]) {
   private def importSelector(): Expr = {
     val first = wildcardOrIdent()
     currentTokenType match {
-      case ARROW ⇒
-        val arrowToken = nextToken()
+      case ARROW | AS ⇒
+        val token = nextToken()
         val rename = wildcardOrIdent()
-        makeExpr(first, arrowToken, rename)
+        makeExpr(first, token, rename)
       case _ ⇒
         makeExpr(first)
     }

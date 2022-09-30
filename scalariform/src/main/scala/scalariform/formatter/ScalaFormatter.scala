@@ -565,7 +565,7 @@ object ScalaFormatter {
     THROW, TRAIT, TRY, /* TYPE ,*/
     VAL, VAR, WHILE, WITH, YIELD,
     /* USCORE, */ COLON, EQUALS, ARROW, LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /* HASH, AT */
-    LBRACE, SEMI)
+    LBRACE, SEMI, AS)
 
   val ENSURE_SPACE_BEFORE: Set[TokenType] = Set(
     ABSTRACT, CASE, CATCH, CLASS, DEF,
@@ -577,7 +577,7 @@ object ScalaFormatter {
     /* THROW, */ TRAIT, /* TRY, TYPE, */
     VAL, VAR, /* WHILE, */ WITH, YIELD,
     /* USCORE, COLON, */ EQUALS, /* ARROW, */ LARROW, SUBTYPE, VIEWBOUND, SUPERTYPE, /*, HASH, AT, */
-    RBRACE)
+    RBRACE, AS)
   // format: ON
 
   @throws(classOf[ScalaParserException])
