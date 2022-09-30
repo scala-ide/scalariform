@@ -97,6 +97,7 @@ object Tokens {
   val XML_CDATA = TokenType("XML_CDATA", isXml = true)
   val XML_UNPARSED = TokenType("XML_UNPARSED", isXml = true)
   val XML_PROCESSING_INSTRUCTION = TokenType("XML_PROCESSING_INSTRUCTION", isXml = true)
+  val AS = TokenType("AS")
 
   val KEYWORDS: Set[TokenType] = Set(
     ABSTRACT, CASE, CATCH, CLASS, DEF,
@@ -106,7 +107,7 @@ object Tokens {
     OBJECT, OVERRIDE, PACKAGE, PRIVATE, PROTECTED,
     RETURN, SEALED, SUPER, THIS,
     THROW, TRAIT, TRY, TYPE,
-    VAL, VAR, WHILE, WITH, YIELD
+    VAL, VAR, WHILE, WITH, YIELD, AS
   )
 
   val COMMENTS: Set[TokenType] = Set(LINE_COMMENT, MULTILINE_COMMENT, XML_COMMENT)

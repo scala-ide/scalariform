@@ -13,7 +13,9 @@ class ImportFormatterTest extends AbstractFormatterTest {
     "import foo . _" ==> "import foo._"
     "import foo . bar" ==> "import foo.bar"
     "import foo.{bar=>baz}" ==> "import foo.{ bar => baz }"
+    "import foo.{bar as baz}" ==> "import foo.{ bar as baz }"
     "import foo.{bar=>baz},baz.biz" ==> "import foo.{ bar => baz }, baz.biz"
+    "import foo.{bar as baz},baz.biz" ==> "import foo.{ bar as baz }, baz.biz"
     """import foo.{bar => baz,
         |wibble => wobble}""" ==>
       """import foo.{
@@ -29,7 +31,9 @@ class ImportFormatterTest extends AbstractFormatterTest {
     "import foo . _" ==> "import foo._"
     "import foo . bar" ==> "import foo.bar"
     "import foo.{bar=>baz}" ==> "import foo.{bar => baz}"
+    "import foo.{bar as baz}" ==> "import foo.{bar as baz}"
     "import foo.{bar=>baz},baz.biz" ==> "import foo.{bar => baz}, baz.biz"
+    "import foo.{bar as baz},baz.biz" ==> "import foo.{bar as baz}, baz.biz"
     """import foo.{bar => baz,
       |wibble => wobble}""" ==>
       """import foo.{
