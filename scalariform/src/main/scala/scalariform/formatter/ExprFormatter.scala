@@ -475,7 +475,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       (formattingPreferences(DanglingCloseParenthesis) == Preserve) &&
         hiddenPredecessors(rparen).containsNewline &&
         contents.nonEmpty
-    if (firstTokensAreOnNewline || shouldPreserveNewline)
+    if (firstTokensAreOnNewline || shouldPreserveNewline || parenArguments.hasTrailingComma)
       formatResult ++= formatResult.before(rparen, formatterState.currentIndentLevelInstruction)
 
     formatResult
@@ -1211,23 +1211,34 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
       }
     }
 
-    // Handle placing the first argument on a newline, if requested.
-    if (multilineArguments) {
-      formattingPreferences(FirstParameterOnNewline) match {
-        case Force =>
-          formatResult ++= formatResult.before(
-            firstParamOption.get.firstToken,
-            paramFormatterState.indent(paramIndent).currentIndentLevelInstruction
-          )
-        case Prevent =>
-          formatResult ++= formatResult.before(firstParamOption.get.firstToken, Compact)
-        case Preserve => // no-op.
+    val hasTrailingComma = paramClause.trailComa.nonEmpty
+
+    if (hasTrailingComma) {
+      // Trailing comma should always trigger new line for the first arg.
+      formatResult ++= formatResult.before(
+        firstParamOption.get.firstToken,
+        paramFormatterState.indent(paramIndent).currentIndentLevelInstruction
+      )
+    } else {
+      // Handle placing the first argument on a newline, if requested.
+      if (multilineArguments) {
+        formattingPreferences(FirstParameterOnNewline) match {
+          case Force =>
+            formatResult ++= formatResult.before(
+              firstParamOption.get.firstToken,
+              paramFormatterState.indent(paramIndent).currentIndentLevelInstruction
+            )
+          case Prevent =>
+            formatResult ++= formatResult.before(firstParamOption.get.firstToken, Compact)
+          case Preserve => // no-op.
+        }
       }
     }
 
     val hasContent = implicitOption.isDefined || firstParamOption.isDefined
 
     val shouldIndentParen = hiddenPredecessors(rparen).containsComment ||
+      hasTrailingComma ||
       ((hiddenPredecessors(rparen).containsNewline &&
         formattingPreferences(DanglingCloseParenthesis) == Preserve) ||
         formattingPreferences(DanglingCloseParenthesis) == Force)
@@ -1237,7 +1248,7 @@ trait ExprFormatter { self: HasFormattingPreferences with AnnotationFormatter wi
 
     // Place rparen on its own line if this is a multi-line param clause with content, and the
     // preferences say to.
-    if ((multilineArguments || firstTokenIsOnNewline) && hasContent && shouldIndentParen)
+    if ((multilineArguments || firstTokenIsOnNewline || hasTrailingComma) && hasContent && shouldIndentParen)
       formatResult = formatResult.before(rparen, paramFormatterState.currentIndentLevelInstruction)
 
     val groupedParams = groupParams(paramClause, alignParameters)

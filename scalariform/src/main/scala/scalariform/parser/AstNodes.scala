@@ -1,6 +1,6 @@
 package scalariform.parser
 
-import scalariform.lexer.Token
+import scalariform.lexer.{ Token, Tokens }
 import scalariform.utils.Range
 
 sealed trait AstNode extends Product {
@@ -154,6 +154,8 @@ case class BlockArgumentExprs(contents: List[ExprElement]) extends ArgumentExprs
 
 case class ParenArgumentExprs(lparen: Token, contents: List[ExprElement], rparen: Token) extends ArgumentExprs {
   lazy val tokens: List[Token] = flatten(lparen, contents, rparen)
+
+  lazy val hasTrailingComma: Boolean = flatten(contents).lastOption.exists(_.tokenType == Tokens.COMMA)
 }
 
 case class Argument(expr: Expr) extends AstNode with ExprElement {
@@ -303,7 +305,7 @@ case class ParamClauses(newlineOpt: Option[Token], paramClausesAndNewlines: List
 }
 
 case class ParamClause(lparen: Token, implicitOption: Option[Token], firstParamOption: Option[Param], otherParams: List[(Token, Param)], rparen: Token, trailComa: Option[Token]) extends AstNode {
-  lazy val tokens: List[Token] = flatten(lparen, implicitOption, firstParamOption, otherParams, rparen)
+  lazy val tokens: List[Token] = flatten(lparen, implicitOption, firstParamOption, otherParams, trailComa, rparen)
 }
 
 case class Param(annotations: List[Annotation], modifiers: List[Modifier], valOrVarOpt: Option[Token], id: Token, paramTypeOpt: Option[(Token, Type)], defaultValueOpt: Option[(Token, Expr)]) extends AstNode {
@@ -378,7 +380,7 @@ case class TemplateParents(typeAndArgs: (Type, List[ArgumentExprs]), withTypesAn
 }
 
 case class ImportClause(importToken: Token, importExpr: ImportExpr, otherImportExprs: List[(Token, ImportExpr)], trailOpt: Option[Token]) extends AstNode with Stat {
-  lazy val tokens: List[Token] = flatten(importToken, importExpr, otherImportExprs)
+  lazy val tokens: List[Token] = flatten(importToken, importExpr, otherImportExprs, trailOpt)
 }
 
 sealed trait ImportExpr extends AstNode
